@@ -1,0 +1,2601 @@
+{
+  "version": "0.1.0",
+  "rules": [
+    {
+      "id": "AC-01",
+      "name": "All-caps tracked label",
+      "what": "Small labels above headings, scroll hints and section heads set in uppercase with wide letter-spacing.",
+      "why": "The most common decorative grammar of AI landing pages. It imitates luxury while carrying no information, and it was flagged again and again in our own work.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element with its own text, not inside nav, where text-transform is uppercase (or the Latin text has no lowercase letters) and computed letter-spacing is at least 0.05em.",
+        "selectors": [
+          "body *:not(nav *)"
+        ],
+        "css": {
+          "text-transform": "uppercase",
+          "letter-spacing_min_em": 0.05,
+          "exclude_ancestor": "nav"
+        }
+      },
+      "fix": "Sentence case with default tracking. Express emphasis with weight, size or color. Navigation labels are the only exception.",
+      "fix_patterns": [
+        "hairline-data-table",
+        "hero-headline-lockup",
+        "multi-column-footer",
+        "plain-headline-and-eyebrow",
+        "site-header",
+        "split-section-header"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Anthropic frontend-design skill",
+          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+        },
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "Solo Design, AI design slop tells",
+          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+        },
+        {
+          "label": "Hallmark",
+          "url": "https://github.com/Nutlope/hallmark"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "name": "Em dash and en dash",
+      "what": "Long dashes used between clauses and in labels shaped like WORD, dash, description.",
+      "why": "A signature habit of AI writing. In UI labels it reads as template chrome.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Visible text nodes containing U+2014 or U+2013. An en dash between two digits is ignored as a legitimate range. Headings, labels and buttons weigh more than body prose.",
+        "selectors": [
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "label",
+          "button",
+          "a",
+          "p",
+          "li",
+          "span"
+        ],
+        "css": {
+          "codepoints": [
+            "U+2014",
+            "U+2013"
+          ],
+          "ignore_digit_ranges": true
+        }
+      },
+      "fix": "Use a middle dot, comma, colon or period. For numeric ranges use a tilde or the word \"to\". Or split the sentence.",
+      "fix_patterns": [
+        "plain-honest-copy"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Anthropic frontend-design skill",
+          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+        },
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "name": "Emoji as UI",
+      "what": "Emoji and pictographic symbols (warning signs, sparkles, arrows) used as feature icons, in headings, bullets and labels.",
+      "why": "A sign that nobody chose an icon. The glyphs differ per platform and break the tone.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Visible text containing Unicode Extended_Pictographic or Dingbats characters. Copyright, registered and trademark signs are ignored, as is text inside user content areas (editable regions, textareas).",
+        "selectors": [],
+        "css": {
+          "unicode_property": "Extended_Pictographic",
+          "ignore": [
+            "U+00A9",
+            "U+00AE",
+            "U+2122"
+          ]
+        }
+      },
+      "fix": "Use plain text. If an icon is needed, use one consistent line icon set.",
+      "fix_patterns": [
+        "hairline-accordion-faq",
+        "line-icon-set"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "name": "Tinted pill badge",
+      "what": "A fully rounded pill with a pale tinted background, text in the same hue and often a colored dot in front.",
+      "why": "Solves status with color decoration. It is the default part of AI dashboards and landing pages, and reviewers describe it as simply looking AI-made.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "border-radius at least half the height, background a chromatic color with alpha 0.05 to 0.3 or a pale tint (lightness 85% or more), text color within 40 degrees of the background hue, one to three words.",
+        "selectors": [
+          "span",
+          "div",
+          "a",
+          "small",
+          "li"
+        ],
+        "css": {
+          "radius_min_height_ratio": 0.5,
+          "bg_alpha": [
+            0.05,
+            0.3
+          ],
+          "bg_lightness_min": 0.85,
+          "hue_tolerance_deg": 40,
+          "max_words": 3
+        }
+      },
+      "fix": "A neutral text label. If a chip is required, a square chip with a neutral border.",
+      "fix_patterns": [
+        "plan-cards",
+        "segmented-control",
+        "status-label",
+        "step-workflow-section"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-05",
+      "name": "Outlined pill badge",
+      "what": "A rounded pill label with a transparent background and only a colored border.",
+      "why": "A variant of the tinted pill. It boxes the text and fragments the screen into tiny pieces.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "border-radius at least half the height, transparent background, a border of at least 1px with saturation of 30% or more, one to three words. Buttons and inputs are excluded.",
+        "selectors": [
+          "span",
+          "div",
+          "a",
+          "small",
+          "li"
+        ],
+        "css": {
+          "radius_min_height_ratio": 0.5,
+          "bg_alpha_max": 0.02,
+          "border_saturation_min": 0.3,
+          "max_words": 3
+        }
+      },
+      "fix": "A neutral text label.",
+      "fix_patterns": [
+        "filter-chip",
+        "segmented-control",
+        "status-label"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-06",
+      "name": "Tinted notice band",
+      "what": "A wide notice or warning box with a pale yellow or blue fill, an icon and a line of text.",
+      "why": "A template habit: information hierarchy solved with a color field.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Block at least 80% as wide as its parent, chromatic tinted background, height under 160px, containing an icon (svg, img or icon element) and text.",
+        "selectors": [
+          "div",
+          "aside",
+          "p"
+        ],
+        "css": {
+          "width_parent_ratio_min": 0.8,
+          "bg_alpha": [
+            0.05,
+            0.3
+          ],
+          "bg_lightness_min": 0.85,
+          "has_icon": true,
+          "height_max_px": 160
+        }
+      },
+      "fix": "A neutral surface with a 1px border.",
+      "fix_patterns": [
+        "callout-and-toast",
+        "text-input-field"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-07",
+      "name": "Orange processing pill with glow",
+      "what": "A progress state shown as an orange pill that also glows.",
+      "why": "The state is emphasised with decoration, so it reads like a warning.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "A tinted pill (the AC-04 conditions) with hue 20 to 50 degrees and a colored box-shadow whose blur is 8px or more.",
+        "selectors": [
+          "span",
+          "div",
+          "small"
+        ],
+        "css": {
+          "hue_deg": [
+            20,
+            50
+          ],
+          "shadow_blur_min_px": 8
+        }
+      },
+      "fix": "Neutral text with a neutral spinner.",
+      "fix_patterns": [
+        "agent-status-line",
+        "live-step-list",
+        "progress-and-spinner",
+        "quiet-empty-state",
+        "status-label"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-08",
+      "name": "Colored status dot",
+      "what": "A small colored dot in front of text, sometimes pulsing or glowing.",
+      "why": "Imitates a living system. Meaningless dots end up on every screen.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element 4 to 12px square with fully rounded corners, an opaque chromatic background, no text, followed by text. A running animation or a colored box-shadow raises the weight.",
+        "selectors": [
+          "span",
+          "i",
+          "div"
+        ],
+        "css": {
+          "size_px": [
+            4,
+            12
+          ],
+          "radius": "50%",
+          "text_follows": true
+        }
+      },
+      "fix": "A neutral dot or plain text. Use a flat semantic color only when it carries real meaning, such as an outage or a healthy state.",
+      "fix_patterns": [
+        "gauge-and-meter",
+        "plan-comparison-table",
+        "sortable-data-grid",
+        "stage-dot-progress",
+        "status-label"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "name": "Monospace for UI labels",
+      "what": "Small labels, captions and numbers set in a code font as decoration.",
+      "why": "The default \"developer feel\" ornament. It looks like code where there is no code.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element with its own text outside code, pre, kbd, samp and var whose first available family in the computed stack is monospace. Short texts (labels, captions, numbers) matter most.",
+        "selectors": [
+          "span",
+          "small",
+          "label",
+          "p",
+          "div",
+          "li",
+          "td"
+        ],
+        "css": {
+          "font_class": "monospace",
+          "exclude": [
+            "code",
+            "pre",
+            "kbd",
+            "samp",
+            "var"
+          ],
+          "text_max_chars": 80
+        }
+      },
+      "fix": "Use the body font, with font-variant-numeric: tabular-nums for numbers.",
+      "fix_patterns": [
+        "hairline-data-table",
+        "sortable-data-grid",
+        "tabular-number-text",
+        "text-input-field"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Anthropic frontend-design skill",
+          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "Solo Design, AI design slop tells",
+          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "name": "Side accent border card",
+      "what": "A rounded card with a thick colored border on one side only, usually the left, sometimes the top.",
+      "why": "The default way to mark quotes and callouts with a color bar.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "border-left-width (or top) of at least 2px and thicker than every other side, a saturated color (30% or more), and the element has a background or a radius. blockquote gets lower weight.",
+        "selectors": [
+          "div",
+          "blockquote",
+          "aside",
+          "li",
+          "article"
+        ],
+        "css": {
+          "border_side_min_px": 2,
+          "saturation_min": 0.3,
+          "needs_any": [
+            "background",
+            "radius"
+          ]
+        }
+      },
+      "fix": "Lighten the whole border one step, or separate the card with a background lightness step.",
+      "fix_patterns": [
+        "callout-and-toast",
+        "collapsible-sidebar",
+        "plain-pull-quote",
+        "status-without-side-bar"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "name": "Filled circle glyph",
+      "what": "A green circle with a white check, a colored circle holding an icon, a gray disc behind an icon.",
+      "why": "A decorative circle template for check lists and feature lists.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Non-interactive element 16 to 48px square with fully rounded corners and a filled background, whose only child is one svg or a single non-alphanumeric character.",
+        "selectors": [
+          "span",
+          "div",
+          "i"
+        ],
+        "css": {
+          "size_px": [
+            16,
+            48
+          ],
+          "radius": "50%",
+          "child": "single svg or single symbol",
+          "exclude": [
+            "button",
+            "a",
+            "input"
+          ]
+        }
+      },
+      "fix": "A line icon without the circle, or neutral text.",
+      "fix_patterns": [
+        "connection-diagram",
+        "kpi-stat-tile",
+        "line-icon-set",
+        "monochrome-logo-strip",
+        "plan-comparison-table",
+        "quiet-empty-state"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-12",
+      "name": "Heavy contact form on a landing page",
+      "what": "A large form with name, company, phone and message fields in the middle or at the end of a landing page.",
+      "why": "The closing section is filled with a form when there is nothing left to say.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "A form with three or more text inputs plus a textarea on a page whose URL and title do not look like a contact page. Whether the form is really operated cannot be judged from the page.",
+        "selectors": [
+          "form"
+        ],
+        "css": {
+          "inputs_min": 3,
+          "needs_textarea": true,
+          "url_exclude": "contact|inquiry|support"
+        }
+      },
+      "fix": "A single button link to the contact page plus a mail link in the footer.",
+      "fix_patterns": [
+        "closing-contact-link",
+        "in-hero-form-flow",
+        "lead-capture-form"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-13",
+      "name": "Rainbow chart colors",
+      "what": "Every chart series gets a different primary color, bars are filled red, yellow and green.",
+      "why": "When every series has its own color, nothing stands out.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "Inside an svg of at least 150 by 80px, the shapes whose fill or stroke is saturated (40% or more) cover four or more 30 degree hue buckets. Canvas charts need pixel sampling and are not covered.",
+        "selectors": [
+          "svg"
+        ],
+        "css": {
+          "svg_min_px": [
+            150,
+            80
+          ],
+          "saturation_min": 0.4,
+          "hue_buckets_min": 4,
+          "bucket_deg": 30
+        }
+      },
+      "fix": "Lightness steps of one hue, and a single brand color for the one series to emphasise.",
+      "fix_patterns": [
+        "bar-funnel",
+        "line-area-chart",
+        "neutral-donut",
+        "ranked-bar-chart",
+        "relationship-charts"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-14",
+      "name": "Flat gray bordered cards",
+      "what": "White or light gray boxes with a 1px gray border and the same radius fill the whole screen.",
+      "why": "It is the component-kit default, so the page turns into an app everyone has already seen.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "Boxes of at least 120 by 60px with an opaque near-white or light gray background (lightness 95% or more), a 1px neutral border on all sides, no box-shadow and radius 6 to 12px. Fires only when four or more exist, because human-made sites use them too. Read together with CMP-04.",
+        "selectors": [
+          "div",
+          "article",
+          "li",
+          "section"
+        ],
+        "css": {
+          "bg_lightness_min": 0.95,
+          "border_px": 1,
+          "radius_px": [
+            6,
+            12
+          ],
+          "box_shadow": "none",
+          "count_min": 4
+        }
+      },
+      "fix": "Group with surface lightness steps and spacing, and keep borders only where they are needed.",
+      "fix_patterns": [
+        "dashboard-zones",
+        "hairline-card",
+        "hairline-data-table",
+        "plan-cards",
+        "text-input-field"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-15",
+      "name": "Default browser or OS font",
+      "what": "Headings and body fall back to Times, Arial or system-ui. This includes the case where a named serif failed to load and Times shows instead.",
+      "why": "Looks like an undesigned document. Usually the font load was forgotten.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "The rendered font of h1 to h3 and of body (the first available family in the stack, checked against loaded FontFaces and measured installation) is a browser default serif or sans-serif, or a system-ui alias.",
+        "selectors": [
+          "h1",
+          "h2",
+          "h3",
+          "body"
+        ],
+        "css": {
+          "default_families": [
+            "serif",
+            "sans-serif",
+            "times",
+            "times new roman",
+            "arial",
+            "helvetica",
+            "system-ui",
+            "-apple-system",
+            "blinkmacsystemfont",
+            "ui-sans-serif",
+            "ui-serif",
+            "segoe ui"
+          ]
+        }
+      },
+      "fix": "Load the intended font for real and spell out the fallback order.",
+      "fix_patterns": [
+        "type-system"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-16",
+      "name": "Ghost primary button",
+      "what": "The most important action is a transparent button with only a border.",
+      "why": "Tries to look refined and hides where to click.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "The first button-like control in the first screen (outside nav) has a transparent background and a visible border.",
+        "selectors": [
+          "button",
+          "a[class*=\"btn\"]",
+          "a[class*=\"button\"]",
+          "[role=\"button\"]"
+        ],
+        "css": {
+          "bg_alpha_max": 0.02,
+          "border_px_min": 1,
+          "scope": "first screen"
+        }
+      },
+      "fix": "One filled button for the primary action.",
+      "fix_patterns": [
+        "flat-solid-button"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-17",
+      "name": "Drawn mockup instead of the real thing",
+      "what": "CSS shapes or a hand-drawn fake screen sit where a product photo or a real screenshot should be.",
+      "why": "It feels like a slide deck. People see at once that it is fake.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "No img, video, canvas, picture, iframe or large background image in the first screen, and an element of at least 240 by 140px that holds six or more text-less decorative boxes nested three levels deep. Illustration-led sites are hard to separate.",
+        "selectors": [
+          "div"
+        ],
+        "css": {
+          "first_screen": true,
+          "decorative_boxes_min": 6,
+          "nesting_min": 3,
+          "size_min_px": [
+            240,
+            140
+          ]
+        }
+      },
+      "fix": "A real screen capture or a real photo.",
+      "fix_patterns": [
+        "asymmetric-product-hero",
+        "media-tile-card",
+        "outcome-quote-card",
+        "real-product-frame"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-18",
+      "name": "Redrawn logo or swapped wordmark font",
+      "what": "A supplied logo is redrawn with similar shapes, or a wordmark is replaced with a system font.",
+      "why": "When an agent rebuilds an original asset \"as it understands it\", shading and proportion are lost and the result is obvious.",
+      "detect": {
+        "level": "manual",
+        "signal": "Needs the original asset for comparison, so it cannot be measured on an arbitrary site. It is a rule for the generation process.",
+        "selectors": [],
+        "css": {}
+      },
+      "fix": "Use the original pixels or vectors untouched. Take vectors from the design tool with text outlined.",
+      "fix_patterns": [
+        "original-logo-assets"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "AC-19",
+      "name": "AI photo tone",
+      "what": "Golden hour light, waxy skin, bright and over-saturated generated photos.",
+      "why": "Generated images are an average of everything, so they read as AI photos at a glance.",
+      "detect": {
+        "level": "manual",
+        "signal": "Needs an image classifier. It cannot be measured from CSS or DOM.",
+        "selectors": [
+          "img"
+        ],
+        "css": {}
+      },
+      "fix": "Feed a real reference photo as input, and prefer film grain, lower saturation and a slightly darker exposure.",
+      "fix_patterns": [
+        "photo-led-hero"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "COL-01",
+      "name": "Purple gradient",
+      "what": "An indigo to violet gradient on backgrounds, buttons or headings.",
+      "why": "Indigo from popular Tailwind examples was copied across tutorials and training data, and AI converges on it as the \"modern default\" (a hypothesis, not a measurement). It gets attached to any product regardless of brand.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "background-image gradient with two or more color stops at hue 230 to 290 degrees and saturation of 40% or more. Weighted by covered area.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "hue_deg": [
+            230,
+            290
+          ],
+          "saturation_min": 0.4,
+          "stops_min": 2
+        }
+      },
+      "fix": "One brand color as a flat surface. If a gradient is required, change only the lightness inside one hue.",
+      "fix_patterns": [
+        "ambient-background",
+        "editorial-paper-sheet",
+        "flat-solid-button",
+        "kpi-stat-tile",
+        "line-area-chart",
+        "neutral-cta-band",
+        "progress-and-spinner",
+        "sourced-metric-band"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "slop-detect",
+          "url": "https://slop-detect.com"
+        },
+        {
+          "label": "925 Studios, AI slop design tells",
+          "url": "https://www.925studios.co/blog/ai-slop-design-tells"
+        },
+        {
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill"
+        },
+        {
+          "label": "prg.sh, why AI keeps building the same purple gradient",
+          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website"
+        }
+      ]
+    },
+    {
+      "id": "COL-02",
+      "name": "Cream background with terracotta accent",
+      "what": "Paper-colored (cream, beige) page with a rust-orange accent and a large serif.",
+      "why": "Became the default taste of recent AI tools and now reads as \"premium, seen before\". It also overlaps the brand color of one specific AI vendor.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Effective page background lightness 90% or more, hue 30 to 60 degrees, low but non-zero chroma, together with a button or link accent at hue 10 to 30 degrees and saturation 50% or more.",
+        "selectors": [
+          "body",
+          "html"
+        ],
+        "css": {
+          "bg_lightness_min": 0.9,
+          "bg_hue_deg": [
+            30,
+            60
+          ],
+          "bg_chroma": [
+            0.025,
+            0.15
+          ],
+          "accent_hue_deg": [
+            10,
+            30
+          ],
+          "accent_saturation_min": 0.5
+        }
+      },
+      "fix": "Pure white or a neutral derived from the brand for the surface, and an accent taken from the brand definition.",
+      "fix_patterns": [
+        "token-themes"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Anthropic frontend-design skill",
+          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "Solo Design, AI design slop tells",
+          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+        },
+        {
+          "label": "Coverage of the Claude design aesthetic",
+          "url": "https://letsdatascience.com/news/anthropics-claude-design-shapes-new-design-aesthetic-aaf43749"
+        }
+      ]
+    },
+    {
+      "id": "COL-03",
+      "name": "Near-black background with neon glow",
+      "what": "A near-black page (#0B0B0B and similar) with one neon green or vermilion accent that glows.",
+      "why": "The default \"developer tool\" look. The contrast is strong but there is no information hierarchy.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Effective page background relative luminance of 0.02 or less, plus a saturated (70% or more) accent element with a box-shadow or text-shadow blur of 16px or more.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "bg_luminance_max": 0.02,
+          "accent_saturation_min": 0.7,
+          "glow_blur_min_px": 16
+        }
+      },
+      "fix": "If a dark theme is needed, separate surfaces with gray steps and keep the accent flat, without glow.",
+      "fix_patterns": [
+        "ambient-background",
+        "photo-led-hero",
+        "plain-section-surface",
+        "token-themes"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "Anthropic frontend-design skill",
+          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+        },
+        {
+          "label": "Solo Design, AI design slop tells",
+          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        }
+      ]
+    },
+    {
+      "id": "COL-04",
+      "name": "Gradient text",
+      "what": "Heading glyphs filled with a gradient.",
+      "why": "The cheapest single move to look flashy. It breaks readability and contrast checks.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Text element with background-clip: text (or the -webkit- form), a gradient background-image and a transparent text fill.",
+        "selectors": [
+          "h1",
+          "h2",
+          "h3",
+          "span",
+          "p",
+          "a"
+        ],
+        "css": {
+          "background-clip": "text",
+          "text_fill": "transparent",
+          "background-image": "gradient"
+        }
+      },
+      "fix": "Solid text color. Use weight or size for emphasis.",
+      "fix_patterns": [
+        "animated-text",
+        "plain-headline-and-eyebrow"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        }
+      ]
+    },
+    {
+      "id": "COL-05",
+      "name": "Purple banned, green substituted",
+      "what": "Block purple and the output moves to emerald or mint green and repeats the same composition.",
+      "why": "Only the color changed. The structure of one accent, a gradient and a glow is still there, so the tell remains.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "Primary accent at hue 140 to 170 degrees appearing together with COL-01, COL-03 or COL-07 structures. Green alone is normal for many real brands, so it never fires without those structures.",
+        "selectors": [
+          "button",
+          "a"
+        ],
+        "css": {
+          "accent_hue_deg": [
+            140,
+            170
+          ],
+          "requires_any": [
+            "COL-01",
+            "COL-03",
+            "COL-07"
+          ]
+        }
+      },
+      "fix": "Change the structure (glow, gradient), not just the hue.",
+      "fix_patterns": [
+        "token-themes"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "Solo Design, AI design slop tells",
+          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+        }
+      ]
+    },
+    {
+      "id": "COL-06",
+      "name": "Tinted box rainbow",
+      "what": "Cards, badges and icon backgrounds each get a different pale tint, so the page turns into a rainbow.",
+      "why": "Giving every item its own color looks organised, but color stops meaning anything.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Chromatic tinted surfaces (alpha 0.05 to 0.3, or lightness 90% or more) falling in four or more distinct 30 degree hue buckets.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "bg_alpha": [
+            0.05,
+            0.3
+          ],
+          "bg_lightness_min": 0.9,
+          "hue_buckets_min": 4,
+          "bucket_deg": 30
+        }
+      },
+      "fix": "Neutral surfaces, with color reserved for real meaning (error, success) in one or two places.",
+      "fix_patterns": [
+        "callout-and-toast",
+        "collapsible-sidebar",
+        "dashboard-zones",
+        "relationship-charts",
+        "segmented-control"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Solo Design, AI design slop tells",
+          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        }
+      ]
+    },
+    {
+      "id": "COL-07",
+      "name": "Large colored glow shadow",
+      "what": "A large-radius colored shadow spreads behind buttons and cards.",
+      "why": "Depth faked with light. The screen floats and looks hazy.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "box-shadow with blur of 24px or more and a shadow color with saturation of 40% or more (not gray or black).",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "shadow_blur_min_px": 24,
+          "shadow_saturation_min": 0.4
+        }
+      },
+      "fix": "A neutral one-step shadow, or no shadow and a 1px border.",
+      "fix_patterns": [
+        "flat-solid-button",
+        "hairline-card",
+        "neutral-cta-band",
+        "spotlight-border-card",
+        "step-workflow-section"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        }
+      ]
+    },
+    {
+      "id": "TYP-01",
+      "name": "Inter everywhere",
+      "what": "Body, headings and buttons all in Inter.",
+      "why": "The default of AI builders and templates, so no personality is left. It is also very common on human-made sites, so on its own it is a weak signal.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "The rendered font (document.fonts load result plus first available family) of h1 to h3 and of body text is Inter.",
+        "selectors": [
+          "h1",
+          "h2",
+          "h3",
+          "body"
+        ],
+        "css": {
+          "font": "Inter"
+        }
+      },
+      "fix": "Separate heading and body fonts, or choose a font that suits the brand.",
+      "fix_patterns": [
+        "type-system"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "slop-detect",
+          "url": "https://slop-detect.com"
+        },
+        {
+          "label": "925 Studios, AI slop design tells",
+          "url": "https://www.925studios.co/blog/ai-slop-design-tells"
+        },
+        {
+          "label": "prg.sh, why AI keeps building the same purple gradient",
+          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website"
+        }
+      ]
+    },
+    {
+      "id": "TYP-02",
+      "name": "Substitute favorite fonts",
+      "what": "Told to avoid Inter, the output moves to Space Grotesk, Instrument Serif or Geist.",
+      "why": "It is only the second default.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "The rendered font of headings or body is in the list (Space Grotesk, Instrument Serif, Geist, Geist Mono, DM Sans, Plus Jakarta Sans and similar). The list is meant to be updated by measurement.",
+        "selectors": [
+          "h1",
+          "h2",
+          "h3",
+          "body"
+        ],
+        "css": {
+          "fonts": [
+            "Space Grotesk",
+            "Instrument Serif",
+            "Geist",
+            "Geist Mono",
+            "DM Sans",
+            "Plus Jakarta Sans",
+            "Outfit",
+            "Manrope",
+            "Sora",
+            "Bricolage Grotesque"
+          ]
+        }
+      },
+      "fix": "A font chosen from the brand context. You should be able to explain the choice in one line.",
+      "fix_patterns": [
+        "type-system"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        }
+      ]
+    },
+    {
+      "id": "TYP-03",
+      "name": "One italic serif word in a heading",
+      "what": "In a sans-serif heading a single word switches to an italic serif or to another color.",
+      "why": "A cliché that imitates editorial taste. It appears in almost every AI hero.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "A child of h1 or h2 that differs from its parent in font family, italic style or color, and whose text is under 40% of the heading length.",
+        "selectors": [
+          "h1 *",
+          "h2 *"
+        ],
+        "css": {
+          "child_text_ratio_max": 0.4,
+          "differs": [
+            "font-family",
+            "font-style",
+            "color"
+          ]
+        }
+      },
+      "fix": "One typeface per heading. If emphasis is needed, rewrite the sentence.",
+      "fix_patterns": [
+        "animated-text",
+        "plain-headline-and-eyebrow",
+        "plain-pull-quote",
+        "split-section-header"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Anthropic frontend-design skill",
+          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        }
+      ]
+    },
+    {
+      "id": "TYP-04",
+      "name": "Whole sentence as a giant heading",
+      "what": "A sentence of eight words or more set at display size.",
+      "why": "Size is used to fill the space when there is no key point to make.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "h1 with font-size of 64px or more (measured at the current viewport, best at 1440 wide) and eight or more words (whitespace separated units for Korean).",
+        "selectors": [
+          "h1"
+        ],
+        "css": {
+          "font_size_min_px": 64,
+          "words_min": 8,
+          "viewport_width_reference": 1440
+        }
+      },
+      "fix": "Short heading, with the explanation split out at body size.",
+      "fix_patterns": [
+        "hero-headline-lockup",
+        "split-section-header",
+        "split-title-faq",
+        "type-system"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        }
+      ]
+    },
+    {
+      "id": "TYP-05",
+      "name": "Extreme negative tracking",
+      "what": "Large headings are tightened so far that the letters touch.",
+      "why": "Imitates a refined tech look. One measurement claims a large share of generated pages do it, though the method is unpublished.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element with font-size of 32px or more and computed letter-spacing of -0.04em or tighter.",
+        "selectors": [
+          "h1",
+          "h2",
+          "h3",
+          "p",
+          "div",
+          "span"
+        ],
+        "css": {
+          "font_size_min_px": 32,
+          "letter_spacing_max_em": -0.04
+        }
+      },
+      "fix": "Use the type design default, and only at large sizes a mild -0.01 to -0.02em.",
+      "fix_patterns": [
+        "hero-headline-lockup",
+        "plain-headline-and-eyebrow"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "Paul Bakaus, letter-spacing measurement",
+          "url": "https://x.com/pbakaus/status/2060208540992880794"
+        }
+      ]
+    },
+    {
+      "id": "LAY-01",
+      "name": "Centered hero formula",
+      "what": "Centered heading, a pill badge above it and two buttons below it.",
+      "why": "Every builder produces the same first screen in the same order, so it reads as a template at first glance.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "In the first screen, a centered h1 that has a pill-shaped short text element before it and two or more button-like controls after it inside the same container. Thresholds need tuning because it judges composition.",
+        "selectors": [
+          "h1"
+        ],
+        "css": {
+          "text_align": "center",
+          "pill_before": true,
+          "buttons_after_min": 2
+        }
+      },
+      "fix": "An asymmetric layout that fits the content, with the real product screen or photo moved forward.",
+      "fix_patterns": [
+        "asymmetric-product-hero",
+        "auth-split-frame",
+        "photo-led-hero",
+        "split-section-header"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "slop-detect",
+          "url": "https://slop-detect.com"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "prg.sh, why AI keeps building the same purple gradient",
+          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website"
+        }
+      ]
+    },
+    {
+      "id": "LAY-02",
+      "name": "Three icon cards",
+      "what": "Three cards of the same size, each with an icon, a heading and two lines of text.",
+      "why": "The default frame of a feature introduction. The shape stays the same whatever the content, so the information is not read.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Three or more siblings of nearly equal size under one parent, each with an icon, then a heading, then a paragraph in the same order.",
+        "selectors": [
+          "div",
+          "ul",
+          "section"
+        ],
+        "css": {
+          "siblings_min": 3,
+          "structure": "icon, heading, paragraph",
+          "size_tolerance_px": 3
+        }
+      },
+      "fix": "A list, a table, a real screen capture, or whichever format suits the content.",
+      "fix_patterns": [
+        "audience-entry-split",
+        "connection-diagram",
+        "content-matched-grid",
+        "focus-card-carousel",
+        "media-tile-card",
+        "myth-vs-truth-pair",
+        "outcome-led-cards",
+        "tabbed-product-showcase"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "slop-detect",
+          "url": "https://slop-detect.com"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "925 Studios, AI slop design tells",
+          "url": "https://www.925studios.co/blog/ai-slop-design-tells"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "prg.sh, why AI keeps building the same purple gradient",
+          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website"
+        }
+      ]
+    },
+    {
+      "id": "LAY-03",
+      "name": "01 / 02 / 03 section numbers",
+      "what": "Numbers such as 01, 02, 03 above sections or cards.",
+      "why": "Numbers are attached to unordered content to look structured.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Two or more small text elements (font-size 24px or less) whose whole text matches ^0[1-9]\\.?$.",
+        "selectors": [
+          "span",
+          "div",
+          "p",
+          "small"
+        ],
+        "css": {
+          "text_regex": "^0[1-9]\\.?$",
+          "count_min": 2,
+          "font_size_max_px": 24
+        }
+      },
+      "fix": "Number only real steps. Otherwise use the heading alone.",
+      "fix_patterns": [
+        "step-workflow-section",
+        "tabbed-product-showcase"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Anthropic frontend-design skill",
+          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill"
+        }
+      ]
+    },
+    {
+      "id": "LAY-04",
+      "name": "Predictable section order",
+      "what": "Hero, logo strip, three cards, three pricing tiers, testimonials, footer, in exactly this order.",
+      "why": "The same skeleton for any product.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "Top-level sections are classified (hero, logo strip, feature cards, pricing, testimonial, footer) and their order is compared with the canonical sequence. Four or more in order fires. The result depends on the classifier.",
+        "selectors": [
+          "main > *",
+          "body > *"
+        ],
+        "css": {
+          "canonical": [
+            "hero",
+            "logos",
+            "features",
+            "pricing",
+            "testimonial",
+            "footer"
+          ],
+          "in_order_min": 4
+        }
+      },
+      "fix": "Order the sections starting from what only this product has.",
+      "fix_patterns": [
+        "editorial-storefront-home",
+        "product-first-section-order"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        }
+      ]
+    },
+    {
+      "id": "LAY-05",
+      "name": "Bento grid",
+      "what": "Rounded boxes of different sizes packed like a puzzle.",
+      "why": "Learned as \"the current style\" and used regardless of how much information there is.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "A display:grid container with four or more children of at least three distinct sizes, each with radius of 12px or more and a background or border. Real dashboards are hard to separate.",
+        "selectors": [
+          "[style*=\"grid\"]",
+          "div",
+          "section"
+        ],
+        "css": {
+          "children_min": 4,
+          "distinct_sizes_min": 3,
+          "radius_min_px": 12
+        }
+      },
+      "fix": "A simple grid that matches the amount of information.",
+      "fix_patterns": [
+        "content-matched-grid",
+        "dashboard-zones"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "Slopdar",
+          "url": "https://slopdar.com"
+        }
+      ]
+    },
+    {
+      "id": "LAY-06",
+      "name": "One spacing value everywhere",
+      "what": "Every gap between sections and between cards is the same.",
+      "why": "No rhythm, so you cannot see what groups together and what separates.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Across top-level sections and card groups, the vertical paddings and gaps take two or fewer distinct values with a coefficient of variation under 0.1.",
+        "selectors": [
+          "main",
+          "body"
+        ],
+        "css": {
+          "distinct_values_max": 2,
+          "cv_max": 0.1,
+          "sections_min": 4
+        }
+      },
+      "fix": "Tight for related things, wide for distant ones.",
+      "fix_patterns": [
+        "content-matched-grid",
+        "site-header",
+        "spacing-and-dividers"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        }
+      ]
+    },
+    {
+      "id": "CMP-01",
+      "name": "Announcement pill above the heading",
+      "what": "A rounded \"New: something\" badge directly above the hero heading.",
+      "why": "It appears even when there is no launch news.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Just before the first h1 (previous sibling, or a sibling of its parent), a short text element whose radius is at least half its height.",
+        "selectors": [
+          "h1"
+        ],
+        "css": {
+          "radius_min_height_ratio": 0.5,
+          "max_chars": 60
+        }
+      },
+      "fix": "If there is news, put it in one line of body text.",
+      "fix_patterns": [
+        "hero-headline-lockup"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "slop-detect",
+          "url": "https://slop-detect.com"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        }
+      ]
+    },
+    {
+      "id": "CMP-02",
+      "name": "Card inside a card",
+      "what": "A box with a border or shadow that holds another box with a border or shadow.",
+      "why": "Hierarchy is expressed only with boxes, so the screen becomes heavy and layered.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "An element with a full border or a box-shadow and a radius whose descendant (inputs, buttons and media excluded) meets the same condition and is at least 80 by 48px.",
+        "selectors": [
+          "div",
+          "article",
+          "li"
+        ],
+        "css": {
+          "border_all_sides_min_px": 1,
+          "or": "box-shadow",
+          "radius_min_px": 4,
+          "inner_min_px": [
+            80,
+            48
+          ]
+        }
+      },
+      "fix": "Drop the inner box and use spacing and dividers.",
+      "fix_patterns": [
+        "hairline-data-table",
+        "list-item-row",
+        "single-surface-section",
+        "spacing-and-dividers"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        }
+      ]
+    },
+    {
+      "id": "CMP-03",
+      "name": "Rounded square icon tile",
+      "what": "A pale colored rounded square above the heading with an icon of the same color inside.",
+      "why": "The default of putting an icon into a decoration box. It almost always appears together with the three-card layout.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Square 32 to 64px, radius 6 to 16px, chromatic tinted background, a single svg child, and the next sibling is a heading.",
+        "selectors": [
+          "div",
+          "span"
+        ],
+        "css": {
+          "size_px": [
+            32,
+            64
+          ],
+          "radius_px": [
+            6,
+            16
+          ],
+          "child": "single svg",
+          "next_sibling": "heading"
+        }
+      },
+      "fix": "The icon alone, or nothing.",
+      "fix_patterns": [
+        "line-icon-set",
+        "outcome-led-cards"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        }
+      ]
+    },
+    {
+      "id": "CMP-04",
+      "name": "Same big radius and same soft shadow everywhere",
+      "what": "Every box has the same large radius and the same gray shadow.",
+      "why": "Feels stamped out of one kit.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Among boxes with a background or border, 80% or more share one radius of 12px or more, and the box-shadow string is identical and not none.",
+        "selectors": [
+          "div",
+          "article",
+          "li",
+          "section"
+        ],
+        "css": {
+          "radius_min_px": 12,
+          "share_min": 0.8,
+          "same_box_shadow": true,
+          "boxes_min": 5
+        }
+      },
+      "fix": "Radius steps proportional to element size, and shadows only for things that float.",
+      "fix_patterns": [
+        "dialog",
+        "editorial-paper-sheet",
+        "hairline-accordion-faq",
+        "hairline-card",
+        "neutral-cta-band",
+        "token-themes"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Anthropic frontend-design skill",
+          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        }
+      ]
+    },
+    {
+      "id": "CMP-05",
+      "name": "Glassmorphism everywhere",
+      "what": "Translucent background with background blur on every card.",
+      "why": "Used even when there is nothing behind it to blur.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Three or more elements with backdrop-filter blur that are not nav, dialogs or fixed and sticky bars.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "backdrop_filter": "blur",
+          "count_min": 3,
+          "exclude": [
+            "nav",
+            "dialog",
+            "position:fixed",
+            "position:sticky"
+          ]
+        }
+      },
+      "fix": "Opaque surfaces. Blur only where layers really overlap (navigation, modal).",
+      "fix_patterns": [
+        "app-bars",
+        "dialog",
+        "hairline-card",
+        "plain-section-surface",
+        "site-header"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "slop-detect",
+          "url": "https://slop-detect.com"
+        }
+      ]
+    },
+    {
+      "id": "CMP-06",
+      "name": "Triple number strip",
+      "what": "Three big numbers such as 10K+ users, 99.9% uptime, 3x faster.",
+      "why": "The numbers are often invented. The structure can be found, the truth cannot.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "Three or four siblings each holding a big number (with a +, %, K, M or x suffix) and a short label. The structure is deterministic, whether the numbers are invented is not.",
+        "selectors": [
+          "div",
+          "ul",
+          "section"
+        ],
+        "css": {
+          "siblings": [
+            3,
+            4
+          ],
+          "number_font_size_min_px": 28
+        }
+      },
+      "fix": "Real numbers only, with sources.",
+      "fix_patterns": [
+        "asymmetric-product-hero",
+        "data-honesty-label",
+        "kpi-stat-tile",
+        "outcome-led-cards",
+        "sourced-answer-block",
+        "sourced-metric-band"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "Adrian Krebs, design slop",
+          "url": "https://adriankrebs.ch/blog/design-slop/"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        }
+      ]
+    },
+    {
+      "id": "CMP-07",
+      "name": "Fake terminal hero",
+      "what": "A window with three red, yellow and green dots and monospace commands inside.",
+      "why": "Added as a \"technical feel\" even to products that are not for developers.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Three adjacent round elements near red, yellow and green hues followed by a monospace block in the same container.",
+        "selectors": [
+          "div",
+          "span"
+        ],
+        "css": {
+          "dots": 3,
+          "hues_deg": [
+            0,
+            45,
+            120
+          ],
+          "then": "monospace block"
+        }
+      },
+      "fix": "The real product screen.",
+      "fix_patterns": [
+        "asymmetric-product-hero",
+        "real-product-frame"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        }
+      ]
+    },
+    {
+      "id": "CMP-08",
+      "name": "Fake trust signals",
+      "what": "Testimonials from people who do not exist, a strip of invented company logos.",
+      "why": "It imitates trust, but checking reveals it is false.",
+      "detect": {
+        "level": "manual",
+        "signal": "The testimonial and logo structure can be found, but truth needs an outside check (reverse image search, confirming the company exists).",
+        "selectors": [
+          "blockquote"
+        ],
+        "css": {}
+      },
+      "fix": "Real customers only. If there are none, remove the section.",
+      "fix_patterns": [
+        "data-honesty-label",
+        "monochrome-logo-strip",
+        "outcome-quote-card",
+        "sourced-metric-band"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        }
+      ]
+    },
+    {
+      "id": "CMP-09",
+      "name": "Pricing in three tiers, middle highlighted",
+      "what": "Of three price cards, only the middle one is lifted by a border, a badge or a scale.",
+      "why": "The same scene in every SaaS template.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Three sibling cards with a currency amount where only the middle one differs in border color, scale or badge text.",
+        "selectors": [
+          "div",
+          "section"
+        ],
+        "css": {
+          "cards": 3,
+          "middle_differs_by": [
+            "border-color",
+            "transform",
+            "badge"
+          ]
+        }
+      },
+      "fix": "Use three plans only if there really are three. Mark the recommended plan with text.",
+      "fix_patterns": [
+        "plan-cards"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        }
+      ]
+    },
+    {
+      "id": "CMP-10",
+      "name": "Subscribe form at the end of every page",
+      "what": "An email signup field at the end of every page, with a thank-you message even when nothing is sent.",
+      "why": "A closer added when there is nothing left to fill.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "One email input with a button just before the footer. Whether it sends anything needs network observation.",
+        "selectors": [
+          "input[type=\"email\"]"
+        ],
+        "css": {
+          "input": "email",
+          "position": "before footer"
+        }
+      },
+      "fix": "Only a subscription that is really operated.",
+      "fix_patterns": [
+        "in-hero-form-flow",
+        "lead-capture-form",
+        "multi-column-footer",
+        "slim-legal-footer"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Hallmark",
+          "url": "https://github.com/Nutlope/hallmark"
+        }
+      ]
+    },
+    {
+      "id": "CMP-11",
+      "name": "Dark only, no light mode",
+      "what": "Only a dark screen exists and the user setting is ignored.",
+      "why": "Dark is used as the default for \"refined\".",
+      "detect": {
+        "level": "deterministic",
+        "signal": "The effective page background is dark, no stylesheet rule uses prefers-color-scheme, color-scheme does not include light, and no theme toggle is found.",
+        "selectors": [
+          "body",
+          "html"
+        ],
+        "css": {
+          "bg_luminance_max": 0.1,
+          "no": [
+            "prefers-color-scheme",
+            "color-scheme: light",
+            "theme toggle"
+          ]
+        }
+      },
+      "fix": "Define both modes as tokens.",
+      "fix_patterns": [
+        "token-themes"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "slop-detect",
+          "url": "https://slop-detect.com"
+        },
+        {
+          "label": "css-slop-detector",
+          "url": "https://github.com/hahahahahahahahah6/css-slop-detector"
+        }
+      ]
+    },
+    {
+      "id": "BG-01",
+      "name": "Aurora and mesh blob background",
+      "what": "Blurred color lumps or radial halos floating in the background.",
+      "why": "The easiest decoration for filling empty space.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "An element (or its ::before and ::after) with filter: blur of 40px or more, or one that covers 30% of the screen with a radial-gradient background.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "filter_blur_min_px": 40,
+          "radial_gradient_viewport_ratio_min": 0.3
+        }
+      },
+      "fix": "Leave the space empty.",
+      "fix_patterns": [
+        "ambient-background",
+        "photo-led-hero",
+        "plain-section-surface",
+        "scroll-driven-product-hero",
+        "webgl-scene"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "slop-detect",
+          "url": "https://slop-detect.com"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        }
+      ]
+    },
+    {
+      "id": "ICO-01",
+      "name": "Same Lucide icons repeated",
+      "what": "A few default Lucide icons (bolt, shield, sparkles) used over and over.",
+      "why": "The default icon set of builders, so it becomes a fingerprint.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Count and variety of svg elements with a lucide class or a data-lucide attribute. Whether an svg was drawn by AI cannot be judged.",
+        "selectors": [
+          "svg[class*=\"lucide\"]",
+          "[data-lucide]"
+        ],
+        "css": {
+          "class_contains": "lucide",
+          "count_min": 3
+        }
+      },
+      "fix": "Only use icons where they are really needed, and give them meaning within one set.",
+      "fix_patterns": [
+        "connection-diagram",
+        "line-icon-set",
+        "site-header"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        }
+      ]
+    },
+    {
+      "id": "MOT-01",
+      "name": "Same entrance motion on every block",
+      "what": "On scroll, every block fades in from below, or with a bouncy easing.",
+      "why": "The motion repeats without meaning and makes the page feel slow.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "Static signals of a reveal pattern: reveal classes or data-aos attributes, below-the-fold elements waiting at opacity 0 with a translateY, or keyframes that animate opacity plus translate, on half or more of the sections. Overshoot easing (cubic-bezier with values outside 0 to 1) is also reported. Scroll replay would give better accuracy.",
+        "selectors": [
+          "[data-aos]",
+          "[class*=\"reveal\"]",
+          "[class*=\"fade\"]"
+        ],
+        "css": {
+          "sections_share_min": 0.5,
+          "overshoot": "cubic-bezier y outside 0..1"
+        }
+      },
+      "fix": "Use motion only for state changes.",
+      "fix_patterns": [
+        "animated-text",
+        "count-up-number",
+        "logo-draw-splash",
+        "scroll-driven-product-hero",
+        "scroll-reveal-wrapper",
+        "skeleton-placeholder",
+        "webgl-scene"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Anthropic frontend-design skill",
+          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+        },
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design"
+        }
+      ]
+    },
+    {
+      "id": "CPY-01",
+      "name": "AI copy voice",
+      "what": "Weightless parallelism such as \"Build faster, ship smarter\", and \"not X but Y\" constructions.",
+      "why": "The sentence fits any product, which is the same as saying nothing.",
+      "detect": {
+        "level": "manual",
+        "signal": "A list of stock phrases can produce candidates, but judging needs meaning. Separate lists per language are required. detect.js reports candidates only.",
+        "selectors": [
+          "h1",
+          "h2",
+          "h3",
+          "p"
+        ],
+        "css": {
+          "phrase_list": "candidates only"
+        }
+      },
+      "fix": "One concrete fact that only this product can state.",
+      "fix_patterns": [
+        "action-label-button",
+        "confirm-destructive-dialog",
+        "korean-natural-copy",
+        "myth-vs-truth-pair",
+        "plain-honest-copy",
+        "sourced-answer-block"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "925 Studios, AI slop design tells",
+          "url": "https://www.925studios.co/blog/ai-slop-design-tells"
+        },
+        {
+          "label": "Impeccable slop catalog",
+          "url": "https://impeccable.style/slop"
+        },
+        {
+          "label": "AI Slop Detector by Made with Jev",
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop"
+        }
+      ]
+    },
+    {
+      "id": "KO-01",
+      "name": "Hangul broken mid-word (keep-all missing)",
+      "what": "Korean paragraphs and headings wrap in the middle of a word, leaving a stray syllable on the next line.",
+      "why": "Browsers break Hangul between syllables by default. English-first templates do not guard against it, and Korean readers notice immediately.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element whose text is at least 50% Hangul, with word-break other than keep-all, where a Range measurement shows a line ending between two Hangul syllables of the same word.",
+        "selectors": [
+          "p",
+          "h1",
+          "h2",
+          "h3",
+          "li",
+          "div",
+          "span"
+        ],
+        "css": {
+          "word-break": "not keep-all",
+          "hangul_ratio_min": 0.5,
+          "check": "line end inside word"
+        }
+      },
+      "fix": "Set word-break: keep-all on Korean text, and overflow-wrap: anywhere as a guard for long URLs.",
+      "fix_patterns": [
+        "korean-line-breaking"
+      ],
+      "severity": "high",
+      "korean": true,
+      "refs": [
+        {
+          "label": "MDN: word-break",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/word-break"
+        }
+      ]
+    },
+    {
+      "id": "KO-02",
+      "name": "Latin-only font stack for Hangul",
+      "what": "font-family lists only Latin fonts such as Inter, so Hangul falls to the operating system default.",
+      "why": "It looks different on every platform, and weight and size do not match the Latin. A trace of English-first defaults.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element with Hangul text whose font stack has at least one named family but none of them is a known Korean font or measures as Hangul-capable (checked with loaded FontFaces and a canvas width test).",
+        "selectors": [
+          "p",
+          "h1",
+          "h2",
+          "h3",
+          "li",
+          "a",
+          "button",
+          "span",
+          "div"
+        ],
+        "css": {
+          "named_family_required": true,
+          "hangul_capable_in_stack": false
+        }
+      },
+      "fix": "Name a Hangul-capable font (Pretendard, a Noto Sans KR family and similar) in the intended order, not as an accident of fallback.",
+      "fix_patterns": [
+        "korean-type-setup"
+      ],
+      "severity": "high",
+      "korean": true,
+      "refs": []
+    },
+    {
+      "id": "KO-03",
+      "name": "Hangul line height too tight",
+      "what": "Korean body text uses a Latin default line height (1.2 to 1.4), so lines feel cramped.",
+      "why": "Hangul fills its square frame, final consonants included, so the same line height feels tighter than with Latin.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Body-like element (not a heading, font-size 28px or less) with at least 50% Hangul and two or more lines whose line-height divided by font-size is under 1.5.",
+        "selectors": [
+          "p",
+          "li",
+          "div",
+          "span"
+        ],
+        "css": {
+          "hangul_ratio_min": 0.5,
+          "lines_min": 2,
+          "line_height_ratio_max": 1.5
+        }
+      },
+      "fix": "Body 1.6 to 1.8, headings around 1.3.",
+      "fix_patterns": [
+        "korean-type-setup",
+        "long-form-prose"
+      ],
+      "severity": "high",
+      "korean": true,
+      "refs": [
+        {
+          "label": "W3C Requirements for Hangul Text Layout",
+          "url": "https://www.w3.org/TR/klreq/"
+        }
+      ]
+    },
+    {
+      "id": "KO-04",
+      "name": "Uppercase on Hangul",
+      "what": "text-transform: uppercase is applied to Korean labels.",
+      "why": "Hangul has no case, so it does nothing, and mixed Latin words become uppercase unevenly. A trace of translating English labels without redesign.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element with text-transform: uppercase whose text contains Hangul.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "text-transform": "uppercase",
+          "contains": "Hangul"
+        }
+      },
+      "fix": "Delete the property. Use weight or size for emphasis.",
+      "fix_patterns": [
+        "korean-type-setup"
+      ],
+      "severity": "medium",
+      "korean": true,
+      "refs": [
+        {
+          "label": "MDN: text-transform",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform"
+        }
+      ]
+    },
+    {
+      "id": "KO-05",
+      "name": "Too much Hangul tracking, wide or tight",
+      "what": "Hangul with letter-spacing wider than 0.1em, or the negative tracking meant for Latin headings (-0.04em and tighter).",
+      "why": "Wide spacing scatters the syllables so words stop grouping, and tight spacing makes the square glyphs collide.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element containing Hangul with computed letter-spacing above 0.05em or below -0.03em.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "letter_spacing_em_max": 0.05,
+          "letter_spacing_em_min": -0.03
+        }
+      },
+      "fix": "Between 0 and -0.02em for Hangul, slightly tighter only for large headings.",
+      "fix_patterns": [
+        "korean-type-setup"
+      ],
+      "severity": "medium",
+      "korean": true,
+      "refs": [
+        {
+          "label": "W3C Requirements for Hangul Text Layout",
+          "url": "https://www.w3.org/TR/klreq/"
+        }
+      ]
+    },
+    {
+      "id": "KO-06",
+      "name": "Faux italic on Hangul",
+      "what": "Hangul text set to italic, so the browser slants it artificially.",
+      "why": "Almost no Hangul font has an italic face. Moving the \"one italic word in a heading\" cliché to Korean gives distorted glyphs.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "font-style italic or oblique on an element with Hangul text, with no loaded italic FontFace for any family in its stack.",
+        "selectors": [
+          "em",
+          "i",
+          "h1",
+          "h2",
+          "span"
+        ],
+        "css": {
+          "font-style": "italic",
+          "hangul": true,
+          "italic_face_loaded": false
+        }
+      },
+      "fix": "Use weight or color for emphasis.",
+      "fix_patterns": [
+        "korean-type-setup"
+      ],
+      "severity": "medium",
+      "korean": true,
+      "refs": [
+        {
+          "label": "MDN: font-style",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/font-style"
+        }
+      ]
+    },
+    {
+      "id": "KO-07",
+      "name": "Translationese AI copy",
+      "what": "Literal sentences such as \"Experience the future of X\" and \"a new dimension of Y\" rendered in Korean.",
+      "why": "It carries the tone of translated English marketing, so Korean users sense the machine at once.",
+      "detect": {
+        "level": "manual",
+        "signal": "A list of stock phrases gives candidates, but judging needs meaning. detect.js reports candidates only.",
+        "selectors": [
+          "h1",
+          "h2",
+          "h3",
+          "p"
+        ],
+        "css": {
+          "phrase_list": "candidates only"
+        }
+      },
+      "fix": "Write short, concrete Korean as if it had been written in Korean first.",
+      "fix_patterns": [
+        "korean-natural-copy"
+      ],
+      "severity": "medium",
+      "korean": true,
+      "refs": []
+    },
+    {
+      "id": "KO-08",
+      "name": "Missing or wrong lang attribute",
+      "what": "A Korean page whose html lang is missing or en.",
+      "why": "Glyph choice for shared CJK characters, line breaking rules and screen reader pronunciation go wrong. A fingerprint of an English template left as is.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Visible body text is at least 50% Hangul but documentElement.lang does not start with ko.",
+        "selectors": [
+          "html"
+        ],
+        "css": {
+          "hangul_ratio_min": 0.5,
+          "lang_prefix": "ko"
+        }
+      },
+      "fix": "Set <html lang=\"ko\">.",
+      "fix_patterns": [
+        "korean-type-setup"
+      ],
+      "severity": "high",
+      "korean": true,
+      "refs": [
+        {
+          "label": "MDN: lang attribute",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/lang"
+        }
+      ]
+    },
+    {
+      "id": "KO-09",
+      "name": "English button labels on a Korean page",
+      "what": "The body is Korean but buttons still say \"Get started\" or \"Learn more\".",
+      "why": "Template default copy that was never replaced.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "On a page that is at least 50% Hangul, button-like controls whose text is Latin only and matches common call-to-action phrases. Brand names in Latin must be told apart.",
+        "selectors": [
+          "button",
+          "a[role=\"button\"]",
+          "a[class*=\"btn\"]",
+          "input[type=\"submit\"]"
+        ],
+        "css": {
+          "page_hangul_ratio_min": 0.5,
+          "label": "Latin only call to action"
+        }
+      },
+      "fix": "Translate the button too, and make the action concrete.",
+      "fix_patterns": [
+        "action-label-button",
+        "korean-natural-copy"
+      ],
+      "severity": "low",
+      "korean": true,
+      "refs": []
+    },
+    {
+      "id": "KO-10",
+      "name": "Justified Hangul",
+      "what": "text-align: justify on Korean paragraphs, so the gaps between words differ line by line.",
+      "why": "Hangul has few spaces to stretch, so spacing becomes uneven from line to line.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Paragraph with at least 50% Hangul and three or more lines whose text-align is justify.",
+        "selectors": [
+          "p",
+          "div",
+          "li"
+        ],
+        "css": {
+          "text-align": "justify",
+          "hangul_ratio_min": 0.5,
+          "lines_min": 3
+        }
+      },
+      "fix": "Left aligned.",
+      "fix_patterns": [
+        "korean-line-breaking"
+      ],
+      "severity": "medium",
+      "korean": true,
+      "refs": [
+        {
+          "label": "MDN: text-align",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/text-align"
+        }
+      ]
+    },
+    {
+      "id": "KO-11",
+      "name": "Hangul body text too small",
+      "what": "Korean body text and captions at 12px or less.",
+      "why": "Latin-sized small text turns Hangul strokes and final consonants into mush.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element with own Hangul text whose computed font-size is under 13px. Footer and legal text carries lower weight.",
+        "selectors": [
+          "p",
+          "li",
+          "span",
+          "small",
+          "div",
+          "a"
+        ],
+        "css": {
+          "font_size_min_px": 13,
+          "hangul": true
+        }
+      },
+      "fix": "Korean body 15 to 16px, captions at least 13px.",
+      "fix_patterns": [
+        "korean-type-setup",
+        "long-form-prose"
+      ],
+      "severity": "medium",
+      "korean": true,
+      "refs": []
+    }
+  ]
+}

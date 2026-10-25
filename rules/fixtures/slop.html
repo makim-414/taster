@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing sample</title>
+<style>
+/* Stand-in web fonts: local fonts registered under the popular names, so the detector sees loaded faces. */
+@font-face { font-family: "Inter"; src: local("Helvetica Neue"), local("Arial"), local("Helvetica"), local("DejaVu Sans"); }
+@font-face { font-family: "Space Grotesk"; src: local("Helvetica Neue"), local("Arial"), local("Helvetica"), local("DejaVu Sans"); }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: .4; } 100% { opacity: 1; } }
+
+* { box-sizing: border-box; }
+html { background: #0b0b0b; }
+body { margin: 0; background: #0b0b0b; color: #e5e5e5; font-family: "Inter", sans-serif; font-size: 16px; line-height: 1.3; }
+main > section { padding: 32px; position: relative; }
+h1 { font-family: "Times New Roman", serif; font-size: 68px; line-height: 1.1; letter-spacing: -0.05em; margin: 16px auto; max-width: 1100px; text-align: center; }
+h2 { font-family: "Space Grotesk", sans-serif; font-size: 32px; margin: 0 0 16px; }
+h3 { font-size: 20px; margin: 12px 0 8px; }
+p { margin: 0 0 8px; }
+header { padding: 16px 32px; }
+nav a { color: #e5e5e5; margin-right: 16px; text-decoration: none; }
+.eyebrow { display: block; text-transform: uppercase; letter-spacing: 0.2em; font-size: 12px; text-align: center; color: #a3a3a3; }
+.hero { text-align: center; overflow: hidden; }
+.hero .inner { position: relative; z-index: 1; }
+.blob { position: absolute; width: 700px; height: 700px; left: 50%; top: -200px; margin-left: -350px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, .7), rgba(236, 72, 153, 0) 70%); filter: blur(80px); z-index: 0; }
+.pill { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 13px; line-height: 18px; margin-right: 8px; }
+.pill.green { background: rgba(34, 197, 94, .15); color: #4ade80; }
+.pill.blue { background: rgba(59, 130, 246, .15); color: #60a5fa; }
+.pill.red { background: rgba(239, 68, 68, .15); color: #f87171; }
+.pill.purple { background: rgba(168, 85, 247, .15); color: #c084fc; }
+.pill.orange { background: rgba(249, 115, 22, .15); color: #fb923c; box-shadow: 0 0 12px rgba(249, 115, 22, .6); }
+.pill.outline { background: transparent; border: 1px solid #3b82f6; color: #e5e5e5; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; margin-right: 6px; }
+.dot.pulse { animation: pulse 2s infinite; box-shadow: 0 0 8px #22c55e; }
+.row { display: block; }
+.btn { display: inline-block; padding: 12px 24px; border-radius: 8px; color: #fff; text-decoration: none; margin: 8px; font-size: 16px;
+  transition: transform .6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.btn.ghost { background: transparent; border: 1px solid #a3a3a3; }
+.btn.primary { background: linear-gradient(135deg, #6366f1, #a855f7); box-shadow: 0 8px 32px rgba(139, 92, 246, .6); }
+.btn.green { background: #10b981; box-shadow: 0 0 24px rgba(0, 255, 136, .7); }
+.grad { background: linear-gradient(90deg, #6366f1, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.serif { font-family: Georgia, serif; font-style: italic; }
+.mock { width: 560px; height: 280px; margin: 24px auto 0; }
+.mock .win { width: 100%; height: 100%; }
+.mock .bar { height: 20px; background: rgba(255, 255, 255, .1); }
+.mock .grid { display: block; }
+.mock .cell { display: inline-block; width: 120px; height: 60px; margin: 8px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .12); vertical-align: top; }
+.cards { display: flex; gap: 32px; }
+.card { flex: 1; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, .08); background: rgba(255, 255, 255, .06); }
+.glass { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.icon-tile { width: 48px; height: 48px; border-radius: 12px; background: rgba(139, 92, 246, .15); display: flex; align-items: center; justify-content: center; }
+.icon-tile svg { width: 24px; height: 24px; stroke: #a78bfa; fill: none; }
+.inner-box { display: block; width: 160px; height: 56px; border: 1px solid #555; border-radius: 12px; padding: 8px; }
+.price { font-size: 32px; font-weight: 700; }
+.badge-top { display: inline-block; padding: 2px 10px; border-radius: 999px; background: rgba(168, 85, 247, .2); color: #c084fc; font-size: 12px; }
+.card.mid { border: 2px solid #8b5cf6; transform: scale(1.05); }
+.card.side { border: 1px solid #333; }
+.stats { display: flex; gap: 32px; }
+.stat { flex: 1; text-align: center; }
+.stat b { display: block; font-size: 44px; }
+.flat { display: inline-block; width: 220px; height: 80px; padding: 12px; margin: 0 8px 8px 0; background: #fafafa; border: 1px solid #e5e5e5; border-radius: 8px; color: #111; }
+.notice { display: flex; align-items: center; height: 56px; padding: 0 16px; background: rgba(234, 179, 8, .12); color: #facc15; }
+.notice svg { width: 20px; height: 20px; margin-right: 12px; stroke: #facc15; fill: none; }
+.callout { border-left: 4px solid #8b5cf6; background: rgba(255, 255, 255, .05); border-radius: 8px; padding: 16px; }
+.check { display: inline-flex; width: 24px; height: 24px; border-radius: 50%; background: #22c55e; align-items: center; justify-content: center; margin-right: 8px; vertical-align: middle; }
+.check svg { width: 14px; height: 14px; stroke: #fff; fill: none; }
+.mono { font-family: "JetBrains Mono", monospace; font-size: 12px; color: #a3a3a3; }
+.term { width: 520px; background: #111; border-radius: 8px; }
+.term .bar { padding: 10px; }
+.term .bar span { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+.term pre { margin: 0; padding: 12px; font-family: monospace; font-size: 14px; }
+.bento { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; grid-auto-rows: 120px; }
+.bento > div { border-radius: 20px; background: rgba(255, 255, 255, .06); padding: 16px; }
+.bento .wide { grid-column: span 2; }
+.bento .tall { grid-row: span 2; }
+form.contact { max-width: 480px; }
+form.contact input, form.contact textarea { display: block; width: 100%; margin-bottom: 8px; padding: 8px; }
+.steps span.num { font-size: 14px; margin-right: 16px; color: #a3a3a3; }
+footer { padding: 32px; color: #a3a3a3; }
+.ko { width: 300px; margin-bottom: 8px; font-size: 16px; line-height: 1.3; }
+.ko-narrow { width: 220px; }
+.ko-wide-track { letter-spacing: 0.15em; }
+.ko-justify { text-align: justify; }
+.ko-upper { text-transform: uppercase; font-size: 13px; }
+.ko-tiny { font-size: 11px; }
+.kogrid { display: block; }
+.kogrid > div { display: inline-block; vertical-align: top; margin-right: 32px; }
+</style>
+</head>
+<body>
+<header>
+  <nav><a href="#">Product</a><a href="#">Pricing</a><a href="#" style="text-transform: uppercase; letter-spacing: 0.15em;">Sign in</a></nav>
+</header>
+<main>
+  <section class="hero reveal">
+    <div class="blob"></div>
+    <div class="inner">
+      <span class="eyebrow">Scroll to explore</span>
+      <span class="pill purple">New: version 2 is live</span>
+      <h1>Build the future of <span class="grad">intelligent</span> workflows with <em class="serif">beautiful</em> software today</h1>
+      <p>Fast &mdash; simple &mdash; yours. Build faster, ship smarter.</p>
+      <div>
+        <a class="btn ghost" href="#">Learn the story</a>
+        <a class="btn primary" href="#">Start for free</a>
+        <a class="btn green" href="#">Book a demo</a>
+      </div>
+      <div class="mock">
+        <div class="win">
+          <div class="bar"></div>
+          <div class="grid">
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <h2>Why teams switch &mdash; and stay</h2>
+    <div class="row">
+      <span class="pill green"><span class="dot pulse"></span>Active</span>
+      <span class="pill blue">Beta</span>
+      <span class="pill orange">Processing</span>
+      <span class="pill red">Failed</span>
+      <span class="pill outline">Pro</span>
+      <span class="mono">build 2041 / region eu-1</span>
+    </div>
+    <div class="cards" style="margin-top: 32px;">
+      <div class="card glass">
+        <div class="icon-tile"><svg class="lucide lucide-zap" viewBox="0 0 24 24" stroke-width="2"><path d="M4 14l8-12v8h8l-8 12v-8z"/></svg></div>
+        <h3>&#x1F680; Launch faster</h3>
+        <p>Ship every release with less friction and more confidence.</p>
+      </div>
+      <div class="card glass">
+        <div class="icon-tile"><svg class="lucide lucide-shield" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2l8 4v6c0 5-4 8-8 10-4-2-8-5-8-10V6z"/></svg></div>
+        <h3>&#x2728; Stay secure</h3>
+        <p>Built-in review keeps every change safe before it ships.</p>
+      </div>
+      <div class="card glass">
+        <div class="icon-tile"><svg class="lucide lucide-sparkles" viewBox="0 0 24 24" stroke-width="2"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg></div>
+        <h3>Scale quietly</h3>
+        <p>Grow from one team to many without changing how you work.</p>
+        <div class="inner-box">Inner panel</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="stats">
+      <div class="stat"><b>10K+</b><span>active users</span></div>
+      <div class="stat"><b>99.9%</b><span>uptime</span></div>
+      <div class="stat"><b>3x</b><span>faster</span></div>
+    </div>
+    <div style="margin-top: 32px;">
+      <div class="flat"><span>Plain box one</span></div><div class="flat"><span>Plain box two</span></div><div class="flat"><span>Plain box three</span></div><div class="flat"><span>Plain box four</span></div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="cards">
+      <div class="card side"><h3>Free</h3><div class="price">$0</div><p>For individuals.</p></div>
+      <div class="card mid"><span class="badge-top">Most popular</span><h3>Team</h3><div class="price">$29</div><p>For small teams.</p></div>
+      <div class="card side"><h3>Scale</h3><div class="price">$99</div><p>For companies.</p></div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <blockquote>"It changed the way we ship."</blockquote>
+    <p class="steps"><span class="num">01</span><span class="num">02</span><span class="num">03</span></p>
+    <div class="callout">A highlighted note with a thick colored bar on the left side.</div>
+    <div class="notice"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v1"/></svg>Scheduled maintenance tonight at nine.</div>
+    <ul style="list-style: none; padding: 0;">
+      <li style="margin: 8px 0;"><span class="check"><svg viewBox="0 0 24 24" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg></span>Unlimited projects</li>
+      <li style="margin: 8px 0;"><span class="check"><svg viewBox="0 0 24 24" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg></span>Priority support</li>
+    </ul>
+    <svg width="320" height="160" viewBox="0 0 320 160">
+      <rect x="10" y="60" width="40" height="90" fill="#ef4444"/>
+      <rect x="70" y="30" width="40" height="120" fill="#f59e0b"/>
+      <rect x="130" y="80" width="40" height="70" fill="#22c55e"/>
+      <rect x="190" y="50" width="40" height="100" fill="#3b82f6"/>
+      <rect x="250" y="20" width="40" height="130" fill="#a855f7"/>
+    </svg>
+    <div class="term">
+      <div class="bar"><span style="background:#ff5f56"></span><span style="background:#ffbd2e"></span><span style="background:#27c93f"></span></div>
+      <pre>$ npx create-app my-site</pre>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="bento">
+      <div class="wide">Analytics</div>
+      <div>Alerts</div>
+      <div class="tall">Reports</div>
+      <div>Search</div>
+      <div class="wide">Integrations</div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <h2>Talk to us</h2>
+    <form class="contact" onsubmit="return false">
+      <input type="text" placeholder="Name"><input type="text" placeholder="Company"><input type="tel" placeholder="Phone">
+      <textarea rows="3" placeholder="Message"></textarea>
+      <button type="button">Send</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Korean text</h2>
+    <div class="kogrid">
+      <div class="ko ko-narrow">소프트웨어 개발 서비스를 제공하는 회사입니다. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다. 데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다.</div>
+      <div class="ko ko-wide-track">소프트웨어 개발 서비스를 제공하는 회사입니다. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다.</div>
+      <div class="ko ko-justify">소프트웨어 개발 서비스를 제공하는 회사입니다. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다. 데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다.</div>
+      <div class="ko"><em>소프트웨어 개발 서비스를 제공하는 회사입니다. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계합니다.</em></div>
+      <div class="ko"><span class="ko-upper">서비스 소개 Service</span></div>
+      <div class="ko"><small class="ko-tiny">사업자 등록 번호와 개인정보 처리 방침은 아래 링크에서 확인할 수 있습니다. 문의는 담당자에게 연락해 주세요.</small></div>
+      <div class="ko">지금 바로 경험하세요. 새로운 차원의 개발 도구를 만나보세요. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다.</div>
+      <div class="ko ko-narrow">데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다.</div>
+      <div class="ko ko-justify">데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다. 소프트웨어 개발 서비스를 제공하는 회사입니다. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다.</div>
+      <div class="ko">소프트웨어 개발 서비스를 제공하는 회사입니다. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다. 데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다.</div>
+      <div class="ko">소프트웨어 개발 서비스를 제공하는 회사입니다. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다. 데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다.</div>
+      <div class="ko">고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다. 소프트웨어 개발 서비스를 제공하는 회사입니다. 데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다.</div>
+      <div class="ko">데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다. 소프트웨어 개발 서비스를 제공하는 회사입니다.</div>
+      <div class="ko">소프트웨어 개발 서비스를 제공하는 회사입니다. 데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다. 고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다.</div>
+      <div class="ko">고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다. 데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다. 소프트웨어 개발 서비스를 제공하는 회사입니다.</div>
+    </div>
+    <a class="btn ghost" href="#" style="margin-top: 16px;">Get started</a>
+  </section>
+</main>
+<footer>
+  <form onsubmit="return false"><input type="email" placeholder="you@example.com"><button type="button">Subscribe</button></form>
+  <p>&copy; Sample Inc.</p>
+</footer>
+</body>
+</html>
