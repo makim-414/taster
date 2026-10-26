@@ -8,14 +8,14 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 if (!fs.existsSync(path.join(here, 'node_modules', '@modelcontextprotocol', 'sdk'))) {
-  process.stderr.write('disegno: installing dependencies (first run)...\n');
+  process.stderr.write('taster: installing dependencies (first run)...\n');
   const r = spawnSync('npm', ['install', '--omit=dev', '--no-audit', '--no-fund', '--loglevel=error'], {
     cwd: here,
     stdio: ['ignore', 2, 2],
     shell: process.platform === 'win32',
   });
   if (r.status !== 0) {
-    process.stderr.write('disegno: npm install failed. Run it manually in ' + here + '\n');
+    process.stderr.write('taster: npm install failed. Run it manually in ' + here + '\n');
     process.exit(1);
   }
 }

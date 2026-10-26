@@ -12,7 +12,7 @@ const fixture = (name) => fileURLToPath(new URL(`../../rules/fixtures/${name}`, 
 const run = (...args) => spawnSync(process.execPath, [cli, ...args], { encoding: 'utf8', timeout: 90000 });
 
 test('exit 1 with findings, report.json and one capture per width', { timeout: 90000 }, () => {
-  const out = mkdtempSync(join(tmpdir(), 'disegno-cli-'));
+  const out = mkdtempSync(join(tmpdir(), 'taster-cli-'));
   try {
     const r = run(fixture('slop.html'), '--out', out);
     assert.equal(r.status, 1, r.stderr);

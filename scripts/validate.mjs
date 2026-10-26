@@ -68,11 +68,11 @@ for (const p of files) {
 }
 
 // Skill
-const skill = fs.readFileSync(path.join(ROOT, 'skills/disegno/SKILL.md'), 'utf8');
+const skill = fs.readFileSync(path.join(ROOT, 'skills/taster/SKILL.md'), 'utf8');
 const sfm = parseFrontmatter(skill);
 if (!sfm?.data.name || !sfm?.data.description) err('SKILL.md needs name and description');
 for (const ref of skill.matchAll(/\]\((references\/[^)]+|data\/[^)]+)\)/g)) {
-  if (!fs.existsSync(path.join(ROOT, 'skills/disegno', ref[1]))) err(`SKILL.md links missing ${ref[1]}`);
+  if (!fs.existsSync(path.join(ROOT, 'skills/taster', ref[1]))) err(`SKILL.md links missing ${ref[1]}`);
 }
 for (const [src, dst] of bundleFiles()) {
   const a = path.join(ROOT, src), b = path.join(ROOT, dst);

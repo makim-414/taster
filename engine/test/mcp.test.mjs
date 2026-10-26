@@ -9,7 +9,7 @@ const server = fileURLToPath(new URL('../mcp.mjs', import.meta.url));
 const fixture = fileURLToPath(new URL('../../rules/fixtures/slop.html', import.meta.url));
 
 test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000 }, async () => {
-  const client = new Client({ name: 'disegno-test', version: '0.1.0' });
+  const client = new Client({ name: 'taster-test', version: '0.1.0' });
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [server] }));
   try {
     const { tools } = await client.listTools();

@@ -7,14 +7,14 @@
  *
  * Usage with Playwright:
  *   await page.addScriptTag({ path: 'rules/detect.js' });
- *   const report = await page.evaluate(() => window.disegnoDetect({ highlight: true }));
+ *   const report = await page.evaluate(() => window.tasterDetect({ highlight: true }));
  *
  * Usage in DevTools: paste this file into the console, then run
- *   disegnoDetect({ highlight: true })
+ *   tasterDetect({ highlight: true })
  *
  * Options:
  *   highlight   boolean   outline every finding. The color comes from the CSS variable
- *                         --disegno-outline (fallback #e5484d). Set it on :root to change it.
+ *                         --taster-outline (fallback #e5484d). Set it on :root to change it.
  *   clear       boolean   remove the outlines added by an earlier call and return.
  *   maxPerRule  number    cap on reported findings per rule (default 40, totals stay in `counts`).
  *   rules       string[]  only run these rule ids.
@@ -31,7 +31,7 @@
   'use strict';
 
   var VERSION = '0.1.0';
-  var STATE_KEY = '__disegnoHighlights';
+  var STATE_KEY = '__tasterHighlights';
   // Long dashes are built from char codes so this file stays free of the characters themselves.
   var EM = String.fromCharCode(8212);
   var EN = String.fromCharCode(8211);
@@ -320,7 +320,7 @@
       if (seen.has(el)) return;
       seen.add(el);
       window[STATE_KEY].push({ el: el, outline: el.style.outline, offset: el.style.outlineOffset });
-      el.style.outline = '2px solid var(--disegno-outline, #e5484d)';
+      el.style.outline = '2px solid var(--taster-outline, #e5484d)';
       el.style.outlineOffset = '-2px';
     });
   }
@@ -1544,6 +1544,6 @@
 
   run.version = VERSION;
   run.clear = clearHighlights;
-  window.disegnoDetect = run;
+  window.tasterDetect = run;
   return run;
 })();

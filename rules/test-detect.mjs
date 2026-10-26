@@ -58,15 +58,15 @@ async function scan(file, width = 1440) {
   await page.goto(pathToFileURL(path.join(here, 'fixtures', file)).href);
   await page.evaluate(() => document.fonts.ready);
   await page.addScriptTag({ path: detectSrc });
-  const result = await page.evaluate(() => window.disegnoDetect({}));
+  const result = await page.evaluate(() => window.tasterDetect({}));
 
   // highlight then clear must leave the DOM as it was
   const before = await page.evaluate(() => document.body.innerHTML.replace(/ style=""/g, ''));
   const hl = await page.evaluate(() => {
-    const r = window.disegnoDetect({ highlight: true });
-    const outlined = Array.from(document.querySelectorAll('*')).filter((e) => e.style.outline.includes('--disegno-outline')).length;
-    window.disegnoDetect({ clear: true });
-    const left = Array.from(document.querySelectorAll('*')).filter((e) => e.style.outline.includes('--disegno-outline')).length;
+    const r = window.tasterDetect({ highlight: true });
+    const outlined = Array.from(document.querySelectorAll('*')).filter((e) => e.style.outline.includes('--taster-outline')).length;
+    window.tasterDetect({ clear: true });
+    const left = Array.from(document.querySelectorAll('*')).filter((e) => e.style.outline.includes('--taster-outline')).length;
     return { outlined, left, n: r.findings.length };
   });
   const after = await page.evaluate(() => document.body.innerHTML.replace(/ style=""/g, ''));

@@ -1,9 +1,9 @@
 ---
-name: disegno
+name: taster
 description: Find and remove AI slop in frontends. Use when the user wants to check whether a site or screen looks AI generated, review a UI for generic patterns, replace slop with better components, or design and build a landing page, dashboard, app screen, store or editorial page that does not look generated. Triggers on "is my site slop", "does this look AI made", "de-slop", "make this less generic", "review this UI", "redesign this section", "build a landing page", "build a dashboard".
 ---
 
-# disegno
+# Taster
 
 Three jobs. Pick the one the user asked for; if unclear, start with Diagnose on whatever they showed you.
 
@@ -18,9 +18,9 @@ Data this skill reads (all inside this folder):
 - [data/rules.json](data/rules.json): the slop rules. `detect.level` says how each is checked: `deterministic` and `heuristic` rules run in the browser through [data/detect.js](data/detect.js); `manual` rules you judge from the capture.
 - [data/taxonomy.json](data/taxonomy.json): families, categories, uses (what the end user is trying to do) and surfaces (landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat).
 - [data/patterns/INDEX.json](data/patterns/INDEX.json) and `data/patterns/<id>.md`: one reusable design answer per file. Every rule lists its fix patterns in `fix_patterns`.
-- [data/registry.json](data/registry.json): token based React components you can copy. Source lives in the repository under `registry/src/`; if this folder was installed alone, fetch the file from `https://raw.githubusercontent.com/makim-414/disegno/main/registry/<file>`.
+- [data/registry.json](data/registry.json): token based React components you can copy. Source lives in the repository under `registry/src/`; if this folder was installed alone, fetch the file from `https://raw.githubusercontent.com/makim-414/taster/main/registry/<file>`.
 
-## If the disegno MCP server is connected
+## If the taster MCP server is connected
 
 Prefer its tools; they run the same detector in a real browser for you.
 
