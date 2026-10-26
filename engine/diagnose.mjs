@@ -7,6 +7,7 @@ import { chromium } from 'playwright';
 
 const ROOT = new URL('../', import.meta.url);
 export const DETECT_SOURCE = readFileSync(new URL('rules/detect.js', ROOT), 'utf8');
+export const EXTRACT_SOURCE = readFileSync(new URL('./extract.js', import.meta.url), 'utf8');
 export const RULES = JSON.parse(readFileSync(new URL('rules/rules.json', ROOT), 'utf8')).rules;
 export const RULE_BY_ID = new Map(RULES.map((r) => [r.id, r]));
 export const VIEWPORTS = [
@@ -126,3 +127,34 @@ export function formatText(report) {
   if (report.screenshots.length) out.push('', ...report.screenshots.map((s) => `annotated: ${s}`));
   return out.join('\n');
 }
+
+// The page's content (words, links, images, brand color and fonts, nav, footer) in reading order, read at
+// desktop width. This is what a rebuild keeps; diagnose() says what it drops.
+export async function extract(target, { timeout = 30000, viewport = VIEWPORTS[0] } = {}) {
+  const url = toUrl(target);
+  const browser = await launch();
+  try {
+    const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
+    await page.goto(url, { waitUntil: 'load', timeout });
+    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
+    await page.evaluate(() => document.fonts && document.fonts.ready);
+    await page.addScriptTag({ content: EXTRACT_SOURCE });
+    return await page.evaluate(() => window.tasterExtract());
+  } finally {
+    await browser.close();
+  }
+}
+
+// Every heading and action label in the original, and whether the rebuild still says it.
+export function contentParity(before, after) {
+  const norm = (s) => String(s || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const items = (c) => [
+    ...c.sections.flatMap((s) => [s.heading?.text, ...s.subheadings.map((h) => h.text), ...s.actions.map((a) => a.text), ...(s.links || []).map((l) => l.text)]),
+    ...c.nav.map((n) => n.text),
+  ].filter(Boolean);
+  const haystack = norm([...items(after), ...after.sections.flatMap((s) => [...s.text, ...s.lists.flat(), ...s.quotes])].join(' '));
+  const expected = [...new Set(items(before))];
+  const missing = expected.filter((t) => !haystack.includes(norm(t)));
+  return { expected: expected.length, kept: expected.length - missing.length, missing };
+}
+

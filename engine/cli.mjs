@@ -2,16 +2,18 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
-import { RULES, VIEWPORTS, diagnose, explainRule, formatText } from './diagnose.mjs';
+import { RULES, VIEWPORTS, diagnose, explainRule, extract, formatText } from './diagnose.mjs';
 
 const HELP = `Usage
   node engine/cli.mjs <url-or-file> [--out <dir>] [--json] [--widths 1440,390]
+  node engine/cli.mjs <url-or-file> --extract [--out <dir>]
   node engine/cli.mjs --rules
   node engine/cli.mjs --explain <rule-id>
 
 Options
   --out <dir>       write report.json and annotated-<width>.png into <dir>
   --json            print the report as JSON
+  --extract         print the page content (sections, actions, images, brand) for a rebuild
   --widths <list>   viewport widths, default ${VIEWPORTS.map((v) => v.width).join(',')}
 
 Exit codes: 0 no findings, 1 findings, 2 error`;
@@ -34,6 +36,7 @@ async function main() {
       widths: { type: 'string' },
       rules: { type: 'boolean' },
       explain: { type: 'string' },
+      extract: { type: 'boolean' },
       help: { type: 'boolean', short: 'h' },
     },
   });
@@ -58,6 +61,12 @@ async function main() {
   }
 
   if (values.out) mkdirSync(values.out, { recursive: true });
+  if (values.extract) {
+    const content = await extract(positionals[0]);
+    if (values.out) writeFileSync(join(values.out, 'content.json'), `${JSON.stringify(content, null, 2)}\n`);
+    console.log(JSON.stringify(content, null, 2));
+    return 0;
+  }
   const report = await diagnose(positionals[0], { viewports: viewportsFrom(values.widths), outDir: values.out || null });
   if (values.out) writeFileSync(join(values.out, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
   console.log(values.json ? JSON.stringify(report, null, 2) : formatText(report));
