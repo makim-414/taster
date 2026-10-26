@@ -29,6 +29,7 @@ export async function launch() {
 }
 const SEVERITY_ORDER = { high: 0, medium: 1, low: 2 };
 const MAX_SHOT_HEIGHT = 8000;
+const LOAD_WAIT = 15000;
 
 // Accepts an http(s) URL, a file:// URL or a path to a local HTML file.
 export function toUrl(target) {
@@ -48,7 +49,9 @@ export function explainRule(id) {
 export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50 } = {}) {
   const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true });
   try {
-    await page.goto(url, { waitUntil: 'load', timeout });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+    // Heavy pages (video, WebGL) can take minutes to fire load; the layout we measure is there long before.
+    await page.waitForLoadState('load', { timeout: LOAD_WAIT }).catch(() => {});
     await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
     await page.evaluate(() => document.fonts && document.fonts.ready);
     await page.addScriptTag({ content: DETECT_SOURCE });
@@ -136,7 +139,9 @@ export async function extract(target, { timeout = 30000, viewport = VIEWPORTS[0]
   const browser = await launch();
   try {
     const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true });
-    await page.goto(url, { waitUntil: 'load', timeout });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+    // Heavy pages (video, WebGL) can take minutes to fire load; the layout we measure is there long before.
+    await page.waitForLoadState('load', { timeout: LOAD_WAIT }).catch(() => {});
     await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
     await page.evaluate(() => document.fonts && document.fonts.ready);
     await page.addScriptTag({ content: EXTRACT_SOURCE });
