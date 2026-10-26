@@ -16,6 +16,7 @@ npx --prefix engine playwright install chromium
 ```bash
 node engine/cli.mjs https://example.com --out out    # report.json, annotated-1440.png, annotated-390.png
 node engine/cli.mjs ./page.html --json --widths 1440 # one width, JSON to stdout
+node engine/cli.mjs https://example.com --extract    # content JSON for a rebuild (content.json with --out)
 node engine/cli.mjs --rules                          # every rule, how it is checked, severity
 node engine/cli.mjs --explain KO-01                  # what, why, how it is found, fix
 ```
@@ -24,7 +25,9 @@ Exit code is 0 with no findings, 1 with findings, 2 on error. The report groups 
 
 ## MCP server
 
-Tools: `diagnose` (report plus one capture per width), `list_rules`, `explain_rule`.
+Prompt: `start` (the opening question: does the site already exist, or are we building a new one?).
+
+Tools: `diagnose` (report plus one capture per width), `extract_content` (the page's content in reading order, for a rebuild), `list_rules`, `explain_rule`, and the swap tools `suggest_swaps`, `list_patterns`, `get_pattern`, `get_component`, `taxonomy`.
 
 Claude Code:
 
@@ -45,7 +48,8 @@ args = ["/path/to/taster/engine/mcp.mjs"]
 ```bash
 node rules/test-detect.mjs           # fixtures: exact rule sets on slop pages, zero on the clean page at both widths
 node engine/scripts/check-rules.mjs  # rules.json schema, and detect.js checks exactly the measured rules
-npm --prefix engine test             # CLI and MCP
+npm --prefix engine test             # CLI, MCP and extract
+node engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop, rebuild is clean and keeps the content
 ```
 
 To add a measured rule: write the check in `rules/detect.js` (`flag('XX-00', el, evidence)`), set its `detect.level` to `deterministic` in `rules/rules.json`, make a fixture in `rules/fixtures/` hit it and add the id to `rules/fixtures/expected.json`. The clean fixture must stay at zero.

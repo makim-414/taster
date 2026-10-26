@@ -34,3 +34,5 @@ jobs:
         run: node rules/test-detect.mjs
       - name: Engine CLI and MCP
         run: npm --prefix engine test
+      - name: Rebuild example stays clean and keeps its content
+        run: node engine/scripts/check-rebuild-example.mjs
