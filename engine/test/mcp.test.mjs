@@ -13,7 +13,21 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [server] }));
   try {
     const { tools } = await client.listTools();
-    assert.equal(tools.map((t) => t.name).sort().join(','), 'diagnose,explain_rule,get_component,get_pattern,list_patterns,list_rules,suggest_swaps,taxonomy');
+    assert.equal(tools.map((t) => t.name).sort().join(','), 'diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,suggest_swaps,taxonomy');
+
+    // The opening question comes from the skill's start guide, so the prompt and the skill say the same thing.
+    const { prompts } = await client.listPrompts();
+    assert.deepEqual(prompts.map((p) => p.name), ['start']);
+    const start = await client.getPrompt({ name: 'start', arguments: { request: 'check my site' } });
+    const startText = start.messages[0].content.text;
+    assert.match(startText, /Is this a site that already exists, or are we building a new one\?/);
+    assert.match(startText, /이미 있는 사이트인가요, 아니면 새로 지을까요\?/);
+    assert.match(startText, /The user said: check my site/);
+
+    const extracted = await client.callTool({ name: 'extract_content', arguments: { target: fixture } });
+    assert.ok(!extracted.isError, extracted.content[0].text);
+    assert.ok(JSON.parse(extracted.content[0].text).sections.length >= 3);
+    assert.ok((await client.callTool({ name: 'extract_content', arguments: { target: '/no/such/file.html' } })).isError);
 
     const listed = JSON.parse((await client.callTool({ name: 'list_rules', arguments: {} })).content[0].text);
     assert.equal(listed.length, RULES.length);

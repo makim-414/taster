@@ -7,6 +7,7 @@ import { chromium } from 'playwright';
 
 const ROOT = new URL('../', import.meta.url);
 export const DETECT_SOURCE = readFileSync(new URL('rules/detect.js', ROOT), 'utf8');
+export const EXTRACT_SOURCE = readFileSync(new URL('./extract.js', import.meta.url), 'utf8');
 export const RULES = JSON.parse(readFileSync(new URL('rules/rules.json', ROOT), 'utf8')).rules;
 export const RULE_BY_ID = new Map(RULES.map((r) => [r.id, r]));
 export const VIEWPORTS = [
@@ -28,6 +29,7 @@ export async function launch() {
 }
 const SEVERITY_ORDER = { high: 0, medium: 1, low: 2 };
 const MAX_SHOT_HEIGHT = 8000;
+const LOAD_WAIT = 15000;
 
 // Accepts an http(s) URL, a file:// URL or a path to a local HTML file.
 export function toUrl(target) {
@@ -43,10 +45,13 @@ export function explainRule(id) {
 }
 
 // One page load at one viewport. Returns the raw detect.js report.
+// bypassCSP: many large sites forbid inline scripts, which would block the injected detector.
 export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50 } = {}) {
-  const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true });
   try {
-    await page.goto(url, { waitUntil: 'load', timeout });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+    // Heavy pages (video, WebGL) can take minutes to fire load; the layout we measure is there long before.
+    await page.waitForLoadState('load', { timeout: LOAD_WAIT }).catch(() => {});
     await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
     await page.evaluate(() => document.fonts && document.fonts.ready);
     await page.addScriptTag({ content: DETECT_SOURCE });
@@ -116,7 +121,8 @@ export function formatText(report) {
       if (seen.has(f.selector) || seen.size >= 3) continue;
       seen.add(f.selector);
       out.push(`  at ${f.selector}${f.text ? `  "${Array.from(f.text).slice(0, 40).join('')}"` : ''}`);
-      if (f.evidence) out.push(`     ${f.evidence}`);
+      const evidence = f.evidence && typeof f.evidence === 'object' ? Object.entries(f.evidence).map(([k, v]) => `${k}=${typeof v === 'object' ? JSON.stringify(v) : v}`).join(' ') : f.evidence;
+      if (evidence) out.push(`     ${evidence}`);
     }
     out.push(`  fix: ${r.fix}`);
     if (r.fix_patterns.length) out.push(`  patterns: ${r.fix_patterns.join(', ')}`);
@@ -125,3 +131,36 @@ export function formatText(report) {
   if (report.screenshots.length) out.push('', ...report.screenshots.map((s) => `annotated: ${s}`));
   return out.join('\n');
 }
+
+// The page's content (words, links, images, brand color and fonts, nav, footer) in reading order, read at
+// desktop width. This is what a rebuild keeps; diagnose() says what it drops.
+export async function extract(target, { timeout = 30000, viewport = VIEWPORTS[0] } = {}) {
+  const url = toUrl(target);
+  const browser = await launch();
+  try {
+    const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+    // Heavy pages (video, WebGL) can take minutes to fire load; the layout we measure is there long before.
+    await page.waitForLoadState('load', { timeout: LOAD_WAIT }).catch(() => {});
+    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
+    await page.evaluate(() => document.fonts && document.fonts.ready);
+    await page.addScriptTag({ content: EXTRACT_SOURCE });
+    return await page.evaluate(() => window.tasterExtract());
+  } finally {
+    await browser.close();
+  }
+}
+
+// Every heading and action label in the original, and whether the rebuild still says it.
+export function contentParity(before, after) {
+  const norm = (s) => String(s || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const items = (c) => [
+    ...c.sections.flatMap((s) => [s.heading?.text, ...s.subheadings.map((h) => h.text), ...s.actions.map((a) => a.text), ...(s.links || []).map((l) => l.text)]),
+    ...c.nav.map((n) => n.text),
+  ].filter(Boolean);
+  const haystack = norm([...items(after), ...after.sections.flatMap((s) => [...s.text, ...s.lists.flat(), ...s.quotes])].join(' '));
+  const expected = [...new Set(items(before))];
+  const missing = expected.filter((t) => !haystack.includes(norm(t)));
+  return { expected: expected.length, kept: expected.length - missing.length, missing };
+}
+
