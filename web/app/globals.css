@@ -1,0 +1,300 @@
+/* Only registry/src/tokens.css and themes/light.css values, read through var().
+   One token is rebound: --font. Its registry default starts with Geist, which TYP-02 flags, and
+   when Geist is missing the detector judges the declared family anyway. A system stack alone
+   would trip AC-15 instead, so the page names a real face: Noto Sans KR, self-hosted. */
+:root {
+  --font: var(--font-sans), 'Apple SD Gothic Neo', sans-serif;
+}
+html {
+  background: var(--bg);
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-4) var(--sp-16);
+}
+@media (min-width: 768px) {
+  .page {
+    padding: var(--sp-8) var(--sp-8) var(--sp-16);
+  }
+}
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2) var(--sp-4);
+  padding-bottom: var(--sp-5);
+  border-bottom: 1px solid var(--border);
+}
+.wordmark {
+  margin: 0;
+  font-size: var(--t-title);
+  font-weight: var(--w-semi);
+}
+.tagline {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.intro {
+  max-width: 720px;
+  padding: var(--sp-12) 0 var(--sp-8);
+}
+h1 {
+  margin: 0;
+  font-size: var(--t-h1);
+  line-height: var(--lh-snug);
+  font-weight: var(--w-semi);
+}
+h2 {
+  margin: 0;
+  font-size: var(--t-h2);
+  line-height: var(--lh-snug);
+  font-weight: var(--w-semi);
+}
+.lede {
+  margin: var(--sp-4) 0 var(--sp-8);
+  font-size: var(--t-title);
+  color: var(--text-muted);
+}
+
+.probe label {
+  display: block;
+  margin-bottom: var(--sp-2);
+  font-weight: var(--w-med);
+}
+.probe-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.probe input {
+  flex: 1 1 260px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 var(--sp-3);
+  font: inherit;
+  font-size: var(--t-title);
+  color: var(--text);
+  background: var(--bg-elev);
+  border: 1px solid var(--input);
+  border-radius: var(--r-md);
+}
+.probe input:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+button {
+  min-height: 44px;
+  padding: 0 var(--sp-5);
+  font: inherit;
+  font-weight: var(--w-med);
+  color: var(--accent-fg);
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+button:active {
+  transform: scale(var(--press-scale));
+}
+button:disabled {
+  cursor: progress;
+  background: var(--highlight);
+}
+.fineprint {
+  margin: var(--sp-3) 0 0;
+  color: var(--text-subtle);
+}
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--sp-3);
+  margin: var(--sp-2) 0 0;
+  color: var(--text-muted);
+}
+button.example {
+  padding: 0;
+  color: var(--text);
+  background: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: var(--w-reg);
+}
+.status {
+  min-height: var(--sp-6);
+  margin: var(--sp-4) 0 0;
+  color: var(--text-muted);
+}
+
+.report {
+  padding: var(--sp-8) 0 var(--sp-12);
+  border-top: 1px solid var(--border);
+}
+.report:focus {
+  outline: none;
+}
+.verdict {
+  margin: var(--sp-2) 0 var(--sp-6);
+  font-size: var(--t-title);
+  color: var(--text-muted);
+}
+
+.hits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hit {
+  padding: var(--sp-3) 0 var(--sp-1);
+  border-top: 1px solid var(--border-soft);
+}
+.hit:last-child {
+  border-bottom: 1px solid var(--border-soft);
+}
+.hit p {
+  margin: 0;
+}
+.hit-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-1) var(--sp-3);
+}
+.hit-name {
+  font-size: var(--t-title);
+  font-weight: var(--w-med);
+}
+.hit-meta {
+  margin-top: var(--sp-1);
+  color: var(--text-muted);
+}
+.hit-fix {
+  margin-top: var(--sp-2);
+}
+code {
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+}
+.hit-where {
+  margin-top: var(--sp-1);
+}
+.hit-where summary {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.hit-advice {
+  margin: var(--sp-1) 0 var(--sp-2);
+}
+.hit-where ul {
+  margin: 0;
+  padding-left: var(--sp-5);
+}
+.hit-where li {
+  margin-bottom: var(--sp-2);
+  overflow-wrap: anywhere;
+}
+.hit-evidence {
+  display: block;
+  color: var(--text-subtle);
+}
+
+.shots {
+  display: grid;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-8);
+}
+@media (min-width: 900px) {
+  .shots {
+    grid-template-columns: 7fr 3fr;
+    align-items: start;
+  }
+}
+.shot {
+  margin: 0;
+  min-width: 0;
+}
+.shot figcaption {
+  margin-bottom: var(--sp-2);
+  color: var(--text-muted);
+}
+.shot-frame {
+  max-height: 720px;
+  overflow: auto;
+  background: var(--bg-sunken);
+  border-radius: var(--r-sm);
+}
+.shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.shot-narrow .shot-frame {
+  max-width: 390px;
+}
+.byeye {
+  margin: var(--sp-6) 0 0;
+  color: var(--text-subtle);
+}
+
+.install {
+  max-width: 720px;
+  padding: var(--sp-12) 0 var(--sp-8);
+  border-top: 1px solid var(--border);
+}
+.install p {
+  margin: var(--sp-3) 0 var(--sp-5);
+}
+.copyline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--sp-2);
+}
+.copyline pre {
+  flex: 1 1 320px;
+  min-width: 0;
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  overflow-x: auto;
+  background: var(--bg-sunken);
+  border-radius: var(--r-md);
+}
+.copyline code {
+  white-space: pre;
+}
+
+.colophon {
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border);
+  color: var(--text-subtle);
+}
+.colophon p {
+  margin: 0;
+}
+a {
+  color: var(--text);
+  text-underline-offset: 3px;
+}
