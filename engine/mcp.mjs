@@ -1,17 +1,40 @@
 #!/usr/bin/env node
-// MCP server over stdio. Diagnose tools: diagnose, list_rules, explain_rule.
-// Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
+// MCP server over stdio. Prompt: start (the opening question). Diagnose tools: diagnose, list_rules, explain_rule.
+// Rebuild tool: extract_content. Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { RULES, VIEWPORTS, diagnose, explainRule } from './diagnose.mjs';
+import { RULES, VIEWPORTS, diagnose, explainRule, extract } from './diagnose.mjs';
 import { getComponent, getPattern, listPatterns, loadTaxonomy, suggestSwaps } from './catalog.mjs';
 
 const server = new McpServer({ name: 'taster', version: '0.1.0' });
 const json = (value) => ({ type: 'text', text: JSON.stringify(value, null, 2) });
+const START_GUIDE = fileURLToPath(new URL('../skills/taster/references/start.md', import.meta.url));
+
+// The opening question every session starts with. The text lives in the skill so both say the same thing.
+server.registerPrompt(
+  'start',
+  {
+    title: 'Start Taster',
+    description: 'Ask whether the site already exists or is being built new, then take the matching route (diagnose and swap, diagnose and rebuild, or build).',
+    argsSchema: { request: z.string().optional().describe('what the user asked for, if anything') },
+  },
+  ({ request }) => ({
+    messages: [
+      {
+        role: 'user',
+        content: {
+          type: 'text',
+          text: `${readFileSync(START_GUIDE, 'utf8')}\n---\n${request ? `The user said: ${request}\n\n` : ''}Follow the guide above. Your first reply is the opening question, unless the user's words already answer it.`,
+        },
+      },
+    ],
+  }),
+);
 
 server.registerTool(
   'diagnose',
@@ -37,6 +60,24 @@ server.registerTool(
       return { isError: true, content: [{ type: 'text', text: `diagnose failed: ${err.message}` }] };
     } finally {
       if (dir) rmSync(dir, { recursive: true, force: true });
+    }
+  },
+);
+
+server.registerTool(
+  'extract_content',
+  {
+    title: 'Read a page for a rebuild',
+    description:
+      "Open a URL or a local HTML file in a real browser and return its content in reading order: sections (each h1 or h2 with its text, subheadings, lists, actions with their targets, images, quotes and forms), nav and footer links, and the brand (name or logo, the most used solid action color, heading and body fonts, dark or light). Emoji are stripped. Use it to rebuild a page the user has no source for, then compare the rebuild's content with this one.",
+    inputSchema: { target: z.string().describe('http(s) URL, file:// URL, or path to a local HTML file') },
+    annotations: { readOnlyHint: true, openWorldHint: true },
+  },
+  async ({ target }) => {
+    try {
+      return { content: [json(await extract(target))] };
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: `extract_content failed: ${err.message}` }] };
     }
   },
 );

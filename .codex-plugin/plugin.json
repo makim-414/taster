@@ -9,7 +9,13 @@
   "homepage": "https://github.com/makim-414/taster",
   "repository": "https://github.com/makim-414/taster",
   "license": "MIT",
-  "keywords": ["skills", "frontend", "design", "ui", "anti-slop"],
+  "keywords": [
+    "skills",
+    "frontend",
+    "design",
+    "ui",
+    "anti-slop"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Taster",
@@ -20,6 +26,7 @@
     "capabilities": [],
     "websiteURL": "https://github.com/makim-414/taster",
     "defaultPrompt": [
+      "Start Taster: ask me whether my site already exists or is new, then take it from there.",
       "Diagnose this site for AI slop and show me every spot.",
       "Swap the slop on this page for better patterns.",
       "Build a landing page for this product without generic AI patterns."

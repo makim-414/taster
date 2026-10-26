@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme Ledger: close your books faster</title>
+<link rel="stylesheet" href="../../registry/src/tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Brand, carried over from the original through the one slot tokens.css leaves open:
+     the solid color on its main action. Everything else comes from tokens.
+     Typeface: the original used the default AI pick for every line. A finance tool reads numbers and
+     dense rows, so this uses IBM Plex Sans (open license): sturdy figures, plain at small sizes. */
+  :root { --brand: #4c1d95; --accent-fg: oklch(0.985 0 0); --font: 'IBM Plex Sans', -apple-system, system-ui, sans-serif; }
+
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: var(--t-title); line-height: var(--lh-normal); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--sp-6); }
+
+  /* site-header */
+  header { border-bottom: 1px solid var(--border); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); min-height: 64px; }
+  .name { font-weight: var(--w-semi); font-size: var(--t-title); color: var(--text); text-decoration: none; }
+  nav ul { display: flex; gap: var(--sp-6); list-style: none; padding: 0; }
+  nav a { color: var(--text-muted); text-decoration: none; font-size: var(--t-body); }
+  nav a:hover { color: var(--text); }
+
+  /* hero-headline-lockup: the original has words and no product picture, so the words carry the hero */
+  .hero { padding: var(--sp-16) 0 var(--sp-12); }
+  .kicker { color: var(--text-muted); font-size: var(--t-body); }
+  .note { margin-top: var(--sp-6); color: var(--text-subtle); font-size: var(--t-body); }
+  h1 { margin-top: var(--sp-4); max-width: 18ch; font-size: clamp(var(--t-display), 6vw, 56px); line-height: var(--lh-tight); font-weight: var(--w-semi); letter-spacing: -0.01em; }
+  .lead { margin-top: var(--sp-5); max-width: 56ch; color: var(--text-muted); font-size: var(--t-title); }
+  .actions { margin-top: var(--sp-8); display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-6); }
+  .primary { display: inline-block; padding: var(--sp-3) var(--sp-6); border-radius: var(--r-md); background: var(--accent); color: var(--accent-fg); font-weight: var(--w-med); text-decoration: none; }
+  .text-link { color: var(--text); font-weight: var(--w-med); text-underline-offset: 4px; }
+
+  /* content-matched-grid: three claims, set as rows with hairlines instead of three icon cards */
+  .features { border-top: 1px solid var(--border); padding: var(--sp-12) 0 var(--sp-16); }
+  .features h2 { font-size: var(--t-h2); font-weight: var(--w-semi); line-height: var(--lh-snug); }
+  .rows { margin-top: var(--sp-8); }
+  .row { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr) minmax(0, 2fr); gap: var(--sp-6); padding: var(--sp-6) 0; border-top: 1px solid var(--border); }
+  .row h3 { font-size: var(--t-title); font-weight: var(--w-semi); }
+  .row p { color: var(--text-muted); }
+  .row .state { color: var(--text-subtle); font-size: var(--t-body); text-align: right; }
+
+  footer { border-top: 1px solid var(--border); padding: var(--sp-8) 0; color: var(--text-subtle); font-size: var(--t-body); }
+
+  @media (max-width: 767px) {
+    .hero { padding: var(--sp-12) 0 var(--sp-8); }
+    nav ul { gap: var(--sp-4); }
+    .row { grid-template-columns: minmax(0, 1fr); gap: var(--sp-2); }
+    .row .state { text-align: left; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a class="name" href="#">Acme Ledger</a>
+      <nav aria-label="Main"><ul><li><a href="#">Product</a></li><li><a href="#">Pricing</a></li><li><a href="#">Docs</a></li></ul></nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <p class="kicker">The future of finance</p>
+        <h1>Close your books 10x faster with effortless clarity</h1>
+        <p class="lead">The all-in-one platform for modern finance teams: automate, reconcile and report in one place.</p>
+        <div class="actions">
+          <a class="primary" href="#">Get started</a>
+          <a class="text-link" href="#">Book a demo</a>
+        </div>
+        <p class="note">New: AI-powered insights.</p>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="wrap">
+        <h2>What it does</h2>
+        <div class="rows">
+          <div class="row"><h3>Lightning fast</h3><p>Reconcile thousands of transactions in seconds with smart matching.</p><span class="state">Live</span></div>
+          <div class="row"><h3>Bank-grade security</h3><p>Your data is protected with enterprise encryption at every step.</p><span class="state">Secure</span></div>
+          <div class="row"><h3>AI insights</h3><p>Spot anomalies and trends before they become problems.</p><span class="state">Beta</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap">Acme Ledger is a sample product made for this example.</div></footer>
+</body>
+</html>
