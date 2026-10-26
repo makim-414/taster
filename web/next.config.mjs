@@ -20,6 +20,7 @@ const nextConfig = {
       '../rules/rules.json',
       '../engine/node_modules/playwright/**',
       '../engine/node_modules/playwright-core/**',
+      './node_modules/playwright-core/**',
       './node_modules/@sparticuz/chromium/**',
     ],
   },
