@@ -41,3 +41,22 @@ test('pages with a strict Content-Security-Policy can still be diagnosed and rea
   const content = await extract(csp);
   assert.equal(content.sections.find((s) => s.heading)?.heading.text, 'A page that forbids inline scripts');
 });
+
+test('a page whose load event never fires is still diagnosed', { timeout: 90000 }, async () => {
+  const { createServer } = await import('node:http');
+  const { diagnose } = await import('../diagnose.mjs');
+  const hung = [];
+  const server = createServer((req, res) => {
+    if (req.url === '/slow.png') return hung.push(res); // never answers, so load never fires
+    res.writeHead(200, { 'content-type': 'text/html' });
+    res.end('<!doctype html><html lang="en"><body><h1>Still here</h1><p style="text-transform:uppercase;letter-spacing:.2em">heavy page</p><img src="/slow.png" alt=""></body></html>');
+  });
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  try {
+    const report = await diagnose(`http://127.0.0.1:${server.address().port}/`, { viewports: [{ width: 1440, height: 900 }], timeout: 30000 });
+    assert.ok(report.rules.some((r) => r.ruleId === 'AC-01'));
+  } finally {
+    hung.forEach((res) => res.destroy());
+    server.close();
+  }
+});
