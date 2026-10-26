@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Clean fixture</title>
+<style>
+  body { margin: 0; font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; color: #1a1a1a; background: #fbfaf8; font-size: 16px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere; }
+  h1, h2, h3 { font-family: "Fraunces", "Noto Serif KR", serif; line-height: 1.3; }
+  h1 { font-size: 48px; letter-spacing: -0.01em; margin: 0 0 16px; }
+  nav { display: flex; gap: 24px; padding: 16px 48px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
+  nav a { color: inherit; text-decoration: none; }
+  main { padding: 48px; max-width: 880px; }
+  .primary { display: inline-block; padding: 12px 20px; background: #1a1a1a; color: #fff; border-radius: 4px; text-decoration: none; }
+  .secondary { display: inline-block; margin-left: 8px; padding: 11px 19px; border: 1px solid #1a1a1a; color: #1a1a1a; border-radius: 4px; text-decoration: none; }
+  .tag { display: inline-block; padding: 0 8px; border-radius: 999px; background: #ecebe8; color: #444; font-size: 13px; line-height: 22px; }
+  .card { margin-top: 24px; padding: 24px; border: 1px solid #e3e1dc; border-radius: 6px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+  .card ul { margin: 0; padding-left: 20px; }
+  blockquote { margin: 24px 0; padding-left: 16px; border-left: 3px solid #b4532a; color: #444; }
+  pre { padding: 16px; background: #f1f0ed; border-radius: 4px; font-family: "JetBrains Mono", monospace; font-size: 14px; }
+  .photo { position: relative; height: 560px; background: #6b6257; }
+  .vignette { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.45)); }
+  footer { padding: 24px 48px; font-size: 12px; color: #666; }
+</style>
+</head>
+<body>
+  <nav><a href="#about">About</a><a href="#work">Work</a></nav>
+  <main>
+    <h1>작은 팀을 위한 출판 도구</h1>
+    <p>원고를 쓰고, 교정하고, 책으로 내는 과정을 한곳에서 관리합니다. 편집자와 저자가 같은 원고를 보며 의견을 남길 수 있고, 마감까지 남은 일을 한눈에 확인할 수 있습니다.</p>
+    <p><a class="primary" href="#start">무료로 써 보기</a><a class="secondary" href="#tour">둘러보기</a></p>
+
+    <h2>무엇이 달라지나요</h2>
+    <p>상태 <span class="tag">초안</span></p>
+    <div class="card">
+      <h3>교정 기록</h3>
+      <ul>
+        <li>누가 어떤 문장을 고쳤는지 원고 옆에 남습니다.</li>
+        <li>되돌리고 싶은 수정은 한 번에 되돌릴 수 있습니다.</li>
+      </ul>
+    </div>
+    <blockquote>교정지가 메일로 오가던 시간이 사라졌습니다. 이제 원고 하나만 보면 됩니다.</blockquote>
+    <pre>npm install press-kit</pre>
+    <p>보통 3~5일이면 첫 책을 낼 수 있습니다. <span lang="en">Works with your existing files.</span></p>
+  </main>
+  <div class="photo"><div class="vignette"></div></div>
+  <footer>&copy; 2026 Example Press</footer>
+</body>
+</html>
