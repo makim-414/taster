@@ -2,7 +2,9 @@ import * as React from 'react'
 import { cn } from './_cn'
 
 // Badge / Status chip. Thin neutral border, pill shape, text always neutral.
-// Semantic color appears only on the small leading dot. No filled tint backgrounds.
+// Meaning color appears only on the small leading dot, and only for real outcomes: `up` and `down` use the
+// page's --delta-up and --delta-down (set by a brand theme), which the AC-08 rule accepts. `warn` and `info` are
+// states, not outcomes, so their dot stays neutral and the word carries the meaning. No filled tint backgrounds.
 
 export type BadgeVariant = 'neutral' | 'up' | 'down' | 'warn' | 'info'
 
@@ -15,8 +17,8 @@ const DOT: Record<BadgeVariant, string> = {
   neutral: 'bg-text-subtle',
   up: 'bg-delta-up',
   down: 'bg-delta-down',
-  warn: 'bg-warning',
-  info: 'bg-accent',
+  warn: 'bg-text-subtle',
+  info: 'bg-text-subtle',
 }
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
