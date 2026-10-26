@@ -34,3 +34,26 @@ jobs:
         run: node rules/test-detect.mjs
       - name: Engine CLI and MCP
         run: npm --prefix engine test
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install web, engine and Chromium
+        run: |
+          npm ci --prefix web
+          npm ci --prefix engine --omit=dev --ignore-scripts
+          npx --prefix web playwright-core install --with-deps chromium
+      - name: Typecheck
+        run: npm --prefix web run typecheck
+      - name: Build
+        run: npm --prefix web run build
+      - name: Address guard, limits and fenced engine on the fixtures
+        run: npm --prefix web test
+      - name: The page itself has zero findings at 1440 and 390
+        run: |
+          npm --prefix web start &
+          for i in $(seq 1 30); do curl -sf http://localhost:3240 > /dev/null && break; sleep 2; done
+          node web/scripts/self-check.mjs
