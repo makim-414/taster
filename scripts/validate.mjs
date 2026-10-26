@@ -67,6 +67,24 @@ for (const p of files) {
   sections.forEach((s, i) => { if (s.trim().length < 40) err(`${id} section "${PATTERN_SECTIONS[i]}" too short`); });
 }
 
+// Iconography: the icon slot map in the taxonomy names real rules and patterns (see patterns/icon-placement.md).
+{
+  const ico = tax.iconography;
+  const SLOT_KEYS = ['id', 'name', 'covers', 'test', 'keep_when', 'instead', 'size_px', 'accessibility', 'rules', 'patterns'];
+  const SLOT_IDS = ['control', 'explanatory', 'identity', 'data-marker', 'no-icon'];
+  if (!ico || !Array.isArray(ico.slots) || !ico.set) err('taxonomy.iconography needs set and slots');
+  else {
+    const ids = ico.slots.map((s) => s.id);
+    if (ids.join('|') !== SLOT_IDS.join('|')) err(`iconography slots must be ${SLOT_IDS.join(', ')}; got ${ids.join(', ')}`);
+    for (const s of ico.slots) {
+      for (const k of SLOT_KEYS) if (s[k] === undefined || s[k] === '') err(`icon slot ${s.id} missing ${k}`);
+      for (const r of s.rules || []) if (!ruleIds.has(r)) err(`icon slot ${s.id} unknown rule ${r}`);
+      for (const pid of s.patterns || []) if (!fileIds.has(pid)) err(`icon slot ${s.id} unknown pattern ${pid}`);
+      if (s.id !== 'no-icon' && !(s.patterns || []).length) err(`icon slot ${s.id} needs at least one pattern`);
+    }
+  }
+}
+
 // Skill
 const skill = fs.readFileSync(path.join(ROOT, 'skills/taster/SKILL.md'), 'utf8');
 const sfm = parseFrontmatter(skill);
