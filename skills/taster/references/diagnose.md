@@ -23,7 +23,7 @@ Playwright example:
 ```js
 const src = fs.readFileSync('data/detect.js', 'utf8');
 await page.addScriptTag({ content: src });
-const report = await page.evaluate(() => window.disegnoDetect({ highlight: true }));
+const report = await page.evaluate(() => window.tasterDetect({ highlight: true }));
 await page.screenshot({ path: 'diagnose-1440.png', fullPage: true });
 ```
 

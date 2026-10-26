@@ -2,7 +2,7 @@
 
 Runs the slop detector (`rules/detect.js`) in a real Chromium at 1440 and 390 wide, writes an annotated capture per width, and serves the same thing to agents over MCP.
 
-`rules/detect.js` has no dependencies. Any browser tool can load it into a page and call `window.disegnoDetect({ highlight: true })`, as `skills/disegno/references/diagnose.md` describes. This folder is the ready-made runner for when you have Node.
+`rules/detect.js` has no dependencies. Any browser tool can load it into a page and call `window.tasterDetect({ highlight: true })`, as `skills/taster/references/diagnose.md` describes. This folder is the ready-made runner for when you have Node.
 
 ## Setup
 
@@ -29,15 +29,15 @@ Tools: `diagnose` (report plus one capture per width), `list_rules`, `explain_ru
 Claude Code:
 
 ```bash
-claude mcp add disegno -- node /path/to/disegno/engine/mcp.mjs
+claude mcp add taster -- node /path/to/taster/engine/mcp.mjs
 ```
 
 Codex, in `~/.codex/config.toml`:
 
 ```toml
-[mcp_servers.disegno]
+[mcp_servers.taster]
 command = "node"
-args = ["/path/to/disegno/engine/mcp.mjs"]
+args = ["/path/to/taster/engine/mcp.mjs"]
 ```
 
 ## Checks

@@ -13,7 +13,7 @@ if (!target) {
 }
 
 const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
-const out = mkdtempSync(join(tmpdir(), 'disegno-smoke-'));
+const out = mkdtempSync(join(tmpdir(), 'taster-smoke-'));
 const errors = [];
 try {
   const run = spawnSync(process.execPath, [cli, target, '--out', out], { encoding: 'utf8', timeout: 120000 });

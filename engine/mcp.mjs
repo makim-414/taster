@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { RULES, VIEWPORTS, diagnose, explainRule } from './diagnose.mjs';
 import { getComponent, getPattern, listPatterns, loadTaxonomy, suggestSwaps } from './catalog.mjs';
 
-const server = new McpServer({ name: 'disegno', version: '0.1.0' });
+const server = new McpServer({ name: 'taster', version: '0.1.0' });
 const json = (value) => ({ type: 'text', text: JSON.stringify(value, null, 2) });
 
 server.registerTool(
@@ -18,7 +18,7 @@ server.registerTool(
   {
     title: 'Diagnose a page',
     description:
-      'Open a URL or a local HTML file in a real browser at 1440 and 390 wide, run the disegno detector, and return every finding grouped by rule with selector, page rect, evidence, severity, fix and fix patterns. Also returns one capture per width with each finding outlined and labeled by rule id, and the list of manual rules to judge by eye.',
+      'Open a URL or a local HTML file in a real browser at 1440 and 390 wide, run the taster detector, and return every finding grouped by rule with selector, page rect, evidence, severity, fix and fix patterns. Also returns one capture per width with each finding outlined and labeled by rule id, and the list of manual rules to judge by eye.',
     inputSchema: {
       target: z.string().describe('http(s) URL, file:// URL, or path to a local HTML file'),
       widths: z.array(z.number().int().min(320).max(3840)).max(4).optional().describe('viewport widths, default [1440, 390]'),
@@ -26,7 +26,7 @@ server.registerTool(
     },
   },
   async ({ target, widths, screenshots = true }) => {
-    const dir = screenshots ? mkdtempSync(join(tmpdir(), 'disegno-')) : null;
+    const dir = screenshots ? mkdtempSync(join(tmpdir(), 'taster-')) : null;
     try {
       const viewports = widths ? widths.map((width) => VIEWPORTS.find((v) => v.width === width) || { width, height: width < 768 ? 844 : 900 }) : VIEWPORTS;
       const report = await diagnose(target, { viewports, outDir: dir });

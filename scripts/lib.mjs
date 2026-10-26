@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export const SKILL_DATA = path.join(ROOT, 'skills', 'disegno', 'data');
+export const SKILL_DATA = path.join(ROOT, 'skills', 'taster', 'data');
 
 export const PATTERN_SECTIONS = ['When to use', 'Anatomy', 'Do', "Don't", 'Swap recipe', 'Tokens'];
 
@@ -53,12 +53,12 @@ export function loadPatterns() {
 // Files copied into the skill bundle, as [source, destination] relative to ROOT.
 export function bundleFiles() {
   const pairs = [
-    ['taxonomy/taxonomy.json', 'skills/disegno/data/taxonomy.json'],
-    ['rules/rules.json', 'skills/disegno/data/rules.json'],
-    ['rules/detect.js', 'skills/disegno/data/detect.js'],
-    ['registry/registry.json', 'skills/disegno/data/registry.json'],
-    ['patterns/INDEX.json', 'skills/disegno/data/patterns/INDEX.json'],
+    ['taxonomy/taxonomy.json', 'skills/taster/data/taxonomy.json'],
+    ['rules/rules.json', 'skills/taster/data/rules.json'],
+    ['rules/detect.js', 'skills/taster/data/detect.js'],
+    ['registry/registry.json', 'skills/taster/data/registry.json'],
+    ['patterns/INDEX.json', 'skills/taster/data/patterns/INDEX.json'],
   ];
-  for (const p of loadPatterns()) pairs.push([`patterns/${p.file}`, `skills/disegno/data/patterns/${p.file}`]);
+  for (const p of loadPatterns()) pairs.push([`patterns/${p.file}`, `skills/taster/data/patterns/${p.file}`]);
   return pairs;
 }

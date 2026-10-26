@@ -1,9 +1,9 @@
-# disegno
+# Taster
 
 프론트엔드에서 AI 티가 나는 곳(슬롭)을 찾고, 그 자리를 같은 일을 더 잘하는 패턴으로 갈아 끼우거나, 처음부터
 슬롭 없이 화면을 짓습니다.
 
-disegno 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 읽는 모든 도구)에 넣어 쓰는 스킬이자
+Taster 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 읽는 모든 도구)에 넣어 쓰는 스킬이자
 플러그인입니다. 에이전트는 세 가지를 함께 씁니다.
 
 - **규칙.** 잴 수 있을 만큼 정확하게 적은 슬롭 목록입니다. 대문자에 넓은 자간을 준 라벨, 색을 옅게 깐 알약
@@ -27,21 +27,21 @@ disegno 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 �
 스킬을 지원하는 에이전트:
 
 ```bash
-npx skills add https://github.com/makim-414/disegno --skill disegno
+npx skills add https://github.com/makim-414/taster --skill taster
 ```
 
 Claude Code 플러그인:
 
 ```text
-/plugin marketplace add makim-414/disegno
-/plugin install disegno@disegno
+/plugin marketplace add makim-414/taster
+/plugin install taster@taster
 ```
 
 MCP 서버(실제 브라우저로 진단, 교체 부품 제안, 패턴·컴포넌트 가져오기)는 Claude Code 플러그인을 설치하면 함께
 켜집니다. 다른 MCP 도구에서는 리포를 받은 뒤 `engine/start.mjs` 를 연결합니다.
 
 ```bash
-claude mcp add disegno -- node /path/to/disegno/engine/start.mjs
+claude mcp add taster -- node /path/to/taster/engine/start.mjs
 ```
 
 설치한 뒤 에이전트에게 이렇게 말하면 됩니다. "이 사이트 슬롭 진단해줘", "이 페이지 슬롭 갈아 끼워줘",

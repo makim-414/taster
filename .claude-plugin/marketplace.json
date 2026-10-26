@@ -1,21 +1,21 @@
 {
-  "name": "disegno",
-  "description": "disegno: find the AI slop in a frontend, swap each spot for a better pattern, or build a new screen from a taxonomy of patterns that do not look generated.",
+  "name": "taster",
+  "description": "Taster: find the AI slop in a frontend, swap each spot for a better pattern, or build a new screen from a taxonomy of patterns that do not look generated.",
   "owner": {
     "name": "makim-414"
   },
   "plugins": [
     {
-      "name": "disegno",
+      "name": "taster",
       "description": "Diagnose, swap and build. 60+ slop rules checked in a real browser, a taxonomy of reusable UI patterns by use and surface, and a token based component registry.",
       "version": "0.1.0",
       "source": "./",
-      "skills": ["./skills/disegno"],
+      "skills": ["./skills/taster"],
       "author": {
         "name": "makim-414"
       },
-      "homepage": "https://github.com/makim-414/disegno",
-      "repository": "https://github.com/makim-414/disegno",
+      "homepage": "https://github.com/makim-414/taster",
+      "repository": "https://github.com/makim-414/taster",
       "license": "MIT",
       "keywords": ["skills", "frontend", "design", "ui", "anti-slop", "design-system", "taxonomy"]
     }

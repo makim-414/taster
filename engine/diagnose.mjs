@@ -50,7 +50,7 @@ export async function detectOnce(browser, url, viewport, { highlight = false, sc
     await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
     await page.evaluate(() => document.fonts && document.fonts.ready);
     await page.addScriptTag({ content: DETECT_SOURCE });
-    const report = await page.evaluate((o) => window.disegnoDetect(o), { highlight: highlight || !!screenshot, maxPerRule });
+    const report = await page.evaluate((o) => window.tasterDetect(o), { highlight: highlight || !!screenshot, maxPerRule });
     if (screenshot) {
       const height = Math.min(report.page.height, MAX_SHOT_HEIGHT);
       await page.screenshot({ path: screenshot, fullPage: true, clip: { x: 0, y: 0, width: Math.max(report.page.width, viewport.width), height } });

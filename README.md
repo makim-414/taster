@@ -1,9 +1,9 @@
-# disegno
+# Taster
 
 Find the AI slop in a frontend, swap each spot for a pattern that does the same job better, or build a new screen
 without it.
 
-disegno is a skill and plugin for coding agents (Claude Code, Codex, Cursor and anything that reads `SKILL.md`).
+Taster is a skill and plugin for coding agents (Claude Code, Codex, Cursor and anything that reads `SKILL.md`).
 It ships three things the agent uses together:
 
 - **Rules.** Slop tells written down precisely enough to measure: all caps labels with wide letter spacing, tinted
@@ -28,14 +28,14 @@ It ships three things the agent uses together:
 Any agent that supports skills:
 
 ```bash
-npx skills add https://github.com/makim-414/disegno --skill disegno
+npx skills add https://github.com/makim-414/taster --skill taster
 ```
 
 Claude Code plugin:
 
 ```text
-/plugin marketplace add makim-414/disegno
-/plugin install disegno@disegno
+/plugin marketplace add makim-414/taster
+/plugin install taster@taster
 ```
 
 Codex: the repository includes `.codex-plugin/plugin.json`.
@@ -44,14 +44,14 @@ MCP server (diagnose in a real browser, suggest swaps, fetch patterns and compon
 starts it for you. For any other MCP client, clone the repository and point the client at `engine/start.mjs`:
 
 ```bash
-claude mcp add disegno -- node /path/to/disegno/engine/start.mjs
+claude mcp add taster -- node /path/to/taster/engine/start.mjs
 ```
 
 Command line, no agent needed:
 
 ```bash
 npm --prefix engine install
-node engine/cli.mjs https://example.com --out ./disegno-report
+node engine/cli.mjs https://example.com --out ./taster-report
 ```
 
 It uses Playwright's Chromium if installed, otherwise your Google Chrome.
@@ -79,7 +79,7 @@ this product without generic AI patterns."
 ## Repository
 
 ```text
-skills/disegno/      the skill (SKILL.md, references, and a generated data/ bundle)
+skills/taster/      the skill (SKILL.md, references, and a generated data/ bundle)
 taxonomy/            families, categories, uses, surfaces
 patterns/            one Markdown file per pattern, plus INDEX.json
 rules/               rules.json, detect.js (runs in the page), fixtures and tests

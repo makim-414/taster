@@ -67,7 +67,7 @@ async function main() {
 main().then(
   (code) => process.exit(code),
   (err) => {
-    console.error(`disegno: ${err.message}`);
+    console.error(`taster: ${err.message}`);
     process.exit(2);
   },
 );
