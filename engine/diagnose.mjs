@@ -44,8 +44,9 @@ export function explainRule(id) {
 }
 
 // One page load at one viewport. Returns the raw detect.js report.
+// bypassCSP: many large sites forbid inline scripts, which would block the injected detector.
 export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50 } = {}) {
-  const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true });
   try {
     await page.goto(url, { waitUntil: 'load', timeout });
     await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
@@ -134,7 +135,7 @@ export async function extract(target, { timeout = 30000, viewport = VIEWPORTS[0]
   const url = toUrl(target);
   const browser = await launch();
   try {
-    const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
+    const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true });
     await page.goto(url, { waitUntil: 'load', timeout });
     await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
     await page.evaluate(() => document.fonts && document.fonts.ready);
