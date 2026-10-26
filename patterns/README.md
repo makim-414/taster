@@ -112,7 +112,8 @@ Layout, type, icons, tokens and the base surfaces everything sits on.
 ### Icon and mark
 
 - [Avatar with fallback](avatar-with-fallback.md)
-- [Line icon set](line-icon-set.md) fixes AC-03, AC-11, CMP-03, ICO-01
+- [Icon placement map](icon-placement.md) fixes ICO-01, ICO-02, ICO-03, ICO-04, CMP-03, LAY-02
+- [Line icon set](line-icon-set.md) fixes AC-03, AC-11, CMP-03, ICO-01, ICO-02, ICO-03
 - [Original logo assets](original-logo-assets.md) fixes AC-18
 
 ## Actions and inputs
