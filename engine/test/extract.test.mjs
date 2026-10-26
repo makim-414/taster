@@ -32,3 +32,12 @@ test('content parity reports what a rebuild dropped', () => {
   const rebuilt = page(['close your books.', 'Fast'], ['Get started!'], ['Pricing']);
   assert.deepEqual(contentParity(original, rebuilt).missing, ['Secure', 'Book a demo']);
 });
+
+test('pages with a strict Content-Security-Policy can still be diagnosed and read', { timeout: 60000 }, async () => {
+  const { diagnose } = await import('../diagnose.mjs');
+  const csp = fileURLToPath(new URL('./fixtures/csp.html', import.meta.url));
+  const report = await diagnose(csp, { viewports: [{ width: 1440, height: 900 }] });
+  assert.ok(report.rules.some((r) => r.ruleId === 'AC-01'), 'the uppercase eyebrow should be found');
+  const content = await extract(csp);
+  assert.equal(content.sections.find((s) => s.heading)?.heading.text, 'A page that forbids inline scripts');
+});
