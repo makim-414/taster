@@ -17,11 +17,18 @@ It ships three things the agent uses together:
 
 ## What it does
 
-| Job | You give it | You get back |
+Every session starts with one question: **is this a site that already exists, or are we building a new one?**
+The answer picks the route.
+
+| Route | You give it | You get back |
 |---|---|---|
-| Diagnose | a URL, a dev server or a screenshot | every slop spot outlined on a capture, with the rule it breaks and the fix |
-| Swap | a diagnosed page and its source | the same page with each spot replaced, checked again until clean |
-| Build | a product, an audience and a surface | a new screen composed from patterns, checked before you see it |
+| Existing site, source in your workspace: Diagnose, then Swap | a URL or dev server, and the code | every slop spot outlined on a capture, then the same page with each spot replaced in your code, checked again until clean |
+| Existing site, address only: Diagnose, then Rebuild | a URL (a hosted builder, a template, lost source) | the same words, links and brand on a new page made from patterns, checked clean and shown next to the original |
+| New site: Build | a product, an audience, the kind of screen, your real content | a new screen composed from patterns, checked before you see it |
+
+`examples/rebuild/` is a worked Rebuild: a generated looking landing page (17 rules hit) and its rebuild (0 at both
+widths, every heading, action and nav item kept, brand color kept). `node engine/scripts/check-rebuild-example.mjs`
+proves it.
 
 ## Install
 
@@ -52,12 +59,14 @@ Command line, no agent needed:
 ```bash
 npm --prefix engine install
 node engine/cli.mjs https://example.com --out ./taster-report
+node engine/cli.mjs https://example.com --extract    # the page's content, for a rebuild
 ```
 
 It uses Playwright's Chromium if installed, otherwise your Google Chrome.
 
-Then ask your agent: "Diagnose this site for AI slop", "Swap the slop on this page", or "Build a pricing page for
-this product without generic AI patterns."
+Then type `/taster` in Claude Code (or ask your agent to start Taster). It asks whether your site exists or is new
+and takes it from there. You can also ask directly: "Diagnose this site for AI slop", "Rebuild my Lovable site
+without the AI look", or "Build a pricing page for this product without generic AI patterns."
 
 ## Taxonomy at a glance
 
@@ -83,7 +92,9 @@ skills/taster/      the skill (SKILL.md, references, and a generated data/ bundl
 taxonomy/            families, categories, uses, surfaces
 patterns/            one Markdown file per pattern, plus INDEX.json
 rules/               rules.json, detect.js (runs in the page), fixtures and tests
-engine/              runs detect.js at two widths: CLI, MCP server (diagnose and swap tools), tests
+engine/              runs detect.js at two widths: CLI, MCP server (start prompt, diagnose, extract, swap tools), tests
+examples/rebuild/    a worked Rebuild, before and after, with its own check
+commands/            the /taster command for Claude Code
 registry/            copyable React components, tokens, a demo page and a render test
 scripts/             build-docs.mjs (derives links and the skill bundle), validate.mjs
 ```
@@ -95,6 +106,7 @@ node scripts/build-docs.mjs
 node scripts/validate.mjs
 node rules/test-detect.mjs
 npm --prefix engine test
+node engine/scripts/check-rebuild-example.mjs
 npm --prefix registry run typecheck && node registry/test-render.mjs
 ```
 
