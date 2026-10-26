@@ -1,0 +1,481 @@
+{
+  "version": "0.1.0",
+  "families": [
+    {
+      "id": "sections",
+      "name": "Page sections",
+      "summary": "Marketing page blocks: the parts a landing page is made of.",
+      "categories": [
+        "hero",
+        "feature-section",
+        "pricing",
+        "cta",
+        "testimonial",
+        "faq"
+      ]
+    },
+    {
+      "id": "navigation",
+      "name": "Navigation",
+      "summary": "Ways to move around a site or an app.",
+      "categories": [
+        "nav-header",
+        "footer",
+        "sidebar",
+        "command-palette",
+        "tabs-segmented"
+      ]
+    },
+    {
+      "id": "foundations",
+      "name": "Foundations",
+      "summary": "Layout, type, icons, tokens and the base surfaces everything sits on.",
+      "categories": [
+        "layout-shell",
+        "card",
+        "typography",
+        "icon"
+      ]
+    },
+    {
+      "id": "controls",
+      "name": "Actions and inputs",
+      "summary": "Buttons and every way a person types, picks or submits something.",
+      "categories": [
+        "button",
+        "form-input"
+      ]
+    },
+    {
+      "id": "feedback",
+      "name": "Feedback and overlays",
+      "summary": "Status, alerts, waiting, empty results and layers above the page.",
+      "categories": [
+        "badge-label",
+        "toast-alert",
+        "empty-state",
+        "loader-skeleton",
+        "modal-drawer"
+      ]
+    },
+    {
+      "id": "data",
+      "name": "Data display",
+      "summary": "Numbers, charts, tables, steps and places.",
+      "categories": [
+        "chart-kpi",
+        "table",
+        "timeline-stepper",
+        "map"
+      ]
+    },
+    {
+      "id": "media",
+      "name": "Media, commerce and AI",
+      "summary": "Galleries, storefront pages and assistant interfaces.",
+      "categories": [
+        "media-gallery",
+        "commerce",
+        "chat-ai"
+      ]
+    },
+    {
+      "id": "motion",
+      "name": "Motion and effects",
+      "summary": "Backgrounds, particles and 3D that set a mood.",
+      "categories": [
+        "motion-particle",
+        "3d"
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": "hero",
+      "name": "Hero",
+      "family": "sections"
+    },
+    {
+      "id": "feature-section",
+      "name": "Feature section",
+      "family": "sections"
+    },
+    {
+      "id": "pricing",
+      "name": "Pricing",
+      "family": "sections"
+    },
+    {
+      "id": "cta",
+      "name": "Call to action",
+      "family": "sections"
+    },
+    {
+      "id": "testimonial",
+      "name": "Testimonial and proof",
+      "family": "sections"
+    },
+    {
+      "id": "faq",
+      "name": "FAQ",
+      "family": "sections"
+    },
+    {
+      "id": "nav-header",
+      "name": "Navigation header",
+      "family": "navigation"
+    },
+    {
+      "id": "footer",
+      "name": "Footer",
+      "family": "navigation"
+    },
+    {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "family": "navigation"
+    },
+    {
+      "id": "command-palette",
+      "name": "Command palette",
+      "family": "navigation"
+    },
+    {
+      "id": "tabs-segmented",
+      "name": "Tabs and segmented control",
+      "family": "navigation"
+    },
+    {
+      "id": "layout-shell",
+      "name": "Layout and shell",
+      "family": "foundations"
+    },
+    {
+      "id": "card",
+      "name": "Card",
+      "family": "foundations"
+    },
+    {
+      "id": "typography",
+      "name": "Typography",
+      "family": "foundations"
+    },
+    {
+      "id": "icon",
+      "name": "Icon and mark",
+      "family": "foundations"
+    },
+    {
+      "id": "button",
+      "name": "Button",
+      "family": "controls"
+    },
+    {
+      "id": "form-input",
+      "name": "Form and input",
+      "family": "controls"
+    },
+    {
+      "id": "badge-label",
+      "name": "Badge and label",
+      "family": "feedback"
+    },
+    {
+      "id": "toast-alert",
+      "name": "Toast and alert",
+      "family": "feedback"
+    },
+    {
+      "id": "empty-state",
+      "name": "Empty and error state",
+      "family": "feedback"
+    },
+    {
+      "id": "loader-skeleton",
+      "name": "Loader and skeleton",
+      "family": "feedback"
+    },
+    {
+      "id": "modal-drawer",
+      "name": "Modal, drawer and menu",
+      "family": "feedback"
+    },
+    {
+      "id": "chart-kpi",
+      "name": "Chart and KPI",
+      "family": "data"
+    },
+    {
+      "id": "table",
+      "name": "Table",
+      "family": "data"
+    },
+    {
+      "id": "timeline-stepper",
+      "name": "Timeline and stepper",
+      "family": "data"
+    },
+    {
+      "id": "map",
+      "name": "Map",
+      "family": "data"
+    },
+    {
+      "id": "media-gallery",
+      "name": "Media and gallery",
+      "family": "media"
+    },
+    {
+      "id": "commerce",
+      "name": "Commerce",
+      "family": "media"
+    },
+    {
+      "id": "chat-ai",
+      "name": "Chat and AI",
+      "family": "media"
+    },
+    {
+      "id": "motion-particle",
+      "name": "Motion and particles",
+      "family": "motion"
+    },
+    {
+      "id": "3d",
+      "name": "3D scene",
+      "family": "motion"
+    }
+  ],
+  "uses": [
+    {
+      "id": "introduce-the-product",
+      "name": "Introduce the product",
+      "question": "What is this and why should I care?"
+    },
+    {
+      "id": "explain-features",
+      "name": "Explain what it does",
+      "question": "What can it do for me?"
+    },
+    {
+      "id": "show-one-number",
+      "name": "Show one number",
+      "question": "How big or how good is it right now?"
+    },
+    {
+      "id": "show-a-trend",
+      "name": "Show a trend",
+      "question": "How is it changing over time?"
+    },
+    {
+      "id": "compare-values",
+      "name": "Compare values",
+      "question": "Which one is larger or better?"
+    },
+    {
+      "id": "show-composition",
+      "name": "Show what it is made of",
+      "question": "How does the whole split into parts?"
+    },
+    {
+      "id": "show-drop-off",
+      "name": "Show where people drop off",
+      "question": "Where do people leave the process?"
+    },
+    {
+      "id": "show-relationships",
+      "name": "Show how things relate",
+      "question": "How are these things connected, or where are they?"
+    },
+    {
+      "id": "compare-plans",
+      "name": "Compare plans",
+      "question": "Which plan fits me?"
+    },
+    {
+      "id": "compare-versions",
+      "name": "Compare versions",
+      "question": "What changed between these two?"
+    },
+    {
+      "id": "prove-trust",
+      "name": "Prove trust",
+      "question": "Why should I believe this?"
+    },
+    {
+      "id": "answer-questions",
+      "name": "Answer common questions",
+      "question": "What do people usually ask?"
+    },
+    {
+      "id": "ask-for-action",
+      "name": "Ask for the next step",
+      "question": "What should I do next?"
+    },
+    {
+      "id": "capture-contact",
+      "name": "Capture contact details",
+      "question": "How do I get in touch or sign up for updates?"
+    },
+    {
+      "id": "sign-in-or-sign-up",
+      "name": "Sign in or sign up",
+      "question": "How do I get into my account?"
+    },
+    {
+      "id": "guide-through-steps",
+      "name": "Guide through steps",
+      "question": "What are the steps and where am I?"
+    },
+    {
+      "id": "show-progress",
+      "name": "Show progress",
+      "question": "Is it working, and how far along is it?"
+    },
+    {
+      "id": "label-a-state",
+      "name": "Label a state",
+      "question": "What is the status of this thing?"
+    },
+    {
+      "id": "notify-the-user",
+      "name": "Notify the user",
+      "question": "What just happened, or what needs my attention?"
+    },
+    {
+      "id": "confirm-an-action",
+      "name": "Confirm an action",
+      "question": "Am I sure I want to do this?"
+    },
+    {
+      "id": "explain-on-demand",
+      "name": "Explain on demand",
+      "question": "What does this term or number mean?"
+    },
+    {
+      "id": "show-details-on-demand",
+      "name": "Show details on demand",
+      "question": "Show me more about this item."
+    },
+    {
+      "id": "navigate-the-site",
+      "name": "Navigate the site",
+      "question": "Where can I go on this site?"
+    },
+    {
+      "id": "navigate-the-app",
+      "name": "Navigate the app",
+      "question": "Where am I in the product and where else can I go?"
+    },
+    {
+      "id": "jump-anywhere",
+      "name": "Jump anywhere fast",
+      "question": "Take me straight to that place or command."
+    },
+    {
+      "id": "switch-views",
+      "name": "Switch views",
+      "question": "Show me another view or setting of the same thing."
+    },
+    {
+      "id": "browse-records",
+      "name": "Browse many records",
+      "question": "How do I scan, sort and page through rows?"
+    },
+    {
+      "id": "filter-and-search",
+      "name": "Filter and search",
+      "question": "How do I narrow this down?"
+    },
+    {
+      "id": "enter-data",
+      "name": "Enter or pick a value",
+      "question": "Where do I type or choose something?"
+    },
+    {
+      "id": "start-an-action",
+      "name": "Start an action",
+      "question": "How do I do the thing?"
+    },
+    {
+      "id": "handle-no-data",
+      "name": "Handle nothing to show",
+      "question": "What if there is no data, or something failed?"
+    },
+    {
+      "id": "browse-media",
+      "name": "Browse media",
+      "question": "How do I look through images, video or results?"
+    },
+    {
+      "id": "sell-a-product",
+      "name": "Sell a product",
+      "question": "How do I see a product and buy it?"
+    },
+    {
+      "id": "ask-the-assistant",
+      "name": "Ask the assistant",
+      "question": "How do I talk to the AI and read its answer?"
+    },
+    {
+      "id": "set-the-mood",
+      "name": "Set the mood",
+      "question": "How do I give the page atmosphere without clutter?"
+    },
+    {
+      "id": "emphasize-text",
+      "name": "Make a phrase land",
+      "question": "How do I draw attention to a line of text?"
+    },
+    {
+      "id": "organize-the-page",
+      "name": "Organize the page",
+      "question": "How is the page laid out and its content grouped?"
+    },
+    {
+      "id": "read-long-text",
+      "name": "Read long text",
+      "question": "How do I read an article or a policy comfortably?"
+    },
+    {
+      "id": "set-the-visual-foundation",
+      "name": "Set the visual foundation",
+      "question": "Which tokens, type, icons and marks does everything share?"
+    },
+    {
+      "id": "show-when-things-happen",
+      "name": "Show when things happen",
+      "question": "What happened or is scheduled, and in what order?"
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "landing",
+      "name": "Marketing landing page"
+    },
+    {
+      "id": "dashboard",
+      "name": "Dashboard and analytics"
+    },
+    {
+      "id": "app",
+      "name": "Product app and tools"
+    },
+    {
+      "id": "commerce",
+      "name": "Store and product pages"
+    },
+    {
+      "id": "editorial",
+      "name": "Articles, documents and papers"
+    },
+    {
+      "id": "auth-onboarding",
+      "name": "Sign in and onboarding"
+    },
+    {
+      "id": "ai-chat",
+      "name": "AI chat and agent"
+    }
+  ]
+}

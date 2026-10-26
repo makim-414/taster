@@ -1,0 +1,29 @@
+/* react-day-picker (Calendar and DatePicker) overrides, token only.
+   Import once next to tokens.css if you use Calendar or DatePicker. */
+.rdp-root {
+  --rdp-accent-color: var(--accent);
+  --rdp-accent-background-color: var(--bg-elev);
+  --rdp-today-color: var(--text);
+  --rdp-day-width: 36px;
+  --rdp-day-height: 36px;
+  --rdp-day_button-width: 32px;
+  --rdp-day_button-height: 32px;
+  --rdp-day_button-border-radius: 8px;
+  --rdp-selected-border: none;
+  color: var(--text);
+  font-size: 13px;
+  margin: 0;
+}
+.rdp-month_caption, .rdp-caption_label { color: var(--text); font-weight: 600; }
+.rdp-weekday { color: var(--text-subtle); font-weight: 500; }
+.rdp-chevron { fill: var(--text-muted); }
+.rdp-button_previous:hover .rdp-chevron, .rdp-button_next:hover .rdp-chevron { fill: var(--text); }
+.rdp-day_button { color: var(--text-muted); border: 0; }
+.rdp-day_button:hover { background: var(--bg-elev); color: var(--text); }
+.rdp-today .rdp-day_button { color: var(--text); font-weight: 600; }
+.rdp-selected .rdp-day_button {
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 600;
+}
+.rdp-outside .rdp-day_button { color: var(--text-subtle); opacity: 0.5; }
