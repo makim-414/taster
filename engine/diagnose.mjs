@@ -116,7 +116,8 @@ export function formatText(report) {
       if (seen.has(f.selector) || seen.size >= 3) continue;
       seen.add(f.selector);
       out.push(`  at ${f.selector}${f.text ? `  "${Array.from(f.text).slice(0, 40).join('')}"` : ''}`);
-      if (f.evidence) out.push(`     ${f.evidence}`);
+      const evidence = f.evidence && typeof f.evidence === 'object' ? Object.entries(f.evidence).map(([k, v]) => `${k}=${typeof v === 'object' ? JSON.stringify(v) : v}`).join(' ') : f.evidence;
+      if (evidence) out.push(`     ${evidence}`);
     }
     out.push(`  fix: ${r.fix}`);
     if (r.fix_patterns.length) out.push(`  patterns: ${r.fix_patterns.join(', ')}`);
