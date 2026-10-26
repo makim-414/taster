@@ -1,0 +1,2129 @@
+[
+  {
+    "id": "asymmetric-product-hero",
+    "name": "Asymmetric product hero",
+    "category": "hero",
+    "uses": [
+      "introduce-the-product",
+      "show-one-number"
+    ],
+    "surfaces": [
+      "landing",
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-17",
+      "CMP-06",
+      "CMP-07",
+      "LAY-01"
+    ],
+    "components": [
+      "blocks/button"
+    ],
+    "summary": "Left-weighted headline and a short sentence next to a real product screen or the actual result a visitor came for, instead of a centered title floating over a gradient."
+  },
+  {
+    "id": "hero-headline-lockup",
+    "name": "Hero headline lockup",
+    "category": "hero",
+    "uses": [
+      "introduce-the-product"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-01",
+      "CMP-01",
+      "TYP-04",
+      "TYP-05"
+    ],
+    "components": [],
+    "summary": "One short headline, one plain sentence of support and one action. No announcement pill above it, no all-caps kicker, no whole paragraph set as a headline."
+  },
+  {
+    "id": "photo-led-hero",
+    "name": "Photo-led hero",
+    "category": "hero",
+    "uses": [
+      "introduce-the-product"
+    ],
+    "surfaces": [
+      "landing",
+      "commerce",
+      "editorial"
+    ],
+    "replaces": [
+      "AC-19",
+      "BG-01",
+      "COL-03",
+      "LAY-01"
+    ],
+    "components": [
+      "blocks/button"
+    ],
+    "summary": "Real photography carries the hero: a full-bleed photo with a gentle bottom scrim, or a serif headline over two or three overlapping photos. Film grain and slightly muted tone replace the glossy AI photo look."
+  },
+  {
+    "id": "scroll-driven-product-hero",
+    "name": "Scroll-driven product hero",
+    "category": "hero",
+    "uses": [
+      "introduce-the-product",
+      "show-when-things-happen"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "BG-01",
+      "MOT-01"
+    ],
+    "components": [],
+    "summary": "The hero reacts to scroll once: product rows slide, a tilted device unfolds, or words change. Motion explains the product and stops afterwards."
+  },
+  {
+    "id": "in-hero-form-flow",
+    "name": "In-hero form flow",
+    "category": "hero",
+    "uses": [
+      "introduce-the-product",
+      "capture-contact",
+      "ask-for-action"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-12",
+      "CMP-10"
+    ],
+    "components": [
+      "blocks/input",
+      "blocks/button"
+    ],
+    "summary": "The first action is an input inside the hero, such as a link to analyze. Submitting slides the hero into a short form or a sample result on the same screen, so the page needs no heavy contact form further down."
+  },
+  {
+    "id": "outcome-led-cards",
+    "name": "Outcome-led cards",
+    "category": "feature-section",
+    "uses": [
+      "explain-features",
+      "show-one-number"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "CMP-03",
+      "CMP-06",
+      "LAY-02"
+    ],
+    "components": [
+      "blocks/card",
+      "blocks/kpi"
+    ],
+    "summary": "Each card opens with its own measured result in large type, then one sentence of explanation. No icon tile, no repeated three-up icon row."
+  },
+  {
+    "id": "myth-vs-truth-pair",
+    "name": "Myth versus truth pair",
+    "category": "feature-section",
+    "uses": [
+      "explain-features"
+    ],
+    "surfaces": [
+      "landing",
+      "editorial"
+    ],
+    "replaces": [
+      "CPY-01",
+      "LAY-02"
+    ],
+    "components": [],
+    "summary": "Two statements side by side: the common belief drawn faint and dashed, the actual claim drawn solid and strong."
+  },
+  {
+    "id": "tabbed-product-showcase",
+    "name": "Tabbed product showcase",
+    "category": "feature-section",
+    "uses": [
+      "explain-features",
+      "switch-views"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "LAY-02",
+      "LAY-03"
+    ],
+    "components": [
+      "blocks/tabs"
+    ],
+    "summary": "Tabs, a hover list or a set of selectable claims swap one large frame between real product screens or charts, so a visitor sees each capability instead of reading about it."
+  },
+  {
+    "id": "real-product-frame",
+    "name": "Real product frame",
+    "category": "feature-section",
+    "uses": [
+      "explain-features"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-17",
+      "CMP-07"
+    ],
+    "components": [],
+    "summary": "A rounded frame around a true screenshot or recording of the product. Drawn skeleton mockups and fake terminals are replaced by the real screen."
+  },
+  {
+    "id": "split-section-header",
+    "name": "Split section header",
+    "category": "feature-section",
+    "uses": [
+      "explain-features",
+      "emphasize-text"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-01",
+      "LAY-01",
+      "TYP-03",
+      "TYP-04"
+    ],
+    "components": [],
+    "summary": "Lowercase eyebrow and a large left-aligned title on one side, small supporting text on the other. Replaces the centered all-caps kicker and giant title."
+  },
+  {
+    "id": "connection-diagram",
+    "name": "Connection diagram and logo grid",
+    "category": "feature-section",
+    "uses": [
+      "explain-features",
+      "show-relationships",
+      "prove-trust"
+    ],
+    "surfaces": [
+      "landing",
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-11",
+      "ICO-01",
+      "LAY-02"
+    ],
+    "components": [],
+    "summary": "Nodes and fine lines show how parts connect, or a quiet grid of single-color logos shows what is supported. Plain line nodes instead of filled circle glyphs, details on click."
+  },
+  {
+    "id": "content-matched-grid",
+    "name": "Content-matched grid",
+    "category": "feature-section",
+    "uses": [
+      "explain-features"
+    ],
+    "surfaces": [
+      "landing",
+      "commerce"
+    ],
+    "replaces": [
+      "LAY-02",
+      "LAY-05",
+      "LAY-06"
+    ],
+    "components": [
+      "blocks/card",
+      "blocks/separator"
+    ],
+    "summary": "Pick the plainest layout the content allows: a list, a two-column table or a simple grid sized to the number of items, with photographs doing the work when they exist. Spacing tightens inside groups and widens between them."
+  },
+  {
+    "id": "hairline-card",
+    "name": "Hairline card",
+    "category": "card",
+    "uses": [
+      "organize-the-page"
+    ],
+    "surfaces": [
+      "landing",
+      "dashboard",
+      "app"
+    ],
+    "replaces": [
+      "AC-14",
+      "CMP-04",
+      "CMP-05",
+      "COL-07"
+    ],
+    "components": [
+      "blocks/card"
+    ],
+    "summary": "A card defined by a one pixel border and a step in surface tone. Radius is scaled to the element, shadow only on things that float."
+  },
+  {
+    "id": "status-without-side-bar",
+    "name": "Status without side bar",
+    "category": "card",
+    "uses": [
+      "label-a-state"
+    ],
+    "surfaces": [
+      "dashboard",
+      "app"
+    ],
+    "replaces": [
+      "AC-10"
+    ],
+    "components": [
+      "blocks/alert",
+      "blocks/badge"
+    ],
+    "summary": "Severity is told with a text label and a brighter full border, not a thick colored bar on the left edge of the card."
+  },
+  {
+    "id": "single-surface-section",
+    "name": "Single surface section",
+    "category": "card",
+    "uses": [
+      "organize-the-page"
+    ],
+    "surfaces": [
+      "dashboard",
+      "app"
+    ],
+    "replaces": [
+      "CMP-02"
+    ],
+    "components": [
+      "blocks/card",
+      "blocks/separator"
+    ],
+    "summary": "One container per idea. Inner boxes are removed and groups are separated by spacing and thin dividers."
+  },
+  {
+    "id": "spotlight-border-card",
+    "name": "Spotlight border card",
+    "category": "card",
+    "uses": [
+      "organize-the-page"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "COL-07"
+    ],
+    "components": [
+      "blocks/card"
+    ],
+    "summary": "On hover a soft light follows the pointer along the card border only, instead of a colored glow shadow around the whole card."
+  },
+  {
+    "id": "media-tile-card",
+    "name": "Media tile card",
+    "category": "card",
+    "uses": [
+      "browse-media",
+      "explain-features"
+    ],
+    "surfaces": [
+      "landing",
+      "commerce",
+      "app",
+      "editorial"
+    ],
+    "replaces": [
+      "AC-17",
+      "LAY-02"
+    ],
+    "components": [
+      "blocks/card",
+      "blocks/badge"
+    ],
+    "summary": "The result, product or article image is the tile; the caption is thin and sits below or on a bottom scrim. Hub cards and article cards follow the same shape."
+  },
+  {
+    "id": "list-item-row",
+    "name": "List item row",
+    "category": "card",
+    "uses": [
+      "browse-records"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-02"
+    ],
+    "components": [
+      "blocks/card"
+    ],
+    "summary": "A single-line row with media or icon, title, short description and a trailing action, replacing a stack of boxed cards. Option cards use a stronger border and a check when selected."
+  },
+  {
+    "id": "site-header",
+    "name": "Site header",
+    "category": "nav-header",
+    "uses": [
+      "navigate-the-site"
+    ],
+    "surfaces": [
+      "landing",
+      "commerce",
+      "editorial"
+    ],
+    "replaces": [
+      "AC-01",
+      "CMP-05",
+      "ICO-01",
+      "LAY-06"
+    ],
+    "components": [
+      "blocks/dropdown",
+      "blocks/button"
+    ],
+    "summary": "Transparent at the top, solid hairline bar after scrolling, labels in normal case. Optional mega menu with text-led items and one short description each, or a minimal wordmark and one action for single-purpose pages."
+  },
+  {
+    "id": "app-bars",
+    "name": "App bars",
+    "category": "nav-header",
+    "uses": [
+      "navigate-the-app"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-05"
+    ],
+    "components": [
+      "blocks/app-shell",
+      "blocks/tabs"
+    ],
+    "summary": "A thin sticky top bar with title, sidebar toggle and page actions, plus a bottom tab bar of three to five destinations on phones."
+  },
+  {
+    "id": "multi-column-footer",
+    "name": "Multi-column footer",
+    "category": "footer",
+    "uses": [
+      "navigate-the-site"
+    ],
+    "surfaces": [
+      "landing",
+      "commerce"
+    ],
+    "replaces": [
+      "AC-01",
+      "CMP-10"
+    ],
+    "components": [],
+    "summary": "Brand and short link columns in normal case, a business or legal block and a bottom row with contact email. No newsletter form by default."
+  },
+  {
+    "id": "slim-legal-footer",
+    "name": "Slim legal footer",
+    "category": "footer",
+    "uses": [
+      "navigate-the-site"
+    ],
+    "surfaces": [
+      "editorial",
+      "app"
+    ],
+    "replaces": [
+      "CMP-10"
+    ],
+    "components": [],
+    "summary": "A single thin row with copyright and legal links for pages that do not need a sitemap."
+  },
+  {
+    "id": "neutral-cta-band",
+    "name": "Neutral call to action band",
+    "category": "cta",
+    "uses": [
+      "ask-for-action"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "CMP-04",
+      "COL-01",
+      "COL-07"
+    ],
+    "components": [
+      "blocks/button"
+    ],
+    "summary": "A flat band on a neutral surface with one sentence, one primary and at most one secondary button. No radial glow or gradient box."
+  },
+  {
+    "id": "audience-entry-split",
+    "name": "Audience entry split",
+    "category": "cta",
+    "uses": [
+      "ask-for-action",
+      "navigate-the-site"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "LAY-02"
+    ],
+    "components": [
+      "blocks/card"
+    ],
+    "summary": "Two or three entry cards that send visitors to the path for their type, instead of a generic feature row."
+  },
+  {
+    "id": "closing-contact-link",
+    "name": "Closing contact link",
+    "category": "cta",
+    "uses": [
+      "ask-for-action",
+      "capture-contact"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-12"
+    ],
+    "components": [
+      "blocks/button",
+      "blocks/dialog"
+    ],
+    "summary": "End the page with a single button that links to contact, or opens a short dialog, and put the mail link in the footer. No long inquiry form in the body."
+  },
+  {
+    "id": "plan-cards",
+    "name": "Plan cards",
+    "category": "pricing",
+    "uses": [
+      "compare-plans"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-04",
+      "AC-14",
+      "CMP-09"
+    ],
+    "components": [
+      "blocks/card",
+      "blocks/badge",
+      "blocks/button",
+      "blocks/toggle"
+    ],
+    "summary": "One card per real plan with aligned slots for name, price, billing note and features. A monthly or yearly toggle updates every price. Recommended is a text label and a stronger border, not a scaled center card."
+  },
+  {
+    "id": "plan-comparison-table",
+    "name": "Plan comparison table",
+    "category": "pricing",
+    "uses": [
+      "compare-plans"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-08",
+      "AC-11"
+    ],
+    "components": [
+      "blocks/table"
+    ],
+    "summary": "Grouped feature rows, the recommended column marked quietly, and cell formats for check, dash, limit and number in neutral ink."
+  },
+  {
+    "id": "usage-cost-estimator",
+    "name": "Usage and cost estimator",
+    "category": "pricing",
+    "uses": [
+      "compare-plans",
+      "enter-data"
+    ],
+    "surfaces": [
+      "landing",
+      "app"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/input"
+    ],
+    "summary": "A small calculator that starts from a preset and shows what a plan or order will cost for the entered usage."
+  },
+  {
+    "id": "outcome-quote-card",
+    "name": "Outcome quote card",
+    "category": "testimonial",
+    "uses": [
+      "prove-trust"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-17",
+      "CMP-08"
+    ],
+    "components": [
+      "blocks/card"
+    ],
+    "summary": "A testimonial that leads with a measured result and a named person and company. No stars, stock avatars or invented quotes."
+  },
+  {
+    "id": "monochrome-logo-strip",
+    "name": "Monochrome logo and proof strip",
+    "category": "testimonial",
+    "uses": [
+      "prove-trust"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-11",
+      "CMP-08"
+    ],
+    "components": [
+      "blocks/badge"
+    ],
+    "summary": "Real customer or integration logos in one neutral color on a single row, plus bordered neutral chips for certifications. Omit the strip when there is nothing real to show."
+  },
+  {
+    "id": "plain-pull-quote",
+    "name": "Plain pull quote",
+    "category": "testimonial",
+    "uses": [
+      "prove-trust",
+      "emphasize-text"
+    ],
+    "surfaces": [
+      "landing",
+      "editorial"
+    ],
+    "replaces": [
+      "AC-10",
+      "TYP-03"
+    ],
+    "components": [],
+    "summary": "A pull quote set in one typeface with a large opening mark and attribution, not an italic fragment with a bar on the left."
+  },
+  {
+    "id": "hairline-accordion-faq",
+    "name": "Hairline accordion FAQ",
+    "category": "faq",
+    "uses": [
+      "answer-questions"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-03",
+      "CMP-04"
+    ],
+    "components": [
+      "blocks/accordion"
+    ],
+    "summary": "Questions separated by hairlines; one answer open at a time, a chevron or plus that turns. No emoji or colored icons."
+  },
+  {
+    "id": "split-title-faq",
+    "name": "Split title FAQ",
+    "category": "faq",
+    "uses": [
+      "answer-questions",
+      "explain-features"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "TYP-04"
+    ],
+    "components": [
+      "blocks/accordion"
+    ],
+    "summary": "Section title on the left, accordion on the right, answers that fade in, and an optional image that appears beside the list for the open item."
+  },
+  {
+    "id": "flat-solid-button",
+    "name": "Flat solid button",
+    "category": "button",
+    "uses": [
+      "start-an-action"
+    ],
+    "surfaces": [
+      "landing",
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-16",
+      "COL-01",
+      "COL-07"
+    ],
+    "components": [
+      "blocks/button"
+    ],
+    "summary": "Primary actions are a solid fill in the accent token, secondary is an outline, tertiary is plain text. No glow, no gradient, no ghost primary. Grouped actions share one border."
+  },
+  {
+    "id": "action-label-button",
+    "name": "Specific action label",
+    "category": "button",
+    "uses": [
+      "start-an-action"
+    ],
+    "surfaces": [
+      "landing",
+      "app"
+    ],
+    "replaces": [
+      "CPY-01",
+      "KO-09"
+    ],
+    "components": [
+      "blocks/button"
+    ],
+    "summary": "Button text names the result in the page language, for example a request for a quote, not a generic English phrase on a Korean page."
+  },
+  {
+    "id": "status-label",
+    "name": "Status label",
+    "category": "badge-label",
+    "uses": [
+      "label-a-state"
+    ],
+    "surfaces": [
+      "dashboard",
+      "app"
+    ],
+    "replaces": [
+      "AC-04",
+      "AC-05",
+      "AC-07",
+      "AC-08"
+    ],
+    "components": [
+      "blocks/badge"
+    ],
+    "summary": "Status as neutral text with an optional small flat dot; semantic color appears only on the dot and only for real error or success."
+  },
+  {
+    "id": "data-honesty-label",
+    "name": "Data honesty label",
+    "category": "badge-label",
+    "uses": [
+      "label-a-state",
+      "prove-trust"
+    ],
+    "surfaces": [
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-06",
+      "CMP-08"
+    ],
+    "components": [
+      "blocks/badge"
+    ],
+    "summary": "Every figure carries a plain label: measured, estimated, pending or concept, set apart by ink tone only."
+  },
+  {
+    "id": "filter-chip",
+    "name": "Filter chip",
+    "category": "badge-label",
+    "uses": [
+      "filter-and-search"
+    ],
+    "surfaces": [
+      "app",
+      "commerce"
+    ],
+    "replaces": [
+      "AC-05"
+    ],
+    "components": [
+      "blocks/badge",
+      "blocks/toggle"
+    ],
+    "summary": "A scrolling row of chips that filter a list; selected chips invert tone and unselected stay quiet."
+  },
+  {
+    "id": "avatar-with-fallback",
+    "name": "Avatar with fallback",
+    "category": "icon",
+    "uses": [
+      "set-the-visual-foundation"
+    ],
+    "surfaces": [
+      "app"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/avatar"
+    ],
+    "summary": "A round picture that falls back to initials on a neutral surface when the image is missing."
+  },
+  {
+    "id": "line-icon-set",
+    "name": "Line icon set",
+    "category": "icon",
+    "uses": [
+      "set-the-visual-foundation"
+    ],
+    "surfaces": [
+      "landing",
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-03",
+      "AC-11",
+      "CMP-03",
+      "ICO-01"
+    ],
+    "components": [],
+    "summary": "One family of 24 pixel line icons with a shared stroke weight, inheriting text color, used only where the icon adds meaning. A category icon sits directly beside its name with no colored circle or tile."
+  },
+  {
+    "id": "original-logo-assets",
+    "name": "Original logo assets",
+    "category": "icon",
+    "uses": [
+      "set-the-visual-foundation"
+    ],
+    "surfaces": [
+      "landing",
+      "app"
+    ],
+    "replaces": [
+      "AC-18"
+    ],
+    "components": [],
+    "summary": "Use the supplied vector or pixel logo unchanged, exported as outlines from the design tool; never redraw it or swap its typeface."
+  },
+  {
+    "id": "plain-headline-and-eyebrow",
+    "name": "Plain headline and eyebrow",
+    "category": "typography",
+    "uses": [
+      "emphasize-text"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-01",
+      "COL-04",
+      "TYP-03",
+      "TYP-05"
+    ],
+    "components": [],
+    "summary": "A headline in one typeface and one color, with a small eyebrow set in normal case at default letter spacing. Emphasis by rewriting the sentence or changing weight, never by gradient text or one italic serif word."
+  },
+  {
+    "id": "type-system",
+    "name": "Type system",
+    "category": "typography",
+    "uses": [
+      "set-the-visual-foundation",
+      "organize-the-page"
+    ],
+    "surfaces": [
+      "landing",
+      "app",
+      "editorial"
+    ],
+    "replaces": [
+      "AC-15",
+      "TYP-01",
+      "TYP-02",
+      "TYP-04"
+    ],
+    "components": [],
+    "summary": "Choose heading and body faces for the brand, actually load them, spell out the fallback order, and keep a short fixed scale of title, subtitle and body sizes. Be able to say why in one line."
+  },
+  {
+    "id": "tabular-number-text",
+    "name": "Tabular number text",
+    "category": "typography",
+    "uses": [
+      "show-one-number",
+      "browse-records"
+    ],
+    "surfaces": [
+      "dashboard",
+      "app"
+    ],
+    "replaces": [
+      "AC-09"
+    ],
+    "components": [],
+    "summary": "UI text uses the body typeface with tabular-nums for aligned figures, instead of a monospaced font for labels."
+  },
+  {
+    "id": "plain-honest-copy",
+    "name": "Plain and specific copy",
+    "category": "typography",
+    "uses": [
+      "introduce-the-product"
+    ],
+    "surfaces": [
+      "landing",
+      "app"
+    ],
+    "replaces": [
+      "AC-02",
+      "CPY-01"
+    ],
+    "components": [],
+    "summary": "Use commas, colons, middle dots or a tilde for ranges instead of long dashes, and replace stock AI phrasing with one concrete fact only this product can state."
+  },
+  {
+    "id": "animated-text",
+    "name": "Animated text",
+    "category": "typography",
+    "uses": [
+      "emphasize-text"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "COL-04",
+      "MOT-01",
+      "TYP-03"
+    ],
+    "components": [],
+    "summary": "Use text motion once and with purpose: words firm up as the reader scrolls, one headline word cycles, a tagline types out. Never a different effect on every heading."
+  },
+  {
+    "id": "long-form-prose",
+    "name": "Long-form prose",
+    "category": "typography",
+    "uses": [
+      "read-long-text"
+    ],
+    "surfaces": [
+      "editorial"
+    ],
+    "replaces": [
+      "KO-03",
+      "KO-11"
+    ],
+    "components": [],
+    "summary": "Reading column with comfortable measure, paragraph rhythm, quotes without side bars and policy pages that render as plain prose."
+  },
+  {
+    "id": "korean-line-breaking",
+    "name": "Korean line breaking and alignment",
+    "category": "typography",
+    "uses": [
+      "read-long-text"
+    ],
+    "surfaces": [
+      "landing",
+      "editorial"
+    ],
+    "replaces": [
+      "KO-01",
+      "KO-10"
+    ],
+    "components": [],
+    "summary": "Set word-break: keep-all with overflow-wrap: anywhere for long strings, and left-align Korean text instead of justifying it."
+  },
+  {
+    "id": "korean-type-setup",
+    "name": "Korean type setup",
+    "category": "typography",
+    "uses": [
+      "read-long-text"
+    ],
+    "surfaces": [
+      "landing",
+      "editorial",
+      "app"
+    ],
+    "replaces": [
+      "KO-02",
+      "KO-03",
+      "KO-04",
+      "KO-05",
+      "KO-06",
+      "KO-08",
+      "KO-11"
+    ],
+    "components": [],
+    "summary": "Declare lang on the document, name a Korean face such as Pretendard on purpose, body at 15 to 16px with line height 1.6 to 1.8, no uppercase on Hangul, tracking between 0 and minus 0.02em, and weight or color instead of synthetic italics."
+  },
+  {
+    "id": "korean-natural-copy",
+    "name": "Korean-first copy",
+    "category": "typography",
+    "uses": [
+      "introduce-the-product"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "CPY-01",
+      "KO-07",
+      "KO-09"
+    ],
+    "components": [],
+    "summary": "Write Korean copy that reads as originally Korean: short, concrete, with button verbs that say the result."
+  },
+  {
+    "id": "app-shell",
+    "name": "App shell",
+    "category": "layout-shell",
+    "uses": [
+      "navigate-the-app",
+      "organize-the-page"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/app-shell"
+    ],
+    "summary": "Sidebar, sticky top bar and content area as one reusable frame; the sidebar becomes a drawer on small screens and the brand is a prop."
+  },
+  {
+    "id": "product-first-section-order",
+    "name": "Product-first section order",
+    "category": "layout-shell",
+    "uses": [
+      "organize-the-page",
+      "introduce-the-product"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "LAY-04"
+    ],
+    "components": [],
+    "summary": "Order a landing page starting from what only this product has, with fixed container widths per zone, rather than hero, three cards, pricing, quotes."
+  },
+  {
+    "id": "spacing-and-dividers",
+    "name": "Spacing and dividers",
+    "category": "layout-shell",
+    "uses": [
+      "organize-the-page"
+    ],
+    "surfaces": [
+      "landing",
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-02",
+      "LAY-06"
+    ],
+    "components": [
+      "blocks/separator"
+    ],
+    "summary": "Tight spacing for related items, wider spacing between unrelated groups, taken from a small token scale. Groups are separated by one pixel dividers in a border token rather than nested boxes."
+  },
+  {
+    "id": "dashboard-zones",
+    "name": "Dashboard zones",
+    "category": "layout-shell",
+    "uses": [
+      "organize-the-page",
+      "show-one-number"
+    ],
+    "surfaces": [
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-14",
+      "COL-06",
+      "LAY-05"
+    ],
+    "components": [
+      "blocks/card",
+      "blocks/kpi"
+    ],
+    "summary": "A KPI row on top and chart panels beneath, aligned to one tone and one shared panel header, instead of mixed colorful widgets."
+  },
+  {
+    "id": "editorial-paper-sheet",
+    "name": "Editorial paper sheet",
+    "category": "layout-shell",
+    "uses": [
+      "organize-the-page",
+      "read-long-text"
+    ],
+    "surfaces": [
+      "editorial"
+    ],
+    "replaces": [
+      "CMP-04",
+      "COL-01"
+    ],
+    "components": [],
+    "summary": "Print-like sheets on a warm paper tone: narrow title column cover, numbered sections, spreads with evidence and tables."
+  },
+  {
+    "id": "auth-split-frame",
+    "name": "Auth split frame",
+    "category": "layout-shell",
+    "uses": [
+      "sign-in-or-sign-up"
+    ],
+    "surfaces": [
+      "auth-onboarding"
+    ],
+    "replaces": [
+      "LAY-01"
+    ],
+    "components": [],
+    "summary": "Form column on one side and a calm visual on the other, with a stacked header on phones, instead of a centered card on a gradient."
+  },
+  {
+    "id": "token-themes",
+    "name": "Token themes",
+    "category": "layout-shell",
+    "uses": [
+      "set-the-visual-foundation",
+      "switch-views"
+    ],
+    "surfaces": [
+      "landing",
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-04",
+      "CMP-11",
+      "COL-02",
+      "COL-03",
+      "COL-05"
+    ],
+    "components": [
+      "blocks/toggle"
+    ],
+    "summary": "Raw values, roles and component tokens in three layers with one brand variable on top, and both light and dark defined as token sets with a switch. Dark steps by gray levels, not neon glow."
+  },
+  {
+    "id": "plain-section-surface",
+    "name": "Plain section surface",
+    "category": "layout-shell",
+    "uses": [
+      "organize-the-page"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "BG-01",
+      "CMP-05",
+      "COL-03"
+    ],
+    "components": [],
+    "summary": "Leave the section background empty: a solid token surface, no aurora blobs or permanent frosted glass. Blur only where layers overlap."
+  },
+  {
+    "id": "collapsible-sidebar",
+    "name": "Collapsible sidebar",
+    "category": "sidebar",
+    "uses": [
+      "navigate-the-app"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-10",
+      "COL-06"
+    ],
+    "components": [
+      "blocks/app-shell",
+      "blocks/dropdown"
+    ],
+    "summary": "Grouped menu with a collapsed icon rail and a drawer on mobile, a workspace switcher on top, one indicator that slides between links. The active item uses a surface tone, not a colored bar or glowing dot."
+  },
+  {
+    "id": "command-palette",
+    "name": "Command palette",
+    "category": "command-palette",
+    "uses": [
+      "jump-anywhere",
+      "explain-on-demand"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/command-palette",
+      "blocks/shortcuts-cheatsheet",
+      "blocks/use-hotkeys"
+    ],
+    "summary": "Open with a shortcut, type to filter grouped commands and pages, move with arrows, trap focus inside. A companion sheet lists keyboard shortcuts by area."
+  },
+  {
+    "id": "segmented-control",
+    "name": "Tabs and segmented control",
+    "category": "tabs-segmented",
+    "uses": [
+      "switch-views",
+      "filter-and-search"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard",
+      "landing"
+    ],
+    "replaces": [
+      "AC-04",
+      "AC-05",
+      "COL-06"
+    ],
+    "components": [
+      "blocks/tabs",
+      "blocks/toggle"
+    ],
+    "summary": "Two to four options in one container where the active option lifts to the surface tone, or text tabs with a thin underline for sibling pages. Includes language switches that show codes. Colored pill tabs are replaced by tone steps."
+  },
+  {
+    "id": "step-workflow-section",
+    "name": "Step workflow section",
+    "category": "timeline-stepper",
+    "uses": [
+      "guide-through-steps",
+      "explain-features"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-04",
+      "COL-07",
+      "LAY-03"
+    ],
+    "components": [
+      "marketing/workflow-section",
+      "blocks/tabs",
+      "blocks/accordion"
+    ],
+    "summary": "Number steps only when order matters. A workflow is shown as tabs or a vertical accordion, the body in neutral tones, with one always-visible assistant dock below."
+  },
+  {
+    "id": "stage-dot-progress",
+    "name": "Stage dot progress",
+    "category": "timeline-stepper",
+    "uses": [
+      "guide-through-steps",
+      "label-a-state"
+    ],
+    "surfaces": [
+      "dashboard",
+      "app",
+      "auth-onboarding"
+    ],
+    "replaces": [
+      "AC-08"
+    ],
+    "components": [
+      "blocks/progress"
+    ],
+    "summary": "Passed stages are filled dots, pending are empty rings, below target are faint dots, all in one row. A segmented bar fits signup and install flows."
+  },
+  {
+    "id": "live-step-list",
+    "name": "Live step list",
+    "category": "timeline-stepper",
+    "uses": [
+      "show-progress",
+      "guide-through-steps"
+    ],
+    "surfaces": [
+      "app",
+      "ai-chat"
+    ],
+    "replaces": [
+      "AC-07"
+    ],
+    "components": [
+      "blocks/progress"
+    ],
+    "summary": "Vertical steps with pending, running and done states, the running step shown larger, with elapsed time and a card per source being checked."
+  },
+  {
+    "id": "vertical-event-timeline",
+    "name": "Vertical event timeline",
+    "category": "timeline-stepper",
+    "uses": [
+      "show-when-things-happen"
+    ],
+    "surfaces": [
+      "app",
+      "editorial"
+    ],
+    "replaces": [],
+    "components": [],
+    "summary": "Dated entries in order with a thin spine, used for roadmaps, change logs and review history."
+  },
+  {
+    "id": "month-calendar",
+    "name": "Month calendar",
+    "category": "timeline-stepper",
+    "uses": [
+      "show-when-things-happen",
+      "enter-data"
+    ],
+    "surfaces": [
+      "app"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/calendar",
+      "blocks/datepicker"
+    ],
+    "summary": "A month grid with today marker, event chips and six-week handling, also available as a date picker popover."
+  },
+  {
+    "id": "onboarding-wizard",
+    "name": "Onboarding wizard",
+    "category": "timeline-stepper",
+    "uses": [
+      "guide-through-steps",
+      "capture-contact"
+    ],
+    "surfaces": [
+      "auth-onboarding"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/input",
+      "blocks/button"
+    ],
+    "summary": "A short multi-step flow with back, progress and one question per screen, optionally with a spotlight tour that lights one area at a time."
+  },
+  {
+    "id": "kpi-stat-tile",
+    "name": "KPI stat tile",
+    "category": "chart-kpi",
+    "uses": [
+      "show-one-number",
+      "explain-on-demand"
+    ],
+    "surfaces": [
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-11",
+      "CMP-06",
+      "COL-01"
+    ],
+    "components": [
+      "blocks/kpi",
+      "blocks/trend"
+    ],
+    "summary": "Label, one large number, a small delta and a caption or comparison line. No icon box or gradient tile; delta uses sign and text, not tinted pills."
+  },
+  {
+    "id": "sourced-metric-band",
+    "name": "Sourced metric band",
+    "category": "chart-kpi",
+    "uses": [
+      "show-one-number",
+      "prove-trust"
+    ],
+    "surfaces": [
+      "landing",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-06",
+      "CMP-08",
+      "COL-01"
+    ],
+    "components": [
+      "blocks/kpi"
+    ],
+    "summary": "Three or four real figures in a row with a source line, hierarchy by ink tone, not gradient. Each figure can open its calculation and source rows."
+  },
+  {
+    "id": "ranked-bar-chart",
+    "name": "Ranked bar chart",
+    "category": "chart-kpi",
+    "uses": [
+      "compare-values"
+    ],
+    "surfaces": [
+      "dashboard",
+      "landing"
+    ],
+    "replaces": [
+      "AC-13"
+    ],
+    "components": [
+      "blocks/bar",
+      "blocks/compare"
+    ],
+    "summary": "Bars ordered by value in a lightness ramp of one hue, with the series to emphasize in the brand color. Leaderboards add share bars and a verdict line."
+  },
+  {
+    "id": "line-area-chart",
+    "name": "Line and area chart",
+    "category": "chart-kpi",
+    "uses": [
+      "show-a-trend"
+    ],
+    "surfaces": [
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-13",
+      "COL-01"
+    ],
+    "components": [
+      "blocks/line",
+      "blocks/trend",
+      "blocks/spark"
+    ],
+    "summary": "A hairline series with a low-opacity fill or none, quiet grid, readable tooltip and a period selector. Sparklines drop axes and labels entirely."
+  },
+  {
+    "id": "neutral-donut",
+    "name": "Neutral donut",
+    "category": "chart-kpi",
+    "uses": [
+      "show-composition"
+    ],
+    "surfaces": [
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-13"
+    ],
+    "components": [
+      "blocks/donut"
+    ],
+    "summary": "A donut in one hue ramp with the key value in the center; emphasize only one slice."
+  },
+  {
+    "id": "bar-funnel",
+    "name": "Bar funnel",
+    "category": "chart-kpi",
+    "uses": [
+      "show-drop-off"
+    ],
+    "surfaces": [
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-13"
+    ],
+    "components": [
+      "blocks/funnel"
+    ],
+    "summary": "Stages as horizontal or vertical bars narrowing downward, with value and percent at the right and hover to expand."
+  },
+  {
+    "id": "gauge-and-meter",
+    "name": "Gauge and meter",
+    "category": "chart-kpi",
+    "uses": [
+      "show-one-number",
+      "compare-values"
+    ],
+    "surfaces": [
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-08"
+    ],
+    "components": [
+      "blocks/progress"
+    ],
+    "summary": "A thin neutral bar or ring that fills to a value, with the figure beside it and threshold markers instead of green and red."
+  },
+  {
+    "id": "relationship-charts",
+    "name": "Relationship charts",
+    "category": "chart-kpi",
+    "uses": [
+      "show-relationships",
+      "show-composition"
+    ],
+    "surfaces": [
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-13",
+      "COL-06"
+    ],
+    "components": [],
+    "summary": "Heatmaps in one hue, scatter and radar on meaningful axes, and treemap, sunburst or Sankey for composition and flow. One hue, the own slice highlighted, empty regions drawn dashed."
+  },
+  {
+    "id": "hairline-data-table",
+    "name": "Hairline data table",
+    "category": "table",
+    "uses": [
+      "browse-records"
+    ],
+    "surfaces": [
+      "dashboard",
+      "app"
+    ],
+    "replaces": [
+      "AC-01",
+      "AC-09",
+      "AC-14",
+      "CMP-02"
+    ],
+    "components": [
+      "blocks/table"
+    ],
+    "summary": "Sentence-case headers, right-aligned tabular figures, hairline row dividers, no zebra stripes or all-caps headers; header and footer stay fixed while the body scrolls."
+  },
+  {
+    "id": "sortable-data-grid",
+    "name": "Sortable data grid",
+    "category": "table",
+    "uses": [
+      "browse-records",
+      "filter-and-search"
+    ],
+    "surfaces": [
+      "dashboard",
+      "app"
+    ],
+    "replaces": [
+      "AC-08",
+      "AC-09"
+    ],
+    "components": [
+      "blocks/datagrid"
+    ],
+    "summary": "Click-to-sort headers, column chooser, density option, sticky first column, pagination and row drilldown; state can live in the URL. Decision queues add a verdict, stage progress and a next action per row."
+  },
+  {
+    "id": "text-input-field",
+    "name": "Text input field",
+    "category": "form-input",
+    "uses": [
+      "enter-data"
+    ],
+    "surfaces": [
+      "app",
+      "auth-onboarding"
+    ],
+    "replaces": [
+      "AC-06",
+      "AC-09",
+      "AC-14"
+    ],
+    "components": [
+      "blocks/input"
+    ],
+    "summary": "A transparent field with a neutral border and a focus ring, label above, hint and inline error text below, in the body typeface. File drop targets follow the same field style. Settings pages use a label column and a value column with a save bar that appears only after a change."
+  },
+  {
+    "id": "select-and-combobox",
+    "name": "Select and combobox",
+    "category": "form-input",
+    "uses": [
+      "enter-data",
+      "filter-and-search"
+    ],
+    "surfaces": [
+      "app"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/combobox",
+      "blocks/datepicker",
+      "blocks/calendar"
+    ],
+    "summary": "A searchable select with option descriptions and grouped headers, apply-on-confirm for multi select, and a date picker that opens a calendar popover."
+  },
+  {
+    "id": "checkbox-and-switch",
+    "name": "Checkbox and switch",
+    "category": "form-input",
+    "uses": [
+      "enter-data"
+    ],
+    "surfaces": [
+      "app"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/toggle"
+    ],
+    "summary": "On state fills with the accent token; labels are part of the control so the whole row is the hit area."
+  },
+  {
+    "id": "lead-capture-form",
+    "name": "Lead capture form",
+    "category": "form-input",
+    "uses": [
+      "capture-contact"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "AC-12",
+      "CMP-10"
+    ],
+    "components": [
+      "blocks/input",
+      "blocks/button"
+    ],
+    "summary": "One email field and one button when a real list exists, or at most three fields with labels in normal case and one clear submit button. Never on every page ending."
+  },
+  {
+    "id": "sign-in-form",
+    "name": "Sign in form",
+    "category": "form-input",
+    "uses": [
+      "sign-in-or-sign-up"
+    ],
+    "surfaces": [
+      "auth-onboarding"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/input",
+      "blocks/button"
+    ],
+    "summary": "Email and password fields with an optional provider button and a strength meter on sign up."
+  },
+  {
+    "id": "search-and-filter-bar",
+    "name": "Search and filter bar",
+    "category": "form-input",
+    "uses": [
+      "filter-and-search",
+      "jump-anywhere"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard",
+      "editorial"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/input",
+      "blocks/combobox"
+    ],
+    "summary": "Search with autocomplete or a static index, sort and one primary action in a single row above a list, filters as selects or chips."
+  },
+  {
+    "id": "dialog",
+    "name": "Dialog and sheet",
+    "category": "modal-drawer",
+    "uses": [
+      "show-details-on-demand"
+    ],
+    "surfaces": [
+      "app",
+      "landing",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-04",
+      "CMP-05"
+    ],
+    "components": [
+      "blocks/dialog"
+    ],
+    "summary": "A centered panel on a dim backdrop with a thin close icon, or a sheet sliding from the edge for row details and a lightbox for media. Blur is allowed here because layers overlap."
+  },
+  {
+    "id": "confirm-destructive-dialog",
+    "name": "Confirm destructive dialog",
+    "category": "modal-drawer",
+    "uses": [
+      "confirm-an-action"
+    ],
+    "surfaces": [
+      "app"
+    ],
+    "replaces": [
+      "CPY-01"
+    ],
+    "components": [
+      "blocks/dialog",
+      "blocks/alert"
+    ],
+    "summary": "Says exactly what disappears and what stays, whether it can be undone, and for irreversible actions asks the name to be typed."
+  },
+  {
+    "id": "tooltip-and-popover",
+    "name": "Tooltip and popover",
+    "category": "modal-drawer",
+    "uses": [
+      "explain-on-demand",
+      "show-details-on-demand"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/tooltip",
+      "blocks/popover"
+    ],
+    "summary": "A small inverted label on hover or focus, an info icon beside a metric that reveals its definition, or free content anchored to a trigger that closes on outside click or Escape."
+  },
+  {
+    "id": "dropdown-menu",
+    "name": "Dropdown menu",
+    "category": "modal-drawer",
+    "uses": [
+      "start-an-action",
+      "navigate-the-app"
+    ],
+    "surfaces": [
+      "app"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/dropdown"
+    ],
+    "summary": "A menu of actions from a button, with checked items and line icons."
+  },
+  {
+    "id": "callout-and-toast",
+    "name": "Callout and toast",
+    "category": "toast-alert",
+    "uses": [
+      "notify-the-user"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-06",
+      "AC-10",
+      "COL-06"
+    ],
+    "components": [
+      "blocks/alert"
+    ],
+    "summary": "A neutral surface with a one pixel border; color appears only on a small title or icon slot, never a tinted full-width banner. Toasts carry one follow-up action, pause on hover and can offer undo."
+  },
+  {
+    "id": "quiet-empty-state",
+    "name": "Quiet empty state",
+    "category": "empty-state",
+    "uses": [
+      "handle-no-data"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "AC-07",
+      "AC-11"
+    ],
+    "components": [
+      "blocks/skeleton"
+    ],
+    "summary": "One line explaining why it is empty and one action, no big illustration or colored icon circle. In data views the axes, headers and labels stay and only the value cells show a dash."
+  },
+  {
+    "id": "error-state",
+    "name": "Error and locked state",
+    "category": "empty-state",
+    "uses": [
+      "handle-no-data",
+      "notify-the-user"
+    ],
+    "surfaces": [
+      "app"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/alert",
+      "blocks/button"
+    ],
+    "summary": "A plain message for failure, missing permission or a locked feature with the reason, what to do and a retry or request button."
+  },
+  {
+    "id": "skeleton-placeholder",
+    "name": "Skeleton placeholder",
+    "category": "loader-skeleton",
+    "uses": [
+      "show-progress"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "MOT-01"
+    ],
+    "components": [
+      "blocks/skeleton"
+    ],
+    "summary": "Neutral pulse shapes that mirror card, table and page structure while data loads; the fallback stays still while real content fades in over it."
+  },
+  {
+    "id": "progress-and-spinner",
+    "name": "Progress bar and spinner",
+    "category": "loader-skeleton",
+    "uses": [
+      "show-progress"
+    ],
+    "surfaces": [
+      "app"
+    ],
+    "replaces": [
+      "AC-07",
+      "COL-01"
+    ],
+    "components": [
+      "blocks/progress"
+    ],
+    "summary": "A thin neutral track with a solid fill, a small outlined ring and plain text for pending work, and a pill above the tab bar for background jobs. No gradient and no orange pill with glow."
+  },
+  {
+    "id": "logo-draw-splash",
+    "name": "Logo draw splash",
+    "category": "loader-skeleton",
+    "uses": [
+      "show-progress",
+      "set-the-mood"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "MOT-01"
+    ],
+    "components": [],
+    "summary": "A logo drawn line by line once on first visit and then faded out, never on every route."
+  },
+  {
+    "id": "before-after-compare",
+    "name": "Before and after compare",
+    "category": "media-gallery",
+    "uses": [
+      "compare-versions"
+    ],
+    "surfaces": [
+      "app",
+      "landing",
+      "editorial"
+    ],
+    "replaces": [],
+    "components": [],
+    "summary": "A draggable divider over one frame to compare an original and an edited version, or two text versions side by side with removed and added lines marked."
+  },
+  {
+    "id": "media-thumb-strip",
+    "name": "Media thumbnail strip",
+    "category": "media-gallery",
+    "uses": [
+      "browse-media"
+    ],
+    "surfaces": [
+      "app",
+      "editorial"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/skeleton"
+    ],
+    "summary": "Lazy thumbnails with a play overlay and a placeholder, laid out as a strip or mosaic whose count adapts to the width, plus inline social embeds and editable image slots."
+  },
+  {
+    "id": "focus-card-carousel",
+    "name": "Focus card carousel",
+    "category": "media-gallery",
+    "uses": [
+      "browse-media",
+      "explain-features"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "LAY-02"
+    ],
+    "components": [
+      "blocks/card"
+    ],
+    "summary": "Cards rotate along an arc or one is enlarged in the center while neighbors recede, with side buttons."
+  },
+  {
+    "id": "editorial-storefront-home",
+    "name": "Editorial storefront home",
+    "category": "commerce",
+    "uses": [
+      "sell-a-product"
+    ],
+    "surfaces": [
+      "commerce"
+    ],
+    "replaces": [
+      "LAY-04"
+    ],
+    "components": [
+      "blocks/card",
+      "blocks/button"
+    ],
+    "summary": "A single still hero, category entries as worlds, best-seller rails with a four by five product grid and a consultation entry, in a light editorial tone."
+  },
+  {
+    "id": "product-detail-page",
+    "name": "Product detail page",
+    "category": "commerce",
+    "uses": [
+      "sell-a-product"
+    ],
+    "surfaces": [
+      "commerce"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/accordion"
+    ],
+    "summary": "Image and info in two columns, option selector, ingredient story, full list in an accordion, reviews, cross-sell and an expandable delivery estimate."
+  },
+  {
+    "id": "cart-and-checkout",
+    "name": "Cart and checkout",
+    "category": "commerce",
+    "uses": [
+      "sell-a-product"
+    ],
+    "surfaces": [
+      "commerce"
+    ],
+    "replaces": [],
+    "components": [],
+    "summary": "Line items, a free-shipping progress line, order summary and a stepped checkout."
+  },
+  {
+    "id": "map-with-pins",
+    "name": "Map with pins",
+    "category": "map",
+    "uses": [
+      "show-relationships"
+    ],
+    "surfaces": [
+      "app"
+    ],
+    "replaces": [],
+    "components": [],
+    "summary": "A map with pins linked to a list; moving the map filters the list, and a world map works as a hero."
+  },
+  {
+    "id": "agent-chat-thread",
+    "name": "Agent chat thread and composer",
+    "category": "chat-ai",
+    "uses": [
+      "ask-the-assistant"
+    ],
+    "surfaces": [
+      "ai-chat"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/input",
+      "blocks/button"
+    ],
+    "summary": "Operator messages as bubbles, agent replies as plain text, tool steps and approval cards inline, jump to latest, and an input that grows with text with slash commands and send or stop."
+  },
+  {
+    "id": "sourced-answer-block",
+    "name": "Sourced answer block",
+    "category": "chat-ai",
+    "uses": [
+      "ask-the-assistant",
+      "prove-trust"
+    ],
+    "surfaces": [
+      "ai-chat",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-06",
+      "CPY-01"
+    ],
+    "components": [
+      "blocks/card",
+      "blocks/kpi"
+    ],
+    "summary": "A conclusion sentence first, then a table, chart or widget with headline number, then evidence, a confidence note, source chips and an as-of date."
+  },
+  {
+    "id": "tool-call-disclosure",
+    "name": "Tool call disclosure",
+    "category": "chat-ai",
+    "uses": [
+      "ask-the-assistant",
+      "show-progress"
+    ],
+    "surfaces": [
+      "ai-chat"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/accordion"
+    ],
+    "summary": "A collapsible line per tool call showing name, arguments, status and a summary."
+  },
+  {
+    "id": "agent-status-line",
+    "name": "Agent status line",
+    "category": "chat-ai",
+    "uses": [
+      "show-progress",
+      "ask-the-assistant"
+    ],
+    "surfaces": [
+      "ai-chat"
+    ],
+    "replaces": [
+      "AC-07"
+    ],
+    "components": [
+      "blocks/skeleton"
+    ],
+    "summary": "A single shimmering line or typing dots that describes what the agent is doing now, a feed where new actions enter and earlier ones fade, and a small orb animated only beside the latest reply."
+  },
+  {
+    "id": "ask-human-step",
+    "name": "Ask-human step",
+    "category": "chat-ai",
+    "uses": [
+      "confirm-an-action",
+      "ask-the-assistant"
+    ],
+    "surfaces": [
+      "ai-chat"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/button"
+    ],
+    "summary": "The agent pauses with choices, a free-text field and a pager, or a review queue of keep or remove buttons."
+  },
+  {
+    "id": "ambient-background",
+    "name": "Ambient background",
+    "category": "motion-particle",
+    "uses": [
+      "set-the-mood"
+    ],
+    "surfaces": [
+      "landing",
+      "auth-onboarding"
+    ],
+    "replaces": [
+      "BG-01",
+      "COL-01",
+      "COL-03"
+    ],
+    "components": [],
+    "summary": "A GPU or canvas point cloud in neutral tones that forms shapes slowly, or thin noise-driven lines on a calm surface, replacing purple orbs and aurora blobs."
+  },
+  {
+    "id": "marquee-band",
+    "name": "Marquee band",
+    "category": "motion-particle",
+    "uses": [
+      "set-the-mood",
+      "prove-trust"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [],
+    "components": [],
+    "summary": "A seamless horizontal loop that pauses on hover, for logos or tickers."
+  },
+  {
+    "id": "scroll-reveal-wrapper",
+    "name": "Scroll reveal wrapper",
+    "category": "motion-particle",
+    "uses": [
+      "set-the-mood"
+    ],
+    "surfaces": [
+      "landing"
+    ],
+    "replaces": [
+      "MOT-01"
+    ],
+    "components": [],
+    "summary": "A fade-up on first entry and a height-expanding reveal for panels, instead of the same entrance on every block."
+  },
+  {
+    "id": "count-up-number",
+    "name": "Count-up number",
+    "category": "motion-particle",
+    "uses": [
+      "show-one-number"
+    ],
+    "surfaces": [
+      "landing",
+      "dashboard"
+    ],
+    "replaces": [
+      "MOT-01"
+    ],
+    "components": [
+      "blocks/kpi"
+    ],
+    "summary": "A figure rolls to its value once when it enters the view, reserves its final width and gives assistive tech the end value only."
+  },
+  {
+    "id": "webgl-scene",
+    "name": "WebGL and 3D scene",
+    "category": "3d",
+    "uses": [
+      "set-the-mood",
+      "introduce-the-product",
+      "show-relationships"
+    ],
+    "surfaces": [
+      "landing",
+      "dashboard"
+    ],
+    "replaces": [
+      "BG-01",
+      "MOT-01"
+    ],
+    "components": [],
+    "summary": "A restrained 3D scene behind the hero, a half globe rising from a container edge, a particle core that reshapes while scrolling, or a 3D graph built from real data. Runs only when visible."
+  }
+]

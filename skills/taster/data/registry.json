@@ -1,0 +1,500 @@
+{
+  "version": "0.1.0",
+  "shared": [
+    "src/blocks/_cn.ts",
+    "src/icons/index.tsx"
+  ],
+  "tokens": [
+    "src/tokens.css",
+    "src/base.css",
+    "src/themes/light.css",
+    "src/tailwind-preset.cjs"
+  ],
+  "components": [
+    {
+      "id": "blocks/accordion",
+      "file": "src/blocks/accordion.tsx",
+      "category": "faq",
+      "patterns": [
+        "hairline-accordion-faq",
+        "product-detail-page",
+        "split-title-faq",
+        "step-workflow-section",
+        "tool-call-disclosure"
+      ],
+      "deps": [
+        "@radix-ui/react-accordion"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/alert",
+      "file": "src/blocks/alert.tsx",
+      "category": "toast-alert",
+      "patterns": [
+        "callout-and-toast",
+        "confirm-destructive-dialog",
+        "error-state",
+        "status-without-side-bar"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/app-shell",
+      "file": "src/blocks/app-shell.tsx",
+      "category": "layout-shell",
+      "patterns": [
+        "app-bars",
+        "app-shell",
+        "collapsible-sidebar"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/avatar",
+      "file": "src/blocks/avatar.tsx",
+      "category": "badge-label",
+      "patterns": [
+        "avatar-with-fallback"
+      ],
+      "deps": [
+        "@radix-ui/react-avatar"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/badge",
+      "file": "src/blocks/badge.tsx",
+      "category": "badge-label",
+      "patterns": [
+        "data-honesty-label",
+        "filter-chip",
+        "media-tile-card",
+        "monochrome-logo-strip",
+        "plan-cards",
+        "status-label",
+        "status-without-side-bar"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/bar",
+      "file": "src/blocks/bar.tsx",
+      "category": "chart-kpi",
+      "patterns": [
+        "ranked-bar-chart"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/button",
+      "file": "src/blocks/button.tsx",
+      "category": "button",
+      "patterns": [
+        "action-label-button",
+        "agent-chat-thread",
+        "ask-human-step",
+        "asymmetric-product-hero",
+        "closing-contact-link",
+        "editorial-storefront-home",
+        "error-state",
+        "flat-solid-button",
+        "in-hero-form-flow",
+        "lead-capture-form",
+        "neutral-cta-band",
+        "onboarding-wizard",
+        "photo-led-hero",
+        "plan-cards",
+        "sign-in-form",
+        "site-header"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/calendar",
+      "file": "src/blocks/calendar.tsx",
+      "category": "form-input",
+      "patterns": [
+        "month-calendar",
+        "select-and-combobox"
+      ],
+      "deps": [
+        "react-day-picker"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/card",
+      "file": "src/blocks/card.tsx",
+      "category": "card",
+      "patterns": [
+        "audience-entry-split",
+        "content-matched-grid",
+        "dashboard-zones",
+        "editorial-storefront-home",
+        "focus-card-carousel",
+        "hairline-card",
+        "list-item-row",
+        "media-tile-card",
+        "outcome-led-cards",
+        "outcome-quote-card",
+        "plan-cards",
+        "single-surface-section",
+        "sourced-answer-block",
+        "spotlight-border-card"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/combobox",
+      "file": "src/blocks/combobox.tsx",
+      "category": "form-input",
+      "patterns": [
+        "search-and-filter-bar",
+        "select-and-combobox"
+      ],
+      "deps": [
+        "@radix-ui/react-popover",
+        "cmdk"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/command-palette",
+      "file": "src/blocks/command-palette.tsx",
+      "category": "command-palette",
+      "patterns": [
+        "command-palette"
+      ],
+      "deps": [
+        "blocks/use-hotkeys"
+      ],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/compare",
+      "file": "src/blocks/compare.tsx",
+      "category": "chart-kpi",
+      "patterns": [
+        "ranked-bar-chart"
+      ],
+      "deps": [
+        "recharts"
+      ],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/datagrid",
+      "file": "src/blocks/datagrid.tsx",
+      "category": "table",
+      "patterns": [
+        "sortable-data-grid"
+      ],
+      "deps": [
+        "@tanstack/react-table"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/datepicker",
+      "file": "src/blocks/datepicker.tsx",
+      "category": "form-input",
+      "patterns": [
+        "month-calendar",
+        "select-and-combobox"
+      ],
+      "deps": [
+        "@radix-ui/react-popover",
+        "blocks/calendar"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/dialog",
+      "file": "src/blocks/dialog.tsx",
+      "category": "modal-drawer",
+      "patterns": [
+        "closing-contact-link",
+        "confirm-destructive-dialog",
+        "dialog"
+      ],
+      "deps": [
+        "@radix-ui/react-dialog"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/donut",
+      "file": "src/blocks/donut.tsx",
+      "category": "chart-kpi",
+      "patterns": [
+        "neutral-donut"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/dropdown",
+      "file": "src/blocks/dropdown.tsx",
+      "category": "modal-drawer",
+      "patterns": [
+        "collapsible-sidebar",
+        "dropdown-menu",
+        "site-header"
+      ],
+      "deps": [
+        "@radix-ui/react-dropdown-menu"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/funnel",
+      "file": "src/blocks/funnel.tsx",
+      "category": "chart-kpi",
+      "patterns": [
+        "bar-funnel"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/input",
+      "file": "src/blocks/input.tsx",
+      "category": "form-input",
+      "patterns": [
+        "agent-chat-thread",
+        "in-hero-form-flow",
+        "lead-capture-form",
+        "onboarding-wizard",
+        "search-and-filter-bar",
+        "sign-in-form",
+        "text-input-field",
+        "usage-cost-estimator"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/kpi",
+      "file": "src/blocks/kpi.tsx",
+      "category": "chart-kpi",
+      "patterns": [
+        "count-up-number",
+        "dashboard-zones",
+        "kpi-stat-tile",
+        "outcome-led-cards",
+        "sourced-answer-block",
+        "sourced-metric-band"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/line",
+      "file": "src/blocks/line.tsx",
+      "category": "chart-kpi",
+      "patterns": [
+        "line-area-chart"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/popover",
+      "file": "src/blocks/popover.tsx",
+      "category": "modal-drawer",
+      "patterns": [
+        "tooltip-and-popover"
+      ],
+      "deps": [
+        "@radix-ui/react-popover"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/progress",
+      "file": "src/blocks/progress.tsx",
+      "category": "loader-skeleton",
+      "patterns": [
+        "gauge-and-meter",
+        "live-step-list",
+        "progress-and-spinner",
+        "stage-dot-progress"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/separator",
+      "file": "src/blocks/separator.tsx",
+      "category": "layout-shell",
+      "patterns": [
+        "content-matched-grid",
+        "single-surface-section",
+        "spacing-and-dividers"
+      ],
+      "deps": [
+        "@radix-ui/react-separator"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/shortcuts-cheatsheet",
+      "file": "src/blocks/shortcuts-cheatsheet.tsx",
+      "category": "command-palette",
+      "patterns": [
+        "command-palette"
+      ],
+      "deps": [
+        "blocks/use-hotkeys"
+      ],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/skeleton",
+      "file": "src/blocks/skeleton.tsx",
+      "category": "loader-skeleton",
+      "patterns": [
+        "agent-status-line",
+        "media-thumb-strip",
+        "quiet-empty-state",
+        "skeleton-placeholder"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/spark",
+      "file": "src/blocks/spark.tsx",
+      "category": "chart-kpi",
+      "patterns": [
+        "line-area-chart"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/table",
+      "file": "src/blocks/table.tsx",
+      "category": "table",
+      "patterns": [
+        "hairline-data-table",
+        "plan-comparison-table"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/tabs",
+      "file": "src/blocks/tabs.tsx",
+      "category": "tabs-segmented",
+      "patterns": [
+        "app-bars",
+        "segmented-control",
+        "step-workflow-section",
+        "tabbed-product-showcase"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/toggle",
+      "file": "src/blocks/toggle.tsx",
+      "category": "form-input",
+      "patterns": [
+        "checkbox-and-switch",
+        "filter-chip",
+        "plan-cards",
+        "segmented-control",
+        "token-themes"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/tooltip",
+      "file": "src/blocks/tooltip.tsx",
+      "category": "modal-drawer",
+      "patterns": [
+        "tooltip-and-popover"
+      ],
+      "deps": [
+        "@radix-ui/react-tooltip"
+      ],
+      "license": "MIT",
+      "credit": "shadcn/ui, MIT, https://ui.shadcn.com"
+    },
+    {
+      "id": "blocks/trend",
+      "file": "src/blocks/trend.tsx",
+      "category": "chart-kpi",
+      "patterns": [
+        "kpi-stat-tile",
+        "line-area-chart"
+      ],
+      "deps": [
+        "recharts"
+      ],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "blocks/use-hotkeys",
+      "file": "src/blocks/use-hotkeys.ts",
+      "category": "command-palette",
+      "patterns": [
+        "command-palette"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/workflow-section",
+      "file": "src/marketing/workflow-section.tsx",
+      "category": "feature-section",
+      "patterns": [
+        "step-workflow-section"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    }
+  ]
+}

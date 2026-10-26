@@ -1,0 +1,28 @@
+{
+  "name": "taster",
+  "version": "0.1.0",
+  "description": "Find the AI slop in a frontend, swap each spot for a better pattern, or build a new screen from a taxonomy of patterns.",
+  "author": {
+    "name": "makim-414",
+    "url": "https://github.com/makim-414"
+  },
+  "homepage": "https://github.com/makim-414/taster",
+  "repository": "https://github.com/makim-414/taster",
+  "license": "MIT",
+  "keywords": ["skills", "frontend", "design", "ui", "anti-slop"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Taster",
+    "shortDescription": "Diagnose AI slop in a frontend, swap it, or build without it.",
+    "longDescription": "Slop rules checked in a real browser, a taxonomy of reusable UI patterns organized by what the user is trying to do, and a token based component registry you can copy from.",
+    "developerName": "makim-414",
+    "category": "Design",
+    "capabilities": [],
+    "websiteURL": "https://github.com/makim-414/taster",
+    "defaultPrompt": [
+      "Diagnose this site for AI slop and show me every spot.",
+      "Swap the slop on this page for better patterns.",
+      "Build a landing page for this product without generic AI patterns."
+    ]
+  }
+}

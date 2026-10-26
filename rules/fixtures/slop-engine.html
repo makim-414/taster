@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slop fixture</title>
+<style>
+  body { margin: 0; font-family: "Inter", sans-serif; color: #111; background: #fff; }
+  .hero { position: relative; padding: 96px 48px; text-align: center; background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; overflow: hidden; }
+  .blob { position: absolute; top: -100px; left: -100px; width: 400px; height: 400px; border-radius: 50%; background: #ec4899; filter: blur(80px); opacity: 0.6; }
+  .announce { display: inline-block; padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,0.2); font-size: 14px; }
+  .eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 0.2em; }
+  h1 { font-size: 72px; letter-spacing: -0.05em; margin: 16px 0; }
+  .grad { background: linear-gradient(90deg, #f472b6, #facc15); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .ghost { display: inline-block; padding: 12px 24px; border: 1px solid #fff; border-radius: 8px; background: transparent; color: #fff; font: inherit; }
+  .glow { display: inline-block; margin-left: 12px; padding: 12px 24px; border-radius: 8px; background: #7c3aed; color: #fff; box-shadow: 0 10px 40px rgba(124,58,237,0.5); }
+  section { padding: 64px 48px; }
+  .num { font-size: 14px; color: #6366f1; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; background: rgba(34,197,94,0.15); color: #15803d; font-size: 12px; line-height: 20px; }
+  .outline { display: inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid #3b82f6; color: #3b82f6; font-size: 12px; line-height: 20px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; margin-right: 6px; }
+  .mono { font-family: "JetBrains Mono", monospace; font-size: 13px; }
+  .callout { margin: 24px 0; padding: 16px; background: #f8fafc; border-left: 4px solid #6366f1; border-radius: 6px; }
+  .card { padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px; background: #fff; }
+  .inner { margin-top: 16px; padding: 16px; border: 1px solid #e5e7eb; border-radius: 12px; min-height: 60px; }
+  .aurora { height: 600px; background: radial-gradient(circle at 50% 40%, rgba(168,85,247,0.35), transparent 70%); }
+  .glass-row { display: flex; gap: 16px; }
+  .glass { flex: 1; padding: 24px; background: rgba(255,255,255,0.4); backdrop-filter: blur(12px); border-radius: 12px; }
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="blob"></div>
+    <div><span class="announce">New: AI agents are here</span></div>
+    <h1>Build <span class="grad">faster</span> than ever</h1>
+    <p class="eyebrow">Trusted by modern teams</p>
+    <p>Ship products in minutes &mdash; not months. &#x1F680;</p>
+    <a class="ghost" href="#start">Get started</a>
+    <a class="glow" href="#demo">Book a demo</a>
+  </header>
+
+  <section>
+    <div class="num">01</div>
+    <h2>Everything you need</h2>
+    <p>Status <span class="badge">Active</span> <span class="outline">Beta</span></p>
+    <p><span class="dot"></span>All systems operational</p>
+    <p class="mono">Latency 24ms</p>
+    <div class="callout">Pro tip: you can connect your stack in one click.</div>
+  </section>
+
+  <section>
+    <div class="num">02</div>
+    <div class="card">
+      <h3>Workspace</h3>
+      <p>Your projects live here.</p>
+      <div class="inner">Nested panel with more details</div>
+    </div>
+    <div class="glass-row">
+      <div class="glass">Fast</div>
+      <div class="glass">Secure</div>
+      <div class="glass">Scalable</div>
+    </div>
+  </section>
+  <section class="aurora"><h2>Join the waitlist</h2></section>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clean sample</title>
+<style>
+/* A stand-in for a real brand font, registered so the page uses a loaded face, not the browser default. */
+@font-face { font-family: "Fixture Sans"; src: local("Helvetica Neue"), local("Arial"), local("Helvetica"), local("DejaVu Sans"); }
+
+:root {
+  --surface: #ffffff;
+  --surface-alt: #f4f4f2;
+  --ink: #1a1a1a;
+  --ink-soft: #55575a;
+  --line: #d9d9d6;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--surface); color: var(--ink);
+  font-family: "Fixture Sans", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-size: 17px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere;
+}
+header { display: flex; justify-content: space-between; align-items: center; padding: 20px 48px; border-bottom: 1px solid var(--line); }
+nav a { color: var(--ink); text-decoration: none; margin-left: 28px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; }
+.brand { font-weight: 700; }
+main { max-width: 960px; margin: 0 auto; }
+section.intro { padding: 96px 48px 72px; }
+section.text { padding: 64px 48px; background: var(--surface-alt); }
+section.pair { padding: 120px 48px 88px; }
+h1 { font-size: 44px; line-height: 1.3; letter-spacing: -0.01em; margin: 0 0 24px; font-weight: 700; }
+h2 { font-size: 26px; line-height: 1.35; margin: 0 0 20px; }
+p { margin: 0 0 16px; color: var(--ink-soft); max-width: 36em; }
+.btn { display: inline-block; padding: 12px 28px; background: var(--ink); color: #ffffff; text-decoration: none; border-radius: 4px; font-size: 16px; }
+.link { margin-left: 24px; color: var(--ink); }
+.figure { display: block; width: 480px; height: 270px; margin-top: 40px; }
+dl { margin: 0; display: grid; grid-template-columns: 160px 1fr; row-gap: 14px; column-gap: 40px; }
+dt { font-weight: 700; }
+dd { margin: 0; color: var(--ink-soft); }
+blockquote { margin: 32px 0 0; padding: 4px 0 4px 20px; border-left: 2px solid #bbbbb8; color: var(--ink-soft); max-width: 36em; }
+footer { padding: 40px 48px; font-size: 14px; color: var(--ink-soft); border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">Sample</span>
+  <nav><a href="#">Docs</a><a href="#">Blog</a></nav>
+</header>
+<main>
+  <section class="intro">
+    <h1>복잡한 일을 단순하게 만듭니다</h1>
+    <p>고객의 요구사항을 정확하게 분석하고 안정적인 시스템을 설계하여 운영 단계까지 책임집니다. 필요한 기능만 남기고 나머지는 덜어냅니다.</p>
+    <a class="btn" href="#">견적 받기</a><a class="link" href="#">사례 보기</a>
+    <img class="figure" alt="화면 예시" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='270'%3E%3Crect width='480' height='270' fill='%23e6e6e3'/%3E%3C/svg%3E">
+  </section>
+  <section class="text">
+    <h2>일하는 방식</h2>
+    <p>소프트웨어 개발 서비스를 제공하는 회사입니다. 데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다. 매주 진행 상황을 문서로 공유하고, 결정이 필요한 항목은 미리 정리해서 전달합니다.</p>
+    <blockquote>처음 상담에서 범위를 좁혀 준 덕분에 일정이 절반으로 줄었습니다.</blockquote>
+  </section>
+  <section class="pair">
+    <h2>진행 단계</h2>
+    <dl>
+      <dt>분석</dt><dd>요구사항을 정리하고 우선순위를 정합니다.</dd>
+      <dt>설계</dt><dd>화면과 데이터 구조를 함께 확정합니다.</dd>
+      <dt>운영</dt><dd>배포 이후 안정화까지 함께 합니다.</dd>
+    </dl>
+  </section>
+</main>
+<footer>&copy; Sample Inc. 문의는 메일로 보내 주세요.</footer>
+</body>
+</html>

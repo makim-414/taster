@@ -1,0 +1,23 @@
+{
+  "name": "@taster/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Runs rules/detect.js in a real browser at two widths, writes annotated captures, and serves it to agents over MCP.",
+  "bin": {
+    "taster-diagnose": "cli.mjs",
+    "taster-mcp": "mcp.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "playwright": "1.64.1",
+    "zod": "4.6.7"
+  }
+}
