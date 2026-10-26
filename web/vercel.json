@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "npm ci && npm ci --prefix ../engine --omit=dev --ignore-scripts",
+  "git": { "deploymentEnabled": { "**": false, "main": true } }
+}
