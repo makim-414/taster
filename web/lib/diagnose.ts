@@ -3,7 +3,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { Browser, BrowserContextOptions, Page } from 'playwright-core';
+import type { Browser, BrowserContext, BrowserContextOptions, Page } from 'playwright-core';
 import { fencePage, launchBrowser, type Budget } from './browser.ts';
 
 type Viewport = { width: number; height: number };
@@ -53,6 +53,14 @@ export type Diagnosis = { report: Summary; shots: Record<string, string>; reques
 
 export class PageLoadError extends Error {}
 
+function safeHostForLog(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return 'invalid';
+  }
+}
+
 // allowLoopback is for test/fixtures.test.ts only; the API route never passes it.
 export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopback = false } = {}): Promise<Diagnosis> {
   const engine = await loadEngine();
@@ -60,11 +68,16 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
   const budget: Budget = { requests: 0, bytes: 0, blocked: null, allowLoopback };
   const shots: Record<string, string> = {};
 
-  // detectOnce only calls browser.newPage, so a thin stand-in adds the fence and captures the
-  // screenshot as JPEG in memory instead of a file path.
+  // detectOnce only calls browser.newPage and page.close, so a thin stand-in adds the fence and
+  // captures the screenshot as JPEG in memory instead of a file path. All pages share one
+  // context that stays open until the browser closes: the serverless Chromium runs with
+  // --single-process, where disposing a context can take the whole browser down.
+  let context: BrowserContext | null = null;
   const fenced = {
     newPage: async (options: BrowserContextOptions) => {
-      const page: Page = await browser.newPage({ ...options, serviceWorkers: 'block', bypassCSP: true, acceptDownloads: false, locale: 'ko-KR' });
+      context ||= await browser.newContext({ deviceScaleFactor: 1, serviceWorkers: 'block', bypassCSP: true, acceptDownloads: false, locale: 'ko-KR' });
+      const page: Page = await context.newPage();
+      if (options.viewport) await page.setViewportSize(options.viewport);
       await fencePage(page, budget);
       const width = options.viewport ? options.viewport.width : 0;
       const original = page.screenshot.bind(page);
@@ -76,6 +89,10 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
         shots[width] = `data:image/jpeg;base64,${buf.toString('base64')}`;
         return buf;
       }) as Page['screenshot'];
+      // Stop the page instead of closing its target; browser.close() cleans up at the end.
+      page.close = (async () => {
+        await page.goto('about:blank', { timeout: 5000 }).catch(() => {});
+      }) as Page['close'];
       return page;
     },
   };
@@ -91,6 +108,7 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
         try {
           runs.push(await engine.detectOnce(fenced, url, viewport, { screenshot: `shot-${viewport.width}.jpg`, timeout: 15000, maxPerRule: 20 }));
         } catch (err) {
+          console.error('diagnose load failed', safeHostForLog(url), viewport.width, String((err as Error).message || err).split('\n')[0].slice(0, 300));
           if (budget.blocked) throw new PageLoadError(budget.blocked);
           throw new PageLoadError(`페이지를 열지 못했습니다. (${String((err as Error).message || err).split('\n')[0].slice(0, 120)})`);
         }
