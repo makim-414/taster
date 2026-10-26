@@ -20,6 +20,18 @@ Data this skill reads (all inside this folder):
 - [data/patterns/INDEX.json](data/patterns/INDEX.json) and `data/patterns/<id>.md`: one reusable design answer per file. Every rule lists its fix patterns in `fix_patterns`.
 - [data/registry.json](data/registry.json): token based React components you can copy. Source lives in the repository under `registry/src/`; if this folder was installed alone, fetch the file from `https://raw.githubusercontent.com/makim-414/disegno/main/registry/<file>`.
 
+## If the disegno MCP server is connected
+
+Prefer its tools; they run the same detector in a real browser for you.
+
+- `diagnose { target }`: findings grouped by rule plus one outlined capture per width (1440 and 390).
+- `suggest_swaps { ruleIds }`: the fix patterns and registry components for each rule found.
+- `get_pattern { id }` and `get_component { id }`: the swap recipe and copyable code with its tokens.
+- `list_patterns { surface, use, category, family, rule }` and `taxonomy`: for Build.
+- `list_rules`, `explain_rule { id }`.
+
+Without the server, follow the steps below with any browser tool, or run `node engine/cli.mjs <url>` from the repository.
+
 ## Diagnose
 
 Follow [references/diagnose.md](references/diagnose.md). Short version:

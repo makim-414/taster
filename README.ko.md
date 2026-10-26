@@ -37,6 +37,13 @@ Claude Code 플러그인:
 /plugin install disegno@disegno
 ```
 
+MCP 서버(실제 브라우저로 진단, 교체 부품 제안, 패턴·컴포넌트 가져오기)는 Claude Code 플러그인을 설치하면 함께
+켜집니다. 다른 MCP 도구에서는 리포를 받은 뒤 `engine/start.mjs` 를 연결합니다.
+
+```bash
+claude mcp add disegno -- node /path/to/disegno/engine/start.mjs
+```
+
 설치한 뒤 에이전트에게 이렇게 말하면 됩니다. "이 사이트 슬롭 진단해줘", "이 페이지 슬롭 갈아 끼워줘",
 "이 제품 요금제 페이지를 AI 티 안 나게 만들어줘".
 

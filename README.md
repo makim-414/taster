@@ -40,6 +40,22 @@ Claude Code plugin:
 
 Codex: the repository includes `.codex-plugin/plugin.json`.
 
+MCP server (diagnose in a real browser, suggest swaps, fetch patterns and components). The Claude Code plugin
+starts it for you. For any other MCP client, clone the repository and point the client at `engine/start.mjs`:
+
+```bash
+claude mcp add disegno -- node /path/to/disegno/engine/start.mjs
+```
+
+Command line, no agent needed:
+
+```bash
+npm --prefix engine install
+node engine/cli.mjs https://example.com --out ./disegno-report
+```
+
+It uses Playwright's Chromium if installed, otherwise your Google Chrome.
+
 Then ask your agent: "Diagnose this site for AI slop", "Swap the slop on this page", or "Build a pricing page for
 this product without generic AI patterns."
 
@@ -67,6 +83,7 @@ skills/disegno/      the skill (SKILL.md, references, and a generated data/ bund
 taxonomy/            families, categories, uses, surfaces
 patterns/            one Markdown file per pattern, plus INDEX.json
 rules/               rules.json, detect.js (runs in the page), fixtures and tests
+engine/              runs detect.js at two widths: CLI, MCP server (diagnose and swap tools), tests
 registry/            copyable React components, tokens, a demo page and a render test
 scripts/             build-docs.mjs (derives links and the skill bundle), validate.mjs
 ```
@@ -77,6 +94,7 @@ Edit sources, then run:
 node scripts/build-docs.mjs
 node scripts/validate.mjs
 node rules/test-detect.mjs
+npm --prefix engine test
 npm --prefix registry run typecheck && node registry/test-render.mjs
 ```
 
