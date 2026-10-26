@@ -85,6 +85,29 @@ const cx = readJson('.codex-plugin/plugin.json');
 if (mk.plugins[0].version !== cx.version) err('plugin versions differ between .claude-plugin and .codex-plugin');
 for (const s of mk.plugins[0].skills) if (!fs.existsSync(path.join(ROOT, s, 'SKILL.md'))) err(`marketplace skill path missing ${s}`);
 
+// The registry's own default type must pass the repo's own font rules: not a stock default (AC-15), not one of the
+// usual substitutes (TYP-02), and a Hangul family in the stack (KO-02).
+{
+  const tokens = fs.readFileSync(path.join(ROOT, 'registry/src/tokens.css'), 'utf8');
+  const detect = fs.readFileSync(path.join(ROOT, 'rules/detect.js'), 'utf8');
+  const list = (name) => {
+    const m = detect.match(new RegExp(`var ${name} = \\{([\\s\\S]*?)\\};`));
+    return m ? [...m[1].matchAll(/'([^']+)'|(\b[a-z][\w-]*)\s*:/g)].map((x) => (x[1] || x[2]).toLowerCase()) : null;
+  };
+  const favorites = list('FAVORITE_FONTS');
+  const defaults = list('DEFAULT_FONTS');
+  const korean = new RegExp(detect.match(/var KOREAN_FONT_RE = \/(.+)\/i;/)[1], 'i');
+  if (!favorites || !favorites.includes('geist') || !defaults || !defaults.includes('arial')) err('could not read the font lists from rules/detect.js');
+  for (const token of ['--font', '--font-mono']) {
+    const stack = (tokens.match(new RegExp(`${token}:\\s*([^;]+);`)) || [])[1];
+    if (!stack) { err(`tokens.css has no ${token}`); continue; }
+    const names = stack.split(',').map((f) => f.trim().replace(/^['"]|['"]$/g, '').toLowerCase());
+    if (favorites?.includes(names[0])) err(`tokens.css ${token} starts with ${names[0]}, which TYP-02 flags`);
+    if (defaults?.includes(names[0])) err(`tokens.css ${token} starts with ${names[0]}, which AC-15 flags`);
+    if (token === '--font' && !names.some((n) => korean.test(n))) err('tokens.css --font has no Hangul family (KO-02)');
+  }
+}
+
 // Text hygiene: long dashes and emoji are banned in this repo.
 const dash = new RegExp('[' + String.fromCharCode(0x2014, 0x2013) + ']');
 const emoji = /\p{Extended_Pictographic}/u;
