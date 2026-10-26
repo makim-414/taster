@@ -5,6 +5,8 @@ own code, and prove it with a second detector run.
 
 ## Order
 
+0. Absorb the brand ([brand.md](brand.md), `brand_theme`) if you have not yet. The theme decides the brand color,
+   the typeface and the meaning colors every swap below uses.
 1. Fix tokens first. Many findings share one cause (a purple accent, a global letter spacing, a radius scale).
    Changing the token removes them all at once and keeps the brand coherent.
 2. Then structural swaps, one rule at a time, highest severity first.

@@ -18,7 +18,9 @@ it", "build me a landing page for ..."). Then say which path you are taking in o
    source code for this site here?"
 3. Diagnose the page (`diagnose` tool, or [diagnose.md](diagnose.md)). Show the outlined captures and the table
    before you change anything.
-4. Then one of two routes:
+4. Absorb the brand (`brand_theme` tool, [brand.md](brand.md)): brand color, typeface, logo, and success and failure
+   colors fitted to them. Show the notes and confirm the brand color, the typeface and the logo file with the owner.
+5. Then one of two routes, both wearing that theme:
    - **Source code is here: Swap.** Replace each marked spot in their code, keep their brand and words, re check
      until clean. Follow [swap.md](swap.md).
    - **Only the address (a hosted builder, lost source, a template they cannot edit): Rebuild.** Read the page's
@@ -32,7 +34,8 @@ Ask, in one message, for what you do not already know:
 1. The product in one sentence.
 2. Who the screen is for.
 3. What kind of screen: landing, dashboard, app screen, store, editorial, sign in and onboarding, or AI chat.
-4. The real content they have: name, words, numbers with a source, images they own, a brand color or logo.
+4. The real content they have: name, words, numbers with a source, images they own.
+5. Their brand: a color, a typeface, the logo file, or any existing page to absorb them from ([brand.md](brand.md)).
 
 Then follow [build.md](build.md) and run Diagnose on your result before you show it. Missing content stays a
 clearly marked gap; never invent numbers, logos or testimonials.

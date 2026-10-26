@@ -17,14 +17,15 @@ source, is in [references/start.md](references/start.md).
 
 | Answer | Then | Job |
 |---|---|---|
-| Already exists, source code is in the workspace | Diagnose, then replace each spot in their code | Diagnose + Swap |
-| Already exists, only the address (hosted builder, lost source) | Diagnose, read its content, rebuild it clean | Diagnose + Rebuild |
-| New | Ask for product, audience, kind of screen, real content | Build |
+| Already exists, source code is in the workspace | Diagnose, absorb the brand, then replace each spot in their code | Diagnose + Brand + Swap |
+| Already exists, only the address (hosted builder, lost source) | Diagnose, absorb the brand, read its content, rebuild it clean | Diagnose + Brand + Rebuild |
+| New | Ask for product, audience, kind of screen, real content, brand | Brand + Build |
 
 | Job | Input | Output |
 |---|---|---|
 | Diagnose | a URL, a running dev server, or a screenshot | every slop spot, marked on a capture, with the rule it breaks and the pattern that fixes it |
 | Swap | a diagnosed page plus its source code | the same page with each spot replaced, re checked until clean |
+| Brand | the original site, or the owner's color, typeface and logo | a `theme.css` of token overrides (brand color, typeface, success and failure colors fitted to the brand) that every route wears |
 | Rebuild | a diagnosed page with no editable source | the same content on a new page made from patterns, checked clean, shown next to the original |
 | Build | a product, an audience and a surface | a new screen composed only from taxonomy patterns, checked before you hand it over |
 
@@ -41,6 +42,7 @@ Prefer its tools; they run the same detector in a real browser for you.
 
 - The `start` prompt asks the opening question for you.
 - `diagnose { target }`: findings grouped by rule plus one outlined capture per width (1440 and 390).
+- `brand_theme { target }`: the site's brand absorbed into token overrides and a ready `:root` block, with a note per choice.
 - `extract_content { target }`: the page's content in reading order (sections, actions, images, nav, footer, brand color and fonts), for Rebuild.
 - `suggest_swaps { ruleIds }`: the fix patterns and registry components for each rule found.
 - `get_pattern { id }` and `get_component { id }`: the swap recipe and copyable code with its tokens.
@@ -61,6 +63,12 @@ Follow [references/diagnose.md](references/diagnose.md). Short version:
 ## Swap
 
 Follow [references/swap.md](references/swap.md). For each finding, open the fix pattern, apply its "Swap recipe" in the user's code, prefer the registry component when the pattern lists one, keep the user's brand colors and copy, then re run detect.js. A rule is fixed only when detect.js no longer reports it at both widths.
+
+## Brand
+
+Follow [references/brand.md](references/brand.md). Absorb the brand from the original with `brand_theme`, or ask for it
+on a new site. Save the CSS as `theme.css` after the tokens, show the notes, and confirm color, typeface and logo with the
+owner. Status dots for real outcomes use the theme's `--success` and `--danger`, flat and still.
 
 ## Rebuild
 

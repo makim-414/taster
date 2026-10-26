@@ -5,14 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Acme Ledger: close your books faster</title>
 <link rel="stylesheet" href="../../registry/src/tokens.css">
+<!-- The brand, absorbed from before.html by `node engine/cli.mjs before.html --brand --out .` -->
+<link rel="stylesheet" href="theme.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-  /* Brand, carried over from the original through the one slot tokens.css leaves open:
-     the solid color on its main action. Everything else comes from tokens.
-     Typeface: the original used the default AI pick for every line. A finance tool reads numbers and
-     dense rows, so this uses IBM Plex Sans (open license): sturdy figures, plain at small sizes. */
-  :root { --brand: #4c1d95; --accent-fg: oklch(0.985 0 0); --font: 'IBM Plex Sans', -apple-system, system-ui, sans-serif; }
+  /* Brand color, the text color on it, the typeface and the meaning colors all come from theme.css. */
 
   * { box-sizing: border-box; margin: 0; }
   body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: var(--t-title); line-height: var(--lh-normal); }

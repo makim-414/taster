@@ -18,7 +18,8 @@ It ships three things the agent uses together:
 ## What it does
 
 Every session starts with one question: **is this a site that already exists, or are we building a new one?**
-The answer picks the route.
+The answer picks the route. Every route also absorbs the brand: the site's own color, typeface and logo become a
+`theme.css` of token overrides, with success and failure colors fitted so they never read as brand decoration.
 
 | Route | You give it | You get back |
 |---|---|---|
@@ -60,6 +61,7 @@ Command line, no agent needed:
 npm --prefix engine install
 node engine/cli.mjs https://example.com --out ./taster-report
 node engine/cli.mjs https://example.com --extract    # the page's content, for a rebuild
+node engine/cli.mjs https://example.com --brand      # the site's brand as a token theme
 ```
 
 It uses Playwright's Chromium if installed, otherwise your Google Chrome.
