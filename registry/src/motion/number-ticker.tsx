@@ -9,6 +9,7 @@ import { useInViewOnce, useReducedMotion } from './_motion'
 // reserved from the first frame and nothing reflows; screen readers and the server HTML get the final
 // value only; reduced motion shows it at once; digits keep tabular figures. See patterns/count-up-number.
 // Use it for one figure in view at a time, not a row of them.
+// Upstream license: MIT, Copyright (c) Magic UI. Full text in THIRD_PARTY_NOTICES.md.
 
 export interface NumberTickerProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
   value: number

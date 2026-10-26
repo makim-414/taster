@@ -9,6 +9,7 @@ import { useReducedMotion } from './_motion'
 // Changes: the monospace face, wide tracking and forced capitals of the original are gone (sans with
 // tabular figures keeps the width steady), the hover glow is gone, keyboard focus triggers it too,
 // reduced motion only draws the underline, and screen readers always get the real text.
+// Upstream license: MIT, Copyright (c) 2024 ibelick. Full text in THIRD_PARTY_NOTICES.md.
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 

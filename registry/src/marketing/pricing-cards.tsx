@@ -12,6 +12,7 @@ import { useInViewOnce, useStyleOnce } from '../motion/_motion'
 // pill badge, because that is the CMP-09 tell this kit flags; the recommended plan gets a text label
 // and a border one step stronger, as the plan-cards pattern says. All cards are the same size.
 // Cards are hidden until they slide in, so an unrevealed card is neither focusable nor read.
+// Upstream license: MIT, Copyright (c) 2026 Shadcn Space. Full text in THIRD_PARTY_NOTICES.md.
 
 const CSS =
   '@keyframes dsg-plan-in{from{opacity:0;transform:translateX(calc(var(--sp-16) * -1))}to{opacity:1;transform:none}}' +

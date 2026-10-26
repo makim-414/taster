@@ -3,6 +3,7 @@ import { cn } from './_cn'
 
 // Button with solid, secondary, outline, ghost and destructive variants.
 // API follows the shadcn/ui button (MIT). The solid variant uses the accent token so a theme can recolor it.
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export type ButtonVariant = 'solid' | 'secondary' | 'outline' | 'ghost' | 'destructive'
 export type ButtonSize = 'sm' | 'md' | 'lg'
