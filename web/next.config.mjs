@@ -10,10 +10,11 @@ const nextConfig = {
   outputFileTracingRoot: repo,
   turbopack: { root: repo },
   serverExternalPackages: ['playwright-core', '@sparticuz/chromium'],
-  // engine/diagnose.mjs is imported at run time (not bundled), so its files are listed by hand.
+  // engine/diagnose.mjs is imported at run time (not bundled), so the engine files it reads are listed by hand.
   outputFileTracingIncludes: {
     '/api/diagnose': [
-      '../engine/diagnose.mjs',
+      '../engine/*.mjs',
+      '../engine/*.js',
       '../engine/package.json',
       '../rules/detect.js',
       '../rules/rules.json',
