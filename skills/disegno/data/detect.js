@@ -243,13 +243,18 @@
   var firstCache = {};
   function firstFont(ff) {
     if (Object.prototype.hasOwnProperty.call(firstCache, ff)) return firstCache[ff];
-    var names = stackNames(ff), res = 'serif';
+    var names = stackNames(ff), res = 'serif', declared = null;
     for (var i = 0; i < names.length; i++) {
       if (fontAvailable(names[i])) {
         res = names[i].toLowerCase();
         break;
       }
+      // First family the author named on purpose that this browser cannot supply (web font blocked, not loaded, not installed).
+      if (!declared) declared = names[i].toLowerCase();
     }
+    // Only the generic fallback is left: judge the font the author asked for, not the fallback it degraded to.
+    // A page that names Fraunces or Inter made a font choice (AC-15 is about not choosing); Inter is still Inter (TYP-01).
+    if (declared && GENERIC[res]) res = declared;
     firstCache[ff] = res;
     return res;
   }
@@ -327,7 +332,7 @@
     var vw = window.innerWidth, vh = window.innerHeight;
     var viewport = { width: vw, height: vh, dpr: window.devicePixelRatio || 1 };
     if (options.clear) {
-      return { url: location.href, viewport: viewport, cleared: true, findings: [], counts: {}, notes: [], errors: [] };
+      return { url: location.href, viewport: viewport, page: { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }, cleared: true, findings: [], counts: {}, notes: [], errors: [] };
     }
     FACES = loadedFaces();
 
@@ -362,6 +367,8 @@
       if (parseFloat(cs.opacity) === 0) return null;
       var r = el.getBoundingClientRect();
       if (r.width <= 0 || r.height <= 0) return null;
+      // The visually-hidden pattern (1px box, clipped) is for screen readers: nothing on screen to judge.
+      if (r.width <= 2 && r.height <= 2) return null;
       return { el: el, cs: cs, tag: el.tagName.toLowerCase(), r: { l: r.left, t: r.top, w: r.width, h: r.height, b: r.bottom, rt: r.right } };
     }
     [document.documentElement, document.body].forEach(function (el) {
@@ -465,6 +472,8 @@
       if (!isPill(it)) return null;
       var w = words(it.el);
       if (w < 1 || w > 3) return null;
+      // A badge is a label. A control drawn as a capsule (btn/button/cta class, role=button) is a button.
+      if (it.tag === 'button' || btnLike(it.el)) return null;
       var bg = bgOf(it);
       if (!isTint(bg)) return null;
       var tc = parseColor(it.cs.color);
@@ -529,7 +538,7 @@
 
     R['AC-05'] = function () {
       I.forEach(function (it) {
-        if (/^(button|input|select|textarea)$/.test(it.tag)) return;
+        if (/^(button|input|select|textarea)$/.test(it.tag) || btnLike(it.el)) return;
         if (it.r.h > 64 || it.r.h < 12 || it.r.w > 360 || !isPill(it)) return;
         var w = words(it.el);
         if (w < 1 || w > 3) return;
@@ -696,10 +705,19 @@
       });
     };
 
+    // A link drawn as a button without a btn/button/cta class: a block-level link with horizontal padding, a short label
+    // and a fill or a border. Used by AC-16 only, so the other button rules keep their strict class based test.
+    function linkButton(it) {
+      if (it.tag !== 'a' || !/^(inline-block|inline-flex|flex|block|grid|inline-grid)$/.test(it.cs.display)) return false;
+      if (px(it.cs.paddingLeft) < 12 && px(it.cs.paddingRight) < 12) return false;
+      var t = norm(it.el.textContent);
+      if (!t || t.length > 40 || t.split(' ').length > 5) return false;
+      return minBorder(it.cs) >= 1 || bgOf(it).a > 0.04 || it.cs.backgroundImage !== 'none';
+    }
     R['AC-16'] = function () {
       var cands = [];
       I.forEach(function (it) {
-        if (it.r.t >= vh || it.r.b <= 0 || !btnLike(it.el) || inNav(it.el)) return;
+        if (it.r.t >= vh || it.r.b <= 0 || !(btnLike(it.el) || linkButton(it)) || inNav(it.el)) return;
         if (!norm(it.el.textContent || it.el.value)) return;
         cands.push(it);
       });
@@ -831,7 +849,7 @@
     R['COL-07'] = function () {
       I.forEach(function (it) {
         var s = parseShadows(it.cs.boxShadow).filter(function (x) {
-          return !x.inset && x.blur >= 24 && x.color && x.color.a >= 0.1 && hsl(x.color).s >= 0.4 && hsl(x.color).chroma >= 0.2;
+          return !x.inset && x.blur >= 24 && x.color && x.color.a >= 0.15 && hsl(x.color).s >= 0.4 && hsl(x.color).chroma >= 0.2;
         })[0];
         if (s) add('COL-07', it.el, { blurPx: s.blur, color: 'rgba(' + [s.color.r, s.color.g, s.color.b, rn(s.color.a)].join(',') + ')' });
       });
@@ -1250,20 +1268,31 @@
         var m = (cs.filter || '').match(/blur\(([\d.]+)px\)/);
         return m ? parseFloat(m[1]) : 0;
       }
+      // An aurora glows in a color. A radial gradient whose stops are only black, white or gray (a vignette over a photo,
+      // a soft shade) is not one, so it needs at least one visible stop with real chroma.
+      function coloredRadial(bi) {
+        if (!/radial-gradient/.test(bi)) return false;
+        return colorsIn(bi).some(function (c) {
+          if (c.a < 0.1) return false;
+          var h = hsl(c);
+          return h.s >= 0.35 && h.chroma >= 0.12 && h.l < 0.97;
+        });
+      }
       I.forEach(function (it) {
         var b = blurOf(it.cs);
-        var radial = /radial-gradient/.test(it.cs.backgroundImage);
+        var radial = coloredRadial(it.cs.backgroundImage);
         var cover = (it.r.w * it.r.h) / (vw * vh);
-        if (b >= 40) add('BG-01', it.el, { blurPx: b });
+        // A blur is a blob only when the box is blob sized; small blurred things are glows on icons or text.
+        if (b >= 40 && it.r.w >= 200 && it.r.h >= 200) add('BG-01', it.el, { blurPx: b });
         else if (radial && cover >= 0.3) add('BG-01', it.el, { radialGradient: true, viewportAreaRatio: rn(cover) });
         else if (it.tag !== 'html' && it.tag !== 'body') {
           ['::before', '::after'].forEach(function (ps) {
             var pcs = getComputedStyle(it.el, ps);
             if (!pcs || pcs.content === 'none' || pcs.content === 'normal') return;
             var pb = blurOf(pcs);
-            var pr = /radial-gradient/.test(pcs.backgroundImage);
+            var pr = coloredRadial(pcs.backgroundImage);
             var w = px(pcs.width), h = px(pcs.height);
-            if (pb >= 40) add('BG-01', it.el, { pseudo: ps, blurPx: pb });
+            if (pb >= 40 && (!w || !h || (w >= 200 && h >= 200))) add('BG-01', it.el, { pseudo: ps, blurPx: pb });
             else if (pr && w && h && (w * h) / (vw * vh) >= 0.3) add('BG-01', it.el, { pseudo: ps, radialGradient: true });
           });
         }
@@ -1353,6 +1382,19 @@
       var fs = px(cs.fontSize);
       return cs.lineHeight === 'normal' ? fs * 1.2 : px(cs.lineHeight);
     }
+    // Rendered lines of an element's own text, counted from the line boxes of its text nodes. The element's box height
+    // is not a line count: a one-word menu item with padding, a fixed height or a flex row is tall without wrapping.
+    function lineCount(el) {
+      var rng = document.createRange(), tops = [];
+      Array.prototype.forEach.call(el.childNodes, function (nd) {
+        if (nd.nodeType !== 3 || !nd.nodeValue.trim()) return;
+        rng.selectNodeContents(nd);
+        Array.prototype.forEach.call(rng.getClientRects(), function (rc) {
+          if (rc.width > 0 && !tops.some(function (t) { return Math.abs(t - rc.top) < 2; })) tops.push(rc.top);
+        });
+      });
+      return tops.length;
+    }
     var breakBudget = 40000;
     function midWordBreaks(el, fs) {
       var found = 0, sample = null;
@@ -1383,8 +1425,7 @@
       koEls(4).forEach(function (o) {
         var it = o.it;
         if (it.cs.wordBreak === 'keep-all' || o.st.ratio < 0.5) return;
-        var lh = lineHeightPx(it.cs);
-        if (it.r.h < lh * 1.6) return;
+        if (lineCount(it.el) < 2) return;
         var res = midWordBreaks(it.el, px(it.cs.fontSize));
         if (res.found) add('KO-01', it.el, { wordBreak: it.cs.wordBreak, midWordBreaks: res.found, sample: res.sample });
       });
@@ -1394,6 +1435,11 @@
       koEls(1).forEach(function (o) {
         var names = stackNames(o.it.cs.fontFamily).filter(function (nm) { return !GENERIC[nm.toLowerCase()]; });
         if (!names.length) return;
+        // system-ui and its aliases resolve to the operating system UI font, which carries Hangul glyphs.
+        var sysUi = stackNames(o.it.cs.fontFamily).some(function (nm) {
+          return /^(system-ui|-apple-system|blinkmacsystemfont|ui-sans-serif|ui-serif|ui-rounded)$/i.test(nm);
+        });
+        if (sysUi) return;
         var capable = names.some(function (nm) {
           return KOREAN_FONT_RE.test(nm) || (fontAvailable(nm) && hangulMeasured(nm));
         });
@@ -1408,9 +1454,10 @@
         var fs = px(it.cs.fontSize);
         if (fs > 28) return;
         var lh = lineHeightPx(it.cs);
-        if (it.r.h < lh * 1.8) return;
+        var lines = lineCount(it.el);
+        if (lines < 2) return;
         var ratio = lh / fs;
-        if (ratio < 1.5) add('KO-03', it.el, { lineHeightRatio: rn(ratio), lines: Math.round(it.r.h / lh) });
+        if (ratio < 1.5) add('KO-03', it.el, { lineHeightRatio: rn(ratio), lines: lines });
       });
     };
 
@@ -1457,14 +1504,16 @@
       koEls(20).forEach(function (o) {
         var it = o.it;
         if (o.st.ratio < 0.5 || it.cs.textAlign !== 'justify') return;
-        var lh = lineHeightPx(it.cs);
-        if (it.r.h >= lh * 2.6) add('KO-10', it.el, { textAlign: 'justify', lines: Math.round(it.r.h / lh) });
+        var lines = lineCount(it.el);
+        if (lines >= 3) add('KO-10', it.el, { textAlign: 'justify', lines: lines });
       });
     };
 
     R['KO-11'] = function () {
       koEls(1).forEach(function (o) {
         var fs = px(o.it.cs.fontSize);
+        // Captions and body copy, not one-word labels: needs mostly Hangul and a sentence worth of characters.
+        if (o.st.ratio < 0.5 || o.text.replace(/\s/g, '').length < 10) return;
         if (fs < 13 && !/^(sup|sub)$/.test(o.it.tag)) add('KO-11', o.it.el, { fontSizePx: fs, inFooter: !!o.it.el.closest('footer') });
       });
     };
@@ -1490,7 +1539,7 @@
 
     if (options.highlight) highlight(toHL);
 
-    return { url: location.href, viewport: viewport, version: VERSION, findings: findings, counts: counts, notes: notes, errors: errors };
+    return { url: location.href, viewport: viewport, page: { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }, version: VERSION, findings: findings, counts: counts, notes: notes, errors: errors };
   }
 
   run.version = VERSION;
