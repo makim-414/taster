@@ -19,7 +19,8 @@ Paste a URL, see which slop rules it hits. The page links from the series ("put 
 - The browser is pointed at a dead proxy, so anything that is not intercepted (WebSocket, WebRTC, workers,
   cross-origin frames) fails instead of reaching the network. Only GET and HEAD leave the server.
 - Per IP: 6 diagnoses per 10 minutes per instance. One Chromium per instance at a time, a short queue, then 503.
-- Page load 15 s per width, 50 s for the whole run, 400 requests and 60 MB per run.
+- Page load 15 s per width (plus the engine's own load and idle waits), 80 s for the whole run, 400 requests and
+  60 MB per run.
 
 ## Commands
 
