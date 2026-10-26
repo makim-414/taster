@@ -15,6 +15,9 @@ It ships three things the agent uses together:
 - **A registry of components.** Token based React components you copy into your app. No package to install, no
   brand to undo.
 
+Try it without installing anything: paste a URL at https://taster-six.vercel.app and see which rules it hits,
+outlined on captures at desktop and phone width.
+
 ## What it does
 
 Every session starts with one question: **is this a site that already exists, or are we building a new one?**
@@ -95,6 +98,7 @@ rules/               rules.json, detect.js (runs in the page), fixtures and test
 engine/              runs detect.js at two widths: CLI, MCP server (start prompt, diagnose, extract, swap tools), tests
 examples/rebuild/    a worked Rebuild, before and after, with its own check
 commands/            the /taster command for Claude Code
+web/                 the web diagnosis page (Next.js), deployed at https://taster-six.vercel.app
 registry/            copyable React components, tokens, a demo page and a render test
 scripts/             build-docs.mjs (derives links and the skill bundle), validate.mjs
 ```
