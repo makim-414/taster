@@ -113,7 +113,7 @@ const dash = new RegExp('[' + String.fromCharCode(0x2014, 0x2013) + ']');
 const emoji = /\p{Extended_Pictographic}/u;
 (function walk(d) {
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-    if (['.git', 'node_modules', 'dist', 'shots'].includes(e.name)) continue;
+    if (['.git', 'node_modules', 'dist', 'shots', '.next'].includes(e.name)) continue;
     const p = path.join(d, e.name);
     if (e.isDirectory()) { walk(p); continue; }
     if (!/\.(md|json|tsx?|jsx?|mjs|css|html|ya?ml)$/.test(e.name)) continue;
