@@ -31,5 +31,9 @@
     "KO-11"
   ],
   "clean-engine.html": [],
-  "clean-menu.html": []
+  "clean-menu.html": [],
+  "clean-status.html": [],
+  "slop-status.html": [
+    "AC-08"
+  ]
 }

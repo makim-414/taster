@@ -303,7 +303,7 @@
       "why": "A stock dashboard ornament. Color alone carries the meaning, which also fails color-blind readers. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
-        "signal": "Element 4 to 12px square with fully rounded corners, an opaque chromatic background, no text, followed by text. A running animation or a colored box-shadow raises the weight.",
+        "signal": "Element 4 to 12px square with fully rounded corners, an opaque chromatic background, no text, followed by text. Not flagged when the dot is flat and still and its color is the page's own success or failure token (--success, --danger, --destructive, --error, --delta-up, --delta-down, --positive, --negative on :root). A running animation or a colored box-shadow is always flagged and raises the weight.",
         "selectors": [
           "span",
           "i",
@@ -318,7 +318,7 @@
           "text_follows": true
         }
       },
-      "fix": "Say the state in words. If a mark is needed, use the text color, not a hue.",
+      "fix": "Say the state in words. If a mark is needed, use the text color, or the brand's own success or failure token for a real outcome, flat and still.",
       "fix_patterns": [
         "gauge-and-meter",
         "plan-comparison-table",
