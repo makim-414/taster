@@ -19,7 +19,9 @@ Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLI
   Each redirect hop is checked again.
 - The browser is pointed at a dead proxy, so anything that is not intercepted (WebSocket, WebRTC, workers,
   cross-origin frames) fails instead of reaching the network. Only GET and HEAD leave the server.
-- Per IP: 6 diagnoses per 10 minutes per instance. One Chromium per instance at a time, a short queue, then 503.
+- Per IP: 6 diagnoses per 10 minutes per instance, and a Vercel firewall rule ("diagnose rate limit per IP") that
+  answers 429 after 10 POSTs to `/api/diagnose` per IP per 10 minutes across all instances. One Chromium per
+  instance at a time, a short queue, then 503.
 - Page load 15 s per width (plus the engine's own load and idle waits), 80 s for the whole run, 400 requests and
   60 MB per run.
 
