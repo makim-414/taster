@@ -1,6 +1,7 @@
 # Taster web
 
 Paste a URL, see which slop rules it hits. The page links from the series ("put your site in here").
+Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLIC_SITE_URL` when one is added).
 
 - `app/page.tsx`, `app/diagnose.tsx`: one address field, then the result: rules hit with id, name and count
   per width, the 1440 and 390 captures with findings outlined, the fix patterns per rule, and the install line.
@@ -21,6 +22,12 @@ Paste a URL, see which slop rules it hits. The page links from the series ("put 
 - Per IP: 6 diagnoses per 10 minutes per instance. One Chromium per instance at a time, a short queue, then 503.
 - Page load 15 s per width (plus the engine's own load and idle waits), 80 s for the whole run, 400 requests and
   60 MB per run.
+
+## Link preview
+
+`app/layout.tsx` sets Open Graph and Twitter card tags; the image is `public/og.png`, rendered from
+`scripts/og/card.html` with the registry tokens by `node scripts/og/render.mjs`. Re-render it when the copy or the
+address changes.
 
 ## Commands
 
