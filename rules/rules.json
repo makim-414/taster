@@ -3,9 +3,9 @@
   "rules": [
     {
       "id": "AC-01",
-      "name": "All-caps tracked label",
-      "what": "Small labels above headings, scroll hints and section heads set in uppercase with wide letter-spacing.",
-      "why": "The most common decorative grammar of AI landing pages. It imitates luxury while carrying no information, and it was flagged again and again in our own work.",
+      "name": "All-caps label with wide letter spacing",
+      "what": "Small labels above headings, scroll hints and section heads set in capitals with the letters pushed apart.",
+      "why": "The single most common decoration in generated landing pages. It signals 'premium' while carrying no information. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with its own text, not inside nav, where text-transform is uppercase (or the Latin text has no lowercase letters) and computed letter-spacing is at least 0.05em.",
@@ -18,7 +18,7 @@
           "exclude_ancestor": "nav"
         }
       },
-      "fix": "Sentence case with default tracking. Express emphasis with weight, size or color. Navigation labels are the only exception.",
+      "fix": "Sentence case and default letter spacing. Carry emphasis with weight, size or color.",
       "fix_patterns": [
         "hairline-data-table",
         "hero-headline-lockup",
@@ -62,9 +62,9 @@
     },
     {
       "id": "AC-02",
-      "name": "Em dash and en dash",
-      "what": "Long dashes used between clauses and in labels shaped like WORD, dash, description.",
-      "why": "A signature habit of AI writing. In UI labels it reads as template chrome.",
+      "name": "Em dash or en dash in interface text",
+      "what": "Long dashes between clauses, or labels shaped like 'WORD, dash, explanation'.",
+      "why": "A signature of generated prose. In interface labels it reads as template chrome. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Visible text nodes containing U+2014 or U+2013. An en dash between two digits is ignored as a legitimate range. Headings, labels and buttons weigh more than body prose.",
@@ -88,7 +88,7 @@
           "ignore_digit_ranges": true
         }
       },
-      "fix": "Use a middle dot, comma, colon or period. For numeric ranges use a tilde or the word \"to\". Or split the sentence.",
+      "fix": "Use a comma, a colon, a middle dot, or split the sentence. For ranges use 'to' or a tilde.",
       "fix_patterns": [
         "plain-honest-copy"
       ],
@@ -115,9 +115,9 @@
     },
     {
       "id": "AC-03",
-      "name": "Emoji as UI",
-      "what": "Emoji and pictographic symbols (warning signs, sparkles, arrows) used as feature icons, in headings, bullets and labels.",
-      "why": "A sign that nobody chose an icon. The glyphs differ per platform and break the tone.",
+      "name": "Emoji as icons or bullets",
+      "what": "Emoji and pictographs used for feature icons, headings, bullets and labels.",
+      "why": "It shows no icon decision was made, and emoji render differently on every platform, which breaks the tone. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Visible text containing Unicode Extended_Pictographic or Dingbats characters. Copyright, registered and trademark signs are ignored, as is text inside user content areas (editable regions, textareas).",
@@ -131,7 +131,7 @@
           ]
         }
       },
-      "fix": "Use plain text. If an icon is needed, use one consistent line icon set.",
+      "fix": "Say it in words. If an icon is needed, use one line-icon set throughout.",
       "fix_patterns": [
         "hairline-accordion-faq",
         "line-icon-set"
@@ -164,8 +164,8 @@
     {
       "id": "AC-04",
       "name": "Tinted pill badge",
-      "what": "A fully rounded pill with a pale tinted background, text in the same hue and often a colored dot in front.",
-      "why": "Solves status with color decoration. It is the default part of AI dashboards and landing pages, and reviewers describe it as simply looking AI-made.",
+      "what": "A short label in a fully rounded capsule with a pale colored fill and text in the same hue.",
+      "why": "Component kits ship it as the default status chip, so generated pages scatter it everywhere, often in four or five hues at once. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "border-radius at least half the height, background a chromatic color with alpha 0.05 to 0.3 or a pale tint (lightness 85% or more), text color within 40 degrees of the background hue, one to three words.",
@@ -187,7 +187,7 @@
           "max_words": 3
         }
       },
-      "fix": "A neutral text label. If a chip is required, a square chip with a neutral border.",
+      "fix": "Plain text in the body color, or a neutral outline. If state matters, put it in words next to the value.",
       "fix_patterns": [
         "plan-cards",
         "segmented-control",
@@ -200,9 +200,9 @@
     },
     {
       "id": "AC-05",
-      "name": "Outlined pill badge",
-      "what": "A rounded pill label with a transparent background and only a colored border.",
-      "why": "A variant of the tinted pill. It boxes the text and fragments the screen into tiny pieces.",
+      "name": "Colored outline pill badge",
+      "what": "The same capsule label, now with a transparent fill and a saturated colored border.",
+      "why": "It is the tinted pill with the fill removed. Swapping one for the other does not remove the habit. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "border-radius at least half the height, transparent background, a border of at least 1px with saturation of 30% or more, one to three words. Buttons and inputs are excluded.",
@@ -220,7 +220,7 @@
           "max_words": 3
         }
       },
-      "fix": "A neutral text label.",
+      "fix": "Plain text, or a neutral hairline border with square or slightly rounded corners.",
       "fix_patterns": [
         "filter-chip",
         "segmented-control",
@@ -233,8 +233,8 @@
     {
       "id": "AC-06",
       "name": "Tinted notice band",
-      "what": "A wide notice or warning box with a pale yellow or blue fill, an icon and a line of text.",
-      "why": "A template habit: information hierarchy solved with a color field.",
+      "what": "A full-width notice or warning box laid on a pale yellow or blue fill.",
+      "why": "A template habit that solves information order with a colored surface. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Block at least 80% as wide as its parent, chromatic tinted background, height under 160px, containing an icon (svg, img or icon element) and text.",
@@ -254,7 +254,7 @@
           "height_max_px": 160
         }
       },
-      "fix": "A neutral surface with a 1px border.",
+      "fix": "A neutral surface with a 1px neutral border.",
       "fix_patterns": [
         "callout-and-toast",
         "text-input-field"
@@ -265,9 +265,9 @@
     },
     {
       "id": "AC-07",
-      "name": "Orange processing pill with glow",
-      "what": "A progress state shown as an orange pill that also glows.",
-      "why": "The state is emphasised with decoration, so it reads like a warning.",
+      "name": "Orange 'processing' pill with a glow",
+      "what": "A progress state shown as an orange pill with a soft glow around it.",
+      "why": "Decorating the state makes it look like a warning. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "A tinted pill (the AC-04 conditions) with hue 20 to 50 degrees and a colored box-shadow whose blur is 8px or more.",
@@ -299,8 +299,8 @@
     {
       "id": "AC-08",
       "name": "Colored status dot",
-      "what": "A small colored dot in front of text, sometimes pulsing or glowing.",
-      "why": "Imitates a living system. Meaningless dots end up on every screen.",
+      "what": "A small colored circle placed in front of a label to mean 'live', 'active' or 'online'.",
+      "why": "A stock dashboard ornament. Color alone carries the meaning, which also fails color-blind readers. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Element 4 to 12px square with fully rounded corners, an opaque chromatic background, no text, followed by text. A running animation or a colored box-shadow raises the weight.",
@@ -318,7 +318,7 @@
           "text_follows": true
         }
       },
-      "fix": "A neutral dot or plain text. Use a flat semantic color only when it carries real meaning, such as an outage or a healthy state.",
+      "fix": "Say the state in words. If a mark is needed, use the text color, not a hue.",
       "fix_patterns": [
         "gauge-and-meter",
         "plan-comparison-table",
@@ -345,9 +345,9 @@
     },
     {
       "id": "AC-09",
-      "name": "Monospace for UI labels",
-      "what": "Small labels, captions and numbers set in a code font as decoration.",
-      "why": "The default \"developer feel\" ornament. It looks like code where there is no code.",
+      "name": "Monospace font for interface labels",
+      "what": "Labels, numbers and small headings set in a monospace face outside of code.",
+      "why": "Borrowed 'developer' flavor. It lowers readability and has nothing to do with the content. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with its own text outside code, pre, kbd, samp and var whose first available family in the computed stack is monospace. Short texts (labels, captions, numbers) matter most.",
@@ -372,7 +372,7 @@
           "text_max_chars": 80
         }
       },
-      "fix": "Use the body font, with font-variant-numeric: tabular-nums for numbers.",
+      "fix": "Use the text face. For aligned numbers use font-variant-numeric: tabular-nums.",
       "fix_patterns": [
         "hairline-data-table",
         "sortable-data-grid",
@@ -398,9 +398,9 @@
     },
     {
       "id": "AC-10",
-      "name": "Side accent border card",
-      "what": "A rounded card with a thick colored border on one side only, usually the left, sometimes the top.",
-      "why": "The default way to mark quotes and callouts with a color bar.",
+      "name": "Thick colored accent bar on one edge of a card",
+      "what": "A card or callout with a heavy colored stripe down its left side.",
+      "why": "One of the most repeated generated layouts. The bar adds a color without adding order. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "border-left-width (or top) of at least 2px and thicker than every other side, a saturated color (30% or more), and the element has a background or a radius. blockquote gets lower weight.",
@@ -420,7 +420,7 @@
           ]
         }
       },
-      "fix": "Lighten the whole border one step, or separate the card with a background lightness step.",
+      "fix": "Remove the stripe. Separate with spacing, a heading, or one neutral hairline.",
       "fix_patterns": [
         "callout-and-toast",
         "collapsible-sidebar",
@@ -454,9 +454,9 @@
     },
     {
       "id": "AC-11",
-      "name": "Filled circle glyph",
-      "what": "A green circle with a white check, a colored circle holding an icon, a gray disc behind an icon.",
-      "why": "A decorative circle template for check lists and feature lists.",
+      "name": "Glyph inside a filled circle",
+      "what": "A white check inside a green circle, or an icon on a colored or gray disc.",
+      "why": "A template part used to dress up check lists and feature lists. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Non-interactive element 16 to 48px square with fully rounded corners and a filled background, whose only child is one svg or a single non-alphanumeric character.",
@@ -479,7 +479,7 @@
           ]
         }
       },
-      "fix": "A line icon without the circle, or neutral text.",
+      "fix": "The line icon alone without the disc, or plain neutral text.",
       "fix_patterns": [
         "connection-diagram",
         "kpi-stat-tile",
@@ -494,9 +494,9 @@
     },
     {
       "id": "AC-12",
-      "name": "Heavy contact form on a landing page",
-      "what": "A large form with name, company, phone and message fields in the middle or at the end of a landing page.",
-      "why": "The closing section is filled with a form when there is nothing left to say.",
+      "name": "Heavy contact form in the middle of a landing page",
+      "what": "A large form with name, company, phone and message fields placed mid page or at the end of a landing page.",
+      "why": "It fills the ending when there is nothing else to say. Seen again and again in our own work.",
       "detect": {
         "level": "heuristic",
         "signal": "A form with three or more text inputs plus a textarea on a page whose URL and title do not look like a contact page. Whether the form is really operated cannot be judged from the page.",
@@ -509,7 +509,7 @@
           "url_exclude": "contact|inquiry|support"
         }
       },
-      "fix": "A single button link to the contact page plus a mail link in the footer.",
+      "fix": "One button link in the closing section and an email link in the footer.",
       "fix_patterns": [
         "closing-contact-link",
         "in-hero-form-flow",
@@ -521,9 +521,9 @@
     },
     {
       "id": "AC-13",
-      "name": "Rainbow chart colors",
-      "what": "Every chart series gets a different primary color, bars are filled red, yellow and green.",
-      "why": "When every series has its own color, nothing stands out.",
+      "name": "Rainbow charts",
+      "what": "Every chart series in a different saturated color, bars filled red, yellow and green.",
+      "why": "When every value gets its own color, nothing reads as important. Seen again and again in our own work.",
       "detect": {
         "level": "heuristic",
         "signal": "Inside an svg of at least 150 by 80px, the shapes whose fill or stroke is saturated (40% or more) cover four or more 30 degree hue buckets. Canvas charts need pixel sampling and are not covered.",
@@ -540,7 +540,7 @@
           "bucket_deg": 30
         }
       },
-      "fix": "Lightness steps of one hue, and a single brand color for the one series to emphasise.",
+      "fix": "Steps of one color, with the brand color only on the series that matters.",
       "fix_patterns": [
         "bar-funnel",
         "line-area-chart",
@@ -554,9 +554,9 @@
     },
     {
       "id": "AC-14",
-      "name": "Flat gray bordered cards",
-      "what": "White or light gray boxes with a 1px gray border and the same radius fill the whole screen.",
-      "why": "It is the component-kit default, so the page turns into an app everyone has already seen.",
+      "name": "Flat gray card with a hairline border, everywhere",
+      "what": "White or gray cards with a 1px gray border and the same radius fill the whole screen.",
+      "why": "It is the default of popular component kits, so the product looks like an app you have seen before. Seen again and again in our own work.",
       "detect": {
         "level": "heuristic",
         "signal": "Boxes of at least 120 by 60px with an opaque near-white or light gray background (lightness 95% or more), a 1px neutral border on all sides, no box-shadow and radius 6 to 12px. Fires only when four or more exist, because human-made sites use them too. Read together with CMP-04.",
@@ -577,7 +577,7 @@
           "count_min": 4
         }
       },
-      "fix": "Group with surface lightness steps and spacing, and keep borders only where they are needed.",
+      "fix": "Group with surface contrast and spacing, and keep borders only where they are needed.",
       "fix_patterns": [
         "dashboard-zones",
         "hairline-card",
@@ -591,9 +591,9 @@
     },
     {
       "id": "AC-15",
-      "name": "Default browser or OS font",
-      "what": "Headings and body fall back to Times, Arial or system-ui. This includes the case where a named serif failed to load and Times shows instead.",
-      "why": "Looks like an undesigned document. Usually the font load was forgotten.",
+      "name": "Browser or system default font left as is",
+      "what": "Headings and body rendered in whatever the browser or the operating system picks.",
+      "why": "It shows nobody chose a typeface. It also renders differently on every machine. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "The rendered font of h1 to h3 and of body (the first available family in the stack, checked against loaded FontFaces and measured installation) is a browser default serif or sans-serif, or a system-ui alias.",
@@ -620,7 +620,7 @@
           ]
         }
       },
-      "fix": "Load the intended font for real and spell out the fallback order.",
+      "fix": "Choose a text face on purpose, load it, and give it a real fallback stack.",
       "fix_patterns": [
         "type-system"
       ],
@@ -630,9 +630,9 @@
     },
     {
       "id": "AC-16",
-      "name": "Ghost primary button",
-      "what": "The most important action is a transparent button with only a border.",
-      "why": "Tries to look refined and hides where to click.",
+      "name": "Ghost button as the main call to action",
+      "what": "The first and most important button on the page is only an outline with no fill.",
+      "why": "It looks refined in a mockup and gets lost on the page. The primary action stops reading as primary. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "The first button-like control in the first screen (outside nav) has a transparent background and a visible border.",
@@ -648,7 +648,7 @@
           "scope": "first screen"
         }
       },
-      "fix": "One filled button for the primary action.",
+      "fix": "Fill the primary button. Keep the outline style for the secondary action next to it.",
       "fix_patterns": [
         "flat-solid-button"
       ],
@@ -659,8 +659,8 @@
     {
       "id": "AC-17",
       "name": "Drawn mockup instead of the real thing",
-      "what": "CSS shapes or a hand-drawn fake screen sit where a product photo or a real screenshot should be.",
-      "why": "It feels like a slide deck. People see at once that it is fake.",
+      "what": "CSS shapes or a hand-drawn fake screen where a product photo or a real screenshot belongs.",
+      "why": "It reads like a slide deck, and anyone can tell it is not the product. Seen again and again in our own work.",
       "detect": {
         "level": "heuristic",
         "signal": "No img, video, canvas, picture, iframe or large background image in the first screen, and an element of at least 240 by 140px that holds six or more text-less decorative boxes nested three levels deep. Illustration-led sites are hard to separate.",
@@ -677,7 +677,7 @@
           ]
         }
       },
-      "fix": "A real screen capture or a real photo.",
+      "fix": "A real screenshot or a real photo.",
       "fix_patterns": [
         "asymmetric-product-hero",
         "media-tile-card",
@@ -690,16 +690,16 @@
     },
     {
       "id": "AC-18",
-      "name": "Redrawn logo or swapped wordmark font",
-      "what": "A supplied logo is redrawn with similar shapes, or a wordmark is replaced with a system font.",
-      "why": "When an agent rebuilds an original asset \"as it understands it\", shading and proportion are lost and the result is obvious.",
+      "name": "Logo or wordmark redrawn, font swapped",
+      "what": "A supplied logo redrawn as similar shapes, or a wordmark retyped in a system font.",
+      "why": "When an agent rebuilds an asset from its own understanding, shading and proportions are lost and it shows at once. Seen again and again in our own work.",
       "detect": {
         "level": "manual",
         "signal": "Needs the original asset for comparison, so it cannot be measured on an arbitrary site. It is a rule for the generation process.",
         "selectors": [],
         "css": {}
       },
-      "fix": "Use the original pixels or vectors untouched. Take vectors from the design tool with text outlined.",
+      "fix": "Use the original pixels or vectors as they are. Export vectors as outlines from the design tool.",
       "fix_patterns": [
         "original-logo-assets"
       ],
@@ -709,9 +709,9 @@
     },
     {
       "id": "AC-19",
-      "name": "AI photo tone",
-      "what": "Golden hour light, waxy skin, bright and over-saturated generated photos.",
-      "why": "Generated images are an average of everything, so they read as AI photos at a glance.",
+      "name": "Generated photo look",
+      "what": "Golden hour light, glossy skin, bright and saturated generated photos.",
+      "why": "It is the average of generated imagery, so it reads as AI at a glance. Seen again and again in our own work.",
       "detect": {
         "level": "manual",
         "signal": "Needs an image classifier. It cannot be measured from CSS or DOM.",
@@ -720,7 +720,7 @@
         ],
         "css": {}
       },
-      "fix": "Feed a real reference photo as input, and prefer film grain, lower saturation and a slightly darker exposure.",
+      "fix": "Give real reference photos as input; add film grain, lower saturation, slightly darker exposure.",
       "fix_patterns": [
         "photo-led-hero"
       ],
@@ -731,8 +731,8 @@
     {
       "id": "COL-01",
       "name": "Purple gradient",
-      "what": "An indigo to violet gradient on backgrounds, buttons or headings.",
-      "why": "Indigo from popular Tailwind examples was copied across tutorials and training data, and AI converges on it as the \"modern default\" (a hypothesis, not a measurement). It gets attached to any product regardless of brand.",
+      "what": "Indigo to violet gradients on hero backgrounds, buttons and headings.",
+      "why": "The best known generated color choice. It comes from defaults that models have seen thousands of times.",
       "detect": {
         "level": "deterministic",
         "signal": "background-image gradient with two or more color stops at hue 230 to 290 degrees and saturation of 40% or more. Weighted by covered area.",
@@ -748,7 +748,7 @@
           "stops_min": 2
         }
       },
-      "fix": "One brand color as a flat surface. If a gradient is required, change only the lightness inside one hue.",
+      "fix": "Pick one brand color and use it flat. If a gradient is needed, keep it within one hue and low contrast.",
       "fix_patterns": [
         "ambient-background",
         "editorial-paper-sheet",
@@ -802,9 +802,9 @@
     },
     {
       "id": "COL-02",
-      "name": "Cream background with terracotta accent",
-      "what": "Paper-colored (cream, beige) page with a rust-orange accent and a large serif.",
-      "why": "Became the default taste of recent AI tools and now reads as \"premium, seen before\". It also overlaps the brand color of one specific AI vendor.",
+      "name": "Cream background with a terracotta accent",
+      "what": "A paper-colored cream or beige page with a rusty orange accent, paired with a large serif.",
+      "why": "It has become the default look of recent AI tools, a borrowed kind of elegance.",
       "detect": {
         "level": "deterministic",
         "signal": "Effective page background lightness 90% or more, hue 30 to 60 degrees, low but non-zero chroma, together with a button or link accent at hue 10 to 30 degrees and saturation 50% or more.",
@@ -829,7 +829,7 @@
           "accent_saturation_min": 0.5
         }
       },
-      "fix": "Pure white or a neutral derived from the brand for the surface, and an accent taken from the brand definition.",
+      "fix": "Pure white or a neutral that comes from the brand, and an accent taken from the brand definition.",
       "fix_patterns": [
         "token-themes"
       ],
@@ -856,9 +856,9 @@
     },
     {
       "id": "COL-03",
-      "name": "Near-black background with neon glow",
-      "what": "A near-black page (#0B0B0B and similar) with one neon green or vermilion accent that glows.",
-      "why": "The default \"developer tool\" look. The contrast is strong but there is no information hierarchy.",
+      "name": "Near-black background with a neon glow",
+      "what": "A near-black page with one neon green or vermilion color made to glow.",
+      "why": "The default for a 'developer tool' feel. Contrast looks strong but there is no hierarchy.",
       "detect": {
         "level": "deterministic",
         "signal": "Effective page background relative luminance of 0.02 or less, plus a saturated (70% or more) accent element with a box-shadow or text-shadow blur of 16px or more.",
@@ -871,7 +871,7 @@
           "glow_blur_min_px": 16
         }
       },
-      "fix": "If a dark theme is needed, separate surfaces with gray steps and keep the accent flat, without glow.",
+      "fix": "If a dark theme is needed, separate surfaces with gray steps and keep the accent flat.",
       "fix_patterns": [
         "ambient-background",
         "photo-led-hero",
@@ -909,9 +909,9 @@
     },
     {
       "id": "COL-04",
-      "name": "Gradient text",
-      "what": "Heading glyphs filled with a gradient.",
-      "why": "The cheapest single move to look flashy. It breaks readability and contrast checks.",
+      "name": "Gradient-filled text",
+      "what": "Headline words filled with a gradient instead of a color.",
+      "why": "A shortcut to 'exciting'. It lowers contrast and readability, and it ages fast.",
       "detect": {
         "level": "deterministic",
         "signal": "Text element with background-clip: text (or the -webkit- form), a gradient background-image and a transparent text fill.",
@@ -929,7 +929,7 @@
           "background-image": "gradient"
         }
       },
-      "fix": "Solid text color. Use weight or size for emphasis.",
+      "fix": "Solid text color. Create emphasis with size, weight or placement.",
       "fix_patterns": [
         "animated-text",
         "plain-headline-and-eyebrow"
@@ -961,9 +961,9 @@
     },
     {
       "id": "COL-05",
-      "name": "Purple banned, green substituted",
-      "what": "Block purple and the output moves to emerald or mint green and repeats the same composition.",
-      "why": "Only the color changed. The structure of one accent, a gradient and a glow is still there, so the tell remains.",
+      "name": "Green as the replacement for banned purple",
+      "what": "Once purple is avoided, the same layout returns in emerald or mint green.",
+      "why": "Only the hue changed; the structure of one accent, a gradient and a glow is the same.",
       "detect": {
         "level": "heuristic",
         "signal": "Primary accent at hue 140 to 170 degrees appearing together with COL-01, COL-03 or COL-07 structures. Green alone is normal for many real brands, so it never fires without those structures.",
@@ -983,7 +983,7 @@
           ]
         }
       },
-      "fix": "Change the structure (glow, gradient), not just the hue.",
+      "fix": "Change the structure (glow, gradient), not the hue.",
       "fix_patterns": [
         "token-themes"
       ],
@@ -1002,9 +1002,9 @@
     },
     {
       "id": "COL-06",
-      "name": "Tinted box rainbow",
-      "what": "Cards, badges and icon backgrounds each get a different pale tint, so the page turns into a rainbow.",
-      "why": "Giving every item its own color looks organised, but color stops meaning anything.",
+      "name": "Rainbow of tinted boxes",
+      "what": "Every card, badge and icon background gets a different pale tint until the page is a rainbow.",
+      "why": "Coloring each item looks organized, but color stops meaning anything.",
       "detect": {
         "level": "deterministic",
         "signal": "Chromatic tinted surfaces (alpha 0.05 to 0.3, or lightness 90% or more) falling in four or more distinct 30 degree hue buckets.",
@@ -1021,7 +1021,7 @@
           "bucket_deg": 30
         }
       },
-      "fix": "Neutral surfaces, with color reserved for real meaning (error, success) in one or two places.",
+      "fix": "Neutral surfaces, with color only where it means something (error, success).",
       "fix_patterns": [
         "callout-and-toast",
         "collapsible-sidebar",
@@ -1049,11 +1049,11 @@
     {
       "id": "COL-07",
       "name": "Large colored glow shadow",
-      "what": "A large-radius colored shadow spreads behind buttons and cards.",
-      "why": "Depth faked with light. The screen floats and looks hazy.",
+      "what": "Wide, soft shadows tinted with the accent color around buttons and cards.",
+      "why": "It imitates light that is not there and makes every element compete for attention. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
-        "signal": "box-shadow with blur of 24px or more and a shadow color with saturation of 40% or more (not gray or black).",
+        "signal": "box-shadow with blur of 24px or more and a shadow color with saturation of 40% or more (not gray or black). Shadows with color alpha under 0.15 are ignored.",
         "selectors": [
           "*"
         ],
@@ -1062,7 +1062,7 @@
           "shadow_saturation_min": 0.4
         }
       },
-      "fix": "A neutral one-step shadow, or no shadow and a 1px border.",
+      "fix": "No shadow, or a small neutral shadow that only describes elevation.",
       "fix_patterns": [
         "flat-solid-button",
         "hairline-card",
@@ -1086,8 +1086,8 @@
     {
       "id": "TYP-01",
       "name": "Inter everywhere",
-      "what": "Body, headings and buttons all in Inter.",
-      "why": "The default of AI builders and templates, so no personality is left. It is also very common on human-made sites, so on its own it is a weak signal.",
+      "what": "Every heading and every paragraph set in Inter.",
+      "why": "Inter is a fine typeface and the default of most starters. Using it for everything is the absence of a type decision.",
       "detect": {
         "level": "deterministic",
         "signal": "The rendered font (document.fonts load result plus first available family) of h1 to h3 and of body text is Inter.",
@@ -1101,7 +1101,7 @@
           "font": "Inter"
         }
       },
-      "fix": "Separate heading and body fonts, or choose a font that suits the brand.",
+      "fix": "Keep Inter for interface text if you like it, and pair it with a face that has a point of view for headings.",
       "fix_patterns": [
         "type-system"
       ],
@@ -1140,9 +1140,9 @@
     },
     {
       "id": "TYP-02",
-      "name": "Substitute favorite fonts",
-      "what": "Told to avoid Inter, the output moves to Space Grotesk, Instrument Serif or Geist.",
-      "why": "It is only the second default.",
+      "name": "The usual substitute fonts",
+      "what": "Told to avoid Inter, generated pages move to Space Grotesk, Instrument Serif, Geist and the like.",
+      "why": "It is just the second default.",
       "detect": {
         "level": "deterministic",
         "signal": "The rendered font of headings or body is in the list (Space Grotesk, Instrument Serif, Geist, Geist Mono, DM Sans, Plus Jakarta Sans and similar). The list is meant to be updated by measurement.",
@@ -1167,7 +1167,7 @@
           ]
         }
       },
-      "fix": "A font chosen from the brand context. You should be able to explain the choice in one line.",
+      "fix": "A face chosen for the brand context, with a one-line reason you can state.",
       "fix_patterns": [
         "type-system"
       ],
@@ -1190,9 +1190,9 @@
     },
     {
       "id": "TYP-03",
-      "name": "One italic serif word in a heading",
-      "what": "In a sans-serif heading a single word switches to an italic serif or to another color.",
-      "why": "A cliché that imitates editorial taste. It appears in almost every AI hero.",
+      "name": "One italic serif word in the headline",
+      "what": "One word inside a sans-serif headline switched to an italic serif or a different color.",
+      "why": "A cliche that imitates editorial taste. It appears in nearly every generated hero.",
       "detect": {
         "level": "deterministic",
         "signal": "A child of h1 or h2 that differs from its parent in font family, italic style or color, and whose text is under 40% of the heading length.",
@@ -1209,7 +1209,7 @@
           ]
         }
       },
-      "fix": "One typeface per heading. If emphasis is needed, rewrite the sentence.",
+      "fix": "One typeface for the heading. If emphasis is needed, rewrite the sentence.",
       "fix_patterns": [
         "animated-text",
         "plain-headline-and-eyebrow",
@@ -1243,9 +1243,9 @@
     },
     {
       "id": "TYP-04",
-      "name": "Whole sentence as a giant heading",
-      "what": "A sentence of eight words or more set at display size.",
-      "why": "Size is used to fill the space when there is no key point to make.",
+      "name": "Whole sentence as a giant headline",
+      "what": "A sentence of more than eight words set at display size.",
+      "why": "Size fills the space when there is no point to make.",
       "detect": {
         "level": "deterministic",
         "signal": "h1 with font-size of 64px or more (measured at the current viewport, best at 1440 wide) and eight or more words (whitespace separated units for Korean).",
@@ -1258,7 +1258,7 @@
           "viewport_width_reference": 1440
         }
       },
-      "fix": "Short heading, with the explanation split out at body size.",
+      "fix": "A short headline, and the explanation at body size underneath.",
       "fix_patterns": [
         "hero-headline-lockup",
         "split-section-header",
@@ -1284,9 +1284,9 @@
     },
     {
       "id": "TYP-05",
-      "name": "Extreme negative tracking",
-      "what": "Large headings are tightened so far that the letters touch.",
-      "why": "Imitates a refined tech look. One measurement claims a large share of generated pages do it, though the method is unpublished.",
+      "name": "Extreme negative letter spacing on large type",
+      "what": "Big headlines squeezed so tight the letters nearly touch.",
+      "why": "A 'designed' look applied by formula. Past a point it hurts reading, and in Korean it collides syllables.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with font-size of 32px or more and computed letter-spacing of -0.04em or tighter.",
@@ -1303,7 +1303,7 @@
           "letter_spacing_max_em": -0.04
         }
       },
-      "fix": "Use the type design default, and only at large sizes a mild -0.01 to -0.02em.",
+      "fix": "Use the tracking the typeface was drawn for, or tighten slightly (around -0.01em to -0.02em) and check by eye.",
       "fix_patterns": [
         "hero-headline-lockup",
         "plain-headline-and-eyebrow"
@@ -1323,9 +1323,9 @@
     },
     {
       "id": "LAY-01",
-      "name": "Centered hero formula",
-      "what": "Centered heading, a pill badge above it and two buttons below it.",
-      "why": "Every builder produces the same first screen in the same order, so it reads as a template at first glance.",
+      "name": "The centered hero formula",
+      "what": "Centered headline, a pill badge above it, two buttons below.",
+      "why": "Every builder opens with the same sequence, so the first screen reads as a template.",
       "detect": {
         "level": "heuristic",
         "signal": "In the first screen, a centered h1 that has a pill-shaped short text element before it and two or more button-like controls after it inside the same container. Thresholds need tuning because it judges composition.",
@@ -1338,7 +1338,7 @@
           "buttons_after_min": 2
         }
       },
-      "fix": "An asymmetric layout that fits the content, with the real product screen or photo moved forward.",
+      "fix": "An asymmetric layout that fits the content, with the real product screen or a photo in front.",
       "fix_patterns": [
         "asymmetric-product-hero",
         "auth-split-frame",
@@ -1372,9 +1372,9 @@
     },
     {
       "id": "LAY-02",
-      "name": "Three icon cards",
-      "what": "Three cards of the same size, each with an icon, a heading and two lines of text.",
-      "why": "The default frame of a feature introduction. The shape stays the same whatever the content, so the information is not read.",
+      "name": "Three icon cards in a row",
+      "what": "Three equal cards, each with an icon, a title and a two-line description.",
+      "why": "The default frame for features. Whatever the content, the shape is the same, so nothing is read.",
       "detect": {
         "level": "deterministic",
         "signal": "Three or more siblings of nearly equal size under one parent, each with an icon, then a heading, then a paragraph in the same order.",
@@ -1389,7 +1389,7 @@
           "size_tolerance_px": 3
         }
       },
-      "fix": "A list, a table, a real screen capture, or whichever format suits the content.",
+      "fix": "A list, a table or a real screenshot, whichever fits the content.",
       "fix_patterns": [
         "audience-entry-split",
         "connection-diagram",
@@ -1432,8 +1432,8 @@
     {
       "id": "LAY-03",
       "name": "01 / 02 / 03 section numbers",
-      "what": "Numbers such as 01, 02, 03 above sections or cards.",
-      "why": "Numbers are attached to unordered content to look structured.",
+      "what": "Small zero-padded numbers stamped above each section or step.",
+      "why": "Numbering implies a sequence. On most landing pages there is none, so the numbers are decoration.",
       "detect": {
         "level": "deterministic",
         "signal": "Two or more small text elements (font-size 24px or less) whose whole text matches ^0[1-9]\\.?$.",
@@ -1449,7 +1449,7 @@
           "font_size_max_px": 24
         }
       },
-      "fix": "Number only real steps. Otherwise use the heading alone.",
+      "fix": "Remove them unless order truly matters. If it does, number with words in the heading.",
       "fix_patterns": [
         "step-workflow-section",
         "tabbed-product-showcase"
@@ -1481,8 +1481,8 @@
     },
     {
       "id": "LAY-04",
-      "name": "Predictable section order",
-      "what": "Hero, logo strip, three cards, three pricing tiers, testimonials, footer, in exactly this order.",
+      "name": "The predictable section order",
+      "what": "Hero, logo strip, three cards, three pricing tiers, testimonials, footer, in that order.",
       "why": "The same skeleton for any product.",
       "detect": {
         "level": "heuristic",
@@ -1503,7 +1503,7 @@
           "in_order_min": 4
         }
       },
-      "fix": "Order the sections starting from what only this product has.",
+      "fix": "Order the page by what only this product has.",
       "fix_patterns": [
         "editorial-storefront-home",
         "product-first-section-order"
@@ -1524,8 +1524,8 @@
     {
       "id": "LAY-05",
       "name": "Bento grid",
-      "what": "Rounded boxes of different sizes packed like a puzzle.",
-      "why": "Learned as \"the current style\" and used regardless of how much information there is.",
+      "what": "Rounded boxes of different sizes fitted together like a puzzle.",
+      "why": "Learned as 'the current style' and used whatever the amount of information.",
       "detect": {
         "level": "heuristic",
         "signal": "A display:grid container with four or more children of at least three distinct sizes, each with radius of 12px or more and a background or border. Real dashboards are hard to separate.",
@@ -1540,7 +1540,7 @@
           "radius_min_px": 12
         }
       },
-      "fix": "A simple grid that matches the amount of information.",
+      "fix": "A simple grid sized to the information.",
       "fix_patterns": [
         "content-matched-grid",
         "dashboard-zones"
@@ -1568,9 +1568,9 @@
     },
     {
       "id": "LAY-06",
-      "name": "One spacing value everywhere",
-      "what": "Every gap between sections and between cards is the same.",
-      "why": "No rhythm, so you cannot see what groups together and what separates.",
+      "name": "Every gap is the same",
+      "what": "The space between sections and between cards is one value everywhere.",
+      "why": "Without rhythm you cannot see what belongs together and what is apart.",
       "detect": {
         "level": "deterministic",
         "signal": "Across top-level sections and card groups, the vertical paddings and gaps take two or fewer distinct values with a coefficient of variation under 0.1.",
@@ -1584,7 +1584,7 @@
           "sections_min": 4
         }
       },
-      "fix": "Tight for related things, wide for distant ones.",
+      "fix": "Close relations get small gaps, distant ones large.",
       "fix_patterns": [
         "content-matched-grid",
         "site-header",
@@ -1609,9 +1609,9 @@
     },
     {
       "id": "CMP-01",
-      "name": "Announcement pill above the heading",
-      "what": "A rounded \"New: something\" badge directly above the hero heading.",
-      "why": "It appears even when there is no launch news.",
+      "name": "Announcement pill above the headline",
+      "what": "A rounded 'New: something' chip sitting right above the hero headline.",
+      "why": "Copied from a handful of startup sites until it became the default hero opener, usually with nothing new to announce.",
       "detect": {
         "level": "deterministic",
         "signal": "Just before the first h1 (previous sibling, or a sibling of its parent), a short text element whose radius is at least half its height.",
@@ -1623,7 +1623,7 @@
           "max_chars": 60
         }
       },
-      "fix": "If there is news, put it in one line of body text.",
+      "fix": "Remove it. If there is real news, say it in a sentence under the headline.",
       "fix_patterns": [
         "hero-headline-lockup"
       ],
@@ -1651,8 +1651,8 @@
     {
       "id": "CMP-02",
       "name": "Card inside a card",
-      "what": "A box with a border or shadow that holds another box with a border or shadow.",
-      "why": "Hierarchy is expressed only with boxes, so the screen becomes heavy and layered.",
+      "what": "Bordered or shadowed rounded boxes nested inside other bordered or shadowed rounded boxes.",
+      "why": "Every container gets the same box treatment, so the page becomes frames inside frames with no hierarchy.",
       "detect": {
         "level": "deterministic",
         "signal": "An element with a full border or a box-shadow and a radius whose descendant (inputs, buttons and media excluded) meets the same condition and is at least 80 by 48px.",
@@ -1671,7 +1671,7 @@
           ]
         }
       },
-      "fix": "Drop the inner box and use spacing and dividers.",
+      "fix": "Keep the outer container, and separate the inner items with spacing or hairlines.",
       "fix_patterns": [
         "hairline-data-table",
         "list-item-row",
@@ -1702,8 +1702,8 @@
     {
       "id": "CMP-03",
       "name": "Rounded square icon tile",
-      "what": "A pale colored rounded square above the heading with an icon of the same color inside.",
-      "why": "The default of putting an icon into a decoration box. It almost always appears together with the three-card layout.",
+      "what": "A pale colored rounded square above a heading with a same-colored icon inside.",
+      "why": "The default 'decoration box' for icons. It nearly always comes with three cards in a row.",
       "detect": {
         "level": "deterministic",
         "signal": "Square 32 to 64px, radius 6 to 16px, chromatic tinted background, a single svg child, and the next sibling is a heading.",
@@ -1724,7 +1724,7 @@
           "next_sibling": "heading"
         }
       },
-      "fix": "The icon alone, or nothing.",
+      "fix": "Leave the icon on its own, or remove it.",
       "fix_patterns": [
         "line-icon-set",
         "outcome-led-cards"
@@ -1752,9 +1752,9 @@
     },
     {
       "id": "CMP-04",
-      "name": "Same big radius and same soft shadow everywhere",
-      "what": "Every box has the same large radius and the same gray shadow.",
-      "why": "Feels stamped out of one kit.",
+      "name": "Same large radius and same soft shadow on everything",
+      "what": "Every box shares one large radius and one gray shadow.",
+      "why": "It feels stamped out of one kit.",
       "detect": {
         "level": "deterministic",
         "signal": "Among boxes with a background or border, 80% or more share one radius of 12px or more, and the box-shadow string is identical and not none.",
@@ -1771,7 +1771,7 @@
           "boxes_min": 5
         }
       },
-      "fix": "Radius steps proportional to element size, and shadows only for things that float.",
+      "fix": "A radius scale tied to element size, and shadows only on things that float.",
       "fix_patterns": [
         "dialog",
         "editorial-paper-sheet",
@@ -1799,9 +1799,9 @@
     },
     {
       "id": "CMP-05",
-      "name": "Glassmorphism everywhere",
-      "what": "Translucent background with background blur on every card.",
-      "why": "Used even when there is nothing behind it to blur.",
+      "name": "Glass panels everywhere",
+      "what": "Frosted, blurred translucent panels used for ordinary content blocks.",
+      "why": "Blur behind a panel helps a floating bar or a dialog. On static content it is a costly effect with no job.",
       "detect": {
         "level": "deterministic",
         "signal": "Three or more elements with backdrop-filter blur that are not nav, dialogs or fixed and sticky bars.",
@@ -1819,7 +1819,7 @@
           ]
         }
       },
-      "fix": "Opaque surfaces. Blur only where layers really overlap (navigation, modal).",
+      "fix": "Opaque surfaces. Keep blur for things that float over moving content.",
       "fix_patterns": [
         "app-bars",
         "dialog",
@@ -1854,9 +1854,9 @@
     },
     {
       "id": "CMP-06",
-      "name": "Triple number strip",
-      "what": "Three big numbers such as 10K+ users, 99.9% uptime, 3x faster.",
-      "why": "The numbers are often invented. The structure can be found, the truth cannot.",
+      "name": "Row of three big stats",
+      "what": "Three big numbers such as '10K+ users, 99.9% uptime, 3x faster'.",
+      "why": "Many are invented. The structure can be found; whether the numbers are true cannot.",
       "detect": {
         "level": "heuristic",
         "signal": "Three or four siblings each holding a big number (with a +, %, K, M or x suffix) and a short label. The structure is deterministic, whether the numbers are invented is not.",
@@ -1873,7 +1873,7 @@
           "number_font_size_min_px": 28
         }
       },
-      "fix": "Real numbers only, with sources.",
+      "fix": "Only real numbers, with their source.",
       "fix_patterns": [
         "asymmetric-product-hero",
         "data-honesty-label",
@@ -1906,8 +1906,8 @@
     {
       "id": "CMP-07",
       "name": "Fake terminal hero",
-      "what": "A window with three red, yellow and green dots and monospace commands inside.",
-      "why": "Added as a \"technical feel\" even to products that are not for developers.",
+      "what": "A window with red, yellow and green dots holding monospace commands.",
+      "why": "Added for a 'technical' feel even when the product is not for developers.",
       "detect": {
         "level": "deterministic",
         "signal": "Three adjacent round elements near red, yellow and green hues followed by a monospace block in the same container.",
@@ -1950,8 +1950,8 @@
     {
       "id": "CMP-08",
       "name": "Fake trust signals",
-      "what": "Testimonials from people who do not exist, a strip of invented company logos.",
-      "why": "It imitates trust, but checking reveals it is false.",
+      "what": "Testimonials from people who do not exist, logo strips of invented companies.",
+      "why": "It imitates trust and turns out to be false when checked.",
       "detect": {
         "level": "manual",
         "signal": "The testimonial and logo structure can be found, but truth needs an outside check (reverse image search, confirming the company exists).",
@@ -1982,8 +1982,8 @@
     },
     {
       "id": "CMP-09",
-      "name": "Pricing in three tiers, middle highlighted",
-      "what": "Of three price cards, only the middle one is lifted by a border, a badge or a scale.",
+      "name": "Three pricing tiers with the middle one raised",
+      "what": "Three price cards where only the middle one gets a colored border, a badge or a scale up.",
       "why": "The same scene in every SaaS template.",
       "detect": {
         "level": "deterministic",
@@ -2001,7 +2001,7 @@
           ]
         }
       },
-      "fix": "Use three plans only if there really are three. Mark the recommended plan with text.",
+      "fix": "Three tiers only when there really are three; mark the recommendation in words.",
       "fix_patterns": [
         "plan-cards"
       ],
@@ -2020,9 +2020,9 @@
     },
     {
       "id": "CMP-10",
-      "name": "Subscribe form at the end of every page",
-      "what": "An email signup field at the end of every page, with a thank-you message even when nothing is sent.",
-      "why": "A closer added when there is nothing left to fill.",
+      "name": "A subscribe form at the end of every page",
+      "what": "An email field at the bottom of every page, with a thank-you message even though nothing is sent.",
+      "why": "The ending people add when there is nothing to end with.",
       "detect": {
         "level": "heuristic",
         "signal": "One email input with a button just before the footer. Whether it sends anything needs network observation.",
@@ -2034,7 +2034,7 @@
           "position": "before footer"
         }
       },
-      "fix": "Only a subscription that is really operated.",
+      "fix": "Only a newsletter that is actually run.",
       "fix_patterns": [
         "in-hero-form-flow",
         "lead-capture-form",
@@ -2053,8 +2053,8 @@
     {
       "id": "CMP-11",
       "name": "Dark only, no light mode",
-      "what": "Only a dark screen exists and the user setting is ignored.",
-      "why": "Dark is used as the default for \"refined\".",
+      "what": "Only a dark screen, ignoring the visitor setting.",
+      "why": "Dark is used as the default for 'refined'.",
       "detect": {
         "level": "deterministic",
         "signal": "The effective page background is dark, no stylesheet rule uses prefers-color-scheme, color-scheme does not include light, and no theme toggle is found.",
@@ -2071,7 +2071,7 @@
           ]
         }
       },
-      "fix": "Define both modes as tokens.",
+      "fix": "Define both modes in tokens.",
       "fix_patterns": [
         "token-themes"
       ],
@@ -2090,12 +2090,12 @@
     },
     {
       "id": "BG-01",
-      "name": "Aurora and mesh blob background",
-      "what": "Blurred color lumps or radial halos floating in the background.",
-      "why": "The easiest decoration for filling empty space.",
+      "name": "Aurora or mesh blob background",
+      "what": "Large blurred color blobs or radial glows floating behind the hero.",
+      "why": "Mood without content. It is the background that generated heroes reach for when there is nothing to show.",
       "detect": {
         "level": "deterministic",
-        "signal": "An element (or its ::before and ::after) with filter: blur of 40px or more, or one that covers 30% of the screen with a radial-gradient background.",
+        "signal": "An element (or its ::before and ::after) with filter: blur of 40px or more, or one that covers 30% of the screen with a radial-gradient background. Only gradients with at least one saturated color stop count; black or white alpha vignettes over photos do not. Blurred blobs count only when the blur is 40px or more on a box of at least 200 by 200.",
         "selectors": [
           "*"
         ],
@@ -2104,7 +2104,7 @@
           "radial_gradient_viewport_ratio_min": 0.3
         }
       },
-      "fix": "Leave the space empty.",
+      "fix": "Show the product, a real photo, or nothing. A flat background is a valid choice.",
       "fix_patterns": [
         "ambient-background",
         "photo-led-hero",
@@ -2131,9 +2131,9 @@
     },
     {
       "id": "ICO-01",
-      "name": "Same Lucide icons repeated",
-      "what": "A few default Lucide icons (bolt, shield, sparkles) used over and over.",
-      "why": "The default icon set of builders, so it becomes a fingerprint.",
+      "name": "The same few stock icons on repeat",
+      "what": "A handful of default icons (lightning, shield, sparkles) used over and over.",
+      "why": "It is the builders' default icon set, so it becomes a fingerprint.",
       "detect": {
         "level": "deterministic",
         "signal": "Count and variety of svg elements with a lucide class or a data-lucide attribute. Whether an svg was drawn by AI cannot be judged.",
@@ -2146,7 +2146,7 @@
           "count_min": 3
         }
       },
-      "fix": "Only use icons where they are really needed, and give them meaning within one set.",
+      "fix": "Icons only where they help, chosen within one set for their meaning.",
       "fix_patterns": [
         "connection-diagram",
         "line-icon-set",
@@ -2167,9 +2167,9 @@
     },
     {
       "id": "MOT-01",
-      "name": "Same entrance motion on every block",
-      "what": "On scroll, every block fades in from below, or with a bouncy easing.",
-      "why": "The motion repeats without meaning and makes the page feel slow.",
+      "name": "The same entrance animation on every block",
+      "what": "Every block fades in from below as you scroll, or bounces with an overshooting ease.",
+      "why": "Motion repeated without meaning makes the page feel slow.",
       "detect": {
         "level": "heuristic",
         "signal": "Static signals of a reveal pattern: reveal classes or data-aos attributes, below-the-fold elements waiting at opacity 0 with a translateY, or keyframes that animate opacity plus translate, on half or more of the sections. Overshoot easing (cubic-bezier with values outside 0 to 1) is also reported. Scroll replay would give better accuracy.",
@@ -2183,7 +2183,7 @@
           "overshoot": "cubic-bezier y outside 0..1"
         }
       },
-      "fix": "Use motion only for state changes.",
+      "fix": "Motion only for changes of state.",
       "fix_patterns": [
         "animated-text",
         "count-up-number",
@@ -2212,11 +2212,11 @@
     },
     {
       "id": "CPY-01",
-      "name": "AI copy voice",
-      "what": "Weightless parallelism such as \"Build faster, ship smarter\", and \"not X but Y\" constructions.",
-      "why": "The sentence fits any product, which is the same as saying nothing.",
+      "name": "Generated copy voice",
+      "what": "Weightless parallel lines like 'Build faster, ship smarter' and 'not X, but Y' constructions.",
+      "why": "A sentence that fits any product says nothing. Seen again and again in our own work.",
       "detect": {
-        "level": "manual",
+        "level": "heuristic",
         "signal": "A list of stock phrases can produce candidates, but judging needs meaning. Separate lists per language are required. detect.js reports candidates only.",
         "selectors": [
           "h1",
@@ -2228,7 +2228,7 @@
           "phrase_list": "candidates only"
         }
       },
-      "fix": "One concrete fact that only this product can state.",
+      "fix": "One concrete fact only this product can claim.",
       "fix_patterns": [
         "action-label-button",
         "confirm-destructive-dialog",
@@ -2260,9 +2260,9 @@
     },
     {
       "id": "KO-01",
-      "name": "Hangul broken mid-word (keep-all missing)",
-      "what": "Korean paragraphs and headings wrap in the middle of a word, leaving a stray syllable on the next line.",
-      "why": "Browsers break Hangul between syllables by default. English-first templates do not guard against it, and Korean readers notice immediately.",
+      "name": "Korean words broken mid-word",
+      "what": "Korean lines that wrap in the middle of a word because word-break was left at the default.",
+      "why": "Browsers may break between any two Hangul syllables. Lines that split a word read as careless to every Korean reader. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Element whose text is at least 50% Hangul, with word-break other than keep-all, where a Range measurement shows a line ending between two Hangul syllables of the same word.",
@@ -2281,7 +2281,7 @@
           "check": "line end inside word"
         }
       },
-      "fix": "Set word-break: keep-all on Korean text, and overflow-wrap: anywhere as a guard for long URLs.",
+      "fix": "word-break: keep-all on Korean text, with overflow-wrap: anywhere as a safety net for long strings.",
       "fix_patterns": [
         "korean-line-breaking"
       ],
@@ -2296,9 +2296,9 @@
     },
     {
       "id": "KO-02",
-      "name": "Latin-only font stack for Hangul",
-      "what": "font-family lists only Latin fonts such as Inter, so Hangul falls to the operating system default.",
-      "why": "It looks different on every platform, and weight and size do not match the Latin. A trace of English-first defaults.",
+      "name": "Only a Latin font declared for Korean text",
+      "what": "The font stack lists only Latin faces, so Hangul falls back to the operating system font.",
+      "why": "Mac and Windows render different Korean faces, and Latin and Hangul weights and sizes stop matching. A trace of an English default left as is. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with Hangul text whose font stack has at least one named family but none of them is a known Korean font or measures as Hangul-capable (checked with loaded FontFaces and a canvas width test).",
@@ -2318,7 +2318,7 @@
           "hangul_capable_in_stack": false
         }
       },
-      "fix": "Name a Hangul-capable font (Pretendard, a Noto Sans KR family and similar) in the intended order, not as an accident of fallback.",
+      "fix": "Declare a Korean face on purpose, in the intended order with the Latin face.",
       "fix_patterns": [
         "korean-type-setup"
       ],
@@ -2328,9 +2328,9 @@
     },
     {
       "id": "KO-03",
-      "name": "Hangul line height too tight",
-      "what": "Korean body text uses a Latin default line height (1.2 to 1.4), so lines feel cramped.",
-      "why": "Hangul fills its square frame, final consonants included, so the same line height feels tighter than with Latin.",
+      "name": "Tight line height on Korean text",
+      "what": "Korean paragraphs set with the line height tuned for Latin text.",
+      "why": "Hangul is dense and square. A line height that suits English makes Korean paragraphs feel cramped. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Body-like element (not a heading, font-size 28px or less) with at least 50% Hangul and two or more lines whose line-height divided by font-size is under 1.5.",
@@ -2346,7 +2346,7 @@
           "line_height_ratio_max": 1.5
         }
       },
-      "fix": "Body 1.6 to 1.8, headings around 1.3.",
+      "fix": "1.6 to 1.8 for Korean body text.",
       "fix_patterns": [
         "korean-type-setup",
         "long-form-prose"
@@ -2362,9 +2362,9 @@
     },
     {
       "id": "KO-04",
-      "name": "Uppercase on Hangul",
-      "what": "text-transform: uppercase is applied to Korean labels.",
-      "why": "Hangul has no case, so it does nothing, and mixed Latin words become uppercase unevenly. A trace of translating English labels without redesign.",
+      "name": "Uppercase transform on Korean text",
+      "what": "text-transform: uppercase applied to labels that contain Korean.",
+      "why": "Hangul has no capitals, so the style does nothing for Korean and only shows a Latin template was translated without review.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with text-transform: uppercase whose text contains Hangul.",
@@ -2376,7 +2376,7 @@
           "contains": "Hangul"
         }
       },
-      "fix": "Delete the property. Use weight or size for emphasis.",
+      "fix": "Remove the transform. Style Korean labels with weight and size.",
       "fix_patterns": [
         "korean-type-setup"
       ],
@@ -2391,9 +2391,9 @@
     },
     {
       "id": "KO-05",
-      "name": "Too much Hangul tracking, wide or tight",
-      "what": "Hangul with letter-spacing wider than 0.1em, or the negative tracking meant for Latin headings (-0.04em and tighter).",
-      "why": "Wide spacing scatters the syllables so words stop grouping, and tight spacing makes the square glyphs collide.",
+      "name": "Letter spacing that is too wide or too tight on Korean",
+      "what": "Korean text tracked out like an English label, or squeezed like an English headline.",
+      "why": "Hangul syllables are already evenly spaced. Wide tracking breaks words apart and tight tracking makes syllables collide.",
       "detect": {
         "level": "deterministic",
         "signal": "Element containing Hangul with computed letter-spacing above 0.05em or below -0.03em.",
@@ -2405,7 +2405,7 @@
           "letter_spacing_em_min": -0.03
         }
       },
-      "fix": "Between 0 and -0.02em for Hangul, slightly tighter only for large headings.",
+      "fix": "Default tracking, or a very small negative value on large headings, checked by eye.",
       "fix_patterns": [
         "korean-type-setup"
       ],
@@ -2420,9 +2420,9 @@
     },
     {
       "id": "KO-06",
-      "name": "Faux italic on Hangul",
-      "what": "Hangul text set to italic, so the browser slants it artificially.",
-      "why": "Almost no Hangul font has an italic face. Moving the \"one italic word in a heading\" cliché to Korean gives distorted glyphs.",
+      "name": "Fake italic on Korean",
+      "what": "Italic applied to Hangul, which the browser slants artificially.",
+      "why": "Korean fonts almost never have italics. Carrying the one-italic-word cliche into Korean gives squashed letters.",
       "detect": {
         "level": "deterministic",
         "signal": "font-style italic or oblique on an element with Hangul text, with no loaded italic FontFace for any family in its stack.",
@@ -2439,7 +2439,7 @@
           "italic_face_loaded": false
         }
       },
-      "fix": "Use weight or color for emphasis.",
+      "fix": "Emphasize with weight or color.",
       "fix_patterns": [
         "korean-type-setup"
       ],
@@ -2454,11 +2454,11 @@
     },
     {
       "id": "KO-07",
-      "name": "Translationese AI copy",
-      "what": "Literal sentences such as \"Experience the future of X\" and \"a new dimension of Y\" rendered in Korean.",
-      "why": "It carries the tone of translated English marketing, so Korean users sense the machine at once.",
+      "name": "Translated-sounding generated Korean copy",
+      "what": "Literal translations of English marketing lines that sound foreign in Korean.",
+      "why": "Korean readers notice the machine at once. Seen again and again in our own work.",
       "detect": {
-        "level": "manual",
+        "level": "heuristic",
         "signal": "A list of stock phrases gives candidates, but judging needs meaning. detect.js reports candidates only.",
         "selectors": [
           "h1",
@@ -2470,7 +2470,7 @@
           "phrase_list": "candidates only"
         }
       },
-      "fix": "Write short, concrete Korean as if it had been written in Korean first.",
+      "fix": "Short, concrete sentences written as if Korean came first.",
       "fix_patterns": [
         "korean-natural-copy"
       ],
@@ -2480,9 +2480,9 @@
     },
     {
       "id": "KO-08",
-      "name": "Missing or wrong lang attribute",
-      "what": "A Korean page whose html lang is missing or en.",
-      "why": "Glyph choice for shared CJK characters, line breaking rules and screen reader pronunciation go wrong. A fingerprint of an English template left as is.",
+      "name": "Missing or wrong lang attribute on a Korean page",
+      "what": "A page written in Korean that declares lang=\"en\" or no language at all.",
+      "why": "Line breaking, font fallback and screen readers all depend on it. Generated starters ship lang=\"en\".",
       "detect": {
         "level": "deterministic",
         "signal": "Visible body text is at least 50% Hangul but documentElement.lang does not start with ko.",
@@ -2494,7 +2494,7 @@
           "lang_prefix": "ko"
         }
       },
-      "fix": "Set <html lang=\"ko\">.",
+      "fix": "<html lang=\"ko\">, and lang=\"en\" on English passages inside.",
       "fix_patterns": [
         "korean-type-setup"
       ],
@@ -2510,8 +2510,8 @@
     {
       "id": "KO-09",
       "name": "English button labels on a Korean page",
-      "what": "The body is Korean but buttons still say \"Get started\" or \"Learn more\".",
-      "why": "Template default copy that was never replaced.",
+      "what": "The body is Korean but buttons still say 'Get started' or 'Learn more'.",
+      "why": "A trace of template defaults left unchanged.",
       "detect": {
         "level": "heuristic",
         "signal": "On a page that is at least 50% Hangul, button-like controls whose text is Latin only and matches common call-to-action phrases. Brand names in Latin must be told apart.",
@@ -2526,7 +2526,7 @@
           "label": "Latin only call to action"
         }
       },
-      "fix": "Translate the button too, and make the action concrete.",
+      "fix": "Korean button labels that name the action.",
       "fix_patterns": [
         "action-label-button",
         "korean-natural-copy"
@@ -2537,9 +2537,9 @@
     },
     {
       "id": "KO-10",
-      "name": "Justified Hangul",
-      "what": "text-align: justify on Korean paragraphs, so the gaps between words differ line by line.",
-      "why": "Hangul has few spaces to stretch, so spacing becomes uneven from line to line.",
+      "name": "Justified Korean paragraphs",
+      "what": "Korean body text aligned to both edges.",
+      "why": "Browsers justify Korean by stretching the gaps between syllables, which leaves uneven rivers of space. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
         "signal": "Paragraph with at least 50% Hangul and three or more lines whose text-align is justify.",
@@ -2554,7 +2554,7 @@
           "lines_min": 3
         }
       },
-      "fix": "Left aligned.",
+      "fix": "Left alignment.",
       "fix_patterns": [
         "korean-line-breaking"
       ],
@@ -2569,12 +2569,12 @@
     },
     {
       "id": "KO-11",
-      "name": "Hangul body text too small",
-      "what": "Korean body text and captions at 12px or less.",
-      "why": "Latin-sized small text turns Hangul strokes and final consonants into mush.",
+      "name": "Korean body text that is too small",
+      "what": "Korean captions and body copy set below 13px.",
+      "why": "Hangul strokes fill in at small sizes much sooner than Latin letters do. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
-        "signal": "Element with own Hangul text whose computed font-size is under 13px. Footer and legal text carries lower weight.",
+        "signal": "Element with own Hangul text whose computed font-size is under 13px. Footer and legal text carries lower weight. Only checked on text that is at least half Hangul and at least 10 characters without spaces, so one word navigation labels are skipped.",
         "selectors": [
           "p",
           "li",
@@ -2588,7 +2588,7 @@
           "hangul": true
         }
       },
-      "fix": "Korean body 15 to 16px, captions at least 13px.",
+      "fix": "14px or more for Korean captions and 16px or more for body text.",
       "fix_patterns": [
         "korean-type-setup",
         "long-form-prose"
