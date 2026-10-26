@@ -13,7 +13,7 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [server] }));
   try {
     const { tools } = await client.listTools();
-    assert.equal(tools.map((t) => t.name).sort().join(','), 'diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,suggest_swaps,taxonomy');
+    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,suggest_swaps,taxonomy');
 
     // The opening question comes from the skill's start guide, so the prompt and the skill say the same thing.
     const { prompts } = await client.listPrompts();
@@ -28,6 +28,12 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
     assert.ok(!extracted.isError, extracted.content[0].text);
     assert.ok(JSON.parse(extracted.content[0].text).sections.length >= 3);
     assert.ok((await client.callTool({ name: 'extract_content', arguments: { target: '/no/such/file.html' } })).isError);
+
+    const theme = await client.callTool({ name: 'brand_theme', arguments: { target: fixture } });
+    assert.ok(!theme.isError, theme.content[0].text);
+    const t = JSON.parse(theme.content[0].text);
+    assert.match(t.css, /:root \{/);
+    assert.ok(t.tokens['--success'] && t.tokens['--danger'] && t.notes.length >= 3);
 
     const listed = JSON.parse((await client.callTool({ name: 'list_rules', arguments: {} })).content[0].text);
     assert.equal(listed.length, RULES.length);
