@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Acme Ledger: close your books faster</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: "Inter", system-ui, sans-serif; background: #0b0b12; color: #f4f4f8; }
+  .hero { position: relative; overflow: hidden; padding: 40px 64px 56px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #a855f7 100%); text-align: center; }
+  .blob { position: absolute; width: 520px; height: 520px; border-radius: 50%; background: #ec4899; filter: blur(110px); opacity: .55; top: -160px; right: -120px; }
+  nav { position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 56px; font-size: 14px; }
+  nav .links { display: flex; gap: 28px; opacity: .85; }
+  .announce { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 14px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+  .eyebrow { position: relative; margin-top: 28px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .24em; opacity: .8; }
+  h1 { position: relative; margin: 14px auto 0; max-width: 980px; font-size: 76px; line-height: 1.02; letter-spacing: -.05em; font-weight: 800; }
+  h1 em { font-family: Georgia, serif; font-weight: 400; font-style: italic; }
+  .grad { background: linear-gradient(90deg, #f9a8d4, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { position: relative; margin: 22px auto 0; max-width: 640px; font-size: 19px; line-height: 1.5; opacity: .9; }
+  .ctas { position: relative; margin-top: 32px; display: flex; gap: 14px; justify-content: center; }
+  .ghost { display: inline-block; padding: 14px 26px; border: 1px solid rgba(255,255,255,.8); border-radius: 12px; color: #fff; text-decoration: none; font-weight: 600; }
+  .glow { display: inline-block; padding: 14px 26px; border-radius: 12px; background: #fff; color: #4c1d95; text-decoration: none; font-weight: 700; box-shadow: 0 12px 48px rgba(168,85,247,.65); }
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 48px 64px 56px; }
+  .card { padding: 26px; border: 1px solid #262636; border-radius: 18px; background: #12121c; }
+  .tile { width: 44px; height: 44px; border-radius: 12px; background: rgba(124,58,237,.18); display: grid; place-items: center; font-size: 20px; margin-bottom: 16px; }
+  .card h3 { font-size: 18px; }
+  .card p { margin-top: 8px; font-size: 14px; line-height: 1.6; color: #a1a1b5; }
+  .pill { display: inline-block; margin-top: 14px; padding: 2px 10px; border-radius: 999px; background: rgba(34,197,94,.15); color: #4ade80; font-size: 12px; font-weight: 600; }
+  .pill.b { background: rgba(59,130,246,.15); color: #60a5fa; }
+  .pill.c { background: rgba(245,158,11,.15); color: #fbbf24; }
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="blob"></div>
+    <nav><strong>Acme Ledger</strong><div class="links"><span>Product</span><span>Pricing</span><span>Docs</span></div></nav>
+    <div><span class="announce"><span class="dot"></span>New: AI-powered insights &#x2728;</span></div>
+    <p class="eyebrow">The future of finance</p>
+    <h1>Close your books <span class="grad">10x faster</span> with <em>effortless</em> clarity</h1>
+    <p class="sub">The all-in-one platform for modern finance teams &mdash; automate, reconcile and report in one place. &#x1F680;</p>
+    <div class="ctas"><a class="ghost" href="#">Get started</a><a class="glow" href="#">Book a demo</a></div>
+  </header>
+  <section class="features">
+    <div class="card"><div class="tile">&#x26A1;</div><h3>Lightning fast</h3><p>Reconcile thousands of transactions in seconds with smart matching.</p><span class="pill">Live</span></div>
+    <div class="card"><div class="tile">&#x1F512;</div><h3>Bank-grade security</h3><p>Your data is protected with enterprise encryption at every step.</p><span class="pill b">Secure</span></div>
+    <div class="card"><div class="tile">&#x2728;</div><h3>AI insights</h3><p>Spot anomalies and trends before they become problems.</p><span class="pill c">Beta</span></div>
+  </section>
+</body>
+</html>

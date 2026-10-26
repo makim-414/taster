@@ -1,16 +1,31 @@
 ---
 name: taster
-description: Find and remove AI slop in frontends. Use when the user wants to check whether a site or screen looks AI generated, review a UI for generic patterns, replace slop with better components, or design and build a landing page, dashboard, app screen, store or editorial page that does not look generated. Triggers on "is my site slop", "does this look AI made", "de-slop", "make this less generic", "review this UI", "redesign this section", "build a landing page", "build a dashboard".
+description: Find and remove AI slop in frontends. Starts by asking whether the site already exists or is being built new. Use when the user wants to check whether a site or screen looks AI generated, review a UI for generic patterns, replace slop with better components, rebuild an existing site they only have the address for, or design and build a landing page, dashboard, app screen, store or editorial page that does not look generated. Triggers on "is my site slop", "does this look AI made", "de-slop", "make this less generic", "review this UI", "redesign this section", "rebuild my site", "redo my Lovable site", "build a landing page", "build a dashboard".
 ---
 
 # Taster
 
-Three jobs. Pick the one the user asked for; if unclear, start with Diagnose on whatever they showed you.
+## Start here: one question
+
+Before anything else, ask the user, in their language:
+
+> Is this a site that already exists, or are we building a new one?
+
+(Korean: "이미 있는 사이트인가요, 아니면 새로 지을까요?") Skip it only when their first message already says which,
+and then name the path you are taking in one line. The full opening, including how to tell whether you have the
+source, is in [references/start.md](references/start.md).
+
+| Answer | Then | Job |
+|---|---|---|
+| Already exists, source code is in the workspace | Diagnose, then replace each spot in their code | Diagnose + Swap |
+| Already exists, only the address (hosted builder, lost source) | Diagnose, read its content, rebuild it clean | Diagnose + Rebuild |
+| New | Ask for product, audience, kind of screen, real content | Build |
 
 | Job | Input | Output |
 |---|---|---|
 | Diagnose | a URL, a running dev server, or a screenshot | every slop spot, marked on a capture, with the rule it breaks and the pattern that fixes it |
 | Swap | a diagnosed page plus its source code | the same page with each spot replaced, re checked until clean |
+| Rebuild | a diagnosed page with no editable source | the same content on a new page made from patterns, checked clean, shown next to the original |
 | Build | a product, an audience and a surface | a new screen composed only from taxonomy patterns, checked before you hand it over |
 
 Data this skill reads (all inside this folder):
@@ -24,7 +39,9 @@ Data this skill reads (all inside this folder):
 
 Prefer its tools; they run the same detector in a real browser for you.
 
+- The `start` prompt asks the opening question for you.
 - `diagnose { target }`: findings grouped by rule plus one outlined capture per width (1440 and 390).
+- `extract_content { target }`: the page's content in reading order (sections, actions, images, nav, footer, brand color and fonts), for Rebuild.
 - `suggest_swaps { ruleIds }`: the fix patterns and registry components for each rule found.
 - `get_pattern { id }` and `get_component { id }`: the swap recipe and copyable code with its tokens.
 - `list_patterns { surface, use, category, family, rule }` and `taxonomy`: for Build.
@@ -44,6 +61,13 @@ Follow [references/diagnose.md](references/diagnose.md). Short version:
 ## Swap
 
 Follow [references/swap.md](references/swap.md). For each finding, open the fix pattern, apply its "Swap recipe" in the user's code, prefer the registry component when the pattern lists one, keep the user's brand colors and copy, then re run detect.js. A rule is fixed only when detect.js no longer reports it at both widths.
+
+## Rebuild
+
+Follow [references/rebuild.md](references/rebuild.md). Diagnose the original, read its content with
+`extract_content`, keep every heading, claim, action and owned image, map each section to a use and a pattern,
+build it on tokens, then check the rebuild: zero measured findings at both widths and every original heading and
+action still present. Flag unsourced numbers and testimonials to the user instead of rewriting them.
 
 ## Build
 
