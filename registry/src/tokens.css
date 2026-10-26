@@ -83,9 +83,13 @@
   --delta-up: #34d399;
   --delta-down: #f87171;
 
-  /* Type. Geist is not bundled, the stack falls back to the system font. */
-  --font: 'Geist', 'Geist Variable', -apple-system, system-ui, sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', monospace;
+  /* Type. IBM Plex: one open licensed family drawn for Latin and Hangul (IBM Plex Sans KR), with clear figures for
+     data. It is not one of the faces generated pages default to, so the repo's own TYP-02 rule stays quiet.
+     Not bundled: load it once, for example
+     https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono&display=swap
+     Swap in the brand's face by overriding --font; keep a Hangul family in the stack. */
+  --font: 'IBM Plex Sans', 'IBM Plex Sans KR', -apple-system, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
   /* Scale: KPI value 24, title 16, body 14, label 12, caption 11, micro 10 */
   --t-display: 36px;
   --t-h1: 30px;
