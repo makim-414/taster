@@ -35,7 +35,8 @@ for (const r of doc.rules) {
   if (keys !== 'detect,fix,fix_patterns,id,korean,name,refs,severity,what,why') err(`${at}: unexpected keys ${keys}`);
 }
 
-const checked = new Set([...detect.matchAll(/flag\('([A-Z]{2,3}-\d{2})'/g)].map((m) => m[1]));
+// detect.js registers one checker per rule as R['AC-01'] = function () { ... }.
+const checked = new Set([...detect.matchAll(/(?:flag\(|R\[)'([A-Z]{2,3}-\d{2})'/g)].map((m) => m[1]));
 const measured = doc.rules.filter((r) => r.detect && r.detect.level !== 'manual').map((r) => r.id);
 for (const id of measured) if (!checked.has(id)) err(`${id}: measured in rules.json but not checked in detect.js`);
 for (const id of checked) if (!measured.includes(id)) err(`${id}: checked in detect.js but not measured in rules.json`);

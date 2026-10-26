@@ -13,7 +13,24 @@ jobs:
           node-version: 22
       - name: Repository data and skill bundle
         run: node scripts/validate.mjs
+      - name: Rule schema matches the detector
+        run: node engine/scripts/check-rules.mjs
       - name: Registry typecheck
         run: |
           npm ci --prefix registry
           npm --prefix registry run typecheck
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install engine and Chromium
+        run: |
+          npm ci --prefix engine
+          npx --prefix engine playwright install --with-deps chromium
+      - name: Detector fixtures
+        run: node rules/test-detect.mjs
+      - name: Engine CLI and MCP
+        run: npm --prefix engine test
