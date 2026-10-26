@@ -62,7 +62,7 @@ this product without generic AI patterns."
 ## Taxonomy at a glance
 
 <!-- taxonomy:start -->
-110 patterns, 63 rules, 34 components, 40 uses, 7 surfaces.
+110 patterns, 63 rules, 43 components, 40 uses, 7 surfaces.
 
 | Family | Categories | Patterns |
 |---|---|---|
