@@ -54,7 +54,7 @@ export type Diagnosis = { report: Summary; shots: Record<string, string>; reques
 export class PageLoadError extends Error {}
 
 // allowLoopback is for test/fixtures.test.ts only; the API route never passes it.
-export async function runDiagnosis(url: string, { deadlineMs = 50000, allowLoopback = false } = {}): Promise<Diagnosis> {
+export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopback = false } = {}): Promise<Diagnosis> {
   const engine = await loadEngine();
   const browser: Browser = await launchBrowser();
   const budget: Budget = { requests: 0, bytes: 0, blocked: null, allowLoopback };

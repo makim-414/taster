@@ -5,7 +5,7 @@ import { PageLoadError, runDiagnosis, trimReport } from '../../../lib/diagnose.t
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
+export const maxDuration = 90;
 
 function fail(status: number, code: string, message: string, extra: Record<string, string> = {}) {
   return NextResponse.json({ error: { code, message } }, { status, headers: { 'cache-control': 'no-store', ...extra } });
