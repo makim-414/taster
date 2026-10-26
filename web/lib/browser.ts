@@ -15,8 +15,38 @@ const FENCE_ARGS = [
   '--proxy-bypass-list=<-loopback>',
   '--force-webrtc-ip-handling-policy=disable_non_proxied_udp',
   '--webrtc-ip-handling-policy=disable_non_proxied_udp',
-  '--disable-features=NetworkPrediction,PrivateNetworkAccessSendPreflights',
 ];
+const FENCE_DISABLED_FEATURES = ['NetworkPrediction', 'PrivateNetworkAccessSendPreflights'];
+// Flags from @sparticuz/chromium this fence does not want: the page is untrusted, so keep the
+// same-origin policy and mixed content blocking.
+const DROP_ARGS = new Set(['--disable-web-security', '--allow-running-insecure-content']);
+
+// Chromium only honours the last --disable-features flag, so all of them are merged into one.
+function mergeArgs(base: string[]): string[] {
+  const disabled = new Set(FENCE_DISABLED_FEATURES);
+  const out: string[] = [];
+  for (const arg of base) {
+    if (DROP_ARGS.has(arg)) continue;
+    if (arg.startsWith('--disable-features=')) {
+      for (const f of arg.slice('--disable-features='.length).split(',')) if (f) disabled.add(f);
+      continue;
+    }
+    out.push(arg);
+  }
+  return [...out, ...FENCE_ARGS, `--disable-features=${[...disabled].join(',')}`];
+}
+
+// Chromium's own stderr goes to the function log, a bounded number of lines per launch, so a
+// crash on the platform leaves a trace.
+function browserLogger() {
+  let lines = 0;
+  return {
+    isEnabled: (name: string) => name === 'browser',
+    log: (_name: string, _severity: string, message: string | Error) => {
+      if (lines++ < 60) console.error(`[chromium] ${String(message).slice(0, 300)}`);
+    },
+  };
+}
 const MAC_CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 // Noto Sans KR from the official noto-cjk repository, pinned to a release tag. The Lambda style
 // Chromium ships almost no fonts, so Korean pages would render as empty boxes without it.
@@ -41,10 +71,10 @@ export async function launchBrowser(): Promise<Browser> {
     const executablePath = await chromium.executablePath();
     fontReady ||= installKoreanFont().catch(() => null);
     await fontReady;
-    return playwright.launch({ executablePath, args: [...chromium.args, ...FENCE_ARGS], headless: true });
+    return playwright.launch({ executablePath, args: mergeArgs(chromium.args), headless: true, logger: browserLogger() });
   }
   const executablePath = process.env.CHROME_PATH || (existsSync(MAC_CHROME) ? MAC_CHROME : undefined);
-  return playwright.launch({ executablePath, args: FENCE_ARGS, headless: true });
+  return playwright.launch({ executablePath, args: mergeArgs([]), headless: true });
 }
 
 export type Budget = { requests: number; bytes: number; blocked: string | null; allowLoopback?: boolean };
