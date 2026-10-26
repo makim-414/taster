@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Status dots that are decoration</title>
+<style>
+  :root { --success: #1f7a4d; --danger: #b42318; }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: .4; } 100% { opacity: 1; } }
+  body { margin: 0; padding: 48px; font-family: "IBM Plex Sans", system-ui, sans-serif; color: #1a1a1a; background: #fbfaf8; font-size: 16px; line-height: 1.6; }
+  .row { display: flex; align-items: center; gap: 8px; padding: 12px 0; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  /* A token color, but pulsing: still flagged. */
+  .live { background: var(--success); animation: pulse 2s infinite; }
+  /* A hue that is not one of the page's meaning tokens: still flagged. */
+  .orange { background: #f97316; }
+</style>
+</head>
+<body>
+  <div class="row"><span class="dot live"></span><span>Live</span></div>
+  <div class="row"><span class="dot orange"></span><span>Processing</span></div>
+</body>
+</html>

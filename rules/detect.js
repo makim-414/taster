@@ -588,6 +588,30 @@
       }
       return false;
     }
+    // The page's own meaning colors: CSS variables for success and failure on :root, resolved the same way the
+    // browser resolves a dot's background so the strings compare exactly. A dot painted with one of these is the
+    // site saying a real outcome in its own palette (owner rule: flat meaning color only for real meaning).
+    var SEMANTIC_VARS = ['--success', '--danger', '--destructive', '--error', '--delta-up', '--delta-down', '--positive', '--negative'];
+    var semanticColors = null;
+    function pageSemanticColors() {
+      if (semanticColors) return semanticColors;
+      semanticColors = {};
+      var rootCs = getComputedStyle(document.documentElement);
+      var probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px';
+      document.documentElement.appendChild(probe);
+      SEMANTIC_VARS.forEach(function (v) {
+        var raw = rootCs.getPropertyValue(v).trim();
+        if (!raw) return;
+        probe.style.backgroundColor = '';
+        probe.style.backgroundColor = 'var(' + v + ')';
+        var c = getComputedStyle(probe).backgroundColor;
+        if (c && c !== 'rgba(0, 0, 0, 0)') semanticColors[c] = v;
+      });
+      probe.remove();
+      return semanticColors;
+    }
+
     R['AC-08'] = function () {
       I.forEach(function (it) {
         if (!inRange(it.r.w, 4, 12) || !inRange(it.r.h, 4, 12) || Math.abs(it.r.w - it.r.h) > 1) return;
@@ -597,6 +621,8 @@
         if (!textFollows(it.el)) return;
         var animated = it.cs.animationName !== 'none' && px(it.cs.animationDuration) > 0;
         var glow = parseShadows(it.cs.boxShadow).some(function (s) { return !s.inset && s.blur > 0 && s.color && strong(s.color, 0.3); });
+        // A flat, still dot in the page's own success or failure color is allowed; a glowing or pulsing one is not.
+        if (!animated && !glow && pageSemanticColors()[it.cs.backgroundColor]) return;
         add('AC-08', it.el, { background: it.cs.backgroundColor, animated: animated, glow: glow, weight: animated || glow ? 'high' : 'normal' });
       });
     };
