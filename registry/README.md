@@ -3,7 +3,7 @@
 Portable React and TypeScript components with neutral design tokens. There is no package to
 install. You copy the files you need into your app, the same way you would with shadcn/ui.
 
-34 components, MIT licensed. Every entry is listed in `registry.json` with its file, category,
+43 components, MIT licensed. Every entry is listed in `registry.json` with its file, category,
 npm dependencies and credit.
 
 ## Copy a component into your app
@@ -22,6 +22,9 @@ npm dependencies and credit.
    An entry in `deps` that looks like `blocks/use-hotkeys` is another registry component,
    copy it too.
 5. `marketing/workflow-section` also needs `src/icons/index.tsx`.
+6. Everything under `motion/`, and `marketing/pricing-cards`, `marketing/reveal-faq` and
+   `marketing/step-showcase`, also need `src/motion/_motion.ts` (reduced motion, in-view and
+   keyframe helpers, no dependency). Each of them honors `prefers-reduced-motion`.
 
 Example for a button and a dialog:
 
