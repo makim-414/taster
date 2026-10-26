@@ -8,6 +8,7 @@ import { useReducedMotion, useStyleOnce } from './_motion'
 // and with a visible pause button (automatic motion longer than five seconds needs one); under reduced
 // motion it stops and wraps into a static row; the copy is aria-hidden and inert, so items are read and
 // tabbed once. See patterns/marquee-band: six or more items of the same kind, on hairlines, not in a card.
+// Upstream license: MIT, Copyright (c) Magic UI. Full text in THIRD_PARTY_NOTICES.md.
 
 const CSS =
   // Edges fade through a mask, so it works on any background and adds no color.

@@ -3,12 +3,14 @@ import { cn } from '../blocks/_cn'
 import { useReducedMotion } from './_motion'
 
 // Gooey text: cycles through words, melting one into the next with an SVG threshold filter.
-// Source: "Gooey Text Morphing" by victorwelander on 21st.dev
-// (https://21st.dev/community/components/victorwelander/gooey-text-morphing/default).
+// Source: "Gooey Text Morphing" by Victor Welander on 21st.dev
+// (https://21st.dev/@victorwelander/components/gooey-text-morphing).
 // Changes: each instance gets its own filter id (two on one page no longer share a filter), the size
 // comes from className instead of a fixed display size, the box reserves the longest word, text color
 // is the --text token, reduced motion shows the first word still, and screen readers get the word list
 // once instead of every frame.
+// Upstream license: MIT as stated on the 21st.dev listing (no LICENSE file published),
+// Copyright (c) Victor Welander. Full text in THIRD_PARTY_NOTICES.md.
 
 export interface GooeyTextProps {
   texts: string[]

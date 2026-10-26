@@ -15,6 +15,7 @@ import { useReducedMotion, useStyleOnce } from '../motion/_motion'
 // runs under reduced motion. The original's frame around a panel around the card is now one card (CMP-02),
 // and its click-anywhere-to-advance, mouse-follow glow and lime and purple colors are gone. The edge and
 // shadow sit on the screenshot itself; a step with no screenshot draws a plain neutral fill of the same size.
+// Upstream license: MIT, Copyright (c) 2023 Jordan-Gilliam. Full text in THIRD_PARTY_NOTICES.md.
 
 const CSS = [
   '.dsg-step-card{background:linear-gradient(to bottom, var(--bg-elev), var(--bg) calc(var(--sp-16) * 3));background-color:var(--bg)}',

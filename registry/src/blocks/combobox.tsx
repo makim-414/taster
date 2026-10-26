@@ -4,6 +4,7 @@ import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { cn } from './_cn'
 
 // Combobox. Searchable single select built on cmdk and a Radix popover (shadcn/ui pattern, MIT).
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export interface ComboboxOption {
   value: string

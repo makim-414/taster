@@ -4,6 +4,7 @@ import { cn } from './_cn'
 
 // Dialog / modal. Built on @radix-ui/react-dialog, styled in the shadcn/ui pattern (MIT).
 // Popover-token panel over a translucent scrim, line icon for the close button.
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export const Dialog = DialogPrimitive.Root
 export const DialogTrigger = DialogPrimitive.Trigger
