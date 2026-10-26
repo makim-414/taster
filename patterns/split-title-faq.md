@@ -5,7 +5,7 @@ category: faq
 uses: [answer-questions, explain-features]
 surfaces: [landing]
 replaces: [TYP-04]
-components: [blocks/accordion]
+components: [blocks/accordion, marketing/reveal-faq]
 inspiration: []
 status: draft
 ---
