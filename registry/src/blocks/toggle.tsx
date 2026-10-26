@@ -3,6 +3,7 @@ import { cn } from './_cn'
 
 // Checkbox and Switch. On state uses the accent token so a theme recolors it.
 // API follows shadcn/ui checkbox and switch (MIT).
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 const CheckIcon = () => (
   <svg

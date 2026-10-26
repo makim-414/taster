@@ -3,6 +3,7 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { cn } from './_cn'
 
 // Dropdown menu. Built on @radix-ui/react-dropdown-menu, styled in the shadcn/ui pattern (MIT).
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export const DropdownMenu = DropdownMenuPrimitive.Root
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger

@@ -4,6 +4,7 @@ import { cn } from './_cn'
 
 // Accordion. Built on @radix-ui/react-accordion, styled in the shadcn/ui pattern (MIT).
 // Hairline dividers, line chevron that rotates on open, no emoji.
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export const Accordion = AccordionPrimitive.Root
 

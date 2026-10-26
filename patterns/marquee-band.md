@@ -5,7 +5,7 @@ category: motion-particle
 uses: [set-the-mood, prove-trust]
 surfaces: [landing]
 replaces: []
-components: []
+components: [motion/marquee]
 inspiration: [https://magicui.design/docs/components/marquee]
 status: stable
 ---
