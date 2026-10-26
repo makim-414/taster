@@ -32,6 +32,8 @@ function engineFile(): string {
     process.env.TASTER_ENGINE,
     path.resolve(process.cwd(), '../engine/diagnose.mjs'),
     path.resolve(process.cwd(), 'engine/diagnose.mjs'),
+    // Vercel keeps the traced repo layout under /var/task.
+    '/var/task/engine/diagnose.mjs',
   ].filter(Boolean) as string[];
   const found = candidates.find((c) => existsSync(c));
   if (!found) throw new Error(`engine/diagnose.mjs not found (looked in ${candidates.join(', ')})`);
