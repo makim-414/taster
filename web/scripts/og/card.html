@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=block" rel="stylesheet">
+<style>/*TOKENS*/</style>
+<style>
+  :root { --font: 'Noto Sans KR', sans-serif; }
+  html, body { margin: 0; width: 1200px; height: 630px; background: var(--bg); color: var(--text); font-family: var(--font); word-break: keep-all; }
+  .card { box-sizing: border-box; width: 1200px; height: 630px; padding: var(--sp-16) 80px; display: flex; flex-direction: column; justify-content: space-between; }
+  .top { display: flex; align-items: baseline; gap: var(--sp-4); padding-bottom: var(--sp-5); border-bottom: 1px solid var(--border); }
+  .mark { font-size: 32px; font-weight: var(--w-semi); }
+  .tag { font-size: 24px; color: var(--text-muted); }
+  h1 { margin: 0; font-size: 72px; line-height: var(--lh-snug); font-weight: var(--w-semi); }
+  p { margin: var(--sp-6) 0 0; font-size: 30px; line-height: var(--lh-normal); color: var(--text-muted); }
+  .url { font-size: 24px; color: var(--text-subtle); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="top"><span class="mark">Taster</span><span class="tag">AI 가 만든 웹 화면의 흔적을 잽니다</span></div>
+    <div>
+      <h1>이 화면은 얼마나<br>슬롭일까요</h1>
+      <p>주소를 넣으면 1440 폭과 390 폭으로 열어 규칙 63개를 잽니다</p>
+    </div>
+    <div class="url">taster-six.vercel.app</div>
+  </div>
+</body>
+</html>
