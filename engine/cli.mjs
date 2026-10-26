@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { parseArgs } from 'node:util';
+import { RULES, VIEWPORTS, diagnose, explainRule, formatText } from './diagnose.mjs';
+
+const HELP = `Usage
+  node engine/cli.mjs <url-or-file> [--out <dir>] [--json] [--widths 1440,390]
+  node engine/cli.mjs --rules
+  node engine/cli.mjs --explain <rule-id>
+
+Options
+  --out <dir>       write report.json and annotated-<width>.png into <dir>
+  --json            print the report as JSON
+  --widths <list>   viewport widths, default ${VIEWPORTS.map((v) => v.width).join(',')}
+
+Exit codes: 0 no findings, 1 findings, 2 error`;
+
+function viewportsFrom(list) {
+  if (!list) return VIEWPORTS;
+  return list.split(',').map((w) => {
+    const width = Number(w.trim());
+    if (!Number.isInteger(width) || width < 320 || width > 3840) throw new Error(`Bad width: ${w}`);
+    return VIEWPORTS.find((v) => v.width === width) || { width, height: width < 768 ? 844 : 900 };
+  });
+}
+
+async function main() {
+  const { values, positionals } = parseArgs({
+    allowPositionals: true,
+    options: {
+      out: { type: 'string' },
+      json: { type: 'boolean' },
+      widths: { type: 'string' },
+      rules: { type: 'boolean' },
+      explain: { type: 'string' },
+      help: { type: 'boolean', short: 'h' },
+    },
+  });
+
+  if (values.help) {
+    console.log(HELP);
+    return 0;
+  }
+  if (values.rules) {
+    for (const r of RULES) console.log(`${r.id.padEnd(7)} ${r.detect.level.padEnd(14)} ${r.severity.padEnd(7)} ${r.name}`);
+    return 0;
+  }
+  if (values.explain) {
+    const r = explainRule(values.explain);
+    if (!r) throw new Error(`Unknown rule: ${values.explain}`);
+    console.log(values.json ? JSON.stringify(r, null, 2) : `${r.id}  ${r.name}  [${r.severity}, ${r.detect.level}]\n\nWhat: ${r.what}\nWhy: ${r.why}\nHow it is found: ${r.detect.signal}\nFix: ${r.fix}`);
+    return 0;
+  }
+  if (positionals.length !== 1) {
+    console.error(HELP);
+    return 2;
+  }
+
+  if (values.out) mkdirSync(values.out, { recursive: true });
+  const report = await diagnose(positionals[0], { viewports: viewportsFrom(values.widths), outDir: values.out || null });
+  if (values.out) writeFileSync(join(values.out, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
+  console.log(values.json ? JSON.stringify(report, null, 2) : formatText(report));
+  return report.rulesHit > 0 ? 1 : 0;
+}
+
+main().then(
+  (code) => process.exit(code),
+  (err) => {
+    console.error(`disegno: ${err.message}`);
+    process.exit(2);
+  },
+);
