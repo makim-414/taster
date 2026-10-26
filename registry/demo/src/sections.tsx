@@ -85,7 +85,7 @@ function AppShellDemo() {
     { label: 'Billing', href: '#', group: 'Account' },
   ]
   return (
-    <div className="relative h-[460px] overflow-auto rounded-lg border border-border">
+    <div className="relative h-[460px] overflow-auto border border-border">
       <AppShell
         brand={<span className="text-sm font-semibold">Acme</span>}
         nav={nav}
@@ -593,7 +593,7 @@ export function Sections() {
       </Section>
 
       <Section id="marketing/workflow-section" title="Workflow section">
-        <div className="overflow-x-auto rounded-lg border border-border">
+        <div className="overflow-x-auto border border-border">
           <div className="min-w-[960px]"><WorkflowSection /></div>
         </div>
       </Section>
