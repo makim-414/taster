@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { RULES, VIEWPORTS, diagnose, explainRule, extract } from './diagnose.mjs';
+import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, viewportFor } from './diagnose.mjs';
 import { getComponent, getPattern, listPatterns, loadTaxonomy, suggestSwaps } from './catalog.mjs';
 
 const server = new McpServer({ name: 'taster', version: '0.1.0' });
@@ -44,14 +44,14 @@ server.registerTool(
       'Open a URL or a local HTML file in a real browser at 1440 and 390 wide, run the taster detector, and return every finding grouped by rule with selector, page rect, evidence, severity, fix and fix patterns. Also returns one capture per width with each finding outlined and labeled by rule id, and the list of manual rules to judge by eye.',
     inputSchema: {
       target: z.string().describe('http(s) URL, file:// URL, or path to a local HTML file'),
-      widths: z.array(z.number().int().min(320).max(3840)).max(4).optional().describe('viewport widths, default [1440, 390]'),
+      widths: z.array(z.number().int().min(320).max(3840)).max(9).optional().describe(`viewport widths, default [1440, 390]; for a responsive check pass [${RESPONSIVE_WIDTHS.join(', ')}]`),
       screenshots: z.boolean().optional().describe('return the annotated captures, default true'),
     },
   },
   async ({ target, widths, screenshots = true }) => {
     const dir = screenshots ? mkdtempSync(join(tmpdir(), 'taster-')) : null;
     try {
-      const viewports = widths ? widths.map((width) => VIEWPORTS.find((v) => v.width === width) || { width, height: width < 768 ? 844 : 900 }) : VIEWPORTS;
+      const viewports = widths ? widths.map(viewportFor) : VIEWPORTS;
       const report = await diagnose(target, { viewports, outDir: dir });
       const content = [json({ ...report, screenshots: undefined })];
       for (const file of report.screenshots) content.push({ type: 'image', mimeType: 'image/png', data: readFileSync(file).toString('base64') });
