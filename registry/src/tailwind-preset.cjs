@@ -8,7 +8,12 @@
  */
 module.exports = {
   theme: {
-    screens: { sm: '640px', md: '768px', lg: '1024px', xl: '1280px' },
+    // desk: a wide screen without a coarse pointer. Controls are 44px everywhere else and shrink only here
+    // (desk:h-9). Do not test pointer: fine instead: a headless browser reports no pointer at all.
+    screens: {
+      sm: '640px', md: '768px', lg: '1024px', xl: '1280px',
+      desk: { raw: '(min-width: 1024px) and (not (pointer: coarse))' },
+    },
     extend: {
       colors: {
         bg: 'var(--bg)',
@@ -52,16 +57,17 @@ module.exports = {
         display: ['var(--font-display, var(--font))'],
       },
       fontSize: {
-        // The stock text-sm (14px) and text-xs (12px) stay untouched on purpose.
-        // Token sizes sit next to them under their own names.
+        // The stock text-sm (14px) stays untouched. text-xs and the small token sizes read the --t-* variables,
+        // so a Korean page (lang="ko") gets 13px from tokens.css without a rebuild.
+        xs: ['var(--t-sm)', { lineHeight: '1rem' }],
         display: ['36px', { lineHeight: '1.1' }],
         h1: ['30px', { lineHeight: '1.1' }],
         h2: ['24px', { lineHeight: '1.3' }],
         title: ['16px', { lineHeight: '1.3' }],
         body: ['14px', { lineHeight: '1.5' }],
-        label: ['12px', { lineHeight: '1.5' }],
-        caption: ['11px', { lineHeight: '1.5' }],
-        micro: ['10px', { lineHeight: '1.5' }],
+        label: ['var(--t-sm)', { lineHeight: '1.5' }],
+        caption: ['var(--t-xs)', { lineHeight: '1.5' }],
+        micro: ['var(--t-micro)', { lineHeight: '1.5' }],
       },
       fontWeight: { reg: '400', med: '500', semi: '600' },
       spacing: {

@@ -18,7 +18,7 @@ It prevents four common failures: a single dark mode with no light option, a nea
 
 ## Anatomy
 
-- Layer 1, raw values: a neutral ramp and the semantic hues, for example `oklch(0.12 0.005 240)`. Nobody references these from components.
+- Layer 1, raw values: a neutral ramp and the semantic hues, for example `oklch(0.12 0 0)`. Nobody references these from components.
 - Layer 2, roles: `--bg`, `--bg-elev`, `--bg-sunken`, `--border`, `--text`, `--text-muted`, `--text-subtle`, `--accent`, `--success`, `--warning`, `--danger`.
 - Layer 3, component tokens: only when a component needs its own knob, such as `--sidebar` or `--card-radius`.
 - Brand slot: one variable, `--brand`, defaults to near white (dark) or ink (light). A theme sets this and, if data uses color, the `--chart-*` ramp. Nothing else.
@@ -28,6 +28,8 @@ It prevents four common failures: a single dark mode with no light option, a nea
 ## Do
 
 - Step dark surfaces by lightness (0.12, 0.18, 0.27 in OKLCH) and let borders be white at 8 to 15% alpha.
+- Keep the dark neutral at chroma 0. A hue of 240 at chroma 0.005 already reads as a blue or teal cast across a whole page, and a 5% white card lifts the page more than it looks; 3% is enough.
+- Check the smallest text token (`--text-subtle`) at 4.5:1 on the surface it sits on that is closest in lightness (`--muted`, `--secondary`), not only on `--bg`.
 - Keep accents flat. Emphasis is a contrast step or a single brand fill, not a glow.
 - Make light surfaces opaque. A 5% white card disappears on a white page.
 - Tune semantic colors per mode; the same green is too bright on white.
@@ -58,7 +60,7 @@ Fixed: roles as tokens, both modes, flat accent.
 /* after */
 :root {
   color-scheme: dark;
-  --bg: oklch(0.12 0.005 240);  --bg-elev: oklch(1 0 0 / 5%);
+  --bg: oklch(0.12 0 0);  --bg-elev: oklch(1 0 0 / 3%);
   --text: oklch(0.985 0 0);     --border: oklch(1 0 0 / 8%);
   --brand: oklch(0.985 0 0);    --accent: var(--brand);  --accent-fg: oklch(0.205 0 0);
 }
