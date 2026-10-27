@@ -3,8 +3,8 @@
 /**
  * WorkflowSection. A landing section with step tabs and an always-on agent dock.
  * Neutral palette only: a full-bleed backdrop with a notched corner, a dot texture,
- * a per-tab radial glow, a floating tab rail at the lower left, and a glass step card
- * paired with the agent dock. Plain React, no animation library, inline SVG icons.
+ * a per-tab radial glow, a floating tab rail at the lower left, and an opaque step card
+ * paired with the agent dock. Steps are numbered 1, 2, 3 because they are a real sequence. Plain React, no animation library, inline SVG icons.
  */
 
 import * as React from "react";
@@ -126,7 +126,7 @@ const DEFAULT_AGENT = {
 
 function AgentDock({ agent }: { agent: NonNullable<WorkflowSectionProps["agent"]> }) {
   return (
-    <div style={{ width: 280, flexShrink: 0, display: "flex", flexDirection: "column", borderRadius: 26, border: "1px solid rgba(255,255,255,.1)", background: "rgba(0,0,0,.65)", padding: 20, backdropFilter: "blur(24px)", boxShadow: "0 30px 80px -20px rgba(0,0,0,.8)" }}>
+    <div style={{ width: 280, flexShrink: 0, display: "flex", flexDirection: "column", borderRadius: 26, border: "1px solid rgba(255,255,255,.1)", background: "#0c0c0c", padding: 20 }}>
       <p style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.3, letterSpacing: "-.01em", color: "#fff", margin: 0 }}>{agent.title}</p>
       <span style={{ marginTop: 4, display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, color: "rgba(255,255,255,.62)" }}>
         <span style={{ width: 6, height: 6, borderRadius: 999, background: "rgba(255,255,255,.7)" }} />{agent.online}
@@ -144,7 +144,7 @@ function AgentDock({ agent }: { agent: NonNullable<WorkflowSectionProps["agent"]
       </div>
       <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 8, borderRadius: 999, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.03)", padding: "8px 12px" }}>
         <span style={{ flex: 1, fontSize: 11, color: "rgba(255,255,255,.62)" }}>{agent.input}</span>
-        <span style={{ display: "flex", width: 20, height: 20, alignItems: "center", justifyContent: "center", borderRadius: 999, background: "#ededed", color: "#0a0a0a" }}>
+        <span style={{ display: "flex", width: 20, height: 20, alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.7)" }}>
           <IconArrowUR style={{ width: 12, height: 12 }} />
         </span>
       </div>
@@ -182,7 +182,7 @@ export function WorkflowSection({
               backgroundImage: "radial-gradient(rgba(255,255,255,.4) 1px, transparent 1px)", backgroundSize: "28px 28px",
               WebkitMaskImage: "radial-gradient(ellipse at center, #000 30%, transparent 75%)", maskImage: "radial-gradient(ellipse at center, #000 30%, transparent 75%)" }} />
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 18, paddingLeft: 300, paddingRight: 36 }}>
-              <div key={active} style={{ width: "100%", maxWidth: 360, flexShrink: 1, minWidth: 0, borderRadius: 26, border: "1px solid rgba(255,255,255,.1)", background: "rgba(0,0,0,.65)", backdropFilter: "blur(24px)", boxShadow: "0 30px 80px -20px rgba(0,0,0,.8)", padding: 20, animation: "wfIn .35s ease both" }}>
+              <div key={active} style={{ width: "100%", maxWidth: 360, flexShrink: 1, minWidth: 0, borderRadius: 26, border: "1px solid rgba(255,255,255,.1)", background: "#0c0c0c", padding: 20, animation: "wfIn .35s ease both" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                   <h3 style={{ fontSize: 17, fontWeight: 600, letterSpacing: "-.01em", color: "#fff", lineHeight: 1.2, margin: 0 }}>{item.heading}</h3>
                   <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,.7)", border: "1px solid rgba(255,255,255,.18)", padding: "3px 8px", borderRadius: 6 }}>{item.badge}</span>
@@ -199,7 +199,7 @@ export function WorkflowSection({
                             <AgentDock agent={agent} />
             </div>
           </div>
-          <div style={{ position: "absolute", left: 24, bottom: 56, zIndex: 20, width: 232, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", borderRadius: 24, padding: 12, backdropFilter: "blur(24px)", boxShadow: "0 20px 50px -20px rgba(0,0,0,.7)" }}>
+          <div style={{ position: "absolute", left: 24, bottom: 56, zIndex: 20, width: 232, border: "1px solid rgba(255,255,255,.1)", background: "#121212", borderRadius: 24, padding: 12 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {tabs.map((tab, i) => {
                 const on = active === i; const Icon = tab.icon;
@@ -209,7 +209,7 @@ export function WorkflowSection({
                       background: on ? "rgba(255,255,255,.1)" : "transparent", border: `1px solid ${on ? "rgba(255,255,255,.22)" : "transparent"}` }}>
                     <Icon style={{ width: 20, height: 20, flexShrink: 0, color: on ? "#fff" : "rgba(255,255,255,.55)" }} />
                     <span style={{ fontSize: 14, fontWeight: 500, color: on ? "#fff" : "rgba(255,255,255,.85)", display: "flex", alignItems: "center" }}>
-                      <span style={{ fontSize: 10, fontWeight: 600, marginRight: 6, opacity: .6, fontVariantNumeric: "tabular-nums" }}>{String(i + 1).padStart(2, "0")}</span>
+                      <span style={{ fontSize: 10, fontWeight: 600, marginRight: 6, opacity: .6, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
                       {tab.label}
                     </span>
                   </button>
