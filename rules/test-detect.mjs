@@ -111,7 +111,7 @@ const slopDet = slopIds.filter((i) => level[i] === 'deterministic');
 console.log(`slop.html deterministic rules: ${slopDet.length}`);
 console.log('slop.html ids: ' + slopIds.join(' '));
 
-const union = new Set([...slopIds, ...ids(out['slop-extra.html'].result)]);
+const union = new Set([...slopIds, ...ids(out['slop-extra.html'].result), ...Object.values(engineOut).flatMap((o) => ids(o.result))]);
 const detAll = rules.filter((r) => r.detect.level === 'deterministic').map((r) => r.id);
 const heuAll = rules.filter((r) => r.detect.level === 'heuristic').map((r) => r.id);
 console.log('deterministic rules not covered by fixtures: ' + (detAll.filter((i) => !union.has(i)).join(' ') || 'none'));
