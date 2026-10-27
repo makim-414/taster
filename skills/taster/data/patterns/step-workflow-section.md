@@ -5,7 +5,7 @@ category: timeline-stepper
 uses: [guide-through-steps, explain-features]
 surfaces: [landing]
 replaces: [AC-04, COL-07, LAY-03]
-components: [marketing/workflow-section, blocks/tabs, blocks/accordion]
+components: [marketing/workflow-section, blocks/tabs, blocks/accordion, marketing/step-showcase]
 inspiration: []
 status: stable
 ---

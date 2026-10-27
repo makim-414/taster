@@ -35,6 +35,15 @@ import {
   TrendChart,
   useHotkeys, useListNavigation,
   WorkflowSection,
+  PricingCards, type PricingPlan,
+  RevealFaq,
+  StepShowcase, type ShowcaseStep,
+  GooeyText,
+  Marquee,
+  NumberTicker,
+  TextReveal,
+  TextScramble,
+  Typewriter,
   Icon, IconLabel,
 } from '../../src'
 
@@ -77,7 +86,7 @@ function AppShellDemo() {
     { label: 'Billing', href: '#', group: 'Account' },
   ]
   return (
-    <div className="relative h-[460px] overflow-auto rounded-lg border border-border">
+    <div className="relative h-[460px] overflow-auto border border-border">
       <AppShell
         brand={<span className="text-sm font-semibold">Acme</span>}
         nav={nav}
@@ -242,6 +251,26 @@ const TREND_DATA = [
 const COMPARE_DATA = [
   { label: 'Search', value: 92 }, { label: 'Social', value: 64 }, { label: 'Direct', value: 48 },
   { label: 'Email', value: 31 }, { label: 'Ref', value: 22 },
+]
+
+
+const PLANS: PricingPlan[] = [
+  { id: 'team', name: 'Team', blurb: 'For a small team that reviews every page before it ships.', price: '$79', period: 'per month', note: '5 seats, billed monthly', features: ['5 sites', 'Daily checks at two widths', 'Alerts when a rule regresses', 'API access'], cta: { label: 'Start a trial', href: '#plans' }, recommended: true },
+  { id: 'solo', name: 'Solo', blurb: 'For one person checking their own sites.', price: '$19', period: 'per month', note: '1 seat, billed monthly', features: ['1 site', 'Weekly checks', 'Annotated captures'], cta: { label: 'Start free', href: '#plans' } },
+  { id: 'studio', name: 'Studio', blurb: 'For a studio that reviews client work.', price: '$199', period: 'per month', note: '20 seats, billed monthly', features: ['25 sites', 'Checks on every deploy', 'Shared reports', 'Priority support'], cta: { label: 'Talk to us', href: '#plans' } },
+]
+
+const FAQ = [
+  { q: 'What does the check look at?', a: 'It opens the page in a real browser at two widths and reads the computed styles, so it sees what a visitor sees.' },
+  { q: 'Does it change my code?', a: 'No. It reports each spot with the rule it breaks and the pattern that fixes it. You or your agent apply the change.' },
+  { q: 'Can I use it on a page that is not public?', a: 'Yes. Point it at a local server or a file on your machine.' },
+]
+
+const STEPS: ShowcaseStep[] = [
+  { id: 'open', name: 'Open', title: 'Open the page you want to check', body: 'Paste a link or point at your local server. Both widths are captured.', pictures: [{ alt: 'Desktop capture of a landing page', aspect: 1440 / 900 }, { alt: 'Phone capture of the same page', aspect: 390 / 844 }] },
+  { id: 'mark', name: 'Mark', title: 'See every spot that reads as generated', body: 'Each one is outlined on the capture and named by its rule.', pictures: [{ alt: 'Phone capture with outlines', aspect: 390 / 844 }, { alt: 'Desktop capture with outlines', aspect: 1440 / 900 }] },
+  { id: 'swap', name: 'Swap', title: 'Replace each spot with a pattern', body: 'Every rule points to a pattern and, where one exists, a component to copy.', pictures: [{ alt: 'Pattern page next to the code change', aspect: 1440 / 900 }] },
+  { id: 'check', name: 'Check', title: 'Run it again until it is clean', body: 'The change counts only when the rule no longer shows at either width.', pictures: [{ alt: 'Clean report', aspect: 1440 / 900 }] },
 ]
 
 export function Sections() {
@@ -552,6 +581,18 @@ export function Sections() {
 
       <Section id="blocks/use-hotkeys" title="Keyboard hooks"><HotkeysDemo /></Section>
 
+      <Section id="marketing/pricing-cards" title="Pricing cards">
+        <PricingCards plans={PLANS} />
+      </Section>
+
+      <Section id="marketing/reveal-faq" title="Reveal FAQ">
+        <RevealFaq title="Questions" sub="What people ask before they run the first check." help={<>Something else? <a href="#faq" className="font-medium text-text underline">Write to us</a>.</>} items={FAQ} />
+      </Section>
+
+      <Section id="marketing/step-showcase" title="Step showcase">
+        <StepShowcase steps={STEPS} label="How it works" />
+      </Section>
+
       <Section id="icons/icon" title="Icon and icon label">
         <div className="max-w-xl space-y-5">
           <div>
@@ -584,9 +625,39 @@ export function Sections() {
       </Section>
 
       <Section id="marketing/workflow-section" title="Workflow section">
-        <div className="overflow-x-auto rounded-lg border border-border">
+        <div className="overflow-x-auto border border-border">
           <div className="min-w-[960px]"><WorkflowSection /></div>
         </div>
+      </Section>
+      <Section id="motion/gooey-text" title="Gooey text">
+        <GooeyText texts={['Measure', 'Mark', 'Swap', 'Check']} textClassName="text-display font-semibold" />
+      </Section>
+
+      <Section id="motion/marquee" title="Marquee">
+        <Marquee className="border-y border-border py-4">
+          {['Two widths', 'Computed styles', 'Exact counts', 'Annotated captures', 'Fix patterns', 'Copyable components'].map((n) => (
+            <span key={n} className="text-title font-medium text-text-muted">{n}</span>
+          ))}
+        </Marquee>
+      </Section>
+
+      <Section id="motion/number-ticker" title="Number ticker">
+        <div>
+          <div className="text-sm text-text-subtle">Pages checked in the sample run</div>
+          <NumberTicker value={18420} className="text-h1 font-semibold text-text" />
+        </div>
+      </Section>
+
+      <Section id="motion/text-reveal" title="Text reveal">
+        <TextReveal as="h3" text="Every finding comes with the rule it breaks and the pattern that fixes it." className="max-w-xl text-h2 font-semibold text-text" />
+      </Section>
+
+      <Section id="motion/text-scramble" title="Text scramble">
+        <TextScramble text="Hover or focus to replay" className="text-h2 font-semibold text-text" />
+      </Section>
+
+      <Section id="motion/typewriter" title="Typewriter">
+        <p className="text-h2 font-semibold text-text">Check your <Typewriter words={['landing page', 'dashboard', 'store']} /></p>
       </Section>
     </>
   )
