@@ -9,6 +9,9 @@
   --rdp-day_button-width: var(--control-touch);
   --rdp-day_button-height: var(--control-touch);
   --rdp-day_button-border-radius: var(--r-md);
+  --rdp-nav-height: var(--control-touch);
+  --rdp-nav_button-width: var(--control-touch);
+  --rdp-nav_button-height: var(--control-touch);
   --rdp-selected-border: none;
   color: var(--text);
   font-size: var(--t-body);
@@ -21,6 +24,9 @@
     --rdp-day-height: var(--control-md);
     --rdp-day_button-width: var(--control-sm);
     --rdp-day_button-height: var(--control-sm);
+    --rdp-nav-height: var(--control-md);
+    --rdp-nav_button-width: var(--control-md);
+    --rdp-nav_button-height: var(--control-md);
   }
 }
 .rdp-month_caption, .rdp-caption_label { color: var(--text); font-weight: 600; }
