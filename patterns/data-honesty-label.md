@@ -4,7 +4,7 @@ name: Data honesty label
 category: badge-label
 uses: [label-a-state, prove-trust]
 surfaces: [dashboard]
-replaces: [CMP-06, CMP-08]
+replaces: [CMP-06, CMP-08, CPY-02]
 components: [blocks/badge]
 inspiration: []
 status: stable
@@ -37,6 +37,7 @@ Use it whenever a figure on screen did not come straight from a system of record
 
 ## Don't
 
+- Don't print a missing figure as `0` or as the raw `NaN`. A confirmed zero and an unknown value need different words: "0 items" is a fact, "Not counted yet" is honest about the gap.
 - Don't use green, amber and red to mean honesty. Colors already mean good, caution, bad, and those are different questions.
 - Don't show three round hero numbers (10K+, 99.9%, 3x) with no label at all. If a number is invented, it is a concept, say so.
 - Don't hide the label in a tooltip that only appears on hover. Touch devices never see it.

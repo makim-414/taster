@@ -4,7 +4,7 @@ name: Quiet empty state
 category: empty-state
 uses: [handle-no-data]
 surfaces: [app, dashboard]
-replaces: [AC-07, AC-11]
+replaces: [AC-07, AC-11, CPY-02]
 components: [blocks/skeleton]
 inspiration: []
 status: stable
@@ -35,6 +35,7 @@ Use the structural variant (keep axes, headers and labels, dash the values) for 
 
 ## Don't
 
+- Don't let a missing value reach the screen as `undefined`, `NaN`, `null` or a separator with nothing beside it (`Seoul · · 3 days`). Drop the field and its separator, or say what is missing.
 - Don't center a 160px illustration of a person looking at an empty box.
 - Don't put the icon in a 48px gray disc or a tinted circle (AC-11).
 - Don't write "Oops! Nothing here yet" or "It's quiet... too quiet".

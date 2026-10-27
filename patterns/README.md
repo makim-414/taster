@@ -85,8 +85,9 @@ Layout, type, icons, tokens and the base surfaces everything sits on.
 - [Editorial paper sheet](editorial-paper-sheet.md) fixes CMP-04, COL-01
 - [Plain section surface](plain-section-surface.md) fixes BG-01, CMP-05, COL-03
 - [Product-first section order](product-first-section-order.md) fixes LAY-04
+- [Readable at every width](readable-at-every-width.md) fixes RSP-01, RSP-02, RSP-03, RSP-04, RSP-05
 - [Spacing and dividers](spacing-and-dividers.md) fixes CMP-02, LAY-06
-- [Token themes](token-themes.md) fixes CMP-04, CMP-11, COL-02, COL-03, COL-05
+- [Token themes](token-themes.md) fixes CMP-04, CMP-11, COL-02, COL-03, COL-05, COL-08
 
 ### Card
 
@@ -123,7 +124,7 @@ Buttons and every way a person types, picks or submits something.
 ### Button
 
 - [Specific action label](action-label-button.md) fixes CPY-01, KO-09
-- [Flat solid button](flat-solid-button.md) fixes AC-16, COL-01, COL-07
+- [Flat solid button](flat-solid-button.md) fixes AC-16, COL-01, COL-07, RSP-06
 
 ### Form and input
 
@@ -132,7 +133,7 @@ Buttons and every way a person types, picks or submits something.
 - [Search and filter bar](search-and-filter-bar.md)
 - [Select and combobox](select-and-combobox.md)
 - [Sign in form](sign-in-form.md)
-- [Text input field](text-input-field.md) fixes AC-06, AC-09, AC-14
+- [Text input field](text-input-field.md) fixes AC-06, AC-09, AC-14, RSP-06
 
 ## Feedback and overlays
 
@@ -140,7 +141,7 @@ Status, alerts, waiting, empty results and layers above the page.
 
 ### Badge and label
 
-- [Data honesty label](data-honesty-label.md) fixes CMP-06, CMP-08
+- [Data honesty label](data-honesty-label.md) fixes CMP-06, CMP-08, CPY-02
 - [Filter chip](filter-chip.md) fixes AC-05
 - [Status label](status-label.md) fixes AC-04, AC-05, AC-07, AC-08
 
@@ -151,7 +152,7 @@ Status, alerts, waiting, empty results and layers above the page.
 ### Empty and error state
 
 - [Error and locked state](error-state.md)
-- [Quiet empty state](quiet-empty-state.md) fixes AC-07, AC-11
+- [Quiet empty state](quiet-empty-state.md) fixes AC-07, AC-11, CPY-02
 
 ### Loader and skeleton
 
@@ -174,7 +175,7 @@ Numbers, charts, tables, steps and places.
 
 - [Bar funnel](bar-funnel.md) fixes AC-13
 - [Gauge and meter](gauge-and-meter.md) fixes AC-08
-- [KPI stat tile](kpi-stat-tile.md) fixes AC-11, CMP-06, COL-01
+- [KPI stat tile](kpi-stat-tile.md) fixes AC-11, CMP-06, COL-01, CPY-02
 - [Line and area chart](line-area-chart.md) fixes AC-13, COL-01
 - [Neutral donut](neutral-donut.md) fixes AC-13
 - [Ranked bar chart](ranked-bar-chart.md) fixes AC-13
