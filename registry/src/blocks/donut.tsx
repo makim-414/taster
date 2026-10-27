@@ -84,7 +84,7 @@ export const DonutChart = React.forwardRef<HTMLDivElement, DonutChartProps>(
             <span className="text-h2 font-semibold tabular-nums text-text">
               {total.toLocaleString('en-US')}
             </span>
-            <span className="text-[11px] text-text-subtle">Total</span>
+            <span className="text-caption text-text-subtle">Total</span>
           </div>
         </div>
 

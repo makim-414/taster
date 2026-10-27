@@ -58,7 +58,7 @@ export function Combobox({
       <PopoverPrimitive.Trigger asChild>
         <button
           className={cn(
-            'flex h-9 w-56 items-center justify-between gap-2 rounded-md border border-border bg-bg-elev px-3 text-sm outline-none transition-colors hover:border-text-subtle focus-visible:ring-2 focus-visible:ring-ring',
+            'flex h-11 desk:h-9 w-56 items-center justify-between gap-2 rounded-md border border-border bg-bg-elev px-3 text-sm outline-none transition-colors hover:border-text-subtle focus-visible:ring-2 focus-visible:ring-ring',
             selected ? 'text-text' : 'text-text-subtle',
             className,
           )}
@@ -77,7 +77,7 @@ export function Combobox({
             <div className="border-b border-border-soft px-3">
               <Command.Input
                 placeholder={searchPlaceholder}
-                className="h-9 w-full bg-transparent text-sm text-text outline-none placeholder:text-text-subtle"
+                className="h-11 desk:h-9 w-full bg-transparent text-sm text-text outline-none placeholder:text-text-subtle"
               />
             </div>
             <Command.List className="max-h-60 overflow-auto p-1">
