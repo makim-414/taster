@@ -27,7 +27,8 @@ Skip it on sites with ten pages or fewer, and on any surface where the audience 
 
 ## Do
 
-- Filter on label, kind and hint together, case-insensitive, and reset the highlight to the first row on each keystroke.
+- Filter on label, kind and hint together, case-insensitive, and reset the highlight to the first row on each keystroke. Rank labels that start with the query first.
+- Accept Hangul initials for Korean labels: "ㄹㅇㅂㄹ" finds "라이브러리". Korean users type initials out of habit, and it costs ten lines (`matchCommands` in the registry block).
 - Run the highlighted command on Enter, close on Escape, and return focus to whatever opened the palette.
 - Show "No results" as plain muted text, with a suggestion if one exists.
 - List shortcuts by area in the cheat sheet (Navigation, Editing, View), two columns on wide screens, `kbd` elements with a 1px border.
