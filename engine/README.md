@@ -16,6 +16,7 @@ npx --prefix engine playwright install chromium
 ```bash
 node engine/cli.mjs https://example.com --out out    # report.json, annotated-1440.png, annotated-390.png
 node engine/cli.mjs ./page.html --json --widths 1440 # one width, JSON to stdout
+node engine/cli.mjs https://example.com --widths responsive  # 360 to 1440 in nine steps, for the RSP rules
 node engine/cli.mjs https://example.com --extract    # content JSON for a rebuild (content.json with --out)
 node engine/cli.mjs --rules                          # every rule, how it is checked, severity
 node engine/cli.mjs --explain KO-01                  # what, why, how it is found, fix

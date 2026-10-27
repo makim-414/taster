@@ -14,6 +14,12 @@ export const VIEWPORTS = [
   { width: 1440, height: 900 },
   { width: 390, height: 844 },
 ];
+// --widths responsive: phone, the 767/768 breakpoint pair, portrait and landscape tablet, laptop, desktop.
+// Layouts usually break between the two default widths, and the touch size rule (RSP-06) runs at 1024 and below.
+export const RESPONSIVE_WIDTHS = [360, 390, 640, 767, 768, 820, 1024, 1280, 1440];
+export function viewportFor(width) {
+  return VIEWPORTS.find((v) => v.width === width) || { width, height: width < 768 ? 844 : 900 };
+}
 // Playwright's own Chromium if it was installed, else the system Chrome, so a plugin install works
 // without downloading a browser.
 export async function launch() {

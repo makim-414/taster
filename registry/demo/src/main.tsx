@@ -20,7 +20,7 @@ function App() {
             Every component in registry.json, rendered with sample content and the neutral tokens.
           </p>
         </div>
-        <label className="flex items-center gap-2 text-sm text-text-muted">
+        <label className="flex min-h-11 items-center gap-2 text-sm text-text-muted desk:min-h-0">
           <input type="checkbox" checked={light} onChange={(e) => setLight(e.target.checked)} />
           Light theme
         </label>
