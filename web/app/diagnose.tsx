@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { RuleHit, Summary } from '../lib/diagnose.ts';
+import { CompareReveal } from './compare-reveal.tsx';
 
 const INSTALL = 'npx skills add https://github.com/makim-414/taster --skill taster';
 const SEVERITY: Record<RuleHit['severity'], string> = { high: '높음', medium: '중간', low: '낮음' };
@@ -94,7 +95,23 @@ export function Diagnose({ initialUrl }: { initialUrl: string }) {
         </p>
       </section>
 
-      {state.kind === 'done' ? <Report result={state.result} sectionRef={resultRef} /> : null}
+      {state.kind === 'done' ? (
+        <Report result={state.result} sectionRef={resultRef} />
+      ) : (
+        <section className="sample" aria-labelledby="sample-title">
+          <h2 id="sample-title">고치기 전과 후</h2>
+          <p className="sample-lede">같은 예시 페이지를 고치기 전과 후로 잰 화면입니다. 가운데 선을 좌우로 끌어 보세요.</p>
+          <CompareReveal
+            label="예시 페이지를 고치기 전과 후로 비교"
+            before={{ src: '/compare/before.jpg', alt: '고치기 전: 보라 그라디언트와 알약 배지가 있는 예시 페이지, 걸린 곳 31군데에 빨간 테두리' }}
+            after={{ src: '/compare/after.jpg', alt: '고친 뒤: 같은 내용을 담은 차분한 예시 페이지, 걸린 곳 없음' }}
+          />
+          <div className="sample-captions">
+            <p>전: 규칙 17개, 31곳</p>
+            <p>후: 0건</p>
+          </div>
+        </section>
+      )}
 
       <section className="install" aria-labelledby="install-title">
         <h2 id="install-title">Taster 로 고치기</h2>
