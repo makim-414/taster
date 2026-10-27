@@ -1395,6 +1395,7 @@
         "connection-diagram",
         "content-matched-grid",
         "focus-card-carousel",
+        "icon-placement",
         "media-tile-card",
         "myth-vs-truth-pair",
         "outcome-led-cards",
@@ -1726,6 +1727,7 @@
       },
       "fix": "Leave the icon on its own, or remove it.",
       "fix_patterns": [
+        "icon-placement",
         "line-icon-set",
         "outcome-led-cards"
       ],
@@ -2149,6 +2151,7 @@
       "fix": "Icons only where they help, chosen within one set for their meaning.",
       "fix_patterns": [
         "connection-diagram",
+        "icon-placement",
         "line-icon-set",
         "site-header"
       ],
@@ -2164,6 +2167,97 @@
           "url": "https://github.com/yetone/kill-ai-slop"
         }
       ]
+    },
+    {
+      "id": "ICO-02",
+      "name": "Icons from more than one set",
+      "what": "Icons from two libraries on one page, or outline and filled glyphs mixed in the same interface.",
+      "why": "Builders pull a glyph from whichever library has it. Two drawing styles side by side show that nobody chose a set.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "Small square icons (10 to 40px, inline svg or icon font) outside the identity slot (footer, logos, off-site links, multicolor marks). Flags icons from a second known library (lucide, Font Awesome, Material, Bootstrap Icons, Phosphor, Remix, Tabler, Feather, Ionicons, Iconify), or, with one library, at least two outline and two filled svg icons where the smaller style is 20% or more.",
+        "selectors": [
+          "svg",
+          "i",
+          "span",
+          "ion-icon",
+          "iconify-icon"
+        ],
+        "css": {
+          "size_px": [
+            10,
+            40
+          ],
+          "libraries_min": 2,
+          "style_mix_min_each": 2,
+          "minority_share_min": 0.2
+        }
+      },
+      "fix": "Pick one set and redraw the odd glyphs on its grid and stroke. Filled only as the selected state of an outline icon.",
+      "fix_patterns": [
+        "icon-placement",
+        "line-icon-set"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "ICO-03",
+      "name": "Stroke weights that do not match",
+      "what": "Line icons drawn at clearly different stroke weights on one page, such as 1.5 next to 2.5.",
+      "why": "Stroke weight is what makes a set read as one family. Mixed weights come from pasting icons from different sources or sizes.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Outline svg icons (10 to 40px) outside the identity slot, stroke width normalized to a 24 unit grid and rounded to 0.25. With four or more icons and at least two weights used twice, flags icons whose weight is 1.4 times or more away from the most common weight.",
+        "selectors": [
+          "svg"
+        ],
+        "css": {
+          "size_px": [
+            10,
+            40
+          ],
+          "grid_units": 24,
+          "icons_min": 4,
+          "weight_ratio_min": 1.4
+        }
+      },
+      "fix": "One stroke width for the whole set, between 1.5 and 2 on a 24 grid.",
+      "fix_patterns": [
+        "icon-placement",
+        "line-icon-set"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "ICO-04",
+      "name": "An icon on every card",
+      "what": "Each card or item in a group of three or more opens with a decorative icon above its heading and description.",
+      "why": "The icon is there because the slot looked empty, not because it says something. It is the most common way generated pages fill feature sections.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Three or more siblings outside nav, header and footer, each containing a heading and a description of four words or more, where the first visible element is an icon (svg, icon font or image up to 48px) that is decorative (not inside a control, no accessible name, empty alt) and comes before the heading.",
+        "selectors": [
+          "svg",
+          "i",
+          "img"
+        ],
+        "css": {
+          "siblings_min": 3,
+          "icon_max_px": 48,
+          "description_words_min": 4
+        }
+      },
+      "fix": "Decide the slot first. Feature cards rarely need an icon: remove it, or replace it with a number, a label or a real screenshot.",
+      "fix_patterns": [
+        "icon-placement"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
     },
     {
       "id": "MOT-01",
