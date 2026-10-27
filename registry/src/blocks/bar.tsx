@@ -99,7 +99,7 @@ export const BarChart = React.forwardRef<SVGSVGElement, BarChartProps>(
               x={cx}
               y={height - 6}
               textAnchor="middle"
-              className="fill-current text-[10px] text-text-subtle"
+              className="fill-current text-micro text-text-subtle"
             >
               {d.label}
             </text>
