@@ -3,6 +3,7 @@ import * as SeparatorPrimitive from '@radix-ui/react-separator'
 import { cn } from './_cn'
 
 // Separator. Built on @radix-ui/react-separator, styled in the shadcn/ui pattern (MIT).
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export const Separator = React.forwardRef<
   React.ElementRef<typeof SeparatorPrimitive.Root>,

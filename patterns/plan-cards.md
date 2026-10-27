@@ -5,7 +5,7 @@ category: pricing
 uses: [compare-plans]
 surfaces: [landing]
 replaces: [AC-04, AC-14, CMP-09]
-components: [blocks/card, blocks/badge, blocks/button, blocks/toggle]
+components: [blocks/card, blocks/badge, blocks/button, blocks/toggle, marketing/pricing-cards]
 inspiration: [https://21st.dev/@mokshithgujjeti/components/pricing-section]
 status: stable
 ---
