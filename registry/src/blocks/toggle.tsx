@@ -35,7 +35,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
       <label
         htmlFor={inputId}
         className={cn(
-          'inline-flex select-none items-center gap-2 text-sm text-text',
+          'inline-flex min-h-11 select-none items-center gap-2 text-sm text-text desk:min-h-0',
           disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
           className,
         )}
@@ -82,7 +82,7 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
       <label
         htmlFor={inputId}
         className={cn(
-          'inline-flex select-none items-center gap-2 text-sm text-text',
+          'inline-flex min-h-11 select-none items-center gap-2 text-sm text-text desk:min-h-0',
           disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
           className,
         )}

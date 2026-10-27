@@ -2690,6 +2690,203 @@
       "severity": "medium",
       "korean": true,
       "refs": []
+    },
+    {
+      "id": "RSP-01",
+      "name": "Page wider than the screen",
+      "what": "The page scrolls sideways because an element sticks out past the right edge of the viewport.",
+      "why": "A card name cut to a single letter at a tablet width shipped once with every check green. Layouts tested at one phone width and one desktop width break in between.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "documentElement.scrollWidth is more than 1px wider than clientWidth. The finding is the first element whose right edge passes the viewport while its parent does not, skipping fixed and sticky layers and anything inside a scroll or clip container.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "overflow_px_min": 1
+        }
+      },
+      "fix": "Let the element shrink (min-width: 0 on flex and grid children, max-width: 100% on media), wrap long strings, and put wide tables or code in their own scroll box.",
+      "fix_patterns": [
+        "readable-at-every-width"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "RSP-02",
+      "name": "Text cut off by its box",
+      "what": "A short label or name cut by overflow or an ellipsis, or a label that spills past the edge of its button.",
+      "why": "A card name cut to a single letter at a tablet width shipped once with every check green. Layouts tested at one phone width and one desktop width break in between.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element with its own text, overflow-x hidden or clip or text-overflow ellipsis, and scrollWidth more than 1px past clientWidth: reported when the text is 24 characters or fewer or fewer than about 3 characters stay visible. Buttons, inputs and labels whose text rectangle passes their own edge are reported as spill.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "short_label_chars_max": 24,
+          "visible_chars_min": 3
+        }
+      },
+      "fix": "Give the label room (wrap it, let the box grow, or move secondary text below). Truncate only long titles, keep at least the first words visible, and show the full text on hover or focus.",
+      "fix_patterns": [
+        "readable-at-every-width"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "RSP-03",
+      "name": "Letters stacked one per line",
+      "what": "A column so narrow that a word wraps letter by letter down the screen.",
+      "why": "A card name cut to a single letter at a tablet width shipped once with every check green. Layouts tested at one phone width and one desktop width break in between.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "A text node with 3 or more characters that renders on 3 or more lines with at most 1.5 characters per line, measured with Range.getClientRects.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "lines_min": 3,
+          "chars_per_line_max": 1.5
+        }
+      },
+      "fix": "Set a minimum width on the column, drop to one column earlier, or move the label above the value instead of beside it.",
+      "fix_patterns": [
+        "readable-at-every-width"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "RSP-04",
+      "name": "Text overlapping text",
+      "what": "Two pieces of text drawn on top of each other.",
+      "why": "A card name cut to a single letter at a tablet width shipped once with every check green. Layouts tested at one phone width and one desktop width break in between.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "Line fragments of text from different elements that intersect by more than 2px on both axes, after clipping by overflow ancestors. Text in fixed or sticky layers (headers, banners) and hidden or faded text is skipped. Layered hero art can still trigger it on purpose, so treat findings as candidates to look at.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "overlap_px_min": 2
+        }
+      },
+      "fix": "Take the element out of absolute positioning or give it its own row at narrow widths; check line-height and negative margins.",
+      "fix_patterns": [
+        "readable-at-every-width"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "RSP-05",
+      "name": "Part of the page scrolls sideways",
+      "what": "A box inside the page hides content behind a sideways scroll at this width.",
+      "why": "Readers rarely notice a sideways scroll inside a page, so whatever sits past the edge goes unseen. Chip rows and wide tables are fine when they are a choice.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "Element other than html and body with overflow-x auto or scroll whose scrollWidth passes clientWidth. Code blocks are skipped. Mark an intended scroll row with data-taster-allow=\"scroll\". Reported as candidates.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "allow_attribute": "data-taster-allow"
+        }
+      },
+      "fix": "Wrap the content, switch a wide table to stacked rows at narrow widths, or mark an intended scroll row with data-taster-allow=\"scroll\" and show that more content follows.",
+      "fix_patterns": [
+        "readable-at-every-width"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "RSP-06",
+      "name": "Touch target under 44px",
+      "what": "On a phone or tablet width, a button, field or control under 44px high (an icon-only one under 44 by 44px), or a plain text link under 24px high.",
+      "why": "The most frequent failure in our own responsive audits by a wide margin. Controls sized for a mouse are missed by thumbs, and a smaller control on a hand held tablet fails the same way.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Runs at viewport widths of 1024px and below. Buttons, inputs, selects, summary, ARIA controls and links styled as buttons under 44px high, or under 44px wide when they have no text. A plain text link is held to the WCAG 2.5.8 minimum of 24px and passes below it when spaced apart (a 24px circle on its center touches no other target). A checkbox, radio or visually hidden input is measured through its label. A link inside a sentence, a disabled control, and anything hidden or off screen are skipped.",
+        "selectors": [
+          "a",
+          "button",
+          "input",
+          "select",
+          "textarea",
+          "summary",
+          "[role=button]"
+        ],
+        "css": {
+          "target_px_min": 44,
+          "viewport_max_px": 1024
+        }
+      },
+      "fix": "Make controls 44px on touch screens and shrink them only for a wide screen without a coarse pointer, for example @media (min-width: 1024px) and (not (pointer: coarse)). Do not key the small size on pointer: fine, which a headless browser does not report.",
+      "fix_patterns": [
+        "flat-solid-button",
+        "text-input-field"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "COL-08",
+      "name": "Text that does not stand out from its background",
+      "what": "Text whose contrast against the surface behind it is under 4.5:1, or under 3:1 for large text.",
+      "why": "Low contrast secondary text on a slightly lighter card came back again and again in our own work. A gray that reads on the page background can fail on the card it is placed in.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "For each element with its own text, the text color (with alpha and ancestor opacity) is blended over the composited background colors of its ancestors and compared with the WCAG contrast formula. Large text is 24px, or 18.66px at weight 700. Text over an image, video, gradient or a positioned layer that is not its ancestor is skipped, because the color under it cannot be read from styles. Disabled, aria-hidden and faded out text is skipped.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "ratio_min": 4.5,
+          "ratio_min_large": 3
+        }
+      },
+      "fix": "Raise the text token, not each instance: check the smallest text color against the surface closest to it in lightness, for example a muted card, in both themes.",
+      "fix_patterns": [
+        "token-themes"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "CPY-02",
+      "name": "Empty value traces on screen",
+      "what": "Words like undefined, NaN, null, [object Object] or Invalid Date, or two separators with nothing between them, shown to the reader.",
+      "why": "A missing value printed as code tells the reader the screen is broken. A fake zero is worse because it looks true; leave the value out and say why.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Visible text outside code, pre, kbd and textarea that contains undefined, NaN, [object Object] or Invalid Date as a word, null as the whole text or after a colon, or two middle dots with only space between them.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "tokens": "undefined NaN null [object Object] Invalid Date"
+        }
+      },
+      "fix": "Render a missing value as a middle dot or a short sentence (\"Not measured yet\"), never as the raw value or a fake zero, and drop the separator when a field is empty.",
+      "fix_patterns": [
+        "data-honesty-label",
+        "kpi-stat-tile",
+        "quiet-empty-state"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": []
     }
   ]
 }
