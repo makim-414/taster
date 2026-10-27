@@ -2,14 +2,24 @@ import * as React from 'react'
 import { cn } from './_cn'
 
 // Stat / KPI tile: label, value, delta, caption.
-// Only the delta uses semantic color. An empty value renders a middle dot, never a fake zero.
+// Only the delta uses color, and only by direction. An empty value renders a middle dot, never a fake zero.
+// Say what the delta is against in `sub` ("vs previous 30 days"); a change between two percentages is in %p.
 
-export type StatDeltaDir = 'up' | 'down'
+export type StatDeltaDir = 'up' | 'down' | 'flat'
 
 export interface StatDelta {
   value: string
   dir: StatDeltaDir
+  /** For metrics where up is not simply good (share, rank, cost): caret and sign stay, color goes. */
+  neutral?: boolean
 }
+
+const DELTA_TONE: Record<StatDeltaDir, string> = {
+  up: 'text-delta-up',
+  down: 'text-delta-down',
+  flat: 'text-text-muted',
+}
+const DELTA_WORD: Record<StatDeltaDir, string> = { up: 'up', down: 'down', flat: 'unchanged' }
 
 export interface StatProps extends React.HTMLAttributes<HTMLDivElement> {
   label: string
@@ -33,13 +43,11 @@ function CaretIcon({ dir }: { dir: StatDeltaDir }) {
       className="shrink-0"
     >
       {dir === 'up' ? (
-        <>
-          <path d="M5 14l7-7 7 7" />
-        </>
+        <path d="M5 14l7-7 7 7" />
+      ) : dir === 'down' ? (
+        <path d="M5 10l7 7 7-7" />
       ) : (
-        <>
-          <path d="M5 10l7 7 7-7" />
-        </>
+        <path d="M6 12h12" />
       )}
     </svg>
   )
@@ -60,10 +68,11 @@ export const Stat = React.forwardRef<HTMLDivElement, StatProps>(
             <span
               className={cn(
                 'inline-flex items-center gap-1 whitespace-nowrap tabular-nums',
-                delta.dir === 'up' ? 'text-delta-up' : 'text-delta-down',
+                delta.neutral ? 'text-text-muted' : DELTA_TONE[delta.dir],
               )}
             >
               <CaretIcon dir={delta.dir} />
+              <span className="sr-only">{DELTA_WORD[delta.dir]} </span>
               {delta.value}
             </span>
           )}

@@ -29,7 +29,7 @@
   --card-foreground: var(--foreground);
   --muted-foreground: oklch(0.46 0.006 280);
   --text-muted: var(--muted-foreground);
-  --text-subtle: oklch(0.58 0.006 280);
+  --text-subtle: oklch(0.52 0.006 280);   /* 4.5:1 on paper, --muted and --secondary */
 
   /* Borders (ink with alpha) */
   --border: oklch(0.25 0.01 280 / 13%);

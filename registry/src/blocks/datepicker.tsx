@@ -38,7 +38,7 @@ export function DatePicker({ value, onValueChange, placeholder = 'Pick a date', 
       <PopoverPrimitive.Trigger asChild>
         <button
           className={cn(
-            'flex h-9 w-56 items-center gap-2 rounded-md border border-border bg-bg-elev px-3 text-sm outline-none transition-colors hover:border-text-subtle focus-visible:ring-2 focus-visible:ring-ring',
+            'flex h-11 desk:h-9 w-56 items-center gap-2 rounded-md border border-border bg-bg-elev px-3 text-sm outline-none transition-colors hover:border-text-subtle focus-visible:ring-2 focus-visible:ring-ring',
             current ? 'text-text' : 'text-text-subtle',
             className,
           )}
