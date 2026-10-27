@@ -507,6 +507,105 @@
       "deps": [],
       "license": "MIT",
       "credit": null
+    },
+    {
+      "id": "marketing/pricing-cards",
+      "file": "src/marketing/pricing-cards.tsx",
+      "category": "pricing",
+      "patterns": [
+        "plan-cards"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Shadcn Space pricing-02, MIT, https://github.com/shadcnspace/shadcnspace"
+    },
+    {
+      "id": "marketing/reveal-faq",
+      "file": "src/marketing/reveal-faq.tsx",
+      "category": "faq",
+      "patterns": [
+        "split-title-faq"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Layout after text-reveal-faqs by Ruixen, https://21st.dev/@ruixen.ui/components/text-reveal-faqs (no license stated, no code taken)"
+    },
+    {
+      "id": "marketing/step-showcase",
+      "file": "src/marketing/step-showcase.tsx",
+      "category": "feature-section",
+      "patterns": [
+        "step-workflow-section"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "cult-ui Feature Carousel by Jordan Gilliam, MIT, https://github.com/nolly-studio/cult-ui"
+    },
+    {
+      "id": "motion/gooey-text",
+      "file": "src/motion/gooey-text.tsx",
+      "category": "typography",
+      "patterns": [
+        "animated-text"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Gooey Text Morphing by Victor Welander, MIT as listed, https://21st.dev/@victorwelander/components/gooey-text-morphing"
+    },
+    {
+      "id": "motion/marquee",
+      "file": "src/motion/marquee.tsx",
+      "category": "motion-particle",
+      "patterns": [
+        "marquee-band"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Magic UI Marquee, MIT, https://magicui.design/docs/components/marquee"
+    },
+    {
+      "id": "motion/number-ticker",
+      "file": "src/motion/number-ticker.tsx",
+      "category": "motion-particle",
+      "patterns": [
+        "count-up-number"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Magic UI Number Ticker, MIT, https://magicui.design/docs/components/number-ticker"
+    },
+    {
+      "id": "motion/text-reveal",
+      "file": "src/motion/text-reveal.tsx",
+      "category": "typography",
+      "patterns": [
+        "animated-text"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "motion/text-scramble",
+      "file": "src/motion/text-scramble.tsx",
+      "category": "typography",
+      "patterns": [
+        "animated-text"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "motion-primitives Text Scramble by ibelick, MIT, https://motion-primitives.com/docs/text-scramble"
+    },
+    {
+      "id": "motion/typewriter",
+      "file": "src/motion/typewriter.tsx",
+      "category": "typography",
+      "patterns": [
+        "animated-text"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
     }
   ]
 }

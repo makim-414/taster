@@ -61,8 +61,8 @@ export const Funnel = React.forwardRef<HTMLDivElement, FunnelProps>(
                   />
                 </svg>
               </div>
-              <span className="w-10 shrink-0 text-right text-sm tabular-nums text-text">
-                {stage.value}
+              <span className="w-12 shrink-0 text-right text-sm tabular-nums text-text">
+                {stage.value.toLocaleString('en-US')}
               </span>
               <span className="w-10 shrink-0 text-right text-xs tabular-nums text-text-subtle">
                 {pct}%

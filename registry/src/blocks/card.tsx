@@ -3,6 +3,7 @@ import { cn } from './_cn'
 
 // Card with Header, Title, Description, Content and Footer parts (shadcn/ui API, MIT).
 // Surface is the card token with a hairline border. No glow, no tinted fills.
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export type CardProps = React.HTMLAttributes<HTMLDivElement>
 

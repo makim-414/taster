@@ -4,6 +4,7 @@ import { cn } from './_cn'
 
 // Tooltip. Built on @radix-ui/react-tooltip, styled in the shadcn/ui pattern (MIT).
 // Inverted chip. Wrap the app or section in TooltipProvider.
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export const TooltipProvider = TooltipPrimitive.Provider
 export const Tooltip = TooltipPrimitive.Root
