@@ -10,7 +10,7 @@ const SEVERITY: Record<RuleHit['severity'], string> = { high: '높음', medium: 
 type Result = { report: Summary; shots: Record<string, string> };
 type State = { kind: 'idle' } | { kind: 'running'; started: number } | { kind: 'error'; message: string } | { kind: 'done'; result: Result };
 
-export function Diagnose({ initialUrl }: { initialUrl: string }) {
+export function Diagnose({ initialUrl, ruleCount }: { initialUrl: string; ruleCount: number }) {
   const [url, setUrl] = useState(initialUrl);
   const [state, setState] = useState<State>({ kind: 'idle' });
   const [elapsed, setElapsed] = useState(0);
@@ -57,7 +57,7 @@ export function Diagnose({ initialUrl }: { initialUrl: string }) {
       <section className="intro" aria-labelledby="intro-title">
         <h1 id="intro-title">이 화면은 얼마나 슬롭일까요</h1>
         <p className="lede">
-          주소를 넣으면 1440 폭과 390 폭으로 페이지를 열고, 규칙 66개 중 잴 수 있는 규칙을 모두 돌립니다. 20초쯤 걸립니다.
+          주소를 넣으면 1440 폭과 390 폭으로 페이지를 열고, 규칙 {ruleCount}개 중 잴 수 있는 규칙을 모두 돌립니다. 20초쯤 걸립니다.
         </p>
         <form className="probe" onSubmit={submit}>
           <label htmlFor="target">사이트 주소</label>
