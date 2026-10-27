@@ -486,6 +486,18 @@
       "credit": null
     },
     {
+      "id": "icons/icon",
+      "file": "src/icons/index.tsx",
+      "category": "icon",
+      "patterns": [
+        "icon-placement",
+        "line-icon-set"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
       "id": "marketing/workflow-section",
       "file": "src/marketing/workflow-section.tsx",
       "category": "feature-section",
