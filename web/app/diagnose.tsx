@@ -7,7 +7,7 @@ import { CompareReveal } from './compare-reveal.tsx';
 const INSTALL = 'npx skills add https://github.com/makim-414/taster --skill taster';
 const SEVERITY: Record<RuleHit['severity'], string> = { high: '높음', medium: '중간', low: '낮음' };
 
-type Result = { report: Summary; shots: Record<string, string> };
+type Result = { report: Summary; shots: Record<string, string>; missed?: number[] };
 type State = { kind: 'idle' } | { kind: 'running'; started: number } | { kind: 'error'; message: string } | { kind: 'done'; result: Result };
 
 export function Diagnose({ initialUrl, ruleCount }: { initialUrl: string; ruleCount: number }) {
@@ -134,6 +134,8 @@ export function Diagnose({ initialUrl, ruleCount }: { initialUrl: string; ruleCo
 function Report({ result, sectionRef }: { result: Result; sectionRef: React.RefObject<HTMLElement | null> }) {
   const { report, shots } = result;
   const host = safeHost(report.url);
+  const missed = result.missed ?? [];
+  const noShot = report.widths.filter((w) => !shots[w]);
   return (
     <section className="report" aria-labelledby="report-title" tabIndex={-1} ref={sectionRef}>
       <h2 id="report-title">{host} 진단 결과</h2>
@@ -142,6 +144,12 @@ function Report({ result, sectionRef }: { result: Result; sectionRef: React.RefO
           ? `잴 수 있는 규칙 ${report.measured}개에 하나도 걸리지 않았습니다.`
           : `잴 수 있는 규칙 ${report.measured}개 중 ${report.rulesHit}개에 걸렸습니다.`}
       </p>
+      {missed.length || noShot.length ? (
+        <p className="report-note">
+          {missed.length ? `${missed.join(', ')} 폭은 시간 안에 다 열지 못해, ${report.widths.join(', ')} 폭에서 잰 결과만 보여 줍니다. ` : ''}
+          {noShot.length ? `${noShot.join(', ')} 폭은 화면이 그려지지 않아 캡처가 빠졌습니다.` : ''}
+        </p>
+      ) : null}
 
       <div className="shots">
         {report.widths.map((w) =>
