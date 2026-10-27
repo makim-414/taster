@@ -20,7 +20,7 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
     return (
       <div ref={ref} className={cn('w-full', className)} {...props}>
         {label ? (
-          <div className="mb-1.5 flex items-center justify-between text-[11px]">
+          <div className="mb-1.5 flex items-center justify-between text-caption">
             <span className="text-text-muted">{label}</span>
             <span className="text-text-muted tabular-nums">{Math.round(pct)}%</span>
           </div>
