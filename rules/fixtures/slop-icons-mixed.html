@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mixed icon styles sample</title>
+<style>
+@font-face { font-family: "Fixture Sans"; src: local("Helvetica Neue"), local("Arial"), local("Helvetica"), local("DejaVu Sans"); }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 48px; background: #ffffff; color: #1a1a1a; font-family: "Fixture Sans", sans-serif; font-size: 16px; line-height: 1.6; }
+.toolbar { display: flex; gap: 4px; }
+.toolbar button { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; color: #1a1a1a; }
+</style>
+</head>
+<body>
+  <!-- ICO-02: outline and filled glyphs side by side in one toolbar, no library classes. -->
+  <div class="toolbar">
+    <button aria-label="Search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></svg></button>
+    <button aria-label="Menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <button aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></button>
+    <button aria-label="Favorite"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21 4 13a5 5 0 0 1 8-6 5 5 0 0 1 8 6z"/></svg></button>
+    <button aria-label="Notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z"/></svg></button>
+  </div>
+  <p>Saved views appear here once you star a report.</p>
+</body>
+</html>
