@@ -477,5 +477,152 @@
       "id": "ai-chat",
       "name": "AI chat and agent"
     }
-  ]
+  ],
+  "iconography": {
+    "summary": "Where an icon belongs and what it must look like. Decide the slot first, then whether the slot needs an icon at all, then draw it from the one set. Pattern: icon-placement.",
+    "set": {
+      "grid": "24 by 24 viewBox, 2px safe margin",
+      "style": "One family. Outline only or filled only, never both on one page. Filled is allowed only as the selected state of an outline icon.",
+      "stroke": "One stroke width for the whole set, 1.5 to 2 units on the 24 grid, round caps and joins.",
+      "sizes_px": [
+        16,
+        20,
+        24
+      ],
+      "color": "currentColor. The parent sets the color with a text token; no per-icon hue.",
+      "alignment": "Center the icon on the first line of its label, not on the whole text block. 16px beside 14 to 16px text, 20px beside 18 to 20px text.",
+      "accessibility": "Decorative icons get aria-hidden. An icon-only control gets an accessible name on the control."
+    },
+    "slots": [
+      {
+        "id": "control",
+        "name": "Control icon",
+        "covers": "Buttons, toolbar actions, navigation items, close, menu, search, disclosure chevrons, external link, download.",
+        "test": "Does the icon trigger, open, close or move something?",
+        "keep_when": "The icon is the control itself (icon-only button), or it is a convention people scan for (search, close, menu, back, more, external link).",
+        "instead": "A text label. A primary action with a clear verb needs no leading icon.",
+        "size_px": [
+          16,
+          20
+        ],
+        "accessibility": "Icon-only control: aria-label on the button, aria-hidden on the svg, a 44px hit area.",
+        "rules": [
+          "ICO-01",
+          "ICO-02",
+          "ICO-03"
+        ],
+        "patterns": [
+          "line-icon-set",
+          "action-label-button",
+          "site-header",
+          "app-bars",
+          "command-palette",
+          "collapsible-sidebar"
+        ]
+      },
+      {
+        "id": "explanatory",
+        "name": "Explanatory icon",
+        "covers": "Feature cards, benefit lists, category entries, file types, step lists.",
+        "test": "Would a reader lose information if the icon were removed?",
+        "keep_when": "The icon carries meaning the words do not: a file type, an integration, a category that repeats elsewhere as a filter or navigation key. It is chosen for that item, not to fill a slot.",
+        "instead": "Nothing. Or a number with its unit, a short label, a real screenshot or product crop, or a list with plain bullets.",
+        "size_px": [
+          20,
+          24
+        ],
+        "accessibility": "aria-hidden, because the text beside it says the same thing.",
+        "rules": [
+          "ICO-01",
+          "ICO-04",
+          "LAY-02",
+          "CMP-03",
+          "AC-11",
+          "AC-03"
+        ],
+        "patterns": [
+          "icon-placement",
+          "content-matched-grid",
+          "outcome-led-cards",
+          "real-product-frame",
+          "list-item-row",
+          "tabbed-product-showcase"
+        ]
+      },
+      {
+        "id": "identity",
+        "name": "Identity mark",
+        "covers": "The product logo, partner and integration logos, payment and platform marks, people in avatars.",
+        "test": "Does the mark stand for a specific brand, product or person?",
+        "keep_when": "Always, but only as the original asset: the supplied vector, the owner's official file, or the person's photo.",
+        "instead": "A marked placeholder and a request for the file. Initials for a person without a photo. Never a redrawn lookalike or a generic glyph standing in for a brand.",
+        "size_px": [
+          16,
+          24,
+          32
+        ],
+        "accessibility": "Alt text with the brand or person name, or empty alt when the name is printed beside it.",
+        "rules": [
+          "AC-18",
+          "ICO-02"
+        ],
+        "patterns": [
+          "original-logo-assets",
+          "monochrome-logo-strip",
+          "avatar-with-fallback",
+          "connection-diagram"
+        ]
+      },
+      {
+        "id": "data-marker",
+        "name": "Data marker",
+        "covers": "Trend arrows, legend swatches, check and cross marks in comparison tables, chart markers. Status (live, failed, paused) is written as a word, not a colored dot.",
+        "test": "Does the mark encode a value or a state that is also written next to it?",
+        "keep_when": "It sits beside the number or word it encodes and uses shape as well as color, so it reads in grayscale.",
+        "instead": "The word or the number alone. A status label instead of a colored dot. A table cell with \"Included\" or a dash reads faster than a column of green discs.",
+        "size_px": [
+          12,
+          16
+        ],
+        "accessibility": "The text carries the meaning; the marker is aria-hidden. Color is never the only signal.",
+        "rules": [
+          "AC-08",
+          "AC-11",
+          "ICO-02"
+        ],
+        "patterns": [
+          "status-label",
+          "status-without-side-bar",
+          "kpi-stat-tile",
+          "plan-comparison-table",
+          "line-area-chart",
+          "ranked-bar-chart",
+          "neutral-donut"
+        ]
+      },
+      {
+        "id": "no-icon",
+        "name": "No icon",
+        "covers": "Headlines and section headings, hero copy, section kickers, paragraphs, FAQ questions, footer columns, every item of a long list.",
+        "test": "Is the icon only there because the slot looked empty?",
+        "keep_when": "Never. These slots are carried by type, space and real content.",
+        "instead": "Size, weight and space for hierarchy. A real image or number when the section needs a visual.",
+        "size_px": [],
+        "accessibility": "Nothing to label, because nothing is drawn.",
+        "rules": [
+          "ICO-01",
+          "ICO-04",
+          "AC-03",
+          "CMP-03"
+        ],
+        "patterns": [
+          "hero-headline-lockup",
+          "split-section-header",
+          "hairline-accordion-faq",
+          "long-form-prose",
+          "multi-column-footer"
+        ]
+      }
+    ]
+  }
 }

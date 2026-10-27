@@ -25,6 +25,15 @@ registry components. Read each pattern's "Do" and "Don't" before you write the s
 - One accent color at most. Neutral surfaces. Hierarchy from size, weight and space, not from color.
 - Vary section layouts; three equal cards with icons in a row is a rule violation, not a default.
 
+## 4b. Place icons by slot
+
+Before any icon goes in, open `data/patterns/icon-placement.md` and the `iconography` block of `data/taxonomy.json`.
+For each place you want an icon, name its slot (control, explanatory, identity, data marker, no icon) and run the
+slot's `test`. Keep the icon only when the test passes; otherwise use the slot's `instead`. Survivors come from one
+set at one stroke weight and the three sizes (the registry `icons/icon` component and its tokens), sit on the first
+line of their label, and are `aria-hidden` unless they are the only content of a control. Logos and partner marks are
+the original files, never redrawn. Most feature cards end up with no icon.
+
 ## 5. Check before you show
 
-Run Diagnose on the result at 1440 and 390. Show the user the screen together with the clean detector report.
+Run Diagnose on the result at 1440 and 390, ICO rules included. Show the user the screen together with the clean detector report.

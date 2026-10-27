@@ -43,6 +43,10 @@ trust, compare plans, answer doubts, ask for the action ...). Then pick one patt
 Do not keep a layout just because the original had it. Three equal icon cards become whatever the content needs:
 a short list, a table, a single strong example.
 
+Do not carry icons over either. Sort each one into its slot with `data/patterns/icon-placement.md` (control,
+explanatory, identity, data marker, no icon) and keep only those whose slot test passes, drawn from one set. The
+logo and partner marks stay as the owner's files.
+
 ## 5. Choose where it will live
 
 Ask once: "Where should the new site live?" If the user has no preference, build:

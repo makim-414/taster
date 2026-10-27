@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Icon slop sample</title>
+<style>
+@font-face { font-family: "Fixture Sans"; src: local("Helvetica Neue"), local("Arial"), local("Helvetica"), local("DejaVu Sans"); }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 48px; background: #ffffff; color: #1a1a1a; font-family: "Fixture Sans", sans-serif; font-size: 16px; line-height: 1.6; }
+h2 { font-size: 28px; margin: 0 0 24px; }
+h3 { font-size: 18px; margin: 12px 0 6px; }
+p { margin: 0; color: #55575a; }
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; margin-bottom: 64px; }
+.features > div:nth-child(2) { padding-top: 24px; }
+.fa-solid { display: inline-block; width: 24px; height: 24px; background: #1a1a1a; }
+ul.perks { list-style: none; padding: 0; margin: 0; }
+ul.perks li { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+  <!-- ICO-04: every feature card opens with a decorative icon. ICO-02: one glyph from a second library. -->
+  <section>
+    <h2>Everything you need</h2>
+    <div class="features">
+      <div>
+        <svg class="lucide lucide-zap" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <h3>Fast setup</h3>
+        <p>Ship your first page in minutes, not days.</p>
+      </div>
+      <div>
+        <svg class="lucide lucide-shield" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <h3>Secure by default</h3>
+        <p>Bank grade security for every single plan.</p>
+      </div>
+      <div>
+        <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+        <h3>Smart insights</h3>
+        <p>Know what works and what does not, at a glance.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ICO-03: the same set drawn at a much thinner stroke. -->
+  <section>
+    <h2>Included</h2>
+    <ul class="perks">
+      <li><svg class="lucide lucide-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M5 13l4 4 10-10"/></svg>Unlimited projects</li>
+      <li><svg class="lucide lucide-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M5 13l4 4 10-10"/></svg>Custom domains</li>
+      <li><svg class="lucide lucide-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M5 13l4 4 10-10"/></svg>Priority support</li>
+    </ul>
+  </section>
+</body>
+</html>
