@@ -77,6 +77,10 @@ async function scan(file, width = 1440) {
 const out = {};
 for (const f of ['slop.html', 'slop-extra.html', 'clean.html']) out[f] = await scan(f);
 
+// Render integrity rules: every one fires on slop-render.html at a phone width; the touch rule stays off above 1024.
+const render390 = await scan('slop-render.html', 390);
+const render1440 = await scan('slop-render.html', 1440);
+
 // The engine fixtures from the other detector (feat/diagnose-engine), run at both widths the engine uses.
 const expectedEngine = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'expected-engine.json'), 'utf8'));
 const engineOut = {};
@@ -86,6 +90,15 @@ for (const f of Object.keys(expectedEngine)) {
 await browser.close();
 
 const ids = (r) => Array.from(new Set(r.findings.map((x) => x.ruleId))).sort();
+{
+  const RENDER = ['RSP-01', 'RSP-02', 'RSP-03', 'RSP-04', 'RSP-05', 'RSP-06', 'COL-08', 'CPY-02'];
+  const at390 = ids(render390.result), at1440 = ids(render1440.result);
+  const missing = RENDER.filter((i) => !at390.includes(i));
+  check(missing.length === 0, `slop-render.html at 390: missing ${missing.join(' ')}`);
+  check(!at1440.includes('RSP-06'), 'slop-render.html at 1440: RSP-06 should only run at 1024 and below');
+  check(render390.result.errors.length === 0 && render1440.result.errors.length === 0, 'slop-render.html: detect.js rule errors');
+  console.log(`slop-render.html@390: ${at390.filter((i) => RENDER.includes(i)).length} of ${RENDER.length} render rules`);
+}
 Object.assign(out, engineOut);
 
 for (const [f, o] of Object.entries(out)) {

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Render integrity sample</title>
+<style>
+body { margin: 0; padding: 16px; background: #ffffff; color: #1d1d1f; font-family: Georgia, serif; font-size: 16px; line-height: 1.6; }
+.wide { width: 600px; height: 40px; background: #eeeeee; }
+.name { display: block; width: 30px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.narrow { width: 10px; font-size: 16px; overflow-wrap: anywhere; }
+.stage { position: relative; height: 60px; }
+.stage span { position: absolute; top: 10px; font-size: 18px; }
+.stage .a { left: 0; } .stage .b { left: 20px; }
+.strip { overflow-x: auto; white-space: nowrap; width: 200px; }
+.strip span { display: inline-block; width: 160px; }
+.small { height: 28px; padding: 0 8px; font-size: 14px; }
+.faint { color: #bbbbbb; }
+</style>
+</head>
+<body>
+  <div class="wide">Wide banner</div>
+  <span class="name">Customer name</span>
+  <div class="narrow">Revenue</div>
+  <div class="stage"><span class="a">Monthly total</span><span class="b">Updated today</span></div>
+  <div class="strip"><span>First column</span><span>Second column</span></div>
+  <button class="small" type="button">Save</button>
+  <p class="faint">Last synced a few minutes ago from the main account.</p>
+  <p>Total: NaN</p>
+  <p>Seoul &middot; &middot; 3 days</p>
+</body>
+</html>

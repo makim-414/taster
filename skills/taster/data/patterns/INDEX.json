@@ -676,7 +676,8 @@
     "replaces": [
       "AC-16",
       "COL-01",
-      "COL-07"
+      "COL-07",
+      "RSP-06"
     ],
     "components": [
       "blocks/button"
@@ -738,7 +739,8 @@
     ],
     "replaces": [
       "CMP-06",
-      "CMP-08"
+      "CMP-08",
+      "CPY-02"
     ],
     "components": [
       "blocks/badge"
@@ -1157,7 +1159,8 @@
       "CMP-11",
       "COL-02",
       "COL-03",
-      "COL-05"
+      "COL-05",
+      "COL-08"
     ],
     "components": [
       "blocks/toggle"
@@ -1376,7 +1379,8 @@
     "replaces": [
       "AC-11",
       "CMP-06",
-      "COL-01"
+      "COL-01",
+      "CPY-02"
     ],
     "components": [
       "blocks/kpi",
@@ -1577,7 +1581,8 @@
     "replaces": [
       "AC-06",
       "AC-09",
-      "AC-14"
+      "AC-14",
+      "RSP-06"
     ],
     "components": [
       "blocks/input"
@@ -1786,7 +1791,8 @@
     ],
     "replaces": [
       "AC-07",
-      "AC-11"
+      "AC-11",
+      "CPY-02"
     ],
     "components": [
       "blocks/skeleton"
@@ -2161,5 +2167,32 @@
     ],
     "components": [],
     "summary": "A restrained 3D scene behind the hero, a half globe rising from a container edge, a particle core that reshapes while scrolling, or a 3D graph built from real data. Runs only when visible."
+  },
+  {
+    "id": "readable-at-every-width",
+    "name": "Readable at every width",
+    "category": "layout-shell",
+    "uses": [
+      "organize-the-page",
+      "read-long-text"
+    ],
+    "surfaces": [
+      "landing",
+      "dashboard",
+      "app",
+      "commerce",
+      "editorial",
+      "auth-onboarding",
+      "ai-chat"
+    ],
+    "replaces": [
+      "RSP-01",
+      "RSP-02",
+      "RSP-03",
+      "RSP-04",
+      "RSP-05"
+    ],
+    "components": [],
+    "summary": "Layout habits that keep text readable from 360px to 1440px (content box columns, shrinkable children, planned narrow forms) and the nine widths to check them at."
   }
 ]

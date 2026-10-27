@@ -4,7 +4,7 @@ name: Text input field
 category: form-input
 uses: [enter-data]
 surfaces: [app, auth-onboarding]
-replaces: [AC-06, AC-09, AC-14]
+replaces: [AC-06, AC-09, AC-14, RSP-06]
 components: [blocks/input]
 inspiration: [https://ui.shadcn.com/docs/components/input]
 status: stable

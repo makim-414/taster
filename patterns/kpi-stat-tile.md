@@ -4,7 +4,7 @@ name: KPI stat tile
 category: chart-kpi
 uses: [show-one-number, explain-on-demand]
 surfaces: [dashboard]
-replaces: [AC-11, CMP-06, COL-01]
+replaces: [AC-11, CMP-06, COL-01, CPY-02]
 components: [blocks/kpi, blocks/trend]
 inspiration: []
 status: stable
@@ -17,7 +17,7 @@ The top of a dashboard, a report header, a detail page: any place one number ans
 ## Anatomy
 
 - Label: small, sentence case, `--text-subtle`. Says what is counted and over what period: "Qualified leads, last 30 days".
-- Value: 24 to 30px, semibold, tabular numerals, `--text`. Missing data renders a middle dot, never a fake zero.
+- Value: 24 to 30px, semibold, tabular numerals, `--text`. Missing data renders a middle dot, never a fake zero, and never the raw `undefined` or `NaN` (rule CPY-02).
 - Delta: caret icon, sign and value, colored by direction with `--delta-up` or `--delta-down`. Delta is the only colored element on the tile. For a metric where up is not simply good (share, rank, cost, churn), keep the caret and the sign and drop the color (`neutral` on the Stat block): color would otherwise tell the reader what to feel.
 - Caption: what the delta is against, in words ("vs previous 30 days", "last day vs the day before"), in `--text-muted`. A delta without a stated basis is not readable.
 - Optional sparkline on the right, 120 by 32, neutral stroke.
