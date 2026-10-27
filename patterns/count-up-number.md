@@ -5,7 +5,7 @@ category: motion-particle
 uses: [show-one-number]
 surfaces: [landing, dashboard]
 replaces: [MOT-01]
-components: [blocks/kpi]
+components: [blocks/kpi, motion/number-ticker]
 inspiration: [https://magicui.design/docs/components/number-ticker]
 status: stable
 ---

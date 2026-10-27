@@ -4,6 +4,7 @@ import { Calendar } from './calendar'
 import { cn } from './_cn'
 
 // DatePicker. A trigger button that shows the chosen date, with a Calendar in a Radix popover (shadcn/ui pattern, MIT).
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export interface DatePickerProps {
   value?: Date

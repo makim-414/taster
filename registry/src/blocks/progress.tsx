@@ -3,6 +3,7 @@ import { cn } from './_cn'
 
 // Progress bar. Neutral track, accent fill, so a theme recolors it with one token.
 // API follows shadcn/ui progress (MIT). Values use tabular numerals.
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   value: number
