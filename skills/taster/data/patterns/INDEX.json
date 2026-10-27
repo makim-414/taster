@@ -782,6 +782,38 @@
     "summary": "A round picture that falls back to initials on a neutral surface when the image is missing."
   },
   {
+    "id": "icon-placement",
+    "name": "Icon placement map",
+    "category": "icon",
+    "uses": [
+      "set-the-visual-foundation",
+      "explain-features",
+      "navigate-the-app",
+      "navigate-the-site"
+    ],
+    "surfaces": [
+      "landing",
+      "dashboard",
+      "app",
+      "commerce",
+      "editorial",
+      "auth-onboarding",
+      "ai-chat"
+    ],
+    "replaces": [
+      "ICO-01",
+      "ICO-02",
+      "ICO-03",
+      "ICO-04",
+      "CMP-03",
+      "LAY-02"
+    ],
+    "components": [
+      "icons/icon"
+    ],
+    "summary": "Decide the slot before the glyph: control, explanatory, identity, data marker or no icon. Keep icons only where the slot needs one, draw them from one set, and leave headings and feature cards to real content."
+  },
+  {
     "id": "line-icon-set",
     "name": "Line icon set",
     "category": "icon",
@@ -797,9 +829,13 @@
       "AC-03",
       "AC-11",
       "CMP-03",
-      "ICO-01"
+      "ICO-01",
+      "ICO-02",
+      "ICO-03"
     ],
-    "components": [],
+    "components": [
+      "icons/icon"
+    ],
     "summary": "One family of 24 pixel line icons with a shared stroke weight, inheriting text color, used only where the icon adds meaning. A category icon sits directly beside its name with no colored circle or tile."
   },
   {

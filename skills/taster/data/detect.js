@@ -1310,6 +1310,154 @@
       list.forEach(function (it) { add('ICO-01', it.el, { lucideIcons: list.length, distinctNames: Object.keys(names).length }); });
     };
 
+    // -------- icon sets (ICO-02, ICO-03, ICO-04). Slots and the one-set rule: patterns/icon-placement.md
+    var ICON_LIBS = [
+      ['lucide', function (el, c) { return /(^|\s)lucide/.test(c) || el.hasAttribute('data-lucide'); }],
+      ['font-awesome', function (el, c) { return /(^|\s)(fa|fas|far|fal|fad|fat|fa-solid|fa-regular|fa-light|fa-thin|fa-duotone|svg-inline--fa)(\s|$)/.test(c); }],
+      ['material', function (el, c) { return /(^|\s)material-(icons|symbols)/.test(c); }],
+      ['bootstrap-icons', function (el, c) { return /(^|\s)bi(\s|$)/.test(c) && /(^|\s)bi-[a-z]/.test(c); }],
+      ['phosphor', function (el, c) { return /(^|\s)ph(-(bold|fill|thin|light|duotone))?(\s|$)/.test(c) && /(^|\s)ph-[a-z]/.test(c); }],
+      ['remix', function (el, c) { return /(^|\s)ri-[a-z0-9-]+-(line|fill)(\s|$)/.test(c); }],
+      ['tabler', function (el, c) { return /(^|\s)(tabler-icon|ti ti-)/.test(c) || /(^|\s)ti(\s|$)/.test(c) && /(^|\s)ti-[a-z]/.test(c); }],
+      ['feather', function (el, c) { return /(^|\s)feather(\s|$)/.test(c) || el.hasAttribute('data-feather'); }],
+      ['ionicons', function (el) { return el.tagName.toLowerCase() === 'ion-icon'; }],
+      ['iconify', function (el, c) { return el.tagName.toLowerCase() === 'iconify-icon' || /(^|\s)iconify(\s|$)/.test(c); }]
+    ];
+    var SHAPES = 'path,circle,rect,line,polyline,polygon,ellipse';
+    // Brand glyphs and marks are the identity slot: they keep their own style and are not part of the UI set.
+    function identityMark(el) {
+      var c = String(el.getAttribute('class') || '');
+      if (/(^|\s)fa-brands|(^|\s)fab(\s|$)|logo|brand/i.test(c)) return true;
+      if (el.closest('footer,[class*="logo"],[class*="brand"]')) return true;
+      var a = el.closest('a[href]');
+      if (a) {
+        try {
+          if (new URL(a.href, location.href).host !== location.host) return true;
+        } catch (e) { /* not a URL */ }
+        if (/^\/?$/.test(a.getAttribute('href') || '')) return true;
+      }
+      return false;
+    }
+    var ICONS = null;
+    // Small square glyphs on screen: inline svg icons and icon-font elements, with their library and drawing style.
+    function iconItems() {
+      if (ICONS) return ICONS;
+      ICONS = [];
+      I.forEach(function (it) {
+        var el = it.el, w = it.r.w, h = it.r.h;
+        if (w < 10 || h < 10 || w > 40 || h > 40 || Math.max(w, h) / Math.min(w, h) > 1.34) return;
+        var c = String(el.getAttribute('class') || '');
+        var lib = null;
+        for (var k = 0; k < ICON_LIBS.length; k++) if (ICON_LIBS[k][1](el, c)) { lib = ICON_LIBS[k][0]; break; }
+        var isSvg = it.tag === 'svg';
+        if (!isSvg && !lib) return;
+        if (!isSvg && el.querySelector('svg')) return;
+        var icon = { it: it, el: el, lib: lib, style: null, strokeGrid: 0, identity: identityMark(el) };
+        if (isSvg) {
+          var shapes = el.querySelectorAll(SHAPES);
+          if (!shapes.length || shapes.length > 40) return;
+          var outline = 0, solid = 0, sw = 0, fills = {};
+          for (var s = 0; s < shapes.length; s++) {
+            var cs = getComputedStyle(shapes[s]);
+            var f = parseColor(cs.fill), st = parseColor(cs.stroke);
+            var hasFill = cs.fill !== 'none' && !(f && f.a === 0);
+            var hasStroke = cs.stroke !== 'none' && !(st && st.a === 0) && px(cs.strokeWidth) > 0;
+            if (hasFill) fills[cs.fill] = 1;
+            if (hasStroke && !hasFill) { outline++; sw = Math.max(sw, px(cs.strokeWidth)); }
+            else if (hasFill && !hasStroke) solid++;
+          }
+          if (Object.keys(fills).length > 1) icon.identity = true; // several fill colors: a logo or an illustration
+          icon.style = outline > solid ? 'outline' : solid > outline ? 'solid' : null;
+          var vb = el.viewBox && el.viewBox.baseVal;
+          var grid = vb && vb.width ? vb.width : w;
+          if (icon.style === 'outline' && sw > 0) icon.strokeGrid = Math.round((sw * 24) / grid * 4) / 4;
+        }
+        ICONS.push(icon);
+      });
+      return ICONS;
+    }
+
+    R['ICO-02'] = function () {
+      var ui = iconItems().filter(function (ic) { return !ic.identity; });
+      if (ui.length < 3) return;
+      var libs = {};
+      ui.forEach(function (ic) { if (ic.lib) (libs[ic.lib] = libs[ic.lib] || []).push(ic); });
+      var libNames = Object.keys(libs);
+      if (libNames.length >= 2) {
+        // Report the icons outside the most used library.
+        libNames.sort(function (a, b) { return libs[b].length - libs[a].length; });
+        libNames.slice(1).forEach(function (n) {
+          libs[n].forEach(function (ic) { add('ICO-02', ic.el, { libraries: libNames.join(', '), library: n }); });
+        });
+        return;
+      }
+      var out = ui.filter(function (ic) { return ic.style === 'outline'; });
+      var sol = ui.filter(function (ic) { return ic.style === 'solid'; });
+      if (out.length < 2 || sol.length < 2) return;
+      var minor = out.length >= sol.length ? sol : out;
+      if (minor.length / (out.length + sol.length) < 0.2) return;
+      minor.forEach(function (ic) { add('ICO-02', ic.el, { outline: out.length, solid: sol.length, style: ic.style }); });
+    };
+
+    R['ICO-03'] = function () {
+      var ui = iconItems().filter(function (ic) { return !ic.identity && ic.strokeGrid > 0; });
+      if (ui.length < 4) return;
+      var groups = {};
+      ui.forEach(function (ic) { (groups[ic.strokeGrid] = groups[ic.strokeGrid] || []).push(ic); });
+      var keys = Object.keys(groups).filter(function (k) { return groups[k].length >= 2; }).map(Number).sort(function (a, b) { return a - b; });
+      if (keys.length < 2 || keys[keys.length - 1] / keys[0] < 1.4) return;
+      // The most common weight is the set; icons drawn far from it are reported.
+      var main = keys.slice().sort(function (a, b) { return groups[b].length - groups[a].length; })[0];
+      ui.forEach(function (ic) {
+        var ratio = Math.max(ic.strokeGrid, main) / Math.min(ic.strokeGrid, main);
+        if (ratio >= 1.4) add('ICO-03', ic.el, { strokeOn24Grid: ic.strokeGrid, setStroke: main, weights: keys.join(', ') });
+      });
+    };
+
+    R['ICO-04'] = function () {
+      var icons = new Set(iconItems().filter(function (ic) { return !ic.identity; }).map(function (ic) { return ic.el; }));
+      // A glyph tile (CMP-03 style) counts as the icon when its only content is an icon.
+      function leadIcon(card) {
+        var walk = document.createTreeWalker(card, NodeFilter.SHOW_ELEMENT, null);
+        var e;
+        while ((e = walk.nextNode())) {
+          if (!M.has(e)) continue;
+          if (icons.has(e)) return e;
+          if (e.tagName === 'IMG' && M.get(e).r.w <= 48 && M.get(e).r.h <= 48) return e;
+          var t = norm(e.textContent);
+          // Icon fonts that draw from a ligature (material) carry their name as text: that is still the icon.
+          if (t && !Array.prototype.some.call(e.querySelectorAll('*'), function (x) { return icons.has(x) && norm(x.textContent) === t; })) return null;
+        }
+        return null;
+      }
+      function decorative(ic, card) {
+        var ctl = ic.closest('a,button,[role="button"],summary,label');
+        if (ctl && card.contains(ctl) && ctl !== card) return false;
+        if (ic.tagName === 'IMG') return !ic.getAttribute('alt');
+        return !(ic.getAttribute('aria-label') || (ic.getAttribute('role') === 'img' && ic.querySelector('title')));
+      }
+      function feature(card) {
+        var hd = card.querySelector('h2,h3,h4,h5,h6,[class*="title"]');
+        var pp = card.querySelector('p,[class*="desc"]');
+        if (!hd || !pp || hd.contains(pp) || pp.contains(hd) || !M.has(hd) || !M.has(pp)) return null;
+        if (norm(pp.textContent).split(' ').length < 4) return null;
+        var ic = leadIcon(card);
+        if (!ic || !decorative(ic, card)) return null;
+        return (ic.compareDocumentPosition(hd) & Node.DOCUMENT_POSITION_FOLLOWING) ? ic : null;
+      }
+      I.forEach(function (par) {
+        if (par.el.children.length < 3 || par.el.closest('nav,header,footer,[role="navigation"]')) return;
+        var found = [];
+        Array.prototype.forEach.call(par.el.children, function (c) {
+          if (!M.has(c)) return;
+          var ic = feature(c);
+          if (ic) found.push(ic);
+        });
+        if (found.length < 3) return;
+        found.forEach(function (ic) { add('ICO-04', ic, { cardsWithIcon: found.length, siblings: par.el.children.length }); });
+      });
+    };
+
     R['MOT-01'] = function () {
       var kfNames = {};
       scanSheets(function (r) {
@@ -1524,7 +1672,7 @@
       'AC-13', 'AC-14', 'AC-15', 'AC-16', 'AC-17', 'COL-01', 'COL-02', 'COL-03', 'COL-04', 'COL-06', 'COL-07',
       'COL-05', 'TYP-01', 'TYP-02', 'TYP-03', 'TYP-04', 'TYP-05', 'LAY-01', 'LAY-02', 'LAY-03', 'LAY-04', 'LAY-05',
       'LAY-06', 'CMP-01', 'CMP-02', 'CMP-03', 'CMP-04', 'CMP-05', 'CMP-06', 'CMP-07', 'CMP-09', 'CMP-10', 'CMP-11',
-      'BG-01', 'ICO-01', 'MOT-01', 'CPY-01', 'KO-01', 'KO-02', 'KO-03', 'KO-04', 'KO-05', 'KO-06', 'KO-07',
+      'BG-01', 'ICO-01', 'ICO-02', 'ICO-03', 'ICO-04', 'MOT-01', 'CPY-01', 'KO-01', 'KO-02', 'KO-03', 'KO-04', 'KO-05', 'KO-06', 'KO-07',
       'KO-08', 'KO-09', 'KO-10', 'KO-11'
     ];
     ORDER.forEach(function (id) {

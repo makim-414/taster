@@ -44,6 +44,7 @@ import {
   TextReveal,
   TextScramble,
   Typewriter,
+  Icon, IconLabel,
 } from '../../src'
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
@@ -590,6 +591,37 @@ export function Sections() {
 
       <Section id="marketing/step-showcase" title="Step showcase">
         <StepShowcase steps={STEPS} label="How it works" />
+      </Section>
+
+      <Section id="icons/icon" title="Icon and icon label">
+        <div className="max-w-xl space-y-5">
+          <div>
+            <div className="mb-1.5 text-label text-text-subtle">Control slot: icon-only buttons carry the name</div>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="lg" className="px-3" aria-label="Search"><Icon name="search" /></Button>
+              <Button variant="ghost" size="lg" className="px-3" aria-label="Open menu"><Icon name="menu" /></Button>
+              <Button variant="ghost" size="lg" className="px-3" aria-label="Download report"><Icon name="download" /></Button>
+              <Button variant="ghost" size="lg" className="px-3" aria-label="Close"><Icon name="close" /></Button>
+            </div>
+          </div>
+          <div>
+            <div className="mb-1.5 text-label text-text-subtle">Sizes from the tokens: sm, md, lg</div>
+            <div className="flex items-end gap-4 text-text-muted">
+              <Icon name="file" size="sm" />
+              <Icon name="file" size="md" />
+              <Icon name="file" size="lg" />
+            </div>
+          </div>
+          <div>
+            <div className="mb-1.5 text-label text-text-subtle">Icon label: the icon stays on the first line when the label wraps</div>
+            <p className="max-w-[260px] text-body text-text">
+              <IconLabel icon="file">Quarterly revenue export, CSV with one row per invoice and the tax column split out</IconLabel>
+            </p>
+            <p className="mt-2 text-body">
+              <IconLabel icon="arrow-up-right" trailing>Read the setup guide</IconLabel>
+            </p>
+          </div>
+        </div>
       </Section>
 
       <Section id="marketing/workflow-section" title="Workflow section">

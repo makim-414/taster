@@ -2,8 +2,7 @@
   "version": "0.1.0",
   "shared": [
     "src/blocks/_cn.ts",
-    "src/icons/index.tsx",
-    "src/motion/_motion.ts"
+    "src/icons/index.tsx"
   ],
   "tokens": [
     "src/tokens.css",
@@ -487,6 +486,29 @@
       "credit": null
     },
     {
+      "id": "icons/icon",
+      "file": "src/icons/index.tsx",
+      "category": "icon",
+      "patterns": [
+        "icon-placement",
+        "line-icon-set"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/workflow-section",
+      "file": "src/marketing/workflow-section.tsx",
+      "category": "feature-section",
+      "patterns": [
+        "step-workflow-section"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
       "id": "marketing/pricing-cards",
       "file": "src/marketing/pricing-cards.tsx",
       "category": "pricing",
@@ -518,17 +540,6 @@
       "deps": [],
       "license": "MIT",
       "credit": "cult-ui Feature Carousel by Jordan Gilliam, MIT, https://github.com/nolly-studio/cult-ui"
-    },
-    {
-      "id": "marketing/workflow-section",
-      "file": "src/marketing/workflow-section.tsx",
-      "category": "feature-section",
-      "patterns": [
-        "step-workflow-section"
-      ],
-      "deps": [],
-      "license": "MIT",
-      "credit": null
     },
     {
       "id": "motion/gooey-text",
