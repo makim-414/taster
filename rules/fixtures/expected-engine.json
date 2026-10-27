@@ -32,6 +32,15 @@
   ],
   "clean-engine.html": [],
   "clean-menu.html": [],
+  "slop-icons.html": [
+    "ICO-02",
+    "ICO-03",
+    "ICO-04"
+  ],
+  "slop-icons-mixed.html": [
+    "ICO-02"
+  ],
+  "clean-icons.html": [],
   "clean-status.html": [],
   "slop-status.html": [
     "AC-08"

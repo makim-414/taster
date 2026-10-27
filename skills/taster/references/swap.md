@@ -10,6 +10,9 @@ own code, and prove it with a second detector run.
 1. Fix tokens first. Many findings share one cause (a purple accent, a global letter spacing, a radius scale).
    Changing the token removes them all at once and keeps the brand coherent.
 2. Then structural swaps, one rule at a time, highest severity first.
+   For icon findings (ICO-01 to ICO-04, CMP-03, AC-11, AC-03), sort every icon on the page into its slot with
+   `data/patterns/icon-placement.md` before touching a glyph. Remove the icons whose slot fails its test, then bring
+   the rest onto one set and one stroke weight. Restyling an icon that should not be there does not clear the rule.
 3. Then copy (manual rules), last, and only where the user agrees.
 
 ## For each finding

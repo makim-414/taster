@@ -4,30 +4,31 @@ name: Line icon set
 category: icon
 uses: [set-the-visual-foundation]
 surfaces: [landing, app, dashboard]
-replaces: [AC-03, AC-11, CMP-03, ICO-01]
-components: []
+replaces: [AC-03, AC-11, CMP-03, ICO-01, ICO-02, ICO-03]
+components: [icons/icon]
 inspiration: []
 status: stable
 ---
 
 ## When to use
 
-Use it as the single icon vocabulary for a product or a page. Pick one family of 24px line icons, one stroke weight, and use icons only where they add meaning: navigation items, actions, categories, file types. An icon next to a heading that already says the same thing is noise.
+Use it as the single icon vocabulary for a product or a page, after icon-placement has decided which slots get an icon at all. Pick one family of 24px line icons, one stroke weight, and use icons only where they add meaning: navigation items, actions, categories, file types. An icon next to a heading that already says the same thing is noise.
 
 This pattern removes the emoji used as feature icons, the filled circles with a white check, the pale rounded square behind an icon, and the same three default glyphs (bolt, shield, sparkles) repeated down the page.
 
 ## Anatomy
 
 - Grid: 24 by 24 `viewBox`, 2px safe margin inside, paths drawn on the pixel grid.
-- Style: `fill: none`, `stroke: currentColor`, `stroke-width: 1.5` or `1.75` (one value for the whole set), round caps and joins.
+- Style: `fill: none`, `stroke: currentColor`, one `stroke-width` between 1.5 and 2 on the 24 grid for the whole set (the registry `Icon` uses `--icon-stroke`, 2), round caps and joins. A filled glyph appears only as the selected state of its outline twin.
 - Color: inherits text color. Never a per-icon hue. The parent sets `color`.
 - Sizes: 16px beside body text, 20px in buttons and nav, 24px for category entries. No other sizes.
-- Placement: directly beside the label with `gap: var(--sp-2)`. A category icon sits next to its name with no tile, circle or border around it.
+- Placement: directly beside the label with `gap: var(--sp-2)`, centered on the first line of the label rather than on the whole text block. A category icon sits next to its name with no tile, circle or border around it.
 - Accessibility: decorative icons get `aria-hidden="true"`; icon-only buttons get an `aria-label`.
 
 ## Do
 
-- Choose one set (or draw one) and stay in it. Mixing outline and filled icons breaks the rhythm.
+- Choose one set (or draw one) and stay in it. Mixing libraries, or outline and filled icons, breaks the rhythm (ICO-02).
+- Keep one stroke weight. Icons drawn at 1.5 next to icons drawn at 2.5 read as two sets (ICO-03).
 - Name each icon by meaning ("invoice", "export") rather than by shape, and keep a short registry.
 - Remove an icon when its label alone is clear. Navigation with ten icons and ten labels is usually fine; a card with an icon, heading and line of copy rarely needs the icon.
 - Draw missing icons on the same grid and stroke instead of importing a second library.

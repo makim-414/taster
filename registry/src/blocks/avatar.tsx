@@ -4,6 +4,7 @@ import { cn } from './_cn'
 
 // Avatar. Built on @radix-ui/react-avatar, styled in the shadcn/ui pattern (MIT).
 // Falls back to initials on a neutral surface with a hairline border.
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export type AvatarSize = 'sm' | 'md' | 'lg'
 

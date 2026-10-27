@@ -5,7 +5,7 @@ category: typography
 uses: [emphasize-text]
 surfaces: [landing]
 replaces: [COL-04, MOT-01, TYP-03]
-components: []
+components: [motion/text-reveal, motion/typewriter, motion/gooey-text, motion/text-scramble]
 inspiration: [https://21st.dev/@dillionverma/components/text-reveal, https://21st.dev/@kapishdima/components/marker-highlight]
 status: draft
 ---
