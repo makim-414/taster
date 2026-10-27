@@ -3,7 +3,7 @@
 // browser itself is pointed at a dead proxy so anything that slips past interception
 // (WebSocket, WebRTC, workers, cross-origin frames) has nowhere to go and simply fails.
 import { existsSync } from 'node:fs';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { chromium as playwright, type Browser, type Page } from 'playwright-core';
@@ -65,12 +65,55 @@ async function installKoreanFont(): Promise<void> {
   await writeFile(file, Buffer.from(await res.arrayBuffer()));
 }
 
+function isServerless(): boolean {
+  return process.platform === 'linux' && Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+}
+
+// A page that hangs the single-process renderer (a heavy WebGL hero, for one) can leave its
+// Chromium running after browser.close() gives up. The next launch on the same warm instance then
+// dies within a second, and every later request on that instance fails the same way. withGate
+// (limits.ts) lets one instance run one Chromium at a time, so any Chromium still alive before a
+// launch or after a run is a leftover and is killed. Serverless only: on a laptop or CI runner
+// the same scan would hit the user's own browser.
+export async function killStrayChromium(): Promise<number> {
+  if (!isServerless()) return 0;
+  let pids: string[];
+  try {
+    pids = (await readdir('/proc')).filter((p) => /^\d+$/.test(p) && Number(p) !== process.pid);
+  } catch {
+    return 0;
+  }
+  let killed = 0;
+  for (const pid of pids) {
+    try {
+      const exe = (await readFile(`/proc/${pid}/cmdline`, 'utf8')).split('\0')[0];
+      if (!/^(chromium|chrome|headless_shell)$/.test(path.basename(exe))) continue;
+      process.kill(Number(pid), 'SIGKILL');
+      killed++;
+    } catch {
+      // gone already, or not ours to read
+    }
+  }
+  if (killed) console.error(`[chromium] killed ${killed} leftover process(es)`);
+  return killed;
+}
+
+// browser.close() can wait forever on a renderer that stopped answering, so it gets a few
+// seconds and then whatever is left is killed.
+export async function closeBrowser(browser: Browser): Promise<void> {
+  let timer: NodeJS.Timeout | undefined;
+  await Promise.race([browser.close().catch(() => {}), new Promise<void>((resolve) => (timer = setTimeout(resolve, 5000)))]);
+  clearTimeout(timer);
+  await killStrayChromium();
+}
+
 export async function launchBrowser(): Promise<Browser> {
-  if (process.platform === 'linux' && (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME)) {
+  if (isServerless()) {
     const chromium = (await import('@sparticuz/chromium')).default;
     const executablePath = await chromium.executablePath();
     fontReady ||= installKoreanFont().catch(() => null);
     await fontReady;
+    await killStrayChromium();
     return playwright.launch({ executablePath, args: mergeArgs(chromium.args), headless: true, logger: browserLogger() });
   }
   const executablePath = process.env.CHROME_PATH || (existsSync(MAC_CHROME) ? MAC_CHROME : undefined);
