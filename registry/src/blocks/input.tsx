@@ -3,6 +3,7 @@ import { cn } from './_cn'
 
 // Input and Select with one shared field chrome: transparent surface, hairline border, focus ring.
 // API follows shadcn/ui input and select (MIT).
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 const FIELD =
   'h-9 w-full bg-transparent border border-border-input rounded-md px-3 text-sm text-text ' +

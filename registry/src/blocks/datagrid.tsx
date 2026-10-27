@@ -12,6 +12,7 @@ import { cn } from './_cn'
 
 // DataGrid. Sortable, paginated table built on @tanstack/react-table (shadcn/ui pattern, MIT).
 // Numeric columns are right aligned with tabular numerals.
+// Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 export interface DataGridProps<T> {
   columns: ColumnDef<T, any>[]

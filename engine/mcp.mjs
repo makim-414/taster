@@ -188,7 +188,7 @@ server.registerTool(
   'taxonomy',
   {
     title: 'Taxonomy',
-    description: 'Families, categories, uses and surfaces used to organize and filter patterns.',
+    description: 'Families, categories, uses and surfaces used to organize and filter patterns, plus the icon slot map (iconography): which slots get an icon, which stay empty, and the one-set rules.',
     inputSchema: {},
     annotations: readOnly,
   },

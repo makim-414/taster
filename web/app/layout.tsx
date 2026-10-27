@@ -4,10 +4,26 @@ import '../../registry/src/tokens.css';
 import '../../registry/src/themes/light.css';
 import './globals.css';
 
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://taster-six.vercel.app';
+const DESCRIPTION = '주소를 넣으면 1440 폭과 390 폭으로 열어, AI 가 만든 화면에서 자주 보이는 흔적 66가지를 실제 브라우저로 잽니다.';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE),
   title: 'Taster 진단',
-  description: '주소를 넣으면 AI 가 만든 화면에서 자주 보이는 흔적을 실제 브라우저로 잽니다.',
+  description: DESCRIPTION,
   robots: { index: true, follow: true },
+  alternates: { canonical: '/' },
+  // The link preview LinkedIn, X and messengers show. public/og.png comes from scripts/og/render.mjs.
+  openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: 'Taster',
+    title: '이 화면은 얼마나 슬롭일까요',
+    description: DESCRIPTION,
+    locale: 'ko_KR',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Taster: 이 화면은 얼마나 슬롭일까요' }],
+  },
+  twitter: { card: 'summary_large_image', title: '이 화면은 얼마나 슬롭일까요', description: DESCRIPTION, images: ['/og.png'] },
 };
 
 // Self-hosted at build time by next/font. globals.css points the --font token at it.

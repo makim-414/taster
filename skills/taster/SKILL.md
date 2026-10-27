@@ -32,7 +32,7 @@ source, is in [references/start.md](references/start.md).
 Data this skill reads (all inside this folder):
 
 - [data/rules.json](data/rules.json): the slop rules. `detect.level` says how each is checked: `deterministic` and `heuristic` rules run in the browser through [data/detect.js](data/detect.js); `manual` rules you judge from the capture.
-- [data/taxonomy.json](data/taxonomy.json): families, categories, uses (what the end user is trying to do) and surfaces (landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat).
+- [data/taxonomy.json](data/taxonomy.json): families, categories, uses (what the end user is trying to do) and surfaces (landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat). Its `iconography` block is the icon slot map: control, explanatory, identity, data marker and no icon, each with when it needs an icon and what to use instead.
 - [data/patterns/INDEX.json](data/patterns/INDEX.json) and `data/patterns/<id>.md`: one reusable design answer per file. Every rule lists its fix patterns in `fix_patterns`.
 - [data/registry.json](data/registry.json): token based React components you can copy. Source lives in the repository under `registry/src/`; if this folder was installed alone, fetch the file from `https://raw.githubusercontent.com/makim-414/taster/main/registry/<file>`.
 
@@ -81,10 +81,17 @@ action still present. Flag unsourced numbers and testimonials to the user instea
 
 Follow [references/build.md](references/build.md). Choose the surface, list the uses the screen must serve in order, pick one pattern per use from the taxonomy, then compose. Run Diagnose on your own result before you show it.
 
+## Icons
+
+Every route that adds, keeps or swaps an icon goes through [data/patterns/icon-placement.md](data/patterns/icon-placement.md) first:
+name the slot from `taxonomy.iconography.slots`, run its `test`, and only then pick a glyph from one set (line-icon-set,
+the registry `icons/icon` component). Icons that fail the test are removed, not restyled. Logos and partner marks are the
+identity slot and stay as the original files.
+
 ## Always
 
 - Tokens only for color, spacing, radius and type. Start from `registry/src/tokens.css` or the user's existing tokens.
 - Sentence case labels. No all caps with wide letter spacing (navigation labels are the one exception).
-- No emoji as icons or bullets, no long dashes in UI copy, no tinted pill badges, no thick colored left borders on cards, no purple gradient text, no glow on everything. The full list is the rules file; these are the ones people notice first.
+- Icons only where their slot needs one, from one set at one stroke weight. No emoji as icons or bullets, no long dashes in UI copy, no tinted pill badges, no thick colored left borders on cards, no purple gradient text, no glow on everything. The full list is the rules file; these are the ones people notice first.
 - Real content beats placeholder: real product names, real numbers with a source, real images the user owns.
 - Say what you checked and what you could not check. A clean detect.js run does not prove the design is good; it proves the listed tells are gone.
