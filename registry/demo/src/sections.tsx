@@ -113,6 +113,7 @@ function CommandDemo() {
     { id: 'go-audience', kind: 'Go to', label: 'Audience', hint: 'g a', run: () => setLast('Audience') },
     { id: 'new-report', kind: 'Action', label: 'Create report', run: () => setLast('Create report') },
     { id: 'export', kind: 'Action', label: 'Export as CSV', run: () => setLast('Export as CSV') },
+    { id: 'library', kind: 'Go to', label: '라이브러리', hint: 'g l', run: () => setLast('라이브러리') },
   ]
   return (
     <div className="flex flex-wrap items-center gap-3">
