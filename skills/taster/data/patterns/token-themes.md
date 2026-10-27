@@ -4,7 +4,7 @@ name: Token themes
 category: layout-shell
 uses: [set-the-visual-foundation, switch-views]
 surfaces: [landing, app, dashboard]
-replaces: [CMP-04, CMP-11, COL-02, COL-03, COL-05]
+replaces: [CMP-04, CMP-11, COL-02, COL-03, COL-05, COL-08]
 components: [blocks/toggle]
 inspiration: []
 status: stable
@@ -29,7 +29,7 @@ It prevents four common failures: a single dark mode with no light option, a nea
 
 - Step dark surfaces by lightness (0.12, 0.18, 0.27 in OKLCH) and let borders be white at 8 to 15% alpha.
 - Keep the dark neutral at chroma 0. A hue of 240 at chroma 0.005 already reads as a blue or teal cast across a whole page, and a 5% white card lifts the page more than it looks; 3% is enough.
-- Check the smallest text token (`--text-subtle`) at 4.5:1 on the surface it sits on that is closest in lightness (`--muted`, `--secondary`), not only on `--bg`.
+- Check the smallest text token (`--text-subtle`) at 4.5:1 (rule COL-08) on the surface it sits on that is closest in lightness (`--muted`, `--secondary`), not only on `--bg`.
 - Keep accents flat. Emphasis is a contrast step or a single brand fill, not a glow.
 - Make light surfaces opaque. A 5% white card disappears on a white page.
 - Tune semantic colors per mode; the same green is too bright on white.
