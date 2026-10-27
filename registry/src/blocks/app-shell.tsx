@@ -29,7 +29,7 @@ export interface AppShellProps {
 
 function NavLink({ item }: { item: NavItem }) {
   const cls = cn(
-    'group flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm transition-colors outline-none',
+    'group flex min-h-11 w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm transition-colors outline-none desk:min-h-0',
     'focus-visible:ring-2 focus-visible:ring-ring',
     item.active ? 'bg-bg-elev font-medium text-text' : 'text-text-muted hover:text-text',
   )
@@ -136,7 +136,7 @@ export function AppShell({
               type="button"
               onClick={() => setDrawerOpen(true)}
               aria-label="Open menu"
-              className="-ml-1 rounded-md p-1 text-text-muted transition-colors hover:text-text md:hidden"
+              className="-ml-2.5 inline-flex size-11 items-center justify-center rounded-md text-text-muted transition-colors hover:text-text md:hidden"
             >
               <MenuIcon />
             </button>
