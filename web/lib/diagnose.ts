@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { Browser, BrowserContext, BrowserContextOptions, Page } from 'playwright-core';
-import { closeBrowser, fencePage, launchBrowser, type Budget } from './browser.ts';
+import { closeBrowser, fencePage, launchBrowser, tmpFree, type Budget } from './browser.ts';
 
 type Viewport = { width: number; height: number };
 type RawRun = { viewport: Viewport; page: { width: number; height: number }; counts: Record<string, number>; findings: unknown[]; screenshot?: string };
@@ -116,7 +116,7 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
         try {
           runs.push(await engine.detectOnce(fenced, url, viewport, { screenshot: `shot-${viewport.width}.jpg`, timeout: 15000, maxPerRule: 20 }));
         } catch (err) {
-          console.error('diagnose load failed', safeHostForLog(url), viewport.width, String((err as Error).message || err).split('\n')[0].slice(0, 300));
+          console.error('diagnose load failed', safeHostForLog(url), viewport.width, String((err as Error).message || err).split('\n')[0].slice(0, 300), await tmpFree());
           if (budget.blocked) throw new PageLoadError(budget.blocked);
           throw new PageLoadError(`페이지를 열지 못했습니다. (${String((err as Error).message || err).split('\n')[0].slice(0, 120)})`);
         }

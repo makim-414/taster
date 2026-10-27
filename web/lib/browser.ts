@@ -3,7 +3,7 @@
 // browser itself is pointed at a dead proxy so anything that slips past interception
 // (WebSocket, WebRTC, workers, cross-origin frames) has nowhere to go and simply fails.
 import { existsSync } from 'node:fs';
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, statfs, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { chromium as playwright, type Browser, type Page } from 'playwright-core';
@@ -69,21 +69,25 @@ function isServerless(): boolean {
   return process.platform === 'linux' && Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 }
 
-// A page that hangs the single-process renderer (a heavy WebGL hero, for one) can leave its
-// Chromium running after browser.close() gives up. The next launch on the same warm instance then
-// dies within a second, and every later request on that instance fails the same way. withGate
-// (limits.ts) lets one instance run one Chromium at a time, so any Chromium still alive before a
-// launch or after a run is a leftover and is killed. Serverless only: on a laptop or CI runner
-// the same scan would hit the user's own browser.
-export async function killStrayChromium(): Promise<number> {
-  if (!isServerless()) return 0;
-  let pids: string[];
+// On the live site every diagnosis once started failing within a second after a heavy page (a
+// WebGL hero) timed out on its capture, while older deployments of the same build kept working.
+// The warm instance, not the code, was broken. Two things a crashed Chromium can leave behind on
+// it are cleared before each launch and after each run: a process still running, and its temp
+// profile folder in /tmp (512 MB on the platform, so a few of those stop the next launch).
+// withGate (limits.ts) lets one instance run one Chromium at a time, so anything found is a
+// leftover. Serverless only: on a laptop or CI runner the same scan would hit the user's own
+// browser and profiles.
+const PROFILE_PREFIXES = ['playwright_chromiumdev_profile-', 'playwright-artifacts-'];
+
+export async function clearChromiumLeftovers(): Promise<void> {
+  if (!isServerless()) return;
+  let killed = 0;
+  let pids: string[] = [];
   try {
     pids = (await readdir('/proc')).filter((p) => /^\d+$/.test(p) && Number(p) !== process.pid);
   } catch {
-    return 0;
+    // no /proc
   }
-  let killed = 0;
   for (const pid of pids) {
     try {
       const exe = (await readFile(`/proc/${pid}/cmdline`, 'utf8')).split('\0')[0];
@@ -94,8 +98,24 @@ export async function killStrayChromium(): Promise<number> {
       // gone already, or not ours to read
     }
   }
-  if (killed) console.error(`[chromium] killed ${killed} leftover process(es)`);
-  return killed;
+  let removed = 0;
+  const dir = tmpdir();
+  for (const name of await readdir(dir).catch(() => [] as string[])) {
+    if (!PROFILE_PREFIXES.some((p) => name.startsWith(p))) continue;
+    await rm(path.join(dir, name), { recursive: true, force: true }).catch(() => {});
+    removed++;
+  }
+  if (killed || removed) console.error(`[chromium] cleared ${killed} leftover process(es), ${removed} profile folder(s); ${await tmpFree()}`);
+}
+
+/** Free space in the temp folder, for the log line when a launch or a page fails. */
+export async function tmpFree(): Promise<string> {
+  try {
+    const s = await statfs(tmpdir());
+    return `tmp free ${Math.round((s.bavail * s.bsize) / 1048576)} MB`;
+  } catch {
+    return 'tmp free unknown';
+  }
 }
 
 // browser.close() can wait forever on a renderer that stopped answering, so it gets a few
@@ -104,7 +124,7 @@ export async function closeBrowser(browser: Browser): Promise<void> {
   let timer: NodeJS.Timeout | undefined;
   await Promise.race([browser.close().catch(() => {}), new Promise<void>((resolve) => (timer = setTimeout(resolve, 5000)))]);
   clearTimeout(timer);
-  await killStrayChromium();
+  await clearChromiumLeftovers();
 }
 
 export async function launchBrowser(): Promise<Browser> {
@@ -113,7 +133,7 @@ export async function launchBrowser(): Promise<Browser> {
     const executablePath = await chromium.executablePath();
     fontReady ||= installKoreanFont().catch(() => null);
     await fontReady;
-    await killStrayChromium();
+    await clearChromiumLeftovers();
     return playwright.launch({ executablePath, args: mergeArgs(chromium.args), headless: true, logger: browserLogger() });
   }
   const executablePath = process.env.CHROME_PATH || (existsSync(MAC_CHROME) ? MAC_CHROME : undefined);
