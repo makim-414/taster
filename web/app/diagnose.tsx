@@ -60,7 +60,7 @@ export function Diagnose({ initialUrl }: { initialUrl: string }) {
           주소를 넣으면 1440 폭과 390 폭으로 페이지를 열고, 규칙 66개 중 잴 수 있는 규칙을 모두 돌립니다. 20초쯤 걸립니다.
         </p>
         <form className="probe" onSubmit={submit}>
-          <label htmlFor="target">사이트 주소</label>
+          <label htmlFor="target" className="visually-hidden">사이트 주소</label>
           <div className="probe-row">
             <input
               id="target"
@@ -99,16 +99,16 @@ export function Diagnose({ initialUrl }: { initialUrl: string }) {
         <Report result={state.result} sectionRef={resultRef} />
       ) : (
         <section className="sample" aria-labelledby="sample-title">
-          <h2 id="sample-title">고치기 전과 후</h2>
-          <p className="sample-lede">같은 예시 페이지를 고치기 전과 후로 잰 화면입니다. 가운데 선을 좌우로 끌어 보세요.</p>
+          <h2 id="sample-title">AI 가 그대로 만든 판과 실제 사이트</h2>
+          <p className="sample-lede">같은 첫 화면입니다. 왼쪽은 AI 가 그대로 만든 판에 걸린 규칙 이름을 붙인 것, 오른쪽은 사람이 다듬은 실제 사이트입니다. 가운데 선을 좌우로 끌어 보세요.</p>
           <CompareReveal
-            label="예시 페이지를 고치기 전과 후로 비교"
-            before={{ src: '/compare/before.jpg', alt: '고치기 전: 보라 그라디언트와 알약 배지가 있는 예시 페이지, 걸린 곳 31군데에 빨간 테두리' }}
-            after={{ src: '/compare/after.jpg', alt: '고친 뒤: 같은 내용을 담은 차분한 예시 페이지, 걸린 곳 없음' }}
+            label="AI 가 그대로 만든 판과 실제 사이트 비교"
+            before={{ src: '/compare/before.jpg', alt: 'AI 가 그대로 만든 Prompt Architect 첫 화면. 이모지, 대문자 넓은 자간, 그라디언트 글자, 엠대시, 빛 번짐 버튼, 틴트 알약 배지, 유리 카드에 빨간 이름표' }}
+            after={{ src: '/compare/after.jpg', alt: '사람이 다듬은 Prompt Architect 실제 첫 화면. 흰 글자 제목과 흰 버튼 하나, 입자 구 배경' }}
           />
           <div className="sample-captions">
-            <p>전: 규칙 17개, 31곳</p>
-            <p>후: 0건</p>
+            <p>AI 가 그대로 만든 판</p>
+            <p>실제 사이트</p>
           </div>
         </section>
       )}
