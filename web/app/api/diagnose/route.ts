@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   try {
     const result = await withGate(() => runDiagnosis(target.href));
     if (!result) return fail(503, 'busy', '지금 진단이 몰려 있습니다. 조금 뒤에 다시 해 주세요.', { 'retry-after': '20' });
-    return NextResponse.json({ report: trimReport(result.report), shots: result.shots }, { headers: { 'cache-control': 'no-store' } });
+    return NextResponse.json({ report: trimReport(result.report), shots: result.shots, missed: result.missed }, { headers: { 'cache-control': 'no-store' } });
   } catch (err) {
     if (err instanceof PageLoadError) return fail(422, 'load', err.message);
     console.error('diagnose failed', err);
