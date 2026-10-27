@@ -22,7 +22,7 @@ body {
   font-size: 17px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere;
 }
 header { display: flex; justify-content: space-between; align-items: center; padding: 20px 48px; border-bottom: 1px solid var(--line); }
-nav a { color: var(--ink); text-decoration: none; margin-left: 28px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; }
+nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); text-decoration: none; margin-left: 28px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; }
 .brand { font-weight: 700; }
 main { max-width: 960px; margin: 0 auto; }
 section.intro { padding: 96px 48px 72px; }
@@ -33,7 +33,7 @@ h2 { font-size: 26px; line-height: 1.35; margin: 0 0 20px; }
 p { margin: 0 0 16px; color: var(--ink-soft); max-width: 36em; }
 .btn { display: inline-block; padding: 12px 28px; background: var(--ink); color: #ffffff; text-decoration: none; border-radius: 4px; font-size: 16px; }
 .link { margin-left: 24px; color: var(--ink); }
-.figure { display: block; width: 480px; height: 270px; margin-top: 40px; }
+.figure { display: block; width: 480px; max-width: 100%; height: auto; margin-top: 40px; }
 dl { margin: 0; display: grid; grid-template-columns: 160px 1fr; row-gap: 14px; column-gap: 40px; }
 dt { font-weight: 700; }
 dd { margin: 0; color: var(--ink-soft); }
