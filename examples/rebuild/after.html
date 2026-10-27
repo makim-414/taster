@@ -21,9 +21,9 @@
   /* site-header */
   header { border-bottom: 1px solid var(--border); }
   header .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); min-height: 64px; }
-  .name { font-weight: var(--w-semi); font-size: var(--t-title); color: var(--text); text-decoration: none; }
+  .name { display: inline-flex; align-items: center; min-height: var(--control-touch, 44px); font-weight: var(--w-semi); font-size: var(--t-title); color: var(--text); text-decoration: none; }
   nav ul { display: flex; gap: var(--sp-6); list-style: none; padding: 0; }
-  nav a { color: var(--text-muted); text-decoration: none; font-size: var(--t-body); }
+  nav a { display: inline-flex; align-items: center; min-height: var(--control-touch, 44px); color: var(--text-muted); text-decoration: none; font-size: var(--t-body); }
   nav a:hover { color: var(--text); }
 
   /* hero-headline-lockup: the original has words and no product picture, so the words carry the hero */
@@ -34,7 +34,7 @@
   .lead { margin-top: var(--sp-5); max-width: 56ch; color: var(--text-muted); font-size: var(--t-title); }
   .actions { margin-top: var(--sp-8); display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-6); }
   .primary { display: inline-block; padding: var(--sp-3) var(--sp-6); border-radius: var(--r-md); background: var(--accent); color: var(--accent-fg); font-weight: var(--w-med); text-decoration: none; }
-  .text-link { color: var(--text); font-weight: var(--w-med); text-underline-offset: 4px; }
+  .text-link { display: inline-flex; align-items: center; min-height: var(--control-touch, 44px); color: var(--text); font-weight: var(--w-med); text-underline-offset: 4px; }
 
   /* content-matched-grid: three claims, set as rows with hairlines instead of three icon cards */
   .features { border-top: 1px solid var(--border); padding: var(--sp-12) 0 var(--sp-16); }
