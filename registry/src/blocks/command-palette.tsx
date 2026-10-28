@@ -6,6 +6,7 @@ import { useFocusTrap } from './use-hotkeys'
 
 // CommandPalette. A command menu opened with mod+k. Tokens only, no external UI dependency.
 // Items are defined by the caller, each item carries its own run() callback.
+// Korean labels also match by initials, see matchCommands.
 
 export interface CommandItem {
   id: string
@@ -21,17 +22,45 @@ export interface CommandPaletteProps {
   placeholder?: string
 }
 
+// Hangul initials: a Korean query typed as consonants only ("ㄹㅇㅂㄹ") matches the syllables they start
+// ("라이브러리"). Each syllable from U+AC00 maps to one of 19 initials in blocks of 588.
+const INITIALS = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ'
+const ONLY_INITIALS = /^[\u3131-\u314e]+$/
+
+function initialsOf(text: string) {
+  return Array.from(text, (ch) => {
+    const k = ch.charCodeAt(0) - 0xac00
+    return k >= 0 && k < 11172 ? INITIALS[Math.floor(k / 588)] : ch
+  }).join('')
+}
+
+// Rank: label starts with the query, then label contains it, then kind or hint does. Same rank keeps input order.
+export function matchCommands(items: CommandItem[], query: string): CommandItem[] {
+  const q = query.trim().toLowerCase().replace(/\s+/g, '')
+  if (!q) return items
+  const squash = (t: string) => t.toLowerCase().replace(/\s+/g, '')
+  const fold = ONLY_INITIALS.test(q) ? (t: string) => initialsOf(squash(t)) : squash
+  const rank = (it: CommandItem) => {
+    const label = fold(it.label)
+    if (label.startsWith(q)) return 0
+    if (label.includes(q)) return 1
+    if (fold(`${it.kind} ${it.hint ?? ''}`).includes(q)) return 2
+    return -1
+  }
+  return items
+    .map((it, i) => ({ it, i, r: rank(it) }))
+    .filter((x) => x.r >= 0)
+    .sort((a, b) => a.r - b.r || a.i - b.i)
+    .map((x) => x.it)
+}
+
 export function CommandPalette({ items, onClose, placeholder = 'Search commands' }: CommandPaletteProps) {
   const [query, setQuery] = React.useState('')
   const [hi, setHi] = React.useState(0)
   const dialogRef = React.useRef<HTMLDivElement>(null)
   useFocusTrap(dialogRef)
 
-  const filtered = React.useMemo(() => {
-    const q = query.trim().toLowerCase()
-    if (!q) return items
-    return items.filter((it) => `${it.kind} ${it.label} ${it.hint ?? ''}`.toLowerCase().includes(q))
-  }, [items, query])
+  const filtered = React.useMemo(() => matchCommands(items, query), [items, query])
 
   const clampedHi = Math.min(hi, Math.max(0, filtered.length - 1))
 

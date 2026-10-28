@@ -4,7 +4,7 @@ name: Flat solid button
 category: button
 uses: [start-an-action]
 surfaces: [landing, app, dashboard]
-replaces: [AC-16, COL-01, COL-07]
+replaces: [AC-16, COL-01, COL-07, RSP-06]
 components: [blocks/button]
 inspiration: [https://ui.shadcn.com/docs/components/button]
 status: stable
@@ -20,7 +20,7 @@ Every place a person starts something: sign up, save, run, request a quote. Use 
 - Secondary: `--bg-elev` surface with a 1px `--border`. Hover moves the border to `--text-subtle`.
 - Outline and ghost: transparent, for tertiary and toolbar actions. Never for the main action.
 - Destructive: outline with `--danger` text. Fill it red only inside the confirm step.
-- Sizes `sm` 32px, `md` 36px, `lg` 44px high. Touch targets on phones use `lg`.
+- Sizes: every button is 44px high on touch screens. Only on a wide screen without a coarse pointer (`desk:` in the preset, `(min-width: 1024px) and (not (pointer: coarse))`) do `sm` and `md` drop to 32px and 36px. A tablet held in the hand is a touch screen at 1024px.
 - Grouped actions (save and cancel) sit 8px apart, primary last on the right in LTR forms.
 - Press feedback is `scale(var(--press-scale))` over `--dur-press`. That is the only motion.
 

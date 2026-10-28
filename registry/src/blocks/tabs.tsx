@@ -34,7 +34,7 @@ export function Tabs({ tabs, value, onValueChange, className }: TabsProps) {
             aria-selected={active}
             onClick={() => onValueChange(tab.value)}
             className={cn(
-              'inline-flex h-8 items-center justify-center rounded-sm px-3 text-sm font-medium',
+              'inline-flex h-11 desk:h-8 items-center justify-center rounded-sm px-3 text-sm font-medium',
               'tracking-[-0.01em] transition-colors outline-none',
               'focus-visible:ring-2 focus-visible:ring-ring',
               active

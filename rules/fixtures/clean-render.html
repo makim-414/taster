@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>읽히는 화면 예시</title>
+<style>
+body { margin: 0; padding: 24px 16px; background: #fbfaf8; color: #1a1a1a; font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; font-size: 16px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere; }
+main { max-width: 640px; margin: 0 auto; }
+h1 { font-size: 28px; line-height: 1.35; margin: 0 0 12px; font-weight: 600; }
+p { margin: 0 0 16px; }
+.muted { color: #5a5753; }
+.title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.row a { flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; background: #efebe5; border-radius: 8px; color: #1a1a1a; text-decoration: none; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+button { min-height: 44px; min-width: 44px; padding: 0 20px; border: 0; border-radius: 8px; background: #1a1a1a; color: #ffffff; font: inherit; }
+button.secondary { background: #ffffff; color: #1a1a1a; border: 1px solid #d9d5cf; }
+label.check { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>지난 30일 동안 새로 들어온 문의</h1>
+  <p>문의는 하루 평균 열두 건씩 들어왔고, 그중 아홉 건이 같은 날 답을 받았습니다. 자세한 기준은 <a href="#method">집계 방법</a>에서 볼 수 있습니다.</p>
+  <p class="muted">마지막 갱신: 오늘 오전 9시, 기준은 서울 시간입니다.</p>
+  <p class="title">아주 긴 상품 이름도 첫 단어부터 끝까지 다 보이지는 않지만 앞부분은 충분히 읽힙니다</p>
+  <div class="row" data-taster-allow="scroll">
+    <a href="#a">전체 문의</a><a href="#b">답변 대기</a><a href="#c">오늘 답변</a><a href="#d">지난주 답변</a><a href="#e">보관함</a>
+  </div>
+  <label class="check"><input type="checkbox"> 답변이 끝난 문의 숨기기</label>
+  <div class="actions">
+    <button type="button">내려받기</button>
+    <button type="button" class="secondary">기간 바꾸기</button>
+  </div>
+</main>
+</body>
+</html>

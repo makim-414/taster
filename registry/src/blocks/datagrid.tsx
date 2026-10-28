@@ -42,7 +42,7 @@ export function DataGrid<T>({ columns, data, pageSize = 5, className }: DataGrid
     initialState: { pagination: { pageSize } },
   })
   const pageBtn =
-    'rounded-md border border-border px-2.5 py-1 text-caption text-text-muted transition-colors hover:border-text-subtle hover:text-text disabled:opacity-40 disabled:pointer-events-none'
+    'min-h-11 rounded-md border border-border px-2.5 py-1 text-caption desk:min-h-0 text-text-muted transition-colors hover:border-text-subtle hover:text-text disabled:opacity-40 disabled:pointer-events-none'
   return (
     <div className={cn('w-full', className)}>
       <div className="overflow-hidden rounded-lg border border-border">
@@ -54,12 +54,12 @@ export function DataGrid<T>({ columns, data, pageSize = 5, className }: DataGrid
                   const align = (header.column.columnDef.meta as any)?.align === 'right'
                   const sortable = header.column.getCanSort()
                   return (
-                    <th key={header.id} className={cn('px-3 py-2.5 text-caption font-medium text-text-subtle', align ? 'text-right' : 'text-left')}>
+                    <th key={header.id} className={cn('px-3 py-0 text-caption font-medium text-text-subtle desk:py-2.5', align ? 'text-right' : 'text-left')}>
                       <button
                         type="button"
                         disabled={!sortable}
                         onClick={header.column.getToggleSortingHandler()}
-                        className={cn('inline-flex items-center gap-1.5', align && 'flex-row-reverse', sortable && 'cursor-pointer hover:text-text')}
+                        className={cn('inline-flex min-h-11 items-center gap-1.5 desk:min-h-0', align && 'flex-row-reverse', sortable && 'cursor-pointer hover:text-text')}
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {sortable && <SortGlyph dir={header.column.getIsSorted()} />}

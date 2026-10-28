@@ -1526,8 +1526,8 @@
     };
 
     // -------- copy candidates (manual rules, candidates only)
-    var AI_COPY = /\b(elevate your|unlock the (power|potential)|supercharge|seamless(ly)?|revolutioni[sz]e|game[- ]changer|next[- ]gen(eration)?|to the next level|reimagine[d]?|build faster,? ship smarter|(build|ship|move|work) (faster|smarter),)/i;
-    var KO_COPY = /\uACBD\uD5D8\uD558\uC138\uC694|\uC0C8\uB85C\uC6B4 \uCC28\uC6D0|\uC758 \uBBF8\uB798\uB97C|\uB9CC\uB098\uBCF4\uC138\uC694|\uCC28\uC6D0\uC774 \uB2E4\uB978|\uD55C \uB2E8\uACC4 \uB354 \uC5C5\uADF8\uB808\uC774\uB4DC/;
+    var AI_COPY = /\b(elevate your|unlock the (power|potential)|supercharge|seamless(ly)?|revolutioni[sz]e|game[- ]changer|next[- ]gen(eration)?|to the next level|reimagine[d]?|build faster,? ship smarter|(build|ship|move|work) (faster|smarter),|not (just|only|merely|simply) (a |an |the )?[^.,;!?]{1,40}?,? but\b|it'?s not (just )?(about )?[^.,;!?]{1,40}?, it'?s\b)/i;
+    var KO_COPY = /\uACBD\uD5D8\uD558\uC138\uC694|\uC0C8\uB85C\uC6B4 \uCC28\uC6D0|\uC758 \uBBF8\uB798\uB97C|\uB9CC\uB098\uBCF4\uC138\uC694|\uCC28\uC6D0\uC774 \uB2E4\uB978|\uD55C \uB2E8\uACC4 \uB354 \uC5C5\uADF8\uB808\uC774\uB4DC|\uB2E8\uC21C\uD55C [^.,]{1,20}(\uC774|\uAC00) \uC544\uB2CC/;
     R['CPY-01'] = function () {
       I.forEach(function (it) {
         var t = ownText(it.el);
@@ -1692,6 +1692,283 @@
       });
     };
 
+    // ------------------------------------------------ render integrity (RSP, COL-08, CPY-02)
+    // These measure whether the page can be read at this width, not how it looks. Run the engine at
+    // several widths (--widths responsive) because most of them only show between phone and desktop.
+    function clippedByAncestor(el, edgeX) {
+      for (var a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+        var ox = getComputedStyle(a).overflowX;
+        if (ox !== 'visible') return a.getBoundingClientRect().right < edgeX;
+      }
+      return false;
+    }
+    function scrollerAncestor(el) {
+      for (var a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+        var ox = getComputedStyle(a).overflowX;
+        if (ox === 'auto' || ox === 'scroll') return a;
+      }
+      return null;
+    }
+    function textRects(el) {
+      var rng = document.createRange(), out = [];
+      Array.prototype.forEach.call(el.childNodes, function (nd) {
+        if (nd.nodeType !== 3 || !nd.nodeValue.trim()) return;
+        rng.selectNodeContents(nd);
+        Array.prototype.forEach.call(rng.getClientRects(), function (rc) {
+          if (rc.width > 0.5 && rc.height > 0.5) out.push(rc);
+        });
+      });
+      return out;
+    }
+    function allowed(el, what) {
+      var a = el.closest('[data-taster-allow]');
+      return !!a && (' ' + a.getAttribute('data-taster-allow') + ' ').indexOf(' ' + what + ' ') > -1;
+    }
+    function opacityOf(el) {
+      var o = 1;
+      for (var a = el; a && o > 0; a = a.parentElement) o *= parseFloat(getComputedStyle(a).opacity);
+      return o;
+    }
+    function hiddenFromReader(el) {
+      return opacityOf(el) < 0.1 || !!el.closest('[aria-hidden="true"],[inert]');
+    }
+    // Fixed and sticky layers (headers, cookie banners, chat buttons) cover content on purpose.
+    function inOverlay(el) {
+      for (var a = el; a && a !== document.body; a = a.parentElement) {
+        if (/^(fixed|sticky)$/.test(getComputedStyle(a).position)) return true;
+      }
+      return false;
+    }
+    // The part of a rect left after every clipping ancestor, or null when nothing is left.
+    function clipToAncestors(el, r) {
+      var l = r.left, t = r.top, rt = r.right, b = r.bottom;
+      for (var a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+        var cs = getComputedStyle(a);
+        if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+        var c = a.getBoundingClientRect();
+        l = Math.max(l, c.left); t = Math.max(t, c.top); rt = Math.min(rt, c.right); b = Math.min(b, c.bottom);
+        if (rt - l <= 1 || b - t <= 1) return null;
+      }
+      return { left: l, top: t, right: rt, bottom: b };
+    }
+
+    R['RSP-01'] = function () {
+      var over = document.documentElement.scrollWidth - document.documentElement.clientWidth;
+      if (over <= 1) return;
+      var vwRight = document.documentElement.clientWidth + 1;
+      I.forEach(function (it) {
+        if (it.el === document.documentElement || it.el === document.body) return;
+        if (it.r.rt <= vwRight || /^(fixed|sticky)$/.test(it.cs.position)) return;
+        var p = it.el.parentElement, pit = p && M.get(p);
+        if (pit && pit.r.rt > vwRight && p !== document.body) return; // report where the overflow starts
+        if (scrollerAncestor(it.el) || clippedByAncestor(it.el, vwRight)) return;
+        add('RSP-01', it.el, { pageOverflowPx: over, rightEdge: Math.round(it.r.rt), viewport: vw });
+      });
+    };
+
+    R['RSP-02'] = function () {
+      I.forEach(function (it) {
+        var t = ownText(it.el);
+        if (!t || it.r.w < 4) return;
+        var fs = px(it.cs.fontSize) || 16;
+        var chars = t.replace(/\s/g, '').length;
+        var cuts = /^(hidden|clip)$/.test(it.cs.overflowX) || it.cs.textOverflow === 'ellipsis';
+        if (cuts && it.el.scrollWidth > it.el.clientWidth + 1) {
+          // A long title that ends in an ellipsis is a choice; a short label or a name cut to a few letters is not.
+          var visibleChars = it.el.clientWidth / (fs * 0.55);
+          if (chars <= 24 || visibleChars < 3) add('RSP-02', it.el, { kind: it.cs.textOverflow === 'ellipsis' ? 'cut-label' : 'clipped', chars: chars, visibleChars: rn(visibleChars, 1), boxPx: it.el.clientWidth, textPx: it.el.scrollWidth });
+          return;
+        }
+        if (!btnLike(it.el) && !/^(INPUT|SELECT|LABEL)$/.test(it.el.tagName)) return;
+        var rs = textRects(it.el);
+        for (var k = 0; k < rs.length; k++) {
+          if (rs[k].right > it.r.rt + 1 || rs[k].left < it.r.l - 1) {
+            add('RSP-02', it.el, { kind: 'spill', boxPx: Math.round(it.r.w), textRight: Math.round(rs[k].right - it.r.l) });
+            return;
+          }
+        }
+      });
+    };
+
+    R['RSP-03'] = function () {
+      TN.forEach(function (o) {
+        var chars = o.text.replace(/\s/g, '').length;
+        if (chars < 3) return;
+        var rng = document.createRange();
+        rng.selectNodeContents(o.node);
+        var tops = [];
+        Array.prototype.forEach.call(rng.getClientRects(), function (rc) {
+          if (rc.width > 0 && !tops.some(function (t) { return Math.abs(t - rc.top) < 2; })) tops.push(rc.top);
+        });
+        if (tops.length >= 3 && chars / tops.length <= 1.5) add('RSP-03', o.el, { chars: chars, lines: tops.length, boxPx: Math.round(M.get(o.el).r.w) });
+      });
+    };
+
+    R['RSP-04'] = function () {
+      var boxes = [];
+      TN.forEach(function (o) {
+        var it = M.get(o.el);
+        if (!it || hiddenFromReader(o.el) || inOverlay(o.el)) return;
+        // One box per line fragment: a bounding box of wrapped text would cover its neighbours on the same lines.
+        var rng = document.createRange();
+        rng.selectNodeContents(o.node);
+        Array.prototype.forEach.call(rng.getClientRects(), function (r) {
+          if (r.width <= 1 || r.height <= 1) return;
+          var c = clipToAncestors(o.el, r);
+          if (c) boxes.push({ el: o.el, r: c });
+        });
+      });
+      if (boxes.length > 1500) boxes = boxes.slice(0, 1500);
+      boxes.sort(function (a, b) { return a.r.top - b.r.top; });
+      for (var i = 0; i < boxes.length; i++) {
+        for (var j = i + 1; j < boxes.length && boxes[j].r.top < boxes[i].r.bottom - 2; j++) {
+          var a = boxes[i], b = boxes[j];
+          if (a.el === b.el || a.el.contains(b.el) || b.el.contains(a.el)) continue;
+          var ox = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left);
+          var oy = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
+          if (ox > 2 && oy > 2) {
+            add('RSP-04', a.el, { overlapPx: [Math.round(ox), Math.round(oy)], with: sel(b.el) });
+            add('RSP-04', b.el, { overlapPx: [Math.round(ox), Math.round(oy)], with: sel(a.el) });
+          }
+        }
+      }
+    };
+
+    R['RSP-05'] = function () {
+      I.forEach(function (it) {
+        if (it.el === document.documentElement || it.el === document.body) return;
+        if (!/^(auto|scroll)$/.test(it.cs.overflowX) || /^(PRE|CODE|TEXTAREA)$/.test(it.el.tagName)) return;
+        if (it.el.scrollWidth <= it.el.clientWidth + 1 || allowed(it.el, 'scroll')) return;
+        add('RSP-05', it.el, { hiddenPx: it.el.scrollWidth - it.el.clientWidth, boxPx: it.el.clientWidth, candidate: true });
+      });
+    };
+
+    var TARGET_SEL = 'a[href],button,input,select,textarea,summary,[role="button"],[role="link"],[role="tab"],[role="switch"],[role="checkbox"],[role="radio"],[role="menuitem"],[role="option"]';
+    // WCAG 2.5.8 spacing exception: an undersized target passes when a 24px circle on its center
+    // touches no other target and no other undersized target's circle.
+    function spacedApart(rect, all) {
+      var cx = rect.l + rect.w / 2, cy = rect.t + rect.h / 2;
+      for (var k = 0; k < all.length; k++) {
+        var o = all[k].r;
+        if (o === rect) continue;
+        var dx = Math.max(o.l - cx, 0, cx - o.rt), dy = Math.max(o.t - cy, 0, cy - o.b);
+        if (Math.sqrt(dx * dx + dy * dy) < 12) return false;
+        if (o.h < 24 || o.w < 24) {
+          var ox = o.l + o.w / 2 - cx, oy = o.t + o.h / 2 - cy;
+          if (Math.sqrt(ox * ox + oy * oy) < 24) return false;
+        }
+      }
+      return true;
+    }
+    R['RSP-06'] = function () {
+      if (vw > 1024) return; // wider than a tablet: a mouse is likely, the touch size does not apply
+      var done = new Set(), small = [], targets = [];
+      Array.prototype.forEach.call(document.querySelectorAll(TARGET_SEL), function (el) {
+        if (el.disabled || el.getAttribute('aria-disabled') === 'true' || (el.type || '') === 'hidden') return;
+        var target = el;
+        // A checkbox, a radio or a visually hidden input is reached through its label.
+        if (el.tagName === 'INPUT' && (/^(checkbox|radio)$/i.test(el.type) || !M.has(el) || el.getBoundingClientRect().width <= 2)) {
+          target = el.closest('label') || (el.id && document.querySelector('label[for="' + esc(el.id) + '"]')) || (M.has(el) ? el : null);
+        }
+        if (!target || !M.has(target) || done.has(target)) return;
+        if (target.parentElement && target.parentElement.closest(TARGET_SEL) && target.parentElement.closest(TARGET_SEL) !== target) return;
+        done.add(target);
+        var it = M.get(target);
+        if (hiddenFromReader(target) || it.r.rt <= 0 || it.r.l >= vw) return;
+        // WCAG 2.5.8: a link inside a sentence is exempt; its size comes from the line of text.
+        if (target.tagName === 'A' && /^inline/.test(it.cs.display)) {
+          var block = target.parentElement;
+          var around = block ? norm(block.textContent).length - norm(target.textContent).length : 0;
+          if (around > 20 && !inNav(target)) return;
+        }
+        // Height must reach 44px. Width must too when the control is only an icon; a word gets its width from its letters.
+        var iconOnly = !norm(target.textContent) && !(target.value && target.tagName === 'INPUT' && /^(submit|button)$/i.test(target.type));
+        // A plain text link (not styled as a button) is held to the WCAG 2.5.8 minimum of 24px; controls to 44px.
+        var textLink = target.tagName === 'A' && !btnLike(target) && !iconOnly && !target.getAttribute('role');
+        var minH = textLink ? 24 : 44;
+        targets.push(it);
+        if (it.r.h < minH - 0.5 || (iconOnly && it.r.w < 43.5) || it.r.w < 24) small.push({ it: it, textLink: textLink, minH: minH, iconOnly: iconOnly });
+      });
+      small.forEach(function (o) {
+        if (o.textLink && o.it.r.w >= 24 && spacedApart(o.it.r, targets)) return;
+        add('RSP-06', o.it.el, { heightPx: Math.round(o.it.r.h), widthPx: Math.round(o.it.r.w), minPx: o.minH, iconOnly: o.iconOnly, viewport: vw });
+      });
+    };
+
+    function surfaceUnder(el) {
+      var layers = [];
+      for (var a = el; a; a = a.parentElement) {
+        var cs = getComputedStyle(a);
+        if (cs.backgroundImage && cs.backgroundImage !== 'none') return null; // image or gradient: cannot measure
+        var c = parseColor(cs.backgroundColor);
+        if (c && c.a > 0) {
+          layers.push(c);
+          if (c.a >= 0.99) break;
+        }
+        if (a === document.documentElement) layers.push({ r: 255, g: 255, b: 255, a: 1 });
+      }
+      var base = layers.pop() || { r: 255, g: 255, b: 255, a: 1 };
+      while (layers.length) base = blend(layers.pop(), base);
+      return base;
+    }
+    function blend(top, under) {
+      var a = top.a;
+      return { r: top.r * a + under.r * (1 - a), g: top.g * a + under.g * (1 - a), b: top.b * a + under.b * (1 - a), a: 1 };
+    }
+    // Media and positioned layers can sit between a text and its ancestors' background; their color is unknown.
+    var LAYERS = null;
+    function layersOverlapping(el, r) {
+      if (!LAYERS) {
+        LAYERS = I.filter(function (it) {
+          if (/^(img|video|canvas|picture|iframe)$/.test(it.tag)) return true;
+          if (!/^(absolute|fixed)$/.test(it.cs.position)) return false;
+          var c = parseColor(it.cs.backgroundColor);
+          return (c && c.a > 0.2) || (it.cs.backgroundImage && it.cs.backgroundImage !== 'none');
+        });
+      }
+      for (var k = 0; k < LAYERS.length; k++) {
+        var L = LAYERS[k];
+        if (L.el === el || L.el.contains(el) || el.contains(L.el)) continue;
+        if (L.r.l < r.right && L.r.rt > r.left && L.r.t < r.bottom && L.r.b > r.top) return true;
+      }
+      return false;
+    }
+    R['COL-08'] = function () {
+      var checked = new Set();
+      TN.forEach(function (o) {
+        var el = o.el;
+        if (checked.has(el)) return;
+        checked.add(el);
+        if (hiddenFromReader(el) || el.closest(':disabled,[aria-disabled="true"]')) return;
+        var it = M.get(el);
+        var rng = document.createRange();
+        rng.selectNodeContents(o.node);
+        if (layersOverlapping(el, rng.getBoundingClientRect())) return;
+        var fg = parseColor(it.cs.color);
+        if (!fg) return;
+        var bg = surfaceUnder(el);
+        if (!bg) return;
+        var op = opacityOf(el);
+        var text = blend({ r: fg.r, g: fg.g, b: fg.b, a: fg.a * op }, bg);
+        var l1 = luminance(text), l2 = luminance(bg);
+        var ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        var fs = px(it.cs.fontSize), weight = parseInt(it.cs.fontWeight, 10) || 400;
+        var large = fs >= 24 || (fs >= 18.66 && weight >= 700);
+        var need = large ? 3 : 4.5;
+        if (ratio < need - 0.05) add('COL-08', el, { ratio: rn(ratio, 2), need: need, fontSizePx: fs, color: it.cs.color, background: 'rgb(' + Math.round(bg.r) + ' ' + Math.round(bg.g) + ' ' + Math.round(bg.b) + ')' });
+      });
+    };
+
+    var EMPTY_TRACE = /(^|[^\w])(undefined|NaN|\[object Object\]|Invalid Date)([^\w]|$)|^\s*null\s*$|:\s*null\b|·\s*·/;
+    R['CPY-02'] = function () {
+      I.forEach(function (it) {
+        var t = ownText(it.el);
+        if (!t || it.el.closest('pre,code,kbd,samp,textarea,script')) return;
+        var m = t.match(EMPTY_TRACE);
+        if (m) add('CPY-02', it.el, { match: m[0].trim().slice(0, 20) });
+      });
+    };
+
     // ------------------------------------------------ execute in a fixed order
     var ORDER = [
       'AC-01', 'AC-02', 'AC-03', 'AC-04', 'AC-05', 'AC-06', 'AC-07', 'AC-08', 'AC-09', 'AC-10', 'AC-11', 'AC-12',
@@ -1699,7 +1976,8 @@
       'COL-05', 'TYP-01', 'TYP-02', 'TYP-03', 'TYP-04', 'TYP-05', 'LAY-01', 'LAY-02', 'LAY-03', 'LAY-04', 'LAY-05',
       'LAY-06', 'CMP-01', 'CMP-02', 'CMP-03', 'CMP-04', 'CMP-05', 'CMP-06', 'CMP-07', 'CMP-09', 'CMP-10', 'CMP-11',
       'BG-01', 'ICO-01', 'ICO-02', 'ICO-03', 'ICO-04', 'MOT-01', 'CPY-01', 'KO-01', 'KO-02', 'KO-03', 'KO-04', 'KO-05', 'KO-06', 'KO-07',
-      'KO-08', 'KO-09', 'KO-10', 'KO-11'
+      'KO-08', 'KO-09', 'KO-10', 'KO-11',
+      'RSP-01', 'RSP-02', 'RSP-03', 'RSP-04', 'RSP-05', 'RSP-06', 'COL-08', 'CPY-02'
     ];
     ORDER.forEach(function (id) {
       if (options.rules && options.rules.indexOf(id) < 0) return;
@@ -1709,7 +1987,8 @@
         errors.push({ ruleId: id, message: String((e && e.message) || e) });
       }
     });
-    notes.push('Manual rules not run: AC-18, AC-19, CMP-08. CPY-01 and KO-07 report candidates only.');
+    notes.push('Manual rules not run: AC-18, AC-19, CMP-08. CPY-01, KO-07 and RSP-05 report candidates only.');
+    if (vw > 1024) notes.push('RSP-06 (touch size) runs at 1024px and below only.');
 
     if (options.highlight) highlight(toHL);
 

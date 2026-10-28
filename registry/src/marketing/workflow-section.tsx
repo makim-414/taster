@@ -66,7 +66,7 @@ const ListBody = () => (
     {[["Candidate A", "@handle"], ["Candidate B", "@handle"], ["Candidate C", "@handle"]].map(([a, b], i) => (
       <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 9, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)" }}>
         <Chip n={String.fromCharCode(65 + i)} /><span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.9)" }}>{a}</span>
-        <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,.45)" }}>{b}</span>
+        <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,.62)" }}>{b}</span>
       </div>
     ))}
   </div>
@@ -75,7 +75,7 @@ const BarsBody = () => (
   <div style={{ ...wrapBody, display: "flex", flexDirection: "column", gap: 9 }}>
     {[["Channel A", 82], ["Channel B", 64], ["Channel C", 41]].map(([l, v]) => (
       <div key={l as string} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ width: 54, fontSize: 10.5, color: "rgba(255,255,255,.55)" }}>{l}</span>
+        <span style={{ width: 54, fontSize: 10.5, color: "rgba(255,255,255,.62)" }}>{l}</span>
         <div style={{ flex: 1, height: 13, borderRadius: 3, background: "rgba(255,255,255,.04)", overflow: "hidden" }}>
           <div style={{ height: "100%", width: `${v}%`, background: `rgba(255,255,255,${0.35 + (v as number) / 400})`, borderRadius: 3 }} />
         </div>
@@ -100,7 +100,7 @@ const KpiBody = () => (
   <div style={{ ...wrapBody, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
     {[["Reach", "128K"], ["Conversion", "3.2%"], ["Saves", "9.1K"], ["Shares", "1.4K"]].map(([k, v]) => (
       <div key={k} style={{ border: "1px solid rgba(255,255,255,.08)", borderRadius: 11, padding: "10px 12px" }}>
-        <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.5)" }}>{k}</div>
+        <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.62)" }}>{k}</div>
         <div style={{ fontSize: 20, fontWeight: 600, color: "#fff", marginTop: 3, fontVariantNumeric: "tabular-nums" }}>{v}</div>
       </div>
     ))}
@@ -128,7 +128,7 @@ function AgentDock({ agent }: { agent: NonNullable<WorkflowSectionProps["agent"]
   return (
     <div style={{ width: 280, flexShrink: 0, display: "flex", flexDirection: "column", borderRadius: 26, border: "1px solid rgba(255,255,255,.1)", background: "#0c0c0c", padding: 20 }}>
       <p style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.3, letterSpacing: "-.01em", color: "#fff", margin: 0 }}>{agent.title}</p>
-      <span style={{ marginTop: 4, display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, color: "rgba(255,255,255,.55)" }}>
+      <span style={{ marginTop: 4, display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, color: "rgba(255,255,255,.62)" }}>
         <span style={{ width: 6, height: 6, borderRadius: 999, background: "rgba(255,255,255,.7)" }} />{agent.online}
       </span>
       <div style={{ display: "flex", justifyContent: "center", padding: "6px 0" }}><ParticleOrb size={116} /></div>
@@ -143,7 +143,7 @@ function AgentDock({ agent }: { agent: NonNullable<WorkflowSectionProps["agent"]
         })}
       </div>
       <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 8, borderRadius: 999, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.03)", padding: "8px 12px" }}>
-        <span style={{ flex: 1, fontSize: 11, color: "rgba(255,255,255,.35)" }}>{agent.input}</span>
+        <span style={{ flex: 1, fontSize: 11, color: "rgba(255,255,255,.62)" }}>{agent.input}</span>
         <span style={{ display: "flex", width: 20, height: 20, alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.7)" }}>
           <IconArrowUR style={{ width: 12, height: 12 }} />
         </span>
@@ -189,7 +189,7 @@ export function WorkflowSection({
                 </div>
                 <p style={{ fontSize: 12.5, lineHeight: 1.5, marginTop: 10, color: "rgba(255,255,255,.55)" }}>{item.goal}</p>
                 <div style={{ marginTop: 16 }}>{item.body}</div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,.1)", fontSize: 11, color: "rgba(255,255,255,.45)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,.1)", fontSize: 11, color: "rgba(255,255,255,.62)" }}>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                     <span style={{ width: 6, height: 6, borderRadius: 999, background: "rgba(255,255,255,.55)" }} />Live pipeline
                   </span>

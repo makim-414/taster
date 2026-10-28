@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { RuleHit, Summary } from '../lib/diagnose.ts';
+import { CompareReveal } from './compare-reveal.tsx';
 
 const INSTALL = 'npx skills add https://github.com/makim-414/taster --skill taster';
 const SEVERITY: Record<RuleHit['severity'], string> = { high: '높음', medium: '중간', low: '낮음' };
@@ -9,7 +10,7 @@ const SEVERITY: Record<RuleHit['severity'], string> = { high: '높음', medium: 
 type Result = { report: Summary; shots: Record<string, string> };
 type State = { kind: 'idle' } | { kind: 'running'; started: number } | { kind: 'error'; message: string } | { kind: 'done'; result: Result };
 
-export function Diagnose({ initialUrl }: { initialUrl: string }) {
+export function Diagnose({ initialUrl, ruleCount }: { initialUrl: string; ruleCount: number }) {
   const [url, setUrl] = useState(initialUrl);
   const [state, setState] = useState<State>({ kind: 'idle' });
   const [elapsed, setElapsed] = useState(0);
@@ -56,10 +57,10 @@ export function Diagnose({ initialUrl }: { initialUrl: string }) {
       <section className="intro" aria-labelledby="intro-title">
         <h1 id="intro-title">이 화면은 얼마나 슬롭일까요</h1>
         <p className="lede">
-          주소를 넣으면 1440 폭과 390 폭으로 페이지를 열고, 규칙 66개 중 잴 수 있는 규칙을 모두 돌립니다. 20초쯤 걸립니다.
+          주소를 넣으면 1440 폭과 390 폭으로 페이지를 열고, 규칙 {ruleCount}개 중 잴 수 있는 규칙을 모두 돌립니다. 20초쯤 걸립니다.
         </p>
         <form className="probe" onSubmit={submit}>
-          <label htmlFor="target">사이트 주소</label>
+          <label htmlFor="target" className="visually-hidden">사이트 주소</label>
           <div className="probe-row">
             <input
               id="target"
@@ -94,7 +95,23 @@ export function Diagnose({ initialUrl }: { initialUrl: string }) {
         </p>
       </section>
 
-      {state.kind === 'done' ? <Report result={state.result} sectionRef={resultRef} /> : null}
+      {state.kind === 'done' ? (
+        <Report result={state.result} sectionRef={resultRef} />
+      ) : (
+        <section className="sample" aria-labelledby="sample-title">
+          <h2 id="sample-title">AI 가 그대로 만든 판과 실제 사이트</h2>
+          <p className="sample-lede">같은 첫 화면입니다. 왼쪽은 AI 가 그대로 만든 판에 걸린 규칙 이름을 붙인 것, 오른쪽은 사람이 다듬은 실제 사이트입니다. 가운데 선을 좌우로 끌어 보세요.</p>
+          <CompareReveal
+            label="AI 가 그대로 만든 판과 실제 사이트 비교"
+            before={{ src: '/compare/before.jpg', alt: 'AI 가 그대로 만든 Prompt Architect 첫 화면. 이모지, 대문자 넓은 자간, 그라디언트 글자, 엠대시, 빛 번짐 버튼, 틴트 알약 배지, 유리 카드에 빨간 이름표' }}
+            after={{ src: '/compare/after.jpg', alt: '사람이 다듬은 Prompt Architect 실제 첫 화면. 흰 글자 제목과 흰 버튼 하나, 입자 구 배경' }}
+          />
+          <div className="sample-captions">
+            <p>AI 가 그대로 만든 판</p>
+            <p>실제 사이트</p>
+          </div>
+        </section>
+      )}
 
       <section className="install" aria-labelledby="install-title">
         <h2 id="install-title">Taster 로 고치기</h2>

@@ -2,7 +2,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
-import { RULES, VIEWPORTS, diagnose, explainRule, extract, formatText } from './diagnose.mjs';
+import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, formatText, viewportFor } from './diagnose.mjs';
 import { brandTheme } from './brand.mjs';
 
 const HELP = `Usage
@@ -18,15 +18,17 @@ Options
   --extract         print the page content (sections, actions, images, brand) for a rebuild
   --brand           read the site's brand (color, typeface, logo) and print a token theme fitted to it
   --widths <list>   viewport widths, default ${VIEWPORTS.map((v) => v.width).join(',')}
+                    'responsive' runs ${RESPONSIVE_WIDTHS.join(',')}
 
 Exit codes: 0 no findings, 1 findings, 2 error`;
 
 function viewportsFrom(list) {
   if (!list) return VIEWPORTS;
+  if (list.trim() === 'responsive') return RESPONSIVE_WIDTHS.map(viewportFor);
   return list.split(',').map((w) => {
     const width = Number(w.trim());
     if (!Number.isInteger(width) || width < 320 || width > 3840) throw new Error(`Bad width: ${w}`);
-    return VIEWPORTS.find((v) => v.width === width) || { width, height: width < 768 ? 844 : 900 };
+    return viewportFor(width);
   });
 }
 
