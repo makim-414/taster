@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // MCP server over stdio. Prompt: start (the opening question). Diagnose tools: diagnose, list_rules, explain_rule.
-// Rebuild tool: extract_content. Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
+// Brand tool: brand_theme. Rebuild tool: extract_content. Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -9,6 +9,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, viewportFor } from './diagnose.mjs';
+import { brandTheme } from './brand.mjs';
 import { getComponent, getPattern, listPatterns, loadTaxonomy, suggestSwaps } from './catalog.mjs';
 
 const server = new McpServer({ name: 'taster', version: '0.1.0' });
@@ -78,6 +79,24 @@ server.registerTool(
       return { content: [json(await extract(target))] };
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: `extract_content failed: ${err.message}` }] };
+    }
+  },
+);
+
+server.registerTool(
+  'brand_theme',
+  {
+    title: "Absorb a site's brand",
+    description:
+      "Open a URL or a local HTML file, read its brand (the solid color on its own buttons and links, its typeface, its logo, light or dark) and return token overrides fitted to it: --brand and the text color on it, --font (kept when it was a real choice, replaced when it is a stock or usual AI default), and success and failure colors moved away from the brand hue. Returns the tokens, a ready :root CSS block to load after registry/src/tokens.css, and notes that say why each choice was made. Use it after diagnosing an existing site and before swapping or rebuilding.",
+    inputSchema: { target: z.string().describe('http(s) URL, file:// URL, or path to a local HTML file') },
+    annotations: { readOnlyHint: true, openWorldHint: true },
+  },
+  async ({ target }) => {
+    try {
+      return { content: [json(brandTheme(await extract(target)))] };
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: `brand_theme failed: ${err.message}` }] };
     }
   },
 );

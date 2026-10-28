@@ -19,8 +19,8 @@ If the label is a category or a tag rather than a state, use plain text or the f
 ## Anatomy
 
 - Text label, 12px, medium weight, neutral ink. The word carries the meaning.
-- Optional 6px flat dot in front of the text. Its color is the only place semantic color appears, and only for real success or real error. Everything else (queued, draft, paused, archived) gets a neutral dot or no dot.
-- Optional thin 1px neutral border and `--r-pill` radius when the label has to read as a separate object in a dense row. The registry `Badge` is this: border, transparent fill, `variant` of `neutral | up | down | warn | info`, and `withDot` to show or hide the dot.
+- Optional 6px flat dot in front of the text. Its color is the only place semantic color appears, and only for real success or real error, taken from the page's own `--success` and `--danger` (or `--delta-up` and `--delta-down`) tokens. A brand theme (`brand_theme`, references/brand.md) fits those to the brand so they never read as brand decoration. The detector accepts a flat, still dot in exactly those colors. Everything else (queued, processing, draft, paused, archived, warnings) gets a neutral dot or no dot.
+- Optional thin 1px neutral border and `--r-pill` radius when the label has to read as a separate object in a dense row. The registry `Badge` is this: border, transparent fill, `variant` of `neutral | up | down | warn | info` (only `up` and `down` color the dot), and `withDot` to show or hide the dot.
 - Fixed height 24px (`h-6`) so a column of labels aligns.
 
 ## Do

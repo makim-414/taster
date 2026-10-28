@@ -23,10 +23,16 @@ Call `extract_content { target }` (or `node engine/cli.mjs <url> --extract`). It
 
 Emoji and pictographs are already removed; they were decoration, not content.
 
-## 3. Decide what stays
+## 3. Absorb the brand
+
+Call `brand_theme { target }` on the original and save its `css` as `theme.css` ([brand.md](brand.md)). It carries
+the brand color and the typeface when they were real choices, and fits success and failure colors to them. Show its
+notes, and confirm the brand color, typeface and logo file with the owner.
+
+## 4. Decide what stays
 
 Keep: every heading, every paragraph that carries a claim or a fact, every action and where it goes, nav and
-footer links, images the owner made or owns, the logo, the brand color when it is a solid color.
+footer links, images the owner made or owns, and the logo. The brand color and typeface are already in `theme.css`.
 
 Drop: decoration the detector flagged (blobs, glows, gradient text, tinted pills, icon tiles, tracking wide
 eyebrows), duplicate calls to action that go to the same place, placeholder copy.
@@ -34,7 +40,7 @@ eyebrows), duplicate calls to action that go to the same place, placeholder copy
 Ask before you change claims. Numbers without a source ("10x faster"), invented testimonials and logo walls are
 the owner's to keep or cut. Flag them in your report; do not silently rewrite or delete them.
 
-## 4. Map sections to uses
+## 5. Map sections to uses
 
 For each section, name the use it serves from `taxonomy.uses` (introduce the product, show how it works, prove
 trust, compare plans, answer doubts, ask for the action ...). Then pick one pattern per use with
@@ -47,17 +53,17 @@ Do not carry icons over either. Sort each one into its slot with `data/patterns/
 explanatory, identity, data marker, no icon) and keep only those whose slot test passes, drawn from one set. The
 logo and partner marks stay as the owner's files.
 
-## 5. Choose where it will live
+## 6. Choose where it will live
 
 Ask once: "Where should the new site live?" If the user has no preference, build:
 
 - a plain HTML and CSS page with `registry/src/tokens.css` for a quick preview they can open, and
 - the same page as React components from the registry when they will keep developing it.
 
-Bring the brand in through tokens only: the brand color becomes the accent token, the logo stays as an image.
-One accent color at most.
+Bring the brand in through tokens only: load `theme.css` after `registry/src/tokens.css`, and keep the logo as the
+owner's file. One accent color at most.
 
-## 6. Check and compare
+## 7. Check and compare
 
 1. Run Diagnose on the rebuild at 1440 and 390. Every measured rule must be at zero. Fix and re run until it is.
 2. Run `extract_content` on the rebuild and compare it with the original: every heading, action label and nav
