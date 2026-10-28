@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { Browser, BrowserContext, BrowserContextOptions, Page } from 'playwright-core';
-import { fencePage, launchBrowser, type Budget } from './browser.ts';
+import { closeBrowser, fencePage, launchBrowser, tmpFree, type Budget } from './browser.ts';
 
 type Viewport = { width: number; height: number };
 type RawRun = { viewport: Viewport; page: { width: number; height: number }; counts: Record<string, number>; findings: unknown[]; screenshot?: string };
@@ -48,6 +48,7 @@ export function loadEngine(): Promise<Engine> {
 // per width. The engine asks for up to 8000px; the result page shows the top of the page.
 const SHOT_HEIGHT: Record<number, number> = { 1440: 3600, 390: 5600 };
 const SHOT_BYTES = 1_400_000;
+const SHOT_TIMEOUT_MS = 12000;
 
 export type Diagnosis = { report: Summary; shots: Record<string, string>; requests: number };
 
@@ -84,10 +85,17 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
       page.screenshot = (async (o: { clip?: { x: number; y: number; width: number; height: number } } = {}) => {
         const cap = SHOT_HEIGHT[width] || 4000;
         const clip = o.clip ? { ...o.clip, width: Math.min(o.clip.width, width * 1.5), height: Math.min(o.clip.height, cap) } : undefined;
-        let buf = await original({ type: 'jpeg', quality: 70, fullPage: true, clip });
-        if (buf.length > SHOT_BYTES && clip) buf = await original({ type: 'jpeg', quality: 45, fullPage: true, clip: { ...clip, height: Math.round(clip.height * 0.6) } });
-        shots[width] = `data:image/jpeg;base64,${buf.toString('base64')}`;
-        return buf;
+        // The findings are already measured when the capture runs, so a page whose renderer will
+        // not paint (heavy WebGL, for one) still gets its report, just without this picture.
+        try {
+          let buf = await original({ type: 'jpeg', quality: 70, fullPage: true, clip, timeout: SHOT_TIMEOUT_MS });
+          if (buf.length > SHOT_BYTES && clip) buf = await original({ type: 'jpeg', quality: 45, fullPage: true, clip: { ...clip, height: Math.round(clip.height * 0.6) }, timeout: SHOT_TIMEOUT_MS });
+          shots[width] = `data:image/jpeg;base64,${buf.toString('base64')}`;
+          return buf;
+        } catch (err) {
+          console.error('diagnose capture skipped', width, String((err as Error).message || err).split('\n')[0].slice(0, 200));
+          return Buffer.alloc(0);
+        }
       }) as Page['screenshot'];
       // Stop the page instead of closing its target; browser.close() cleans up at the end.
       page.close = (async () => {
@@ -108,7 +116,7 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
         try {
           runs.push(await engine.detectOnce(fenced, url, viewport, { screenshot: `shot-${viewport.width}.jpg`, timeout: 15000, maxPerRule: 20 }));
         } catch (err) {
-          console.error('diagnose load failed', safeHostForLog(url), viewport.width, String((err as Error).message || err).split('\n')[0].slice(0, 300));
+          console.error('diagnose load failed', safeHostForLog(url), viewport.width, String((err as Error).message || err).split('\n')[0].slice(0, 300), await tmpFree());
           if (budget.blocked) throw new PageLoadError(budget.blocked);
           throw new PageLoadError(`페이지를 열지 못했습니다. (${String((err as Error).message || err).split('\n')[0].slice(0, 120)})`);
         }
@@ -119,7 +127,7 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
     return { report, shots, requests: budget.requests };
   } finally {
     clearTimeout(timer);
-    await browser.close().catch(() => {});
+    await closeBrowser(browser);
   }
 }
 

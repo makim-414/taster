@@ -3,9 +3,10 @@ import { Noto_Sans_KR } from 'next/font/google';
 import '../../registry/src/tokens.css';
 import '../../registry/src/themes/light.css';
 import './globals.css';
+import { RULE_COUNT } from '../lib/rule-count';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://taster-six.vercel.app';
-const DESCRIPTION = '주소를 넣으면 1440 폭과 390 폭으로 열어, AI 가 만든 화면에서 자주 보이는 흔적 66가지를 실제 브라우저로 잽니다.';
+const DESCRIPTION = `주소를 넣으면 1440 폭과 390 폭으로 열어, AI 가 만든 화면에서 자주 보이는 흔적 ${RULE_COUNT}가지를 실제 브라우저로 잽니다.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
