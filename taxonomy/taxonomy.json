@@ -479,7 +479,7 @@
     }
   ],
   "iconography": {
-    "summary": "Where an icon belongs and what it must look like. Decide the slot first, then whether the slot needs an icon at all, then draw it from the one set. Pattern: icon-placement.",
+    "summary": "Where an icon belongs and what it must look like. Decide the slot first, then whether the slot needs an icon at all, then draw it from the one set. Pattern: icon-placement. Five worked variations per slot are rendered in examples/icon-slots/.",
     "set": {
       "grid": "24 by 24 viewBox, 2px safe margin",
       "style": "One family. Outline only or filled only, never both on one page. Filled is allowed only as the selected state of an outline icon.",
@@ -518,6 +518,38 @@
           "app-bars",
           "command-palette",
           "collapsible-sidebar"
+        ],
+        "variations": [
+          {
+            "id": "icon-only-toolbar",
+            "name": "Icon-only toolbar",
+            "use_when": "Frequent actions on a dense surface, where each glyph is a convention (search, download, share, close).",
+            "shows": "Accessible name on each button, 44px hit area, md size."
+          },
+          {
+            "id": "icon-with-label-button",
+            "name": "Secondary button with icon",
+            "use_when": "Secondary actions next to each other, where the icon helps scanning but the word carries the meaning.",
+            "shows": "sm icon before the verb. The primary action with a clear verb gets no icon."
+          },
+          {
+            "id": "field-affordance",
+            "name": "Search and clear inside a field",
+            "use_when": "A search or filter input.",
+            "shows": "One leading glyph says what the field is, one trailing control clears it."
+          },
+          {
+            "id": "disclosure-chevron",
+            "name": "Disclosure chevron",
+            "use_when": "Rows that expand: accordions, settings groups, tree rows.",
+            "shows": "One chevron, rotated for the open state, at the end of the row."
+          },
+          {
+            "id": "mobile-app-bar",
+            "name": "Mobile app bar",
+            "use_when": "Top bar of a phone screen.",
+            "shows": "Back and more only; the title sits between them as text."
+          }
         ]
       },
       {
@@ -547,6 +579,38 @@
           "real-product-frame",
           "list-item-row",
           "tabbed-product-showcase"
+        ],
+        "variations": [
+          {
+            "id": "number-instead",
+            "name": "A number instead of an icon",
+            "use_when": "Feature or benefit cards whose point is a measurable fact.",
+            "shows": "Label and figure with its unit; the icon slot is gone."
+          },
+          {
+            "id": "numbered-steps",
+            "name": "Numbered steps",
+            "use_when": "A process with an order.",
+            "shows": "An ordered list with the step name in bold; no step icons."
+          },
+          {
+            "id": "product-crop",
+            "name": "Crop of the real product",
+            "use_when": "A section that needs a picture.",
+            "shows": "A small cut of the actual screen or data instead of a symbolic glyph."
+          },
+          {
+            "id": "file-type-list",
+            "name": "File type list",
+            "use_when": "Lists of files, attachments or exports.",
+            "shows": "Keep the icon: it tells the type. sm size, aligned to the first line."
+          },
+          {
+            "id": "reused-category",
+            "name": "Category that repeats as a filter",
+            "use_when": "Category names that also appear in navigation or filters.",
+            "shows": "lg glyph next to the name, the same glyph wherever the category appears."
+          }
         ]
       },
       {
@@ -571,6 +635,38 @@
           "monochrome-logo-strip",
           "avatar-with-fallback",
           "connection-diagram"
+        ],
+        "variations": [
+          {
+            "id": "header-wordmark",
+            "name": "Wordmark in the header",
+            "use_when": "The product logo in the site header.",
+            "shows": "The supplied SVG with outlined text, linked home."
+          },
+          {
+            "id": "monochrome-logo-strip",
+            "name": "Monochrome logo strip",
+            "use_when": "Customer or partner logos as proof.",
+            "shows": "One gray, original proportions, real marks only."
+          },
+          {
+            "id": "integration-list",
+            "name": "Integration list",
+            "use_when": "Connected services and what each one does.",
+            "shows": "The partner's official mark at 24px beside its name and one line."
+          },
+          {
+            "id": "avatar-or-initials",
+            "name": "Photo, then initials",
+            "use_when": "People: authors, members, assignees.",
+            "shows": "The photo when there is one, initials when there is not, a count for the rest."
+          },
+          {
+            "id": "missing-asset-placeholder",
+            "name": "Marked placeholder for a missing file",
+            "use_when": "A logo or mark is needed but the file is not supplied.",
+            "shows": "A dashed slot that names the file to request; never a lookalike."
+          }
         ]
       },
       {
@@ -598,6 +694,38 @@
           "line-area-chart",
           "ranked-bar-chart",
           "neutral-donut"
+        ],
+        "variations": [
+          {
+            "id": "trend-arrow-with-delta",
+            "name": "Trend arrow beside the delta",
+            "use_when": "A KPI with a change since the last period.",
+            "shows": "sm arrow next to the delta, and the direction said in words too."
+          },
+          {
+            "id": "words-in-comparison-table",
+            "name": "Words in a comparison table",
+            "use_when": "Plan or feature comparison.",
+            "shows": "Included, none, or the actual limit; no check discs."
+          },
+          {
+            "id": "status-word-with-shape",
+            "name": "Status word with a supporting shape",
+            "use_when": "Connection, job or sync status.",
+            "shows": "The status is written; a neutral outline glyph supports it. No colored dot."
+          },
+          {
+            "id": "line-style-legend",
+            "name": "Line style legend",
+            "use_when": "A chart with two or more series.",
+            "shows": "Solid and dashed swatches with the series name and value beside them."
+          },
+          {
+            "id": "shape-coded-severity",
+            "name": "Shape coded severity",
+            "use_when": "Issues or alerts ranked by severity.",
+            "shows": "One outline shape per level and the level name in text, readable in grayscale."
+          }
         ]
       },
       {
@@ -621,6 +749,38 @@
           "hairline-accordion-faq",
           "long-form-prose",
           "multi-column-footer"
+        ],
+        "variations": [
+          {
+            "id": "hero-text-only",
+            "name": "Hero in type only",
+            "use_when": "The first screen of a landing page.",
+            "shows": "Headline, one sentence, one action."
+          },
+          {
+            "id": "split-section-header",
+            "name": "Split section header",
+            "use_when": "A section introduction.",
+            "shows": "Title on the left, explanation on the right."
+          },
+          {
+            "id": "plain-faq",
+            "name": "Plain FAQ",
+            "use_when": "Questions and answers.",
+            "shows": "Questions as text with hairlines; no question mark glyphs."
+          },
+          {
+            "id": "prose-and-quote",
+            "name": "Prose with a pull quote",
+            "use_when": "Long form text.",
+            "shows": "Indent and one thin rule for the quote."
+          },
+          {
+            "id": "text-footer",
+            "name": "Text footer",
+            "use_when": "Site footer columns.",
+            "shows": "Column titles and text links; no glyph per column."
+          }
         ]
       }
     ]
