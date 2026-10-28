@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Icon slots: five variations each</title>
+<link rel="stylesheet" href="../../registry/src/tokens.css">
+<link rel="stylesheet" href="../../registry/src/themes/light.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Five worked variations for each icon slot in taxonomy.json (iconography.slots[].variations).
+   Every glyph comes from one set: 24 grid, stroke --icon-stroke, sizes --icon-sm/md/lg, text color.
+   Checked by engine/scripts/check-icon-slots-example.mjs: every variation present, zero findings at 1440 and 390. */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: var(--t-body); line-height: var(--lh-normal); overflow-wrap: anywhere; }
+.board { max-width: 1680px; margin: 0 auto; padding: var(--sp-12) var(--sp-6); }
+.top { display: flex; flex-wrap: wrap; gap: var(--sp-4); justify-content: space-between; align-items: end; padding-bottom: var(--sp-6); border-bottom: 1px solid var(--border); }
+.top h1 { margin: 0; font-size: var(--t-h1); line-height: var(--lh-snug); font-weight: var(--w-semi); }
+.top p { margin: var(--sp-2) 0 0; color: var(--text-muted); }
+.top .set { color: var(--text-muted); text-align: right; }
+.slot { padding: var(--sp-8) 0 var(--sp-6); border-bottom: 1px solid var(--border); }
+.slot > header { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); align-items: baseline; margin-bottom: var(--sp-4); }
+.slot > header h2 { margin: 0; font-size: var(--t-h2); line-height: var(--lh-snug); font-weight: var(--w-semi); }
+.slot > header span { color: var(--text-muted); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); column-gap: var(--sp-8); row-gap: var(--sp-6); }
+@media (min-width: 1400px) { .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.v { border-top: 1px solid var(--text); display: flex; flex-direction: column; min-width: 0; }
+.v .stage { padding: var(--sp-5) 0; min-height: 196px; display: flex; flex-direction: column; justify-content: center; gap: var(--sp-3); }
+.v .cap { padding: var(--sp-3) 0 0; border-top: 1px solid var(--border); }
+.v .cap b { display: block; font-weight: var(--w-semi); }
+.v .cap span { color: var(--text-muted); }
+
+svg.i { width: var(--icon-md); height: var(--icon-md); fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; flex: none; }
+svg.i.sm { width: var(--icon-sm); height: var(--icon-sm); }
+svg.i.lg { width: var(--icon-lg); height: var(--icon-lg); }
+.row { display: flex; align-items: center; gap: var(--sp-2); }
+.lbl { display: inline-flex; align-items: flex-start; gap: var(--sp-2); }
+.lbl > svg { height: 1lh; }
+.muted { color: var(--text-muted); }
+.btn-icon { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-md); color: var(--text); background: none; border: 0; }
+.btn { height: 44px; padding: 0 var(--sp-3); display: inline-flex; align-items: center; gap: var(--sp-2); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); color: var(--text); font: inherit; }
+.field { height: 40px; display: flex; align-items: center; gap: var(--sp-2); padding: 0 var(--sp-2) 0 var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); color: var(--text-muted); }
+.field span { flex: 1; }
+.disc { border-top: 1px solid var(--border); }
+.disc > div { display: flex; justify-content: space-between; align-items: center; padding: var(--sp-2) 0; border-bottom: 1px solid var(--border); }
+.disc .open svg { transform: rotate(180deg); }
+.disc p { margin: 0; padding: var(--sp-2) 0; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+.appbar { display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); padding: 0 var(--sp-1); }
+.appbar b { font-weight: var(--w-semi); }
+
+dl.facts { margin: 0; display: grid; gap: var(--sp-3); }
+dl.facts dt { color: var(--text-muted); }
+dl.facts dd { margin: 0; font-size: var(--t-title); font-weight: var(--w-semi); line-height: var(--lh-snug); }
+ol.steps { margin: 0; padding-left: var(--sp-5); display: grid; gap: var(--sp-2); }
+ol.steps b { font-weight: var(--w-semi); }
+.frame { border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg); padding: var(--sp-2); }
+.frame table { width: 100%; border-collapse: collapse; }
+.frame td { padding: var(--sp-1); border-bottom: 1px solid var(--border-soft); font-variant-numeric: tabular-nums; }
+.frame td:last-child { text-align: right; }
+ul.files, ul.cats { list-style: none; margin: 0; padding: 0; }
+ul.files li { display: flex; align-items: flex-start; gap: var(--sp-2); padding: var(--sp-2) 0; border-bottom: 1px solid var(--border); }
+ul.files small { display: block; color: var(--text-muted); font-size: var(--t-body); }
+ul.cats li { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) 0; }
+ul.cats li span { flex: 1; }
+
+.wordmark { display: inline-flex; align-items: center; min-height: 44px; gap: var(--sp-2); color: var(--text); }
+.strip { display: flex; align-items: center; justify-content: space-between; color: var(--text-subtle); }
+.strip svg { height: 20px; width: auto; }
+ul.integr { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+ul.integr li { display: grid; grid-template-columns: 24px 1fr; gap: var(--sp-3); align-items: start; }
+ul.integr li svg { width: 24px; height: 24px; }
+ul.integr small { display: block; color: var(--text-muted); font-size: var(--t-body); }
+.avatars { display: flex; align-items: center; }
+.av { width: 40px; height: 40px; border-radius: var(--r-pill); border: 2px solid var(--bg-elev); background: var(--bg-sunken); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; font-weight: var(--w-med); margin-left: calc(var(--sp-2) * -1); }
+.av:first-child { margin-left: 0; }
+.av.photo { background: linear-gradient(160deg, var(--text-subtle), var(--text-muted)); }
+.more { margin-left: var(--sp-2); color: var(--text-muted); }
+.ph { height: 48px; border: 1px dashed var(--text-subtle); border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+
+.kpi b { display: block; font-size: var(--t-h1); line-height: var(--lh-tight); font-weight: var(--w-semi); font-variant-numeric: tabular-nums; }
+.kpi .delta { display: inline-flex; align-items: center; gap: var(--sp-1); color: var(--text-muted); }
+table.cmp { width: 100%; border-collapse: collapse; }
+table.cmp th, table.cmp td { padding: var(--sp-2) var(--sp-1); border-bottom: 1px solid var(--border); text-align: left; font-weight: var(--w-reg); }
+table.cmp th { color: var(--text-muted); }
+.state { display: grid; gap: var(--sp-2); }
+.state div { display: flex; align-items: center; gap: var(--sp-2); }
+.legend { display: grid; gap: var(--sp-2); }
+.legend div { display: grid; grid-template-columns: 24px 1fr auto; gap: var(--sp-2); align-items: center; font-variant-numeric: tabular-nums; }
+.legend svg { width: 24px; height: 8px; }
+.sev { display: grid; gap: var(--sp-2); }
+.sev div { display: grid; grid-template-columns: 16px 56px 1fr; gap: var(--sp-2); align-items: center; }
+.sev b { font-weight: var(--w-semi); }
+
+.hero b { display: block; font-size: var(--t-h2); line-height: var(--lh-snug); font-weight: var(--w-semi); }
+.hero p { margin: var(--sp-2) 0 var(--sp-3); color: var(--text-muted); }
+.solid { height: 36px; padding: 0 var(--sp-4); display: inline-flex; align-items: center; border-radius: var(--r-md); background: var(--brand); color: var(--bg); font-weight: var(--w-med); }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.split h3 { margin: 0; font-size: var(--t-title); font-weight: var(--w-semi); line-height: var(--lh-snug); }
+.split p { margin: 0; color: var(--text-muted); }
+.faq div { padding: var(--sp-2) 0; border-bottom: 1px solid var(--border); }
+.faq div:first-child { border-top: 1px solid var(--border); }
+.faq p { margin: var(--sp-1) 0 0; color: var(--text-muted); }
+.prose p { margin: 0 0 var(--sp-2); }
+.prose blockquote { margin: 0; padding-left: var(--sp-3); border-left: 1px solid var(--text-subtle); color: var(--text-muted); }
+.foot { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); }
+.foot b { display: block; margin-bottom: var(--sp-1); font-weight: var(--w-semi); }
+.foot a { display: block; padding: var(--sp-1) 0; color: var(--text-muted); text-decoration: none; }
+/* Touch first: controls are 44px; a wide screen without a coarse pointer can take the compact size. */
+@media (min-width: 1024px) and (not (pointer: coarse)) { .btn { height: 36px; } }
+.end { padding-top: var(--sp-5); display: flex; justify-content: space-between; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></symbol>
+  <symbol id="close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path d="M12 15V4"/><path d="m8 8 4-4 4 4"/><path d="M5 13v6h14v-6"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="more" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01"/></symbol>
+  <symbol id="back" viewBox="0 0 24 24"><path d="M15 18 9 12l6-6"/></symbol>
+  <symbol id="file" viewBox="0 0 24 24"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/></symbol>
+  <symbol id="sheet" viewBox="0 0 24 24"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6M12 10v8"/></symbol>
+  <symbol id="image" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="1"/><path d="m4 16 5-5 4 4 2-2 5 5"/></symbol>
+  <symbol id="inbox" viewBox="0 0 24 24"><path d="M4 13h5l1 3h4l1-3h5"/><path d="M4 13 6 5h12l2 8v6H4z"/></symbol>
+  <symbol id="card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="1"/><path d="M3 10h18"/></symbol>
+  <symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><path d="M4 19c0-3 2-5 5-5s5 2 5 5"/><path d="M16 6a3 3 0 0 1 0 6M17 14c2 .5 3 2 3 5"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M5 13l4 4 10-10"/></symbol>
+  <symbol id="pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
+  <symbol id="tri" viewBox="0 0 24 24"><path d="M12 4 21 20H3z"/></symbol>
+  <symbol id="circ" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></symbol>
+  <symbol id="sq" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/></symbol>
+</svg>
+
+<main class="board">
+  <header class="top">
+    <div>
+      <h1>Icon slots, five variations each</h1>
+      <p>A slot has more than one right answer. Everything below is drawn from one set: 24 grid, stroke 2, 16, 20 and 24px.</p>
+    </div>
+    <div class="set">patterns/icon-placement.md<br>taxonomy.json iconography.slots[].variations</div>
+  </header>
+
+  <!-- control -->
+  <section class="slot" data-slot="control">
+    <header><h2>Control</h2><span>control · the icon is the control, or a convention people scan for</span></header>
+    <div class="grid">
+      <article class="v" data-variation="icon-only-toolbar">
+        <div class="stage"><div class="row">
+          <button class="btn-icon" aria-label="Search"><svg class="i" aria-hidden="true"><use href="#search"/></svg></button>
+          <button class="btn-icon" aria-label="Download"><svg class="i" aria-hidden="true"><use href="#download"/></svg></button>
+          <button class="btn-icon" aria-label="Share"><svg class="i" aria-hidden="true"><use href="#share"/></svg></button>
+          <button class="btn-icon" aria-label="Close"><svg class="i" aria-hidden="true"><use href="#close"/></svg></button>
+        </div></div>
+        <div class="cap"><b>1. Icon-only toolbar</b><span>Accessible name on each button, 44px hit area, md size.</span></div>
+      </article>
+      <article class="v" data-variation="icon-with-label-button">
+        <div class="stage"><div class="row">
+          <button class="btn"><svg class="i sm" aria-hidden="true"><use href="#download"/></svg>Export CSV</button>
+          <button class="btn"><svg class="i sm" aria-hidden="true"><use href="#share"/></svg>Share</button>
+        </div></div>
+        <div class="cap"><b>2. Secondary button with icon</b><span>sm icon before the verb. The primary action with a clear verb gets no icon.</span></div>
+      </article>
+      <article class="v" data-variation="field-affordance">
+        <div class="stage">
+          <div class="field"><svg class="i sm" aria-hidden="true"><use href="#search"/></svg><span>Vendor or invoice number</span><button class="btn-icon" aria-label="Clear"><svg class="i sm" aria-hidden="true"><use href="#close"/></svg></button></div>
+        </div>
+        <div class="cap"><b>3. Search and clear inside a field</b><span>One leading glyph says what the field is, one trailing control clears it.</span></div>
+      </article>
+      <article class="v" data-variation="disclosure-chevron">
+        <div class="stage">
+          <div class="disc">
+            <div class="open"><span>Payment method</span><svg class="i sm" aria-hidden="true"><use href="#chev"/></svg></div>
+            <p>One card, next charge on November 2</p>
+            <div><span>Tax details</span><svg class="i sm" aria-hidden="true"><use href="#chev"/></svg></div>
+          </div>
+        </div>
+        <div class="cap"><b>4. Disclosure chevron</b><span>One chevron, rotated for the open state, at the end of the row.</span></div>
+      </article>
+      <article class="v" data-variation="mobile-app-bar">
+        <div class="stage">
+          <div class="appbar">
+            <button class="btn-icon" aria-label="Back"><svg class="i" aria-hidden="true"><use href="#back"/></svg></button>
+            <b>September close</b>
+            <button class="btn-icon" aria-label="More"><svg class="i" aria-hidden="true"><use href="#more"/></svg></button>
+          </div>
+        </div>
+        <div class="cap"><b>5. Mobile app bar</b><span>Back and more only; the title sits between them as text.</span></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- explanatory -->
+  <section class="slot" data-slot="explanatory">
+    <header><h2>Explanatory</h2><span>explanatory · only when removing it would lose information; usually something else</span></header>
+    <div class="grid">
+      <article class="v" data-variation="number-instead">
+        <div class="stage"><dl class="facts">
+          <div><dt>Time to start</dt><dd>12 minutes median</dd></div>
+          <div><dt>Matched automatically</dt><dd>92% of lines</dd></div>
+        </dl></div>
+        <div class="cap"><b>1. A number instead of an icon</b><span>Label and figure with its unit; the icon slot is gone.</span></div>
+      </article>
+      <article class="v" data-variation="numbered-steps">
+        <div class="stage"><ol class="steps">
+          <li><b>Import</b> the bank export</li>
+          <li><b>Match</b> it against invoices</li>
+          <li><b>Hand over</b> one file to the accountant</li>
+        </ol></div>
+        <div class="cap"><b>2. Numbered steps</b><span>An ordered list with the step name in bold; no step icons.</span></div>
+      </article>
+      <article class="v" data-variation="product-crop">
+        <div class="stage"><div class="frame"><table>
+          <tr><td>September invoices</td><td>214</td></tr>
+          <tr><td>Matched</td><td>197</td></tr>
+          <tr><td>Needs review</td><td>17</td></tr>
+        </table></div></div>
+        <div class="cap"><b>3. Crop of the real product</b><span>A small cut of the actual screen or data instead of a symbolic glyph.</span></div>
+      </article>
+      <article class="v" data-variation="file-type-list">
+        <div class="stage"><ul class="files">
+          <li><svg class="i sm lblicon" aria-hidden="true"><use href="#sheet"/></svg><div>september.csv<small>Spreadsheet, 214 rows</small></div></li>
+          <li><svg class="i sm" aria-hidden="true"><use href="#file"/></svg><div>report.pdf<small>Document, 6 pages</small></div></li>
+          <li><svg class="i sm" aria-hidden="true"><use href="#image"/></svg><div>receipt.jpg<small>Photo, 1 image</small></div></li>
+        </ul></div>
+        <div class="cap"><b>4. File type list</b><span>Keep the icon: it tells the type. sm size, aligned to the first line.</span></div>
+      </article>
+      <article class="v" data-variation="reused-category">
+        <div class="stage"><ul class="cats">
+          <li><svg class="i lg" aria-hidden="true"><use href="#inbox"/></svg><span>Received invoices</span><b>38</b></li>
+          <li><svg class="i lg" aria-hidden="true"><use href="#card"/></svg><span>Card spend</span><b>112</b></li>
+          <li><svg class="i lg" aria-hidden="true"><use href="#users"/></svg><span>Vendors</span><b>24</b></li>
+        </ul></div>
+        <div class="cap"><b>5. Category that repeats as a filter</b><span>lg glyph next to the name, the same glyph wherever the category appears.</span></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- identity -->
+  <section class="slot" data-slot="identity">
+    <header><h2>Identity</h2><span>identity · brands, products and people, always as the original file</span></header>
+    <div class="grid">
+      <article class="v" data-variation="header-wordmark">
+        <div class="stage">
+          <a class="wordmark" href="/" aria-label="Home"><svg width="132" height="28" viewBox="0 0 132 28" aria-hidden="true"><rect x="0" y="2" width="24" height="24" fill="currentColor"/><rect x="32" y="10" width="100" height="8" fill="currentColor"/></svg></a>
+        </div>
+        <div class="cap"><b>1. Wordmark in the header</b><span>The supplied SVG with outlined text, linked home.</span></div>
+      </article>
+      <article class="v" data-variation="monochrome-logo-strip">
+        <div class="stage"><div class="strip">
+          <svg viewBox="0 0 60 20" aria-label="Partner A"><rect y="4" width="12" height="12" fill="currentColor"/><rect x="16" y="7" width="44" height="6" fill="currentColor"/></svg>
+          <svg viewBox="0 0 60 20" aria-label="Partner B"><circle cx="6" cy="10" r="6" fill="currentColor"/><rect x="16" y="7" width="40" height="6" fill="currentColor"/></svg>
+          <svg viewBox="0 0 60 20" aria-label="Partner C"><path d="M0 16 6 4l6 12z" fill="currentColor"/><rect x="16" y="7" width="36" height="6" fill="currentColor"/></svg>
+        </div></div>
+        <div class="cap"><b>2. Monochrome logo strip</b><span>One gray, original proportions, real marks only.</span></div>
+      </article>
+      <article class="v" data-variation="integration-list">
+        <div class="stage"><ul class="integr">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" fill="currentColor"/></svg><div>Partner A<small>Pulls bank lines every day</small></div></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg><div>Partner B<small>Invoices appear as soon as they are sent</small></div></li>
+        </ul></div>
+        <div class="cap"><b>3. Integration list</b><span>The partner's official mark at 24px beside its name and one line.</span></div>
+      </article>
+      <article class="v" data-variation="avatar-or-initials">
+        <div class="stage"><div class="avatars">
+          <span class="av photo" aria-label="Photo of the assignee"></span>
+          <span class="av">MK</span>
+          <span class="av">JL</span>
+          <span class="more">and 3 more</span>
+        </div></div>
+        <div class="cap"><b>4. Photo, then initials</b><span>The photo when there is one, initials when there is not, a count for the rest.</span></div>
+      </article>
+      <article class="v" data-variation="missing-asset-placeholder">
+        <div class="stage"><div class="ph">Logo file needed (logo.svg)</div></div>
+        <div class="cap"><b>5. Marked placeholder for a missing file</b><span>A dashed slot that names the file to request; never a lookalike.</span></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- data marker -->
+  <section class="slot" data-slot="data-marker">
+    <header><h2>Data marker</h2><span>data-marker · next to the value it encodes, never color alone</span></header>
+    <div class="grid">
+      <article class="v" data-variation="trend-arrow-with-delta">
+        <div class="stage"><div class="kpi">
+          <span class="muted">September revenue</span>
+          <b>$428,000</b>
+          <span class="delta"><svg class="i sm" aria-hidden="true"><use href="#up"/></svg>12% more than August</span>
+        </div></div>
+        <div class="cap"><b>1. Trend arrow beside the delta</b><span>sm arrow next to the delta, and the direction said in words too.</span></div>
+      </article>
+      <article class="v" data-variation="words-in-comparison-table">
+        <div class="stage"><table class="cmp">
+          <tr><th>Feature</th><th>Basic</th><th>Team</th></tr>
+          <tr><td>SSO</td><td>None</td><td>Included</td></tr>
+          <tr><td>Audit log</td><td>30 days</td><td>1 year</td></tr>
+        </table></div>
+        <div class="cap"><b>2. Words in a comparison table</b><span>Included, none, or the actual limit; no check discs.</span></div>
+      </article>
+      <article class="v" data-variation="status-word-with-shape">
+        <div class="stage"><div class="state">
+          <div><svg class="i sm" aria-hidden="true"><use href="#check"/></svg>Bank feed: connected</div>
+          <div><svg class="i sm" aria-hidden="true"><use href="#pause"/></svg>Card feed: paused</div>
+        </div></div>
+        <div class="cap"><b>3. Status word with a supporting shape</b><span>The status is written; a neutral outline glyph supports it. No colored dot.</span></div>
+      </article>
+      <article class="v" data-variation="line-style-legend">
+        <div class="stage"><div class="legend">
+          <div><svg viewBox="0 0 24 8" aria-hidden="true"><path d="M0 4h24" stroke="currentColor" stroke-width="2"/></svg><span>This year</span><b>4,280</b></div>
+          <div><svg viewBox="0 0 24 8" aria-hidden="true"><path d="M0 4h24" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/></svg><span>Last year</span><b>3,820</b></div>
+        </div></div>
+        <div class="cap"><b>4. Line style legend</b><span>Solid and dashed swatches with the series name and value beside them.</span></div>
+      </article>
+      <article class="v" data-variation="shape-coded-severity">
+        <div class="stage"><div class="sev">
+          <div><svg class="i sm" aria-hidden="true"><use href="#tri"/></svg><b>High</b><span>2 duplicate payments</span></div>
+          <div><svg class="i sm" aria-hidden="true"><use href="#circ"/></svg><b>Medium</b><span>5 missing receipts</span></div>
+          <div><svg class="i sm" aria-hidden="true"><use href="#sq"/></svg><b>Low</b><span>9 missing notes</span></div>
+        </div></div>
+        <div class="cap"><b>5. Shape coded severity</b><span>One outline shape per level and the level name in text, readable in grayscale.</span></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- no icon -->
+  <section class="slot" data-slot="no-icon">
+    <header><h2>No icon</h2><span>no-icon · headings, copy, questions and footers are carried by type and space</span></header>
+    <div class="grid">
+      <article class="v" data-variation="hero-text-only">
+        <div class="stage"><div class="hero">
+          <b>Close the month in an afternoon</b>
+          <p>Import the bank export, match it to invoices and hand over one file.</p>
+          <span class="solid">Start for free</span>
+        </div></div>
+        <div class="cap"><b>1. Hero in type only</b><span>Headline, one sentence, one action.</span></div>
+      </article>
+      <article class="v" data-variation="split-section-header">
+        <div class="stage"><div class="split">
+          <h3>Rules do the matching, not people</h3>
+          <p>When amount, date and vendor agree, lines are paired automatically.</p>
+        </div></div>
+        <div class="cap"><b>2. Split section header</b><span>Title on the left, explanation on the right.</span></div>
+      </article>
+      <article class="v" data-variation="plain-faq">
+        <div class="stage"><div class="faq">
+          <div>Can my accountant see it?<p>A read only link stays open for 30 days.</p></div>
+          <div>Which banks are supported?</div>
+        </div></div>
+        <div class="cap"><b>3. Plain FAQ</b><span>Questions as text with hairlines; no question mark glyphs.</span></div>
+      </article>
+      <article class="v" data-variation="prose-and-quote">
+        <div class="stage"><div class="prose">
+          <p>Most of a late close was spent looking for receipts.</p>
+          <blockquote>Once the searching stopped, the close took two days less.</blockquote>
+        </div></div>
+        <div class="cap"><b>4. Prose with a pull quote</b><span>Indent and one thin rule for the quote.</span></div>
+      </article>
+      <article class="v" data-variation="text-footer">
+        <div class="stage"><div class="foot">
+          <div><b>Product</b><a href="#p1">Pricing</a><a href="#p2">Integrations</a></div>
+          <div><b>Company</b><a href="#c1">About</a><a href="#c2">Jobs</a></div>
+          <div><b>Help</b><a href="#h1">Docs</a><a href="#h2">Contact</a></div>
+        </div></div>
+        <div class="cap"><b>5. Text footer</b><span>Column titles and text links; no glyph per column.</span></div>
+      </article>
+    </div>
+  </section>
+
+  <div class="end"><span>5 icon slots, 5 variations each</span><span>One set: 24 grid, stroke 2, 16, 20 and 24px, text color</span></div>
+</main>
+</body>
+</html>
