@@ -4,15 +4,30 @@
   --rdp-accent-color: var(--accent);
   --rdp-accent-background-color: var(--bg-elev);
   --rdp-today-color: var(--text);
-  --rdp-day-width: 36px;
-  --rdp-day-height: 36px;
-  --rdp-day_button-width: 32px;
-  --rdp-day_button-height: 32px;
-  --rdp-day_button-border-radius: 8px;
+  --rdp-day-width: var(--control-touch);
+  --rdp-day-height: var(--control-touch);
+  --rdp-day_button-width: var(--control-touch);
+  --rdp-day_button-height: var(--control-touch);
+  --rdp-day_button-border-radius: var(--r-md);
+  --rdp-nav-height: var(--control-touch);
+  --rdp-nav_button-width: var(--control-touch);
+  --rdp-nav_button-height: var(--control-touch);
   --rdp-selected-border: none;
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--t-body);
   margin: 0;
+}
+/* Compact days only on a wide screen without a coarse pointer; touch keeps 44px. */
+@media (min-width: 1024px) and (not (pointer: coarse)) {
+  .rdp-root {
+    --rdp-day-width: var(--control-md);
+    --rdp-day-height: var(--control-md);
+    --rdp-day_button-width: var(--control-sm);
+    --rdp-day_button-height: var(--control-sm);
+    --rdp-nav-height: var(--control-md);
+    --rdp-nav_button-width: var(--control-md);
+    --rdp-nav_button-height: var(--control-md);
+  }
 }
 .rdp-month_caption, .rdp-caption_label { color: var(--text); font-weight: 600; }
 .rdp-weekday { color: var(--text-subtle); font-weight: 500; }

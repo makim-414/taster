@@ -6,7 +6,7 @@ import { cn } from './_cn'
 // Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 const FIELD =
-  'h-9 w-full bg-transparent border border-border-input rounded-md px-3 text-sm text-text ' +
+  'h-11 desk:h-9 w-full bg-transparent border border-border-input rounded-md px-3 text-sm text-text ' +
   'placeholder:text-text-subtle focus-visible:ring-2 focus-visible:ring-ring outline-none ' +
   'disabled:opacity-50 disabled:pointer-events-none'
 

@@ -97,7 +97,7 @@ function AppShellDemo() {
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <Stat label="Active users" value="12,840" delta={{ value: '8.2%', dir: 'up' }} sub="vs last month" />
-          <Stat label="Churn" value="3.1%" delta={{ value: '0.6%', dir: 'down' }} sub="vs last week" />
+          <Stat label="Churn" value="3.1%" delta={{ value: '0.6%p', dir: 'down', neutral: true }} sub="vs last week" />
         </div>
       </AppShell>
     </div>
@@ -113,6 +113,7 @@ function CommandDemo() {
     { id: 'go-audience', kind: 'Go to', label: 'Audience', hint: 'g a', run: () => setLast('Audience') },
     { id: 'new-report', kind: 'Action', label: 'Create report', run: () => setLast('Create report') },
     { id: 'export', kind: 'Action', label: 'Export as CSV', run: () => setLast('Export as CSV') },
+    { id: 'library', kind: 'Go to', label: '라이브러리', hint: 'g l', run: () => setLast('라이브러리') },
   ]
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -453,7 +454,7 @@ export function Sections() {
       <Section id="blocks/kpi" title="Stat / KPI">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Stat label="Monthly active users" value="12,840" delta={{ value: '8.2%', dir: 'up' }} sub="vs last month" />
-          <Stat label="Churn rate" value="3.1%" delta={{ value: '0.6%', dir: 'down' }} sub="vs last week" />
+          <Stat label="Churn rate" value="3.1%" delta={{ value: '0.6%p', dir: 'down', neutral: true }} sub="vs last week" />
           <Stat label="Median response time" value="248ms" sub="last 24 hours" />
         </div>
       </Section>

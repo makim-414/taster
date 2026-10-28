@@ -20,14 +20,14 @@ dt { font-weight: 700; }
 dd { margin: 0; color: #55575a; }
 ul.files { list-style: none; margin: 0; padding: 0; }
 ul.files li { display: flex; align-items: flex-start; gap: 8px; padding: 10px 0; border-bottom: 1px solid #d9d9d6; }
-a.ext { color: #1a1a1a; display: inline-flex; align-items: center; gap: 6px; }
+a.ext { color: #1a1a1a; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
 footer { padding: 32px 48px; border-top: 1px solid #d9d9d6; display: flex; gap: 16px; }
-footer a { color: #1a1a1a; }
+footer a { color: #1a1a1a; display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
 </style>
 </head>
 <body>
   <header>
-    <a href="/" aria-label="Home"><svg width="96" height="24" viewBox="0 0 96 24"><rect width="24" height="24" fill="#1a1a1a"/><rect x="30" y="8" width="60" height="8" fill="#c15f3c"/></svg></a>
+    <a href="/" aria-label="Home" style="display: inline-flex; align-items: center; min-height: 44px"><svg width="96" height="24" viewBox="0 0 96 24"><rect width="24" height="24" fill="#1a1a1a"/><rect x="30" y="8" width="60" height="8" fill="#c15f3c"/></svg></a>
     <div class="toolbar">
       <button aria-label="Search"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></svg></button>
       <button aria-label="Download report"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg></button>
