@@ -5,7 +5,7 @@ category: typography
 uses: [show-one-number, browse-records]
 surfaces: [dashboard, app]
 replaces: [AC-09]
-components: []
+components: [motion/digit-swap]
 inspiration: []
 status: stable
 ---
