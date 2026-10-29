@@ -25,12 +25,21 @@ window.tasterMeasure = function tasterMeasure() {
     return r.width > 0 && r.height > 0;
   }
 
+  // The browser's canvas under a page whose html and body are transparent: white, unless the page asks for a dark
+  // canvas with color-scheme (a transparent background is never read as black).
+  const CANVAS = (() => {
+    const meta = document.querySelector('meta[name="color-scheme"]')?.content || '';
+    const scheme = `${getComputedStyle(document.documentElement).colorScheme || ''} ${meta}`.toLowerCase();
+    const prefersDark = typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches;
+    return /\bdark\b/.test(scheme) && (!/\blight\b/.test(scheme) || prefersDark) ? [18, 18, 18] : [255, 255, 255];
+  })();
+
   // The color behind an element, composited from the root down. null when a gradient or image sits behind it,
   // because then no single background color exists to measure against.
   function backdrop(el) {
     const chain = [];
     for (let e = el; e; e = e.parentElement) chain.push(e);
-    let color = [255, 255, 255];
+    let color = CANVAS.slice();
     for (const e of chain.reverse()) {
       const s = getComputedStyle(e);
       if (s.backgroundImage && s.backgroundImage !== 'none') {
@@ -42,7 +51,7 @@ window.tasterMeasure = function tasterMeasure() {
     }
     return color;
   }
-  const parentBackdrop = (el) => (el.parentElement ? backdrop(el.parentElement) : [255, 255, 255]);
+  const parentBackdrop = (el) => (el.parentElement ? backdrop(el.parentElement) : CANVAS.slice());
 
   const all = [...document.body.querySelectorAll('*')].filter(visible);
   const boxOf = (el) => el.getBoundingClientRect();
@@ -197,7 +206,7 @@ window.tasterMeasure = function tasterMeasure() {
   }
   if (document.getAnimations) motion.animated = Math.max(motion.animated, document.getAnimations().filter((a) => a.constructor.name === 'CSSAnimation').length);
 
-  const pageBg = backdrop(document.body) || [255, 255, 255];
+  const pageBg = backdrop(document.body) || CANVAS.slice();
   return {
     page: { width: vw, height: pageH, background: pageBg.map(Math.round) },
     cards,

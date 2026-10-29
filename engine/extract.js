@@ -87,6 +87,25 @@ window.tasterExtract = function tasterExtract() {
     return [...tally.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null;
   }
 
+  // The color the page is drawn on: body, then html, over the browser's canvas. A fully transparent background is not
+  // black; it shows the canvas, which is white unless the page asks for a dark one with color-scheme.
+  function canvasDefault() {
+    const meta = document.querySelector('meta[name="color-scheme"]')?.content || '';
+    const scheme = `${getComputedStyle(document.documentElement).colorScheme || ''} ${meta}`.toLowerCase();
+    const prefersDark = typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches;
+    const dark = /\bdark\b/.test(scheme) && (!/\blight\b/.test(scheme) || prefersDark);
+    return dark ? { r: 18, g: 18, b: 18, a: 1 } : { r: 255, g: 255, b: 255, a: 1 };
+  }
+  function pageBackground() {
+    let base = canvasDefault();
+    for (const el of [document.documentElement, document.body]) {
+      const p = el && parseColor(getComputedStyle(el).backgroundColor);
+      if (!p || !(p.a > 0)) continue;
+      base = { r: p.r * p.a + base.r * (1 - p.a), g: p.g * p.a + base.g * (1 - p.a), b: p.b * p.a + base.b * (1 - p.a), a: 1 };
+    }
+    return base;
+  }
+
   function family(el) {
     if (!el) return null;
     return getComputedStyle(el).fontFamily.split(',')[0].replace(/["']/g, '').trim();
@@ -198,7 +217,6 @@ window.tasterExtract = function tasterExtract() {
 
   const kept = sections.filter((s) => s.heading || s.text.length || s.actions.length || s.links.length || s.images.length || s.lists.length || s.forms.length);
   const h1 = document.querySelector('h1');
-  const bodyStyle = getComputedStyle(document.body);
   const footerLinks = footer
     ? [...footer.querySelectorAll('a')].filter(visible).map((a) => ({ text: words(textOf(a)), href: abs(a.getAttribute('href')) })).filter((l) => l.text)
     : [];
@@ -214,8 +232,8 @@ window.tasterExtract = function tasterExtract() {
       color: brandColor(actionEls),
       fonts: { heading: family(h1), body: family(document.querySelector('main p, p') || document.body) },
       dark: (() => {
-        const p = parseColor(bodyStyle.backgroundColor);
-        return p ? (0.299 * p.r + 0.587 * p.g + 0.114 * p.b) / 255 < 0.35 : false;
+        const p = pageBackground();
+        return (0.299 * p.r + 0.587 * p.g + 0.114 * p.b) / 255 < 0.35;
       })(),
     },
     nav,

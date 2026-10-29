@@ -7,7 +7,8 @@ import { fileURLToPath } from 'node:url';
 import taxonomy from '../../taxonomy/taxonomy.json' with { type: 'json' };
 import { AXIS_IDS, DEFAULTS, STEPS, balance, validateAxes } from '../../taxonomy/axes.mjs';
 import { brandTheme } from '../brand.mjs';
-import { composeSystem, contrastReport, designSystem, readSystem, systemForCategory, systemTokens, tuneSystem, writeSystem } from '../system.mjs';
+import { launch } from '../diagnose.mjs';
+import { axesFromMeasure, composeSystem, contrastReport, designSystem, readPage, readSystem, systemForCategory, systemTokens, tuneSystem, writeSystem } from '../system.mjs';
 
 const fixture = (name) => fileURLToPath(new URL(`./fixtures/system/${name}.html`, import.meta.url));
 const TOKENS_CSS = readFileSync(new URL('../../registry/src/tokens.css', import.meta.url), 'utf8');
@@ -69,6 +70,22 @@ test('fixtures land on the steps they were built for', { timeout: 120000 }, asyn
   assert.equal(airy.scheme, 'dark');
   assert.equal(airy.tokens['--r-card'], '14px');
   assertValid(airy);
+});
+
+test('scheme: a transparent body is the canvas, white unless color-scheme or html says dark', { timeout: 90000 }, async () => {
+  const browser = await launch();
+  try {
+    const read = async (name) => {
+      const r = await readPage(browser, fixture(name));
+      return { extract: r.content.brand.dark, measure: axesFromMeasure(r.measures).scheme, system: composeSystem({ brand: r }).scheme };
+    };
+    // Negative control: transparent was read as black, so a white docs page came out dark.
+    assert.deepEqual(await read('scheme-transparent'), { extract: false, measure: 'light', system: 'light' });
+    assert.deepEqual(await read('scheme-dark-canvas'), { extract: true, measure: 'dark', system: 'dark' });
+    assert.deepEqual(await read('scheme-html-dark'), { extract: true, measure: 'dark', system: 'dark' });
+  } finally {
+    await browser.close();
+  }
 });
 
 test('the loud fixture breaks constraints and is balanced, quoting each principle', { timeout: 60000 }, async () => {
