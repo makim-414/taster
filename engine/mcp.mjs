@@ -323,11 +323,11 @@ server.registerTool(
   {
     title: 'Record a step',
     description:
-      'Move the screen (or part) in progress one step and save the plan: propose (planned to proposed; may set purpose and parts), revise (the builder asked for changes, back to planned), approve (needs note with the builder\'s own words), build (approved to built; output is the built file or URL), check (built to checked). A check without counts runs diagnose on the output and check_consistency against the checked screens and the system itself, and refuses unless both are zero. Out of order steps are refused with the reason.',
+      'Move the screen (or part) in progress one step and save the plan: propose (planned to proposed; may set purpose and parts), revise (the builder asked for changes, back to planned), approve (needs note with the builder\'s own words), build (approved to built; output is the built file or URL), check (built to checked), accept (records a named exception the builder approved on the screen: rule is a detector rule id such as AC-03, or drift:<role>:<property> / off-system:<role>:<property>; needs reason, and by with the builder\'s own words). A check without counts runs diagnose on the output and check_consistency against the checked screens and the system itself, and refuses unless every remaining finding is an accepted exception (with none accepted, unless both are zero). Accepted exceptions stay in the plan and in every next step. Out of order steps are refused with the reason.',
     inputSchema: {
       plan: z.string().describe('path to taster.plan.json or its folder'),
       event: z.object({
-        type: z.enum(['propose', 'revise', 'approve', 'build', 'check']),
+        type: z.enum(['propose', 'revise', 'approve', 'build', 'check', 'accept']),
         screen: z.string(),
         part: z.string().optional(),
         note: z.string().optional(),
@@ -336,6 +336,10 @@ server.registerTool(
         output: z.string().optional(),
         findings: z.number().int().min(0).optional(),
         drift: z.number().int().min(0).optional(),
+        remaining: z.array(z.string()).optional().describe('check with counts: the findings left, named as accept names them'),
+        rule: z.string().optional().describe('accept: AC-03, drift:<role>:<property> or off-system:<role>:<property>'),
+        reason: z.string().optional().describe('accept: why it cannot be fixed here, for example it needs a markup change'),
+        by: z.string().optional().describe("accept: the builder's own words approving the exception"),
       }),
     },
   },
@@ -345,8 +349,11 @@ server.registerTool(
     let check = null;
     if (event.type === 'check' && (event.findings === undefined || event.drift === undefined)) {
       check = await checkScreen(plan, event.screen, { baseDir: dirname(file) });
-      if (check.findings || check.drift) return { isError: true, content: [json({ refused: `Not clean: ${check.findings} detector findings, ${check.drift} consistency findings. Fix them and check again.`, check })] };
-      event = { ...event, findings: check.findings, drift: check.drift };
+      if ((check.findings || check.drift) && check.unaccepted.length) {
+        const refused = `Not clean: ${check.findings} detector findings, ${check.drift} consistency findings. Not accepted: ${check.unaccepted.join(', ')}. Fix them and check again; when one needs a change outside the builder's control, ask the builder and record { type: "accept", screen, rule, reason, by: "<their words>" }.`;
+        return { isError: true, content: [json({ refused, check })] };
+      }
+      event = { ...event, findings: check.findings, drift: check.drift, remaining: check.remaining };
     }
     const next = applyStep(plan, event);
     writePlan(file, next);
