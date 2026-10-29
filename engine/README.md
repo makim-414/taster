@@ -45,6 +45,14 @@ command = "node"
 args = ["/path/to/taster/engine/mcp.mjs"]
 ```
 
+## Hosted MCP (HTTP)
+
+`server.mjs` builds the MCP server; `mcp.mjs` serves it on stdio and `http.mjs` answers one Streamable HTTP request
+statelessly (`handleMcpRequest(request, { remote })`), so it runs on serverless functions. Hosted mode takes
+`remote.diagnose(url)` from the host instead of opening a local browser and leaves out `extract_content` and
+`brand_theme`. `web/app/api/mcp/route.ts` mounts it at `/api/mcp`, with diagnose going through the same fence as
+`/api/diagnose` (public http(s) only, request budget, per-IP window, one browser at a time).
+
 ## ACP agent
 
 `acp.mjs` serves the same engine to editors over the [Agent Client Protocol](https://agentclientprotocol.com)
