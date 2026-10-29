@@ -9,6 +9,8 @@ const HELP = `Usage
   node engine/cli.mjs <url-or-file> [--out <dir>] [--json] [--widths 1440,390]
   node engine/cli.mjs <url-or-file> --extract [--out <dir>]
   node engine/cli.mjs <url-or-file> --brand [--json] [--out <dir>]
+  node engine/cli.mjs --system [brand url or file] [--ref <url or file> ...] [--axis name=value ...] [--surface id] [--scheme dark|light] --out <dir> [--json]
+  node engine/cli.mjs --tune <dir>/taster.system.json name=value ... [--json]
   node engine/cli.mjs --rules
   node engine/cli.mjs --explain <rule-id>
 
@@ -33,6 +35,8 @@ function viewportsFrom(list) {
 }
 
 async function main() {
+  // Design system: brand and references in, balanced axes and every token out (engine/system.mjs).
+  if (process.argv.includes('--system') || process.argv.includes('--tune')) return (await import('./system.mjs')).runSystemCli(process.argv.slice(2));
   const { values, positionals } = parseArgs({
     allowPositionals: true,
     options: {
