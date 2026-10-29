@@ -188,7 +188,7 @@ server.registerTool(
   'taxonomy',
   {
     title: 'Taxonomy',
-    description: 'Families, categories, uses and surfaces used to organize and filter patterns, plus the icon slot map (iconography): which slots get an icon, which stay empty, and the one-set rules.',
+    description: 'The strict taxonomy: families and categories (each with definition, includes, excludes and examples), the classify decision key over a boolean feature vocabulary, uses, surfaces, the weighting axes with the tokens each drives, snap steps, per-category relevance, design constraints, the rule map and gaps, plus the icon slot map (iconography). See taxonomy/SCHEMA.md.',
     inputSchema: {},
     annotations: readOnly,
   },
