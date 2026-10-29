@@ -51,3 +51,10 @@ the original files, never redrawn. Most feature cards end up with no icon.
 ## 5. Check before you show
 
 Run Diagnose on the result at 1440 and 390, ICO rules included. Show the user the screen together with the clean detector report.
+
+## 6. More screens
+
+A product with more than one screen is built one screen (or one part) at a time, each proposed to the builder and
+built only after their yes, then checked against the system and the screens before it with `check_consistency`.
+Follow [screens.md](screens.md); start the plan with `plan_screens`, or write `taster.plan.json` by hand from the
+screens the builder listed (`source: null`, route `build`).

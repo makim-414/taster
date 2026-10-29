@@ -5,6 +5,10 @@ the user has the address but not the source: a page made in a hosted builder, a 
 code they lost. If the source is in the workspace, use [swap.md](swap.md) instead; a swap keeps their stack and
 history.
 
+A site with more than one page is rebuilt one screen at a time ([screens.md](screens.md)): absorb the brand first,
+plan the screens with `plan_screens`, and take each screen through the steps below only after the builder approved
+its proposal. Steps 5 and 6 are what you propose; step 7 is the check `plan_update` runs.
+
 ## 1. Diagnose the original
 
 Run Diagnose on the address at 1440 and 390 ([diagnose.md](diagnose.md)). Keep the outlined captures; they are
@@ -78,5 +82,12 @@ the owner's file. One accent color at most.
 3. Report: the two captures side by side at each width, the rules cleared, the content kept (for example "14 of 14
    headings and actions kept"), the claims you flagged, and what you could not check.
 
+## 8. The next screen
+
+Record the screen as checked (`plan_update { type: "check" }` runs the diagnose and the consistency check itself),
+show it to the builder, and ask `plan_next` for the next step. Every later screen reuses the components the checked
+screens use, so `check_consistency` against them stays at zero ([screens.md](screens.md)).
+
 The repository has a worked example in `examples/rebuild/` with its own check
-(`node engine/scripts/check-rebuild-example.mjs`).
+(`node engine/scripts/check-rebuild-example.mjs`): the original, the rebuilt home screen, a second screen built from
+the same components, and the finished `taster.plan.json`.

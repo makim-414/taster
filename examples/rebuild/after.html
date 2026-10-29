@@ -9,55 +9,14 @@
 <link rel="stylesheet" href="theme.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-<style>
-  /* Brand color, typeface, meaning colors, spacing, radius, type scale, shadows, motion and borders all come from theme.css. */
-
-  * { box-sizing: border-box; margin: 0; }
-  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: var(--t-title); line-height: var(--lh-normal); }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--sp-6); }
-
-  /* site-header */
-  header { border-bottom: 1px solid var(--border); }
-  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); min-height: 64px; }
-  .name { display: inline-flex; align-items: center; min-height: var(--control-touch, 44px); font-weight: var(--w-semi); font-size: var(--t-title); color: var(--text); text-decoration: none; }
-  nav ul { display: flex; gap: var(--sp-6); list-style: none; padding: 0; }
-  nav a { display: inline-flex; align-items: center; min-height: var(--control-touch, 44px); color: var(--text-muted); text-decoration: none; font-size: var(--t-body); }
-  nav a:hover { color: var(--text); }
-
-  /* hero-headline-lockup: the original has words and no product picture, so the words carry the hero */
-  .hero { padding: var(--sp-16) 0 var(--sp-12); }
-  .kicker { color: var(--text-muted); font-size: var(--t-body); }
-  .note { margin-top: var(--sp-6); color: var(--text-subtle); font-size: var(--t-body); }
-  h1 { margin-top: var(--sp-4); max-width: 18ch; font-size: clamp(var(--t-display), 6vw, 56px); line-height: var(--lh-tight); font-weight: var(--w-semi); letter-spacing: -0.01em; }
-  .lead { margin-top: var(--sp-5); max-width: 56ch; color: var(--text-muted); font-size: var(--t-title); }
-  .actions { margin-top: var(--sp-8); display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-6); }
-  .primary { display: inline-block; padding: var(--sp-3) var(--sp-6); border-radius: var(--r-md); background: var(--accent); color: var(--accent-fg); font-weight: var(--w-med); text-decoration: none; }
-  .text-link { display: inline-flex; align-items: center; min-height: var(--control-touch, 44px); color: var(--text); font-weight: var(--w-med); text-underline-offset: 4px; }
-
-  /* content-matched-grid: three claims, set as rows with hairlines instead of three icon cards */
-  .features { border-top: 1px solid var(--border); padding: var(--sp-12) 0 var(--sp-16); }
-  .features h2 { font-size: var(--t-h2); font-weight: var(--w-semi); line-height: var(--lh-snug); }
-  .rows { margin-top: var(--sp-8); }
-  .row { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr) minmax(0, 2fr); gap: var(--sp-6); padding: var(--sp-6) 0; border-top: 1px solid var(--border); }
-  .row h3 { font-size: var(--t-title); font-weight: var(--w-semi); }
-  .row p { color: var(--text-muted); }
-  .row .state { color: var(--text-subtle); font-size: var(--t-body); text-align: right; }
-
-  footer { border-top: 1px solid var(--border); padding: var(--sp-8) 0; color: var(--text-subtle); font-size: var(--t-body); }
-
-  @media (max-width: 767px) {
-    .hero { padding: var(--sp-12) 0 var(--sp-8); }
-    nav ul { gap: var(--sp-4); }
-    .row { grid-template-columns: minmax(0, 1fr); gap: var(--sp-2); }
-    .row .state { text-align: left; }
-  }
-</style>
+<!-- Every screen shares one stylesheet built only from the tokens above. -->
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
   <header>
     <div class="wrap">
       <a class="name" href="#">Acme Ledger</a>
-      <nav aria-label="Main"><ul><li><a href="#">Product</a></li><li><a href="#">Pricing</a></li><li><a href="#">Docs</a></li></ul></nav>
+      <nav aria-label="Main"><ul><li><a href="#">Product</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="#">Docs</a></li></ul></nav>
     </div>
   </header>
 

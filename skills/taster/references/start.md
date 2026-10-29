@@ -49,3 +49,8 @@ Ask, in one message, for what you do not already know:
 Then make the design system with them ([system.md](system.md)), follow [build.md](build.md) for the screens, and run
 Diagnose on your result before you show it. Missing content stays a
 clearly marked gap; never invent numbers, logos or testimonials.
+
+## More than one screen
+
+On either path, once the brand is settled, list the screens with the builder and go one screen or one part at a
+time: propose, wait for their yes, build, check, then the next. Follow [screens.md](screens.md).
