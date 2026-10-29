@@ -22,6 +22,7 @@
       "fix_patterns": [
         "hairline-data-table",
         "hero-headline-lockup",
+        "in-page-toc",
         "multi-column-footer",
         "plain-headline-and-eyebrow",
         "site-header",
@@ -189,6 +190,7 @@
       },
       "fix": "Plain text in the body color, or a neutral outline. If state matters, put it in words next to the value.",
       "fix_patterns": [
+        "pagination",
         "plan-cards",
         "segmented-control",
         "status-label",
@@ -424,6 +426,7 @@
       "fix_patterns": [
         "callout-and-toast",
         "collapsible-sidebar",
+        "in-page-toc",
         "plain-pull-quote",
         "status-without-side-bar"
       ],
@@ -1676,6 +1679,7 @@
       "fix_patterns": [
         "hairline-data-table",
         "list-item-row",
+        "master-detail-split",
         "single-surface-section",
         "spacing-and-dividers"
       ],
@@ -2708,6 +2712,8 @@
       },
       "fix": "Let the element shrink (min-width: 0 on flex and grid children, max-width: 100% on media), wrap long strings, and put wide tables or code in their own scroll box.",
       "fix_patterns": [
+        "master-detail-split",
+        "pagination",
         "readable-at-every-width"
       ],
       "severity": "high",

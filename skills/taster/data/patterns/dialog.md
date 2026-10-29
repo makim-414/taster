@@ -5,7 +5,7 @@ category: modal-drawer
 uses: [show-details-on-demand]
 surfaces: [app, landing, dashboard]
 replaces: [CMP-04, CMP-05]
-components: [blocks/dialog]
+components: [blocks/dialog, blocks/drawer]
 inspiration: [https://ui.shadcn.com/docs/components/dialog, https://www.radix-ui.com/primitives/docs/components/dialog]
 status: stable
 ---

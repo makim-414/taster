@@ -5,7 +5,7 @@ category: timeline-stepper
 uses: [guide-through-steps, label-a-state]
 surfaces: [dashboard, app, auth-onboarding]
 replaces: [AC-08]
-components: [blocks/progress]
+components: [blocks/progress, blocks/stepper]
 inspiration: []
 status: stable
 ---

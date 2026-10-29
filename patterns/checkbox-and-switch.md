@@ -5,7 +5,7 @@ category: form-input
 uses: [enter-data]
 surfaces: [app]
 replaces: []
-components: [blocks/toggle]
+components: [blocks/toggle, blocks/radio-group, blocks/checkbox-group, blocks/switch-list]
 inspiration: [https://ui.shadcn.com/docs/components/checkbox, https://ui.shadcn.com/docs/components/switch]
 status: stable
 ---

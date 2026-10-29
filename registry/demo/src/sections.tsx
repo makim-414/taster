@@ -59,6 +59,7 @@ import {
   SensitiveInput,
   OrbitIllustration,
 } from '../../src'
+import { AppSections } from './sections-app'
 
 
 // A neutral geometric mark for the glass reveal demo. Not a real brand.
@@ -844,6 +845,7 @@ export function Sections() {
       </Section>
 
 
+      <AppSections />
     </>
   )
 }
