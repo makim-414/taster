@@ -283,7 +283,8 @@
     ],
     "components": [
       "blocks/alert",
-      "blocks/badge"
+      "blocks/badge",
+      "blocks/status-list"
     ],
     "summary": "Severity is told with a text label and a brighter full border, not a thick colored bar on the left edge of the card."
   },
@@ -303,7 +304,8 @@
     ],
     "components": [
       "blocks/card",
-      "blocks/separator"
+      "blocks/separator",
+      "blocks/description-list"
     ],
     "summary": "One container per idea. Inner boxes are removed and groups are separated by spacing and thin dividers."
   },
@@ -364,7 +366,9 @@
       "CMP-02"
     ],
     "components": [
-      "blocks/card"
+      "blocks/card",
+      "blocks/description-list",
+      "blocks/item-list"
     ],
     "summary": "A single-line row with media or icon, title, short description and a trailing action, replacing a stack of boxed cards. Option cards use a stronger border and a check when selected."
   },
@@ -562,7 +566,8 @@
     ],
     "replaces": [],
     "components": [
-      "blocks/input"
+      "blocks/input",
+      "blocks/slider"
     ],
     "summary": "A small calculator that starts from a preset and shows what a plan or order will cost for the entered usage."
   },
@@ -680,7 +685,9 @@
       "RSP-06"
     ],
     "components": [
-      "blocks/button"
+      "blocks/button",
+      "blocks/button-group",
+      "blocks/copy-button"
     ],
     "summary": "Primary actions are a solid fill in the accent token, secondary is an outline, tertiary is plain text. No glow, no gradient, no ghost primary. Grouped actions share one border."
   },
@@ -722,7 +729,8 @@
       "AC-08"
     ],
     "components": [
-      "blocks/badge"
+      "blocks/badge",
+      "blocks/status-list"
     ],
     "summary": "Status as neutral text with an optional small flat dot; semantic color appears only on the dot and only for real error or success."
   },
@@ -763,7 +771,8 @@
     ],
     "components": [
       "blocks/badge",
-      "blocks/toggle"
+      "blocks/toggle",
+      "blocks/filter-chips"
     ],
     "summary": "A scrolling row of chips that filter a list; selected chips invert tone and unselected stay quiet."
   },
@@ -1081,7 +1090,8 @@
       "LAY-06"
     ],
     "components": [
-      "blocks/separator"
+      "blocks/separator",
+      "blocks/settings-section"
     ],
     "summary": "Tight spacing for related items, wider spacing between unrelated groups, taken from a small token scale. Groups are separated by one pixel dividers in a border token rather than nested boxes."
   },
@@ -1163,7 +1173,8 @@
       "COL-08"
     ],
     "components": [
-      "blocks/toggle"
+      "blocks/toggle",
+      "blocks/theme-scope"
     ],
     "summary": "Raw values, roles and component tokens in three layers with one brand variable on top, and both light and dark defined as token sets with a switch. Dark steps by gray levels, not neon glow."
   },
@@ -1202,7 +1213,8 @@
     ],
     "components": [
       "blocks/app-shell",
-      "blocks/dropdown"
+      "blocks/dropdown",
+      "blocks/sidebar-nav"
     ],
     "summary": "Grouped menu with a collapsed icon rail and a drawer on mobile, a workspace switcher on top, one indicator that slides between links. The active item uses a surface tone, not a colored bar or glowing dot."
   },
@@ -1222,7 +1234,8 @@
     "components": [
       "blocks/command-palette",
       "blocks/shortcuts-cheatsheet",
-      "blocks/use-hotkeys"
+      "blocks/use-hotkeys",
+      "blocks/kbd"
     ],
     "summary": "Open with a shortcut, type to filter grouped commands and pages, move with arrows, trap focus inside. A companion sheet lists keyboard shortcuts by area."
   },
@@ -1246,9 +1259,53 @@
     ],
     "components": [
       "blocks/tabs",
-      "blocks/toggle"
+      "blocks/toggle",
+      "blocks/underline-tabs"
     ],
     "summary": "Two to four options in one container where the active option lifts to the surface tone, or text tabs with a thin underline for sibling pages. Includes language switches that show codes. Colored pill tabs are replaced by tone steps."
+  },
+  {
+    "id": "pagination",
+    "name": "Pagination",
+    "category": "tabs-segmented",
+    "uses": [
+      "browse-records",
+      "switch-views"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard",
+      "editorial"
+    ],
+    "replaces": [
+      "AC-04",
+      "RSP-01"
+    ],
+    "components": [
+      "blocks/pagination"
+    ],
+    "summary": "Previous and Next in words, page numbers with gaps and aria-current on the page in view, folding to \"Page 4 of 12\" on phones instead of wrapping."
+  },
+  {
+    "id": "in-page-toc",
+    "name": "On this page",
+    "category": "tabs-segmented",
+    "uses": [
+      "read-long-text",
+      "organize-the-page"
+    ],
+    "surfaces": [
+      "editorial",
+      "app"
+    ],
+    "replaces": [
+      "AC-10",
+      "AC-01"
+    ],
+    "components": [
+      "blocks/page-toc"
+    ],
+    "summary": "Plain anchor links to the sections of a long page with one hairline rail; the section in view gets full ink and aria-current, never a colored bar."
   },
   {
     "id": "step-workflow-section",
@@ -1290,7 +1347,8 @@
       "AC-08"
     ],
     "components": [
-      "blocks/progress"
+      "blocks/progress",
+      "blocks/stepper"
     ],
     "summary": "Passed stages are filled dots, pending are empty rings, below target are faint dots, all in one row. A segmented bar fits signup and install flows."
   },
@@ -1326,7 +1384,9 @@
       "editorial"
     ],
     "replaces": [],
-    "components": [],
+    "components": [
+      "blocks/activity-feed"
+    ],
     "summary": "Dated entries in order with a thin spine, used for roadmaps, change logs and review history."
   },
   {
@@ -1361,7 +1421,9 @@
     "replaces": [],
     "components": [
       "blocks/input",
-      "blocks/button"
+      "blocks/button",
+      "blocks/stepper",
+      "blocks/wizard"
     ],
     "summary": "A short multi-step flow with back, progress and one question per screen, optionally with a spotlight tour that lights one area at a time."
   },
@@ -1384,7 +1446,8 @@
     ],
     "components": [
       "blocks/kpi",
-      "blocks/trend"
+      "blocks/trend",
+      "blocks/stat-strip"
     ],
     "summary": "Label, one large number, a small delta and a caption or comparison line. No icon box or gradient tile; delta uses sign and text, not tinted pills."
   },
@@ -1406,7 +1469,8 @@
       "COL-01"
     ],
     "components": [
-      "blocks/kpi"
+      "blocks/kpi",
+      "blocks/stat-strip"
     ],
     "summary": "Three or four real figures in a row with a source line, hierarchy by ink tone, not gradient. Each figure can open its calculation and source rows."
   },
@@ -1447,7 +1511,8 @@
     "components": [
       "blocks/line",
       "blocks/trend",
-      "blocks/spark"
+      "blocks/spark",
+      "blocks/sparkline-table"
     ],
     "summary": "A hairline series with a low-opacity fill or none, quiet grid, readable tooltip and a period selector. Sparklines drop axes and labels entirely."
   },
@@ -1502,7 +1567,8 @@
       "AC-08"
     ],
     "components": [
-      "blocks/progress"
+      "blocks/progress",
+      "blocks/meter"
     ],
     "summary": "A thin neutral bar or ring that fills to a value, with the figure beside it and threshold markers instead of green and red."
   },
@@ -1542,7 +1608,9 @@
       "CMP-02"
     ],
     "components": [
-      "blocks/table"
+      "blocks/table",
+      "blocks/selectable-table",
+      "blocks/sparkline-table"
     ],
     "summary": "Sentence-case headers, right-aligned tabular figures, hairline row dividers, no zebra stripes or all-caps headers; header and footer stay fixed while the body scrolls."
   },
@@ -1563,7 +1631,8 @@
       "AC-09"
     ],
     "components": [
-      "blocks/datagrid"
+      "blocks/datagrid",
+      "blocks/selectable-table"
     ],
     "summary": "Click-to-sort headers, column chooser, density option, sticky first column, pagination and row drilldown; state can live in the URL. Decision queues add a verdict, stage progress and a next action per row."
   },
@@ -1585,7 +1654,13 @@
       "RSP-06"
     ],
     "components": [
-      "blocks/input"
+      "blocks/input",
+      "blocks/settings-section",
+      "blocks/field",
+      "blocks/textarea",
+      "blocks/slider",
+      "blocks/file-dropzone",
+      "blocks/tag-input"
     ],
     "summary": "A transparent field with a neutral border and a focus ring, label above, hint and inline error text below, in the body typeface. File drop targets follow the same field style. Settings pages use a label column and a value column with a save bar that appears only after a change."
   },
@@ -1604,7 +1679,8 @@
     "components": [
       "blocks/combobox",
       "blocks/datepicker",
-      "blocks/calendar"
+      "blocks/calendar",
+      "blocks/tag-input"
     ],
     "summary": "A searchable select with option descriptions and grouped headers, apply-on-confirm for multi select, and a date picker that opens a calendar popover."
   },
@@ -1620,7 +1696,10 @@
     ],
     "replaces": [],
     "components": [
-      "blocks/toggle"
+      "blocks/toggle",
+      "blocks/radio-group",
+      "blocks/checkbox-group",
+      "blocks/switch-list"
     ],
     "summary": "On state fills with the accent token; labels are part of the control so the whole row is the hit area."
   },
@@ -1640,7 +1719,8 @@
     ],
     "components": [
       "blocks/input",
-      "blocks/button"
+      "blocks/button",
+      "blocks/field"
     ],
     "summary": "One email field and one button when a real list exists, or at most three fields with labels in normal case and one clear submit button. Never on every page ending."
   },
@@ -1657,7 +1737,9 @@
     "replaces": [],
     "components": [
       "blocks/input",
-      "blocks/button"
+      "blocks/button",
+      "blocks/field",
+      "blocks/otp-input"
     ],
     "summary": "Email and password fields with an optional provider button and a strength meter on sign up."
   },
@@ -1677,7 +1759,9 @@
     "replaces": [],
     "components": [
       "blocks/input",
-      "blocks/combobox"
+      "blocks/combobox",
+      "blocks/search-field",
+      "blocks/filter-chips"
     ],
     "summary": "Search with autocomplete or a static index, sort and one primary action in a single row above a list, filters as selects or chips."
   },
@@ -1698,7 +1782,8 @@
       "CMP-05"
     ],
     "components": [
-      "blocks/dialog"
+      "blocks/dialog",
+      "blocks/drawer"
     ],
     "summary": "A centered panel on a dim backdrop with a thin close icon, or a sheet sliding from the edge for row details and a lightbox for media. Blur is allowed here because layers overlap."
   },
@@ -1717,7 +1802,8 @@
     ],
     "components": [
       "blocks/dialog",
-      "blocks/alert"
+      "blocks/alert",
+      "blocks/confirm-dialog"
     ],
     "summary": "Says exactly what disappears and what stays, whether it can be undone, and for irreversible actions asks the name to be typed."
   },
@@ -1774,7 +1860,10 @@
       "COL-06"
     ],
     "components": [
-      "blocks/alert"
+      "blocks/alert",
+      "blocks/toast",
+      "blocks/banner",
+      "blocks/notification-list"
     ],
     "summary": "A neutral surface with a one pixel border; color appears only on a small title or icon slot, never a tinted full-width banner. Toasts carry one follow-up action, pause on hover and can offer undo."
   },
@@ -1795,7 +1884,8 @@
       "CPY-02"
     ],
     "components": [
-      "blocks/skeleton"
+      "blocks/skeleton",
+      "blocks/empty-state"
     ],
     "summary": "One line explaining why it is empty and one action, no big illustration or colored icon circle. In data views the axes, headers and labels stay and only the value cells show a dash."
   },
@@ -1813,7 +1903,8 @@
     "replaces": [],
     "components": [
       "blocks/alert",
-      "blocks/button"
+      "blocks/button",
+      "blocks/empty-state"
     ],
     "summary": "A plain message for failure, missing permission or a locked feature with the reason, what to do and a retry or request button."
   },
@@ -1851,7 +1942,8 @@
       "COL-01"
     ],
     "components": [
-      "blocks/progress"
+      "blocks/progress",
+      "blocks/spinner"
     ],
     "summary": "A thin neutral track with a solid fill, a small outlined ring and plain text for pending work, and a pill above the tab bar for background jobs. No gradient and no orange pill with glow."
   },
@@ -1984,7 +2076,9 @@
       "app"
     ],
     "replaces": [],
-    "components": [],
+    "components": [
+      "blocks/location-map"
+    ],
     "summary": "A map with pins linked to a list; moving the map filters the list, and a world map works as a hero."
   },
   {
@@ -2192,7 +2286,30 @@
       "RSP-04",
       "RSP-05"
     ],
-    "components": [],
+    "components": [
+      "blocks/settings-section"
+    ],
     "summary": "Layout habits that keep text readable from 360px to 1440px (content box columns, shrinkable children, planned narrow forms) and the nine widths to check them at."
+  },
+  {
+    "id": "master-detail-split",
+    "name": "Master detail split",
+    "category": "layout-shell",
+    "uses": [
+      "browse-records",
+      "show-details-on-demand"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-02",
+      "RSP-01"
+    ],
+    "components": [
+      "blocks/master-detail"
+    ],
+    "summary": "A list pane beside a detail pane split by one hairline; below the md breakpoint one pane at a time with a Back button and focus moved to the detail heading."
   }
 ]

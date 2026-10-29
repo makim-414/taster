@@ -3,7 +3,7 @@
 Portable React and TypeScript components with neutral design tokens. There is no package to
 install. You copy the files you need into your app, the same way you would with shadcn/ui.
 
-43 components, MIT licensed. Every entry is listed in `registry.json` with its file, category,
+82 components and one keyboard hook, MIT licensed. Every entry is listed in `registry.json` with its file, category,
 npm dependencies and credit.
 
 ## Copy a component into your app
