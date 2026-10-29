@@ -46,6 +46,7 @@ import {
   Typewriter,
   Icon, IconLabel,
 } from '../../src'
+import { AppSections } from './sections-app'
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -660,6 +661,8 @@ export function Sections() {
       <Section id="motion/typewriter" title="Typewriter">
         <p className="text-h2 font-semibold text-text">Check your <Typewriter words={['landing page', 'dashboard', 'store']} /></p>
       </Section>
+
+      <AppSections />
     </>
   )
 }
