@@ -76,6 +76,12 @@ node engine/cli.mjs add blocks/button blocks/citations --dir src/components/tast
 코드 스캔에 올려 바뀐 파일 위에 표시하며, `fail-on`(기본 high) 이상이면 단계를 실패시킵니다. 코드 스캔이 없으면
 `upload-sarif: 'false'`. 로컬에서는 `node engine/cli.mjs <대상...> --sarif taster.sarif`.
 
+### 보고 있는 페이지 재기 (북마클릿과 확장)
+
+[taster-six.vercel.app/bookmarklet](https://taster-six.vercel.app/bookmarklet) 의 북마클릿을 북마크 막대로 끌어 두고
+아무 페이지에서나 누르면, 걸린 곳에 테두리를 치고 규칙 목록을 띄웁니다. 외부 스크립트를 막는 사이트에서는
+`extension/` 폴더를 크롬이나 엣지에 압축해제 확장으로 불러오세요(`activeTab`, `scripting` 권한만 씁니다).
+
 ### 설치 없이 쓰기 (원격 MCP)
 
 같은 MCP 서버가 `https://taster-six.vercel.app/api/mcp` 에서 돌아갑니다(Streamable HTTP). 원격 MCP 서버로 넣으면

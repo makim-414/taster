@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Taster",
+  "version": "0.1.0",
+  "description": "Outline the habits that make a page look AI generated: 74 rules measured on the page you are viewing.",
+  "action": { "default_title": "Check this page with Taster" },
+  "background": { "service_worker": "background.js" },
+  "permissions": ["activeTab", "scripting"],
+  "homepage_url": "https://github.com/makim-414/taster"
+}
