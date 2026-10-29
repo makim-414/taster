@@ -5,7 +5,7 @@ category: card
 uses: [browse-records]
 surfaces: [app, dashboard]
 replaces: [CMP-02]
-components: [blocks/card]
+components: [blocks/card, blocks/session-list]
 inspiration: []
 status: stable
 ---
