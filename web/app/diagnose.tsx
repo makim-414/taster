@@ -103,7 +103,7 @@ export function Diagnose({ initialUrl, ruleCount }: { initialUrl: string; ruleCo
           <p className="sample-lede">같은 첫 화면입니다. 왼쪽은 AI 가 그대로 만든 판에 걸린 규칙 이름을 붙인 것, 오른쪽은 사람이 다듬은 실제 사이트입니다. 가운데 선을 좌우로 끌어 보세요.</p>
           <CompareReveal
             label="AI 가 그대로 만든 판과 실제 사이트 비교"
-            before={{ src: '/compare/before.jpg', alt: 'AI 가 그대로 만든 한 서비스의 첫 화면. 이모지, 대문자 넓은 자간, 그라디언트 글자, 엠대시, 빛 번짐 버튼, 틴트 알약 배지, 유리 카드에 빨간 이름표' }}
+            before={{ src: '/compare/before.jpg', alt: 'AI 가 그대로 만든 서비스 첫 화면. 이모지, 대문자 넓은 자간, 그라디언트 글자, 엠대시, 빛 번짐 버튼, 틴트 알약 배지, 유리 카드에 빨간 이름표' }}
             after={{ src: '/compare/after.jpg', alt: '사람이 다듬은 같은 서비스의 실제 첫 화면. 흰 글자 제목과 흰 버튼 하나, 입자 구 배경' }}
           />
           <div className="sample-captions">
