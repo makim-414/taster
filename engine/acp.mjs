@@ -114,8 +114,13 @@ export function createAgent() {
         promptCapabilities: { image: false, audio: false, embeddedContext: false },
       },
       agentInfo: { name: 'taster', title: 'Taster', version: VERSION },
-      authMethods: [],
+      // No account: the only setup is a browser for page checks. Clients that support terminal setup can run it
+      // before first use (`taster acp --setup`); nothing ever requires it, and authenticate is a no-op.
+      authMethods: [
+        { id: 'setup', name: 'Set up the browser', description: 'Checks for Chrome or Chromium and downloads Chromium once if neither works.', type: 'terminal', args: ['acp', '--setup'], env: {} },
+      ],
     }))
+    .onRequest(methods.agent.authenticate, () => ({}))
     .onRequest(methods.agent.session.new, ({ params, client }) => {
       const sessionId = randomUUID();
       sessions.set(sessionId, { cwd: params.cwd, turn: null });
