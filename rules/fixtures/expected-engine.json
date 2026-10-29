@@ -45,5 +45,9 @@
   "clean-status.html": [],
   "slop-status.html": [
     "AC-08"
+  ],
+  "clean-editor.html": [],
+  "slop-editor.html": [
+    "AC-09"
   ]
 }
