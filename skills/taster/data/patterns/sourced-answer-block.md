@@ -5,7 +5,7 @@ category: chat-ai
 uses: [ask-the-assistant, prove-trust]
 surfaces: [ai-chat, dashboard]
 replaces: [CMP-06, CPY-01]
-components: [blocks/card, blocks/kpi]
+components: [blocks/card, blocks/kpi, blocks/citations]
 inspiration: []
 status: stable
 ---
