@@ -66,6 +66,31 @@ node engine/cli.mjs https://example.com --brand      # the site's brand as a tok
 
 It uses Playwright's Chromium if installed, otherwise your Google Chrome.
 
+### Use from an editor (ACP)
+
+`engine/acp.mjs` speaks the [Agent Client Protocol](https://agentclientprotocol.com), so editors with an agent
+panel can run Taster directly. It has no model inside: it answers slash commands with the engine's results
+(`/start`, `/diagnose <url or file>`, `/extract <url>`, `/brand <url>`, `/explain <rule id>`, `/rules`, `/help`).
+For swaps and rebuilds, use the skill inside an agent that speaks MCP. Point the editor at
+`engine/start.mjs acp`, which installs the engine's dependencies on first start. In Zed's `settings.json`:
+
+```json
+{
+  "agent_servers": {
+    "Taster": {
+      "type": "custom",
+      "command": "node",
+      "args": ["/path/to/taster/engine/start.mjs", "acp"],
+      "env": {}
+    }
+  }
+}
+```
+
+JetBrains IDEs read the same `agent_servers` shape (without `type`) from `~/.jetbrains/acp.json`; they want the
+full path of the executable, so put the output of `which node` in `command`. Other ACP clients (Neovim, Emacs,
+and more) take the same command and arguments.
+
 Then type `/taster` in Claude Code (or ask your agent to start Taster). It asks whether your site exists or is new
 and takes it from there. You can also ask directly: "Diagnose this site for AI slop", "Rebuild my Lovable site
 without the AI look", or "Build a pricing page for this product without generic AI patterns."
@@ -94,7 +119,7 @@ skills/taster/      the skill (SKILL.md, references, and a generated data/ bundl
 taxonomy/            families, categories, uses, surfaces
 patterns/            one Markdown file per pattern, plus INDEX.json
 rules/               rules.json, detect.js (runs in the page), fixtures and tests
-engine/              runs detect.js at two widths: CLI, MCP server (start prompt, diagnose, extract, swap tools), tests
+engine/              runs detect.js at two widths: CLI, MCP server (start prompt, diagnose, extract, swap tools), ACP agent, tests
 examples/rebuild/    a worked Rebuild, before and after, with its own check
 commands/            the /taster command for Claude Code
 registry/            copyable React components, tokens, a demo page and a render test
