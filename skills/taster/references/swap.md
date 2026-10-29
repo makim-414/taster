@@ -30,3 +30,10 @@ own code, and prove it with a second detector run.
 
 Before and after captures side by side, the list of rules cleared, and anything left with a reason (for example
 "kept the gradient on the logo, it is part of the brand mark").
+
+## More than one screen
+
+Swap one screen at a time ([screens.md](screens.md)), with the route set to `swap` so each screen's output is its
+own source. Propose the swaps for a screen, swap only after the builder's yes, then check it: zero findings, and zero
+drift in `check_consistency` against the screens already swapped and the tokens. Shared components fixed on one
+screen usually fix the next; the consistency check shows where they did not.
