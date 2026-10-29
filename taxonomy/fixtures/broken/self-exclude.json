@@ -1,0 +1,19 @@
+{
+  "expect": "DANGLING",
+  "why": "An exclusion that points back to its own category moves nothing.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "categories",
+        {
+          "id": "hero"
+        },
+        "excludes",
+        0,
+        "goes_to"
+      ],
+      "value": "hero"
+    }
+  ]
+}

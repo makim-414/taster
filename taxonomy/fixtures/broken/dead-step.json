@@ -1,0 +1,24 @@
+{
+  "expect": "DEAD_STEP",
+  "why": "A step that an earlier step always catches can never fire.",
+  "patch": [
+    {
+      "op": "insert",
+      "path": [
+        "classify"
+      ],
+      "after": {
+        "category": "typography"
+      },
+      "value": {
+        "all": [
+          "sets_text",
+          "keeps_a_value"
+        ],
+        "none": [],
+        "category": "form-input",
+        "why": "Shadowed by the typography step above it."
+      }
+    }
+  ]
+}

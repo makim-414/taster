@@ -13,6 +13,10 @@ jobs:
           node-version: 22
       - name: Repository data and skill bundle
         run: node scripts/validate.mjs
+      - name: Strict taxonomy, negative controls and balance sweep
+        run: node scripts/check-taxonomy.mjs
+      - name: Weighting axes
+        run: node --test taxonomy/axes.test.mjs
       - name: Rule schema matches the detector
         run: node engine/scripts/check-rules.mjs
       - name: Registry typecheck

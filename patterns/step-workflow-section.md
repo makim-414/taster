@@ -1,7 +1,7 @@
 ---
 id: step-workflow-section
 name: Step workflow section
-category: timeline-stepper
+category: feature-section
 uses: [guide-through-steps, explain-features]
 surfaces: [landing]
 replaces: [AC-04, COL-07, LAY-03]

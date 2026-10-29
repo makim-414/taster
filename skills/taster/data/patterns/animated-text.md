@@ -1,7 +1,7 @@
 ---
 id: animated-text
 name: Animated text
-category: typography
+category: motion-particle
 uses: [emphasize-text]
 surfaces: [landing]
 replaces: [COL-04, MOT-01, TYP-03]
