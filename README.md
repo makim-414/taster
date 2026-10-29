@@ -101,6 +101,12 @@ It writes the findings to the job summary and as SARIF, uploads the SARIF to cod
 changed files, and fails the step for findings at `fail-on` or worse. Without code scanning, set
 `upload-sarif: 'false'`. The CLI does the same locally: `node engine/cli.mjs <targets...> --sarif taster.sarif`.
 
+### Check the page you are looking at (bookmarklet and extension)
+
+[taster-six.vercel.app/bookmarklet](https://taster-six.vercel.app/bookmarklet) has a bookmarklet: drag it to the
+bookmarks bar and click it on any page to outline the findings and list the rules hit. For sites that block injected
+scripts, load `extension/` as an unpacked extension in Chrome or Edge (it asks only for `activeTab` and `scripting`).
+
 ### Use without installing (hosted MCP)
 
 The same MCP server runs at `https://taster-six.vercel.app/api/mcp` (Streamable HTTP). Add it as a remote MCP

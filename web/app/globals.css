@@ -410,3 +410,24 @@ a {
   color: var(--text);
   text-underline-offset: 3px;
 }
+
+/* /bookmarklet */
+.bookmarklet {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--accent-fg);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: grab;
+}
+.steps {
+  margin: 0;
+  padding-left: var(--sp-5);
+}
+.steps li + li {
+  margin-top: var(--sp-2);
+}

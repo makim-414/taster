@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, SKILL_DATA, readJson, writeJson, loadPatterns, bundleFiles } from './lib.mjs';
 import { renderAll } from '../engine/exports.mjs';
+import { extensionRules } from './lib.mjs';
 
 const patterns = loadPatterns().map((p) => p.data).filter(Boolean);
 const taxonomy = readJson('taxonomy/taxonomy.json');
@@ -72,6 +73,11 @@ for (const [rel, content] of Object.entries(renderAll())) {
   fs.mkdirSync(path.dirname(path.join(ROOT, rel)), { recursive: true });
   fs.writeFileSync(path.join(ROOT, rel), content);
 }
+
+// extension/: the detector and the rule names next to the overlay, so the extension and the bookmarklet
+// (served by web/app/taster) inject the same files.
+fs.copyFileSync(path.join(ROOT, 'rules/detect.js'), path.join(ROOT, 'extension/detect.js'));
+fs.writeFileSync(path.join(ROOT, 'extension/rules.js'), extensionRules(rules.rules));
 
 // Skill bundle
 fs.rmSync(SKILL_DATA, { recursive: true, force: true });
