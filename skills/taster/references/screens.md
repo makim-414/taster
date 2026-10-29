@@ -98,6 +98,14 @@ When the last part is checked, the whole screen is checked once more, against th
   resolves it, so `--r-card: var(--radius)` and `calc()` chains count, and a `var()` the system does not define falls
   through to the page's own custom properties. Zero is always allowed for radius, spacing and duration. Kinds the
   system has no tokens for are listed as not checked.
+- **Identity exemptions.** The logo wordmark is often set in its own face, which is not a system typeface. A system
+  declares it as `identity.logoFont` in `taster.system.json` (the brand intake writes it from the logo it read), or
+  the check takes it as `logoFont` (`--logo-font <family>` on the CLI). Then a font-family in exactly that face,
+  inside the site's logo (the home link or a `logo` class in the header and footer, and the header's first link), is
+  listed under `exempt` with the reason instead of under off system. Nothing else is exempt: the same face on body
+  text, and any other value of the logo, stays a finding. Exempt items are printed in their own section and never
+  dropped; show them to the builder. A theme CSS carries no identity, so point the plan's system at
+  `taster.system.json` (or end the list with it) to carry the exemption into every check.
 - **Tolerances.** Lengths within 0.5px are the same; colors within 0.02 in OKLab and 5 of 255 in alpha are the same;
   durations within 1ms are the same. Any radius at or past half the element's short side draws a full pill, so 999px
   and 9999px count as one. Two color sets within 0.08 in OKLab are the same variant drawn slightly off, which is drift.

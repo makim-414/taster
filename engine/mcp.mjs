@@ -269,16 +269,17 @@ server.registerTool(
   {
     title: 'Check screens against each other and the system',
     description:
-      'Render each screen (URL or local HTML file) at 1440 and 390 wide and read the computed values of every button, input, card, h1 to h3, body text, link and badge: radius, typeface, size, weight, line height, padding, gap, text, fill and border colors, shadow, transition duration. Returns drift (the same component drawn differently on two screens, with selectors and screen ids) and, when a system is given (theme CSS with :root tokens, or { tokens } JSON; a list loads in order), every value that is not one of its tokens with the nearest token. ok is true only with zero findings.',
+      'Render each screen (URL or local HTML file) at 1440 and 390 wide and read the computed values of every button, input, card, h1 to h3, body text, link and badge: radius, typeface, size, weight, line height, padding, gap, text, fill and border colors, shadow, transition duration. Returns drift (the same component drawn differently on two screens, with selectors and screen ids) and, when a system is given (theme CSS with :root tokens, or { tokens } JSON; a list loads in order), every value that is not one of its tokens with the nearest token. A system may declare the logo wordmark\'s own face (identity.logoFont in taster.system.json, or logoFont here): inside the site\'s logo or home link in the header and footer that face is listed under exempt instead of off-system, for font-family only. ok is true only with zero findings.',
     inputSchema: {
       screens: z.array(z.string()).min(1).describe('URLs or HTML file paths, in the order the screens were built'),
       system: systemArg.describe('theme CSS or { tokens } JSON path, or a list such as [tokens.css, theme.css]'),
       widths: z.array(z.number().int().min(320).max(3840)).max(9).optional(),
+      logoFont: z.string().optional().describe("the logo wordmark's own face; exempt inside the logo only, overrides the system's identity.logoFont"),
     },
     annotations: { readOnlyHint: true, openWorldHint: true },
   },
-  guard(async ({ screens, system, widths }) => {
-    const report = await checkConsistency(screens, { system: system ?? null, widths });
+  guard(async ({ screens, system, widths, logoFont }) => {
+    const report = await checkConsistency(screens, { system: system ?? null, identity: logoFont ?? null, widths });
     return { content: [json(report), { type: 'text', text: formatConsistencyText(report) }] };
   }),
 );

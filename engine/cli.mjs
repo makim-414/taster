@@ -13,7 +13,7 @@ const HELP = `Usage
   node engine/cli.mjs <url-or-file> --brand [--json] [--out <dir>]
   node engine/cli.mjs --system [brand url or file] [--ref <url or file> ...] [--axis name=value ...] [--surface id] [--scheme dark|light] --out <dir> [--json]
   node engine/cli.mjs --tune <dir>/taster.system.json name=value ... [--json]
-  node engine/cli.mjs --consistency <screen> <screen> ... [--system <file>]... [--json] [--out <dir>]
+  node engine/cli.mjs --consistency <screen> <screen> ... [--system <file>]... [--logo-font <family>] [--json] [--out <dir>]
   node engine/cli.mjs --plan <url-or-file> --out <dir> [--route rebuild] [--system <file>] [--by-part]
   node engine/cli.mjs --rules
   node engine/cli.mjs --explain <rule-id>
@@ -25,6 +25,8 @@ Options
   --brand           read the site's brand (color, typeface, logo) and print a token theme fitted to it
   --consistency     render each screen at 1440 and 390 and report drift between screens and values off the
                     --system (theme CSS or { tokens } JSON, repeatable: tokens.css then theme.css)
+  --logo-font <f>   the logo wordmark's own face: exempt for font-family inside the logo only, listed as exempt
+                    (taster.system.json can declare it as identity.logoFont)
   --plan            write ${PLAN_FILE} into --out: the start page and the same-site pages its nav links to,
                     one screen at a time (--by-part splits each read page into its sections)
   --widths <list>   viewport widths, default ${VIEWPORTS.map((v) => v.width).join(',')}
@@ -59,6 +61,7 @@ async function main() {
       brand: { type: 'boolean' },
       consistency: { type: 'boolean' },
       system: { type: 'string', multiple: true },
+      'logo-font': { type: 'string' },
       plan: { type: 'boolean' },
       route: { type: 'string' },
       'by-part': { type: 'boolean' },
@@ -81,7 +84,7 @@ async function main() {
     return 0;
   }
   if (values.consistency) {
-    const report = await checkConsistency(positionals, { system: values.system || null, widths: values.widths ? viewportsFrom(values.widths).map((v) => v.width) : undefined });
+    const report = await checkConsistency(positionals, { system: values.system || null, identity: values['logo-font'] || null, widths: values.widths ? viewportsFrom(values.widths).map((v) => v.width) : undefined });
     if (values.out) {
       mkdirSync(values.out, { recursive: true });
       writeFileSync(join(values.out, 'consistency.json'), `${JSON.stringify(report, null, 2)}\n`);
