@@ -9,24 +9,22 @@ Write down, before any code: the product in one sentence, who the screen is for,
 If content is missing, ask for it or leave a clearly marked gap. Never invent numbers or testimonials.
 
 Then the brand ([brand.md](brand.md)): their color, typeface and logo file, absorbed with `brand_theme` from any page
-they already have, or the Taster defaults if they have none. Save the theme as `theme.css` and load it after the
-tokens.
+they already have, or the Taster defaults if they have none. Ask for one or two reference pages whose tone they like.
 
-## 2. List the uses in order
+## 2. Make the design system with the builder
+
+Follow [system.md](system.md). Call `design_system { brand, references, axes, surface, out }`: the brand gives the
+identity, the references give the tone, and anything the builder already said goes in `axes`. Propose the eight
+axes (density, contrast, roundness, type-expression, color-restraint, elevation, motion, stroke) by their step names
+from `snap`, never as free numbers. When the builder moves one, call `tune_system`: it keeps that axis where it was
+put, moves the others the least needed to satisfy every `constraint`, and says which moved, quoting the principle.
+Tell the builder. Save `taster.system.json` and `theme.css`; every screen loads `theme.css` after the tokens.
+
+## 2b. List the uses in order
 
 Read the `uses` in the taxonomy and pick the ones this screen must serve, in reading order. A landing page is
 usually: introduce the product, show how it works, prove trust, compare plans, answer doubts, ask for the action.
 A dashboard is usually: show one number, show a trend, compare items, act on a row.
-
-## 2b. Set the weights
-
-Agree the tone with the builder on the `axes` in `data/taxonomy.json`: density, contrast, roundness,
-type-expression, color-restraint, elevation, motion and stroke. Start from each axis `default`, or from the brand theme
-if one was absorbed. Each axis only takes the values in `snap`; offer the step names, never a free number. When the
-builder moves one axis, run `balance(settings, axis)` from `data/axes.mjs`: it keeps that axis where it was put and
-moves the others the least amount needed to satisfy every `constraint`. Tell the builder which other axes moved and
-quote the constraint's `principle`. The `drives` list of each axis names the tokens in `registry/src/tokens.css` that
-the setting changes; `relevance` says which axes matter most for the categories this screen uses.
 
 ## 3. Pick one pattern per use
 
@@ -35,7 +33,9 @@ registry components. Read each pattern's "Do" and "Don't" before you write the s
 
 ## 4. Compose
 
-- Tokens first (`registry/src/tokens.css` or the user's tokens), then layout, then components, then copy.
+- Tokens first (`registry/src/tokens.css`, then the system's `theme.css`), then layout, then components, then copy.
+- Each part reads the alias tokens only. `system_for_category { system, category }` lists, per part, the axes that
+  matter most and the tokens they drive.
 - One accent color at most. Neutral surfaces. Hierarchy from size, weight and space, not from color.
 - Vary section layouts; three equal cards with icons in a row is a rule violation, not a default.
 

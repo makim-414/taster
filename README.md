@@ -33,6 +33,23 @@ The answer picks the route. Every route also absorbs the brand: the site's own c
 widths, every heading, action and nav item kept, brand color kept). `node engine/scripts/check-rebuild-example.mjs`
 proves it.
 
+## Design system
+
+Before any screen, Taster turns the brand and the builder's intent into one design system. Give it the brand site and
+one or two pages whose tone you like. It measures them in a real browser (radii, spacing and control heights, text
+contrast, type scale, hues, shadows, motion, borders), places each of the eight axes on a named step, and balances
+them against design principles written as constraints, so nothing sits in an ambiguous middle. Move a weight and the
+others follow the least needed, with the principle that moved them quoted. The result is `taster.system.json` and a
+`theme.css` with every token the axes drive, the brand inside, and text at WCAG AA. Every screen and part loads it.
+
+```bash
+node engine/cli.mjs --system https://your-site.example --ref ./a-page-you-like.html --out system
+node engine/cli.mjs --tune system/taster.system.json roundness=1
+```
+
+MCP tools: `design_system`, `tune_system`, `system_for_category`. How each measurement maps to a step and each step
+to tokens: `skills/taster/references/system.md`.
+
 ## Install
 
 Any agent that supports skills:

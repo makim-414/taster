@@ -1,6 +1,6 @@
 ---
 name: taster
-description: Find and remove AI slop in frontends. Starts by asking whether the site already exists or is being built new. Use when the user wants to check whether a site or screen looks AI generated, review a UI for generic patterns, replace slop with better components, rebuild an existing site they only have the address for, or design and build a landing page, dashboard, app screen, store or editorial page that does not look generated. Triggers on "is my site slop", "does this look AI made", "de-slop", "make this less generic", "review this UI", "redesign this section", "rebuild my site", "redo my Lovable site", "build a landing page", "build a dashboard".
+description: Find and remove AI slop in frontends. Starts by asking whether the site already exists or is being built new. Use when the user wants to check whether a site or screen looks AI generated, review a UI for generic patterns, replace slop with better components, rebuild an existing site they only have the address for, turn a brand and reference pages into a balanced design system, or design and build a landing page, dashboard, app screen, store or editorial page that does not look generated. Triggers on "is my site slop", "does this look AI made", "de-slop", "make this less generic", "review this UI", "redesign this section", "rebuild my site", "make a design system", "redo my Lovable site", "build a landing page", "build a dashboard".
 ---
 
 # Taster
@@ -15,17 +15,22 @@ Before anything else, ask the user, in their language:
 and then name the path you are taking in one line. The full opening, including how to tell whether you have the
 source, is in [references/start.md](references/start.md).
 
+Every route runs in the same order: Diagnose (an existing site only), then Brand and references, then the design
+System made with the builder, then the Screens, each rebuilt from parts that fit its purpose and all wearing that
+system.
+
 | Answer | Then | Job |
 |---|---|---|
-| Already exists, source code is in the workspace | Diagnose, absorb the brand, then replace each spot in their code | Diagnose + Brand + Swap |
-| Already exists, only the address (hosted builder, lost source) | Diagnose, absorb the brand, read its content, rebuild it clean | Diagnose + Brand + Rebuild |
-| New | Ask for product, audience, kind of screen, real content, brand | Brand + Build |
+| Already exists, source code is in the workspace | Diagnose, absorb the brand, make the system, then replace each spot in their code | Diagnose + Brand + System + Swap |
+| Already exists, only the address (hosted builder, lost source) | Diagnose, absorb the brand, make the system, read its content, rebuild it clean | Diagnose + Brand + System + Rebuild |
+| New | Ask for product, audience, kind of screen, real content, brand, references | Brand + System + Build |
 
 | Job | Input | Output |
 |---|---|---|
 | Diagnose | a URL, a running dev server, or a screenshot | every slop spot, marked on a capture, with the rule it breaks and the pattern that fixes it |
 | Swap | a diagnosed page plus its source code | the same page with each spot replaced, re checked until clean |
-| Brand | the original site, or the owner's color, typeface and logo | a `theme.css` of token overrides (brand color, typeface, success and failure colors fitted to the brand) that every route wears |
+| Brand | the original site, or the owner's color, typeface and logo | the identity: brand color, typeface, logo, and success and failure colors fitted to the brand |
+| System | the brand, one or two reference pages, and what the builder says | `taster.system.json` and `theme.css`: the eight weighting axes balanced with the builder and every token they drive, brand inside, text at AA; every route wears it |
 | Rebuild | a diagnosed page with no editable source | the same content on a new page made from patterns, checked clean, shown next to the original |
 | Build | a product, an audience and a surface | a new screen composed only from taxonomy patterns, checked before you hand it over |
 
@@ -43,6 +48,9 @@ Prefer its tools; they run the same detector in a real browser for you.
 - The `start` prompt asks the opening question for you.
 - `diagnose { target }`: findings grouped by rule plus one outlined capture per width (1440 and 390).
 - `brand_theme { target }`: the site's brand absorbed into token overrides and a ready `:root` block, with a note per choice.
+- `design_system { brand, references, axes, out }`: brand plus references measured into one balanced design system, with a note per axis saying where it came from and what balance moved.
+- `tune_system { system, axes }`: the builder moves a weight; the others rebalance and the reply quotes the principle.
+- `system_for_category { system, category }`: the axes that matter for one kind of part, with the tokens they drive.
 - `extract_content { target }`: the page's content in reading order (sections, actions, images, nav, footer, brand color and fonts), for Rebuild.
 - `suggest_swaps { ruleIds }`: the fix patterns and registry components for each rule found.
 - `get_pattern { id }` and `get_component { id }`: the swap recipe and copyable code with its tokens.
@@ -67,19 +75,26 @@ Follow [references/swap.md](references/swap.md). For each finding, open the fix 
 ## Brand
 
 Follow [references/brand.md](references/brand.md). Absorb the brand from the original with `brand_theme`, or ask for it
-on a new site. Save the CSS as `theme.css` after the tokens, show the notes, and confirm color, typeface and logo with the
-owner. Status dots for real outcomes use the theme's `--success` and `--danger`, flat and still.
+on a new site. Show the notes and confirm color, typeface and logo with the owner; the System step carries it into
+`theme.css`. Status dots for real outcomes use the theme's `--success` and `--danger`, flat and still.
+
+## System
+
+Follow [references/system.md](references/system.md). After the brand, ask for one or two reference pages whose tone
+the builder likes, then call `design_system`. Propose the eight axes by step name with the evidence, let the builder
+move weights with `tune_system`, and say what balance moved and why. Save `taster.system.json` and `theme.css`; every
+screen and part loads `theme.css` after the tokens and reads the alias tokens only.
 
 ## Rebuild
 
-Follow [references/rebuild.md](references/rebuild.md). Diagnose the original, read its content with
-`extract_content`, keep every heading, claim, action and owned image, map each section to a use and a pattern,
+Follow [references/rebuild.md](references/rebuild.md). Diagnose the original, make the system from it, read its
+content with `extract_content`, keep every heading, claim, action and owned image, map each section to a use and a pattern,
 build it on tokens, then check the rebuild: zero measured findings at both widths and every original heading and
 action still present. Flag unsourced numbers and testimonials to the user instead of rewriting them.
 
 ## Build
 
-Follow [references/build.md](references/build.md). Choose the surface, list the uses the screen must serve in order, pick one pattern per use from the taxonomy, set the weighting axes with the builder and balance them, then compose. Run Diagnose on your own result before you show it.
+Follow [references/build.md](references/build.md). Choose the surface, list the uses the screen must serve in order, make the design system with the builder, pick one pattern per use from the taxonomy, then compose on the system's tokens. Run Diagnose on your own result before you show it.
 
 ## Icons
 
@@ -90,7 +105,7 @@ identity slot and stay as the original files.
 
 ## Always
 
-- Tokens only for color, spacing, radius and type. Start from `registry/src/tokens.css` or the user's existing tokens.
+- Tokens only for color, spacing, radius and type. Start from `registry/src/tokens.css` and the system's `theme.css`, or the user's existing tokens.
 - Sentence case labels. No all caps with wide letter spacing (navigation labels are the one exception).
 - Icons only where their slot needs one, from one set at one stroke weight. No emoji as icons or bullets, no long dashes in UI copy, no tinted pill badges, no thick colored left borders on cards, no purple gradient text, no glow on everything. The full list is the rules file; these are the ones people notice first.
 - Real content beats placeholder: real product names, real numbers with a source, real images the user owns.
