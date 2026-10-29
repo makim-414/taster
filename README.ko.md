@@ -70,6 +70,12 @@ node engine/cli.mjs add blocks/button blocks/citations --dir src/components/tast
 뽑아 두었습니다(`rules/rules.json` 에서 생성). `node engine/cli.mjs export all --dir <내 앱>` 은 각 도구가 읽는 자리에
 파일을 넣고, 같이 쓰는 파일에서는 내 글을 그대로 둡니다. 자세한 내용은 `exports/README.md`.
 
+### PR 검사 (GitHub Action)
+
+`uses: makim-414/taster@main` 에 `targets`(파일 경로나 주소, 한 줄에 하나)를 주면 결과를 작업 요약과 SARIF 로 남기고,
+코드 스캔에 올려 바뀐 파일 위에 표시하며, `fail-on`(기본 high) 이상이면 단계를 실패시킵니다. 코드 스캔이 없으면
+`upload-sarif: 'false'`. 로컬에서는 `node engine/cli.mjs <대상...> --sarif taster.sarif`.
+
 ### 설치 없이 쓰기 (원격 MCP)
 
 같은 MCP 서버가 `https://taster-six.vercel.app/api/mcp` 에서 돌아갑니다(Streamable HTTP). 원격 MCP 서버로 넣으면

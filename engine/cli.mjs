@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, formatText, viewportFor } from './diagnose.mjs';
 import { brandTheme } from './brand.mjs';
 
 const HELP = `Usage
-  node engine/cli.mjs <url-or-file> [--out <dir>] [--json] [--widths 1440,390]
+  node engine/cli.mjs <url-or-file>... [--out <dir>] [--json] [--widths 1440,390] [--sarif <file>] [--summary <file>] [--fail-on <level>]
   node engine/cli.mjs <url-or-file> --extract [--out <dir>]
   node engine/cli.mjs <url-or-file> --brand [--json] [--out <dir>]
   node engine/cli.mjs --rules
@@ -20,6 +20,9 @@ Options
   --json            print the report as JSON
   --extract         print the page content (sections, actions, images, brand) for a rebuild
   --brand           read the site's brand (color, typeface, logo) and print a token theme fitted to it
+  --sarif <file>    also write the findings as SARIF 2.1.0 (GitHub code scanning)
+  --summary <file>  also append a Markdown table (for $GITHUB_STEP_SUMMARY)
+  --fail-on <level> exit 1 only for findings at this severity or above: high, medium, low (default) or none
   --widths <list>   viewport widths, default ${VIEWPORTS.map((v) => v.width).join(',')}
                     'responsive' runs ${RESPONSIVE_WIDTHS.join(',')}
 
@@ -93,6 +96,9 @@ async function main() {
       explain: { type: 'string' },
       extract: { type: 'boolean' },
       brand: { type: 'boolean' },
+      sarif: { type: 'string' },
+      summary: { type: 'string' },
+      'fail-on': { type: 'string' },
       help: { type: 'boolean', short: 'h' },
     },
   });
@@ -111,9 +117,26 @@ async function main() {
     console.log(values.json ? JSON.stringify(r, null, 2) : `${r.id}  ${r.name}  [${r.severity}, ${r.detect.level}]\n\nWhat: ${r.what}\nWhy: ${r.why}\nHow it is found: ${r.detect.signal}\nFix: ${r.fix}`);
     return 0;
   }
-  if (positionals.length !== 1) {
+  const many = positionals.length > 1;
+  if (!positionals.length || (many && (values.brand || values.extract || values.out))) {
     console.error(HELP);
     return 2;
+  }
+  if (values.sarif || values.summary || many) {
+    const failOn = values['fail-on'] || 'low';
+    const ranks = { high: 3, medium: 2, low: 1, none: 99 };
+    if (!ranks[failOn]) throw new Error(`Bad --fail-on: ${failOn}`);
+    const { toSarif, toSummary } = await import('./sarif.mjs');
+    const reports = [];
+    for (const target of positionals) {
+      const report = await diagnose(target, { viewports: viewportsFrom(values.widths), outDir: null });
+      reports.push(report);
+      console.log(values.json ? JSON.stringify(report, null, 2) : formatText(report));
+    }
+    if (values.sarif) writeFileSync(values.sarif, `${JSON.stringify(toSarif(reports), null, 2)}\n`);
+    if (values.summary) appendFileSync(values.summary, `${toSummary(reports)}\n`);
+    const worst = Math.max(0, ...reports.flatMap((r) => r.rules.map((h) => ranks[h.severity] || 0)));
+    return worst >= ranks[failOn] ? 1 : 0;
   }
 
   if (values.out) mkdirSync(values.out, { recursive: true });
