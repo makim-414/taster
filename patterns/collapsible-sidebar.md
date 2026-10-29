@@ -5,7 +5,7 @@ category: sidebar
 uses: [navigate-the-app]
 surfaces: [app, dashboard]
 replaces: [AC-10, COL-06]
-components: [blocks/app-shell, blocks/dropdown]
+components: [blocks/app-shell, blocks/dropdown, blocks/tree-view]
 inspiration: [https://ui.shadcn.com/docs/components/sidebar]
 status: stable
 ---

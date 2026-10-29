@@ -5,7 +5,7 @@ category: chat-ai
 uses: [ask-the-assistant]
 surfaces: [ai-chat]
 replaces: []
-components: [blocks/input, blocks/button]
+components: [blocks/input, blocks/button, blocks/citations]
 inspiration: []
 status: stable
 ---

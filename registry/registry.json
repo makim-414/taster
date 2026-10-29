@@ -606,6 +606,155 @@
       "deps": [],
       "license": "MIT",
       "credit": null
+    },
+    {
+      "id": "motion/glass-logo-reveal",
+      "file": "src/motion/glass-logo-reveal.tsx",
+      "category": "motion-particle",
+      "patterns": [
+        "logo-draw-splash"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Liquid Glass Logo Reveal by shepovalovdenis, MIT as listed, https://21st.dev/@shepovalovdenis/components/liquid-glass-logo-reveal; shader and timeline from zanwei/glass-icon-reveal, MIT, https://github.com/zanwei/glass-icon-reveal"
+    },
+    {
+      "id": "motion/mesh-drift",
+      "file": "src/motion/mesh-drift.tsx",
+      "category": "motion-particle",
+      "patterns": [
+        "ambient-background"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "DARK MONO from the 21st.dev Shader Builder, MIT as listed, https://21st.dev/@admin_5eaa986a/components/dark-mono"
+    },
+    {
+      "id": "motion/digit-swap",
+      "file": "src/motion/digit-swap.tsx",
+      "category": "motion-particle",
+      "patterns": [
+        "count-up-number",
+        "tabular-number-text"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "beUI Number (DigitSwap) by Saurabh Chauhan, MIT, https://beui.dev/components/motion/number"
+    },
+    {
+      "id": "blocks/liquid-nav",
+      "file": "src/blocks/liquid-nav.tsx",
+      "category": "nav-header",
+      "patterns": [
+        "site-header"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Liquid Glass Navbar (Nimbus UI) by gughigug, guglielmogiannattasio.it, MIT as listed, https://21st.dev/@gughigug/components/liquid-glass-navbar"
+    },
+    {
+      "id": "blocks/glass-folder",
+      "file": "src/blocks/glass-folder.tsx",
+      "category": "card",
+      "patterns": [
+        "media-tile-card"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Glassmorphism Folder Cards by kedhareswer, MIT as listed, https://21st.dev/@kedhareswer/components/glass-folder-cards"
+    },
+    {
+      "id": "blocks/side-folder",
+      "file": "src/blocks/side-folder.tsx",
+      "category": "card",
+      "patterns": [
+        "media-tile-card"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Written for this registry; idea from a 21st.dev Side Folder whose source could not be traced (no code taken)"
+    },
+    {
+      "id": "blocks/coverflow-carousel",
+      "file": "src/blocks/coverflow-carousel.tsx",
+      "category": "media-gallery",
+      "patterns": [
+        "focus-card-carousel"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Glassy Coverflow Carousel by troyjlorents-gh, MIT as listed, https://21st.dev/@troyjlorents-gh/components/glassy-coverflow-carousel"
+    },
+    {
+      "id": "blocks/select-menu",
+      "file": "src/blocks/select-menu.tsx",
+      "category": "form-input",
+      "patterns": [
+        "select-and-combobox"
+      ],
+      "deps": [
+        "@radix-ui/react-select"
+      ],
+      "license": "MIT",
+      "credit": "oyna-ui OSelect by azabroflovski, MIT, https://github.com/azabroflovski/oyna-ui"
+    },
+    {
+      "id": "blocks/citations",
+      "file": "src/blocks/citations.tsx",
+      "category": "chat-ai",
+      "patterns": [
+        "agent-chat-thread",
+        "sourced-answer-block"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "beUI Citations by Saurabh Chauhan, MIT, https://beui.dev/components/agents/citations"
+    },
+    {
+      "id": "blocks/tree-view",
+      "file": "src/blocks/tree-view.tsx",
+      "category": "sidebar",
+      "patterns": [
+        "collapsible-sidebar"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Written for this registry; API shape from a 21st.dev tree view whose source could not be traced (no code taken)"
+    },
+    {
+      "id": "blocks/session-list",
+      "file": "src/blocks/session-list.tsx",
+      "category": "table",
+      "patterns": [
+        "list-item-row"
+      ],
+      "deps": [
+        "blocks/button"
+      ],
+      "license": "MIT",
+      "credit": "Written for this registry; idea from a 21st.dev session list (no code taken)"
+    },
+    {
+      "id": "blocks/sensitive-input",
+      "file": "src/blocks/sensitive-input.tsx",
+      "category": "form-input",
+      "patterns": [
+        "text-input-field"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Written for this registry; compound API idea from a 21st.dev sensitive input (no code taken)"
+    },
+    {
+      "id": "blocks/orbit-illustration",
+      "file": "src/blocks/orbit-illustration.tsx",
+      "category": "card",
+      "patterns": [
+        "media-tile-card"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Written for this registry; idea from a 21st.dev Enrichment Orbit whose source could not be traced (no code taken)"
     }
   ]
 }

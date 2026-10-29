@@ -5,7 +5,7 @@ category: loader-skeleton
 uses: [show-progress, set-the-mood]
 surfaces: [landing]
 replaces: [MOT-01]
-components: []
+components: [motion/glass-logo-reveal]
 inspiration: []
 status: draft
 ---
