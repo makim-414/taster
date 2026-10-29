@@ -625,7 +625,12 @@ export function composeSystem({ brand = null, references = [], intent = {} } = {
     // A logo read from a local file keeps only its file name, so a saved system never carries a machine's paths.
     const local = (src) => (typeof src === 'string' && /^file:/i.test(src) ? basename(decodeURIComponent(new URL(src).pathname)) : src);
     const logo = theme.source.logo ? { ...theme.source.logo, ...(theme.source.logo.src ? { src: local(theme.source.logo.src) } : {}) } : null;
-    identity = { name: theme.source.name, logo, color: theme.source.color, fonts: theme.source.fonts, tokens, notes: theme.notes.map((n) => n.replace(/file:\/\/\S+?([^/\s)]+)\)/g, '$1)')) };
+    // The logo's own face is identity, not a system typeface: consistency checks list it as exempt inside the logo only.
+    const logoFont = theme.source.fonts?.logo || null;
+    const idNotes = theme.notes.map((n) => n.replace(/file:\/\/\S+?([^/\s)]+)\)/g, '$1)'));
+    const primary = String(tokens['--font'] || '').split(',')[0].replace(/["']/g, '').trim();
+    if (logoFont && logoFont !== primary) idNotes.push(`The logo text is set in ${logoFont}. It stays the logo's own face (identity.logoFont): consistency checks list it as exempt inside the logo only, and the same face anywhere else is off the system.`);
+    identity = { name: theme.source.name, logo, color: theme.source.color, fonts: theme.source.fonts, logoFont, tokens, notes: idNotes };
     notes.push(...identity.notes);
   } else {
     notes.push('No brand site given: the neutral accent and the Taster typeface stay. Ask the owner for a color, a typeface and the logo, or an existing page to absorb them from.');
