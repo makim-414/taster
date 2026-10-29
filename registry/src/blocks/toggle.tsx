@@ -2,7 +2,9 @@ import * as React from 'react'
 import { cn } from './_cn'
 
 // Checkbox and Switch. On state uses the accent token so a theme recolors it.
-// API follows shadcn/ui checkbox and switch (MIT).
+// API follows shadcn/ui checkbox and switch (MIT). The dashed checkbox (an empty slot waiting to be
+// filled, for task lists and setup steps) follows a 21st.dev checkbox the owner picked; it is only a
+// dashed border, so no code came with it.
 // Upstream license: MIT, Copyright (c) 2023 shadcn. Full text in THIRD_PARTY_NOTICES.md.
 
 const CheckIcon = () => (
@@ -25,10 +27,12 @@ const CheckIcon = () => (
 export interface CheckboxProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
   label?: React.ReactNode
+  /** Unchecked box drawn with a dashed border: an empty slot to fill, as in a checklist. */
+  dashed?: boolean
 }
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ label, className, id, checked, disabled, ...props }, ref) => {
+  ({ label, dashed, className, id, checked, disabled, ...props }, ref) => {
     const reactId = React.useId()
     const inputId = id ?? reactId
     return (
@@ -53,6 +57,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           <span
             className={cn(
               'flex h-4 w-4 items-center justify-center rounded-md border border-border-input bg-transparent transition-colors',
+              dashed && 'border-dashed border-text-subtle peer-checked:border-solid',
               'text-transparent peer-checked:border-transparent peer-checked:bg-accent peer-checked:text-accent-fg',
               'peer-focus-visible:ring-2 peer-focus-visible:ring-ring',
             )}
