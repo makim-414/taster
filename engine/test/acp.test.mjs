@@ -58,7 +58,9 @@ test('the ACP agent answers slash commands over stdio', { timeout: 120000 }, asy
     assert.equal(init.result.protocolVersion, 1);
     assert.equal(init.result.agentInfo.name, 'taster');
     assert.equal(init.result.agentCapabilities.loadSession, false);
-    assert.deepEqual(init.result.authMethods, []);
+    assert.deepEqual(init.result.authMethods.map((m) => [m.id, m.type, m.args.join(' ')]), [['setup', 'terminal', 'acp --setup']]);
+    const auth = await c.request('authenticate', { methodId: 'setup' });
+    assert.deepEqual(auth.result, {});
 
     const created = await c.request('session/new', { cwd: fixturesDir, mcpServers: [] });
     const { sessionId } = created.result;

@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "taster",
-      "description": "Diagnose, swap and build. 60+ slop rules checked in a real browser, a taxonomy of reusable UI patterns by use and surface, and a token based component registry.",
+      "description": "Diagnose, swap and build. 70+ slop rules checked in a real browser, a taxonomy of reusable UI patterns by use and surface, and a token based component registry.",
       "version": "0.1.0",
       "source": "./",
       "skills": ["./skills/taster"],

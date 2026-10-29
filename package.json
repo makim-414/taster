@@ -1,8 +1,63 @@
 {
-  "name": "taster",
+  "name": "@makim-414/taster",
+  "version": "0.1.0",
   "private": true,
+  "description": "Find the AI generated look in a frontend and fix it: 74 rules measured in a real browser, patterns and components to swap in, for agents (MCP, ACP), editors, CI and the browser.",
   "type": "module",
   "license": "MIT",
+  "author": "makim-414",
+  "homepage": "https://github.com/makim-414/taster",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makim-414/taster.git"
+  },
+  "bugs": "https://github.com/makim-414/taster/issues",
+  "keywords": [
+    "design",
+    "ui",
+    "frontend",
+    "ai-slop",
+    "design-system",
+    "mcp",
+    "acp",
+    "lint",
+    "accessibility"
+  ],
+  "bin": {
+    "taster": "bin/taster.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "bin/",
+    "engine/*.mjs",
+    "engine/*.js",
+    "engine/package.json",
+    "engine/README.md",
+    "rules/detect.js",
+    "rules/rules.json",
+    "rules/RULES.md",
+    "patterns/",
+    "taxonomy/",
+    "registry/registry.json",
+    "registry/src/",
+    "registry/THIRD_PARTY_NOTICES.md",
+    "registry/README.md",
+    "skills/taster/",
+    "exports/",
+    "extension/",
+    "commands/",
+    "README.md",
+    "README.ko.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@agentclientprotocol/sdk": "2.1.0",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "playwright": "1.64.1",
+    "zod": "4.6.7"
+  },
   "scripts": {
     "build": "node scripts/build-docs.mjs",
     "validate": "node scripts/validate.mjs",
