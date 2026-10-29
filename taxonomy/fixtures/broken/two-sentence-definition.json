@@ -1,0 +1,17 @@
+{
+  "expect": "SCHEMA",
+  "why": "A definition is one sentence.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "categories",
+        {
+          "id": "hero"
+        },
+        "definition"
+      ],
+      "value": "The first section. It says what the page offers."
+    }
+  ]
+}

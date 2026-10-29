@@ -1,0 +1,17 @@
+{
+  "expect": "SNAP",
+  "why": "A default must sit on one of the axis steps.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "axes",
+        {
+          "id": "density"
+        },
+        "default"
+      ],
+      "value": 0.6
+    }
+  ]
+}

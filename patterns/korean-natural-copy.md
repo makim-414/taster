@@ -1,7 +1,7 @@
 ---
 id: korean-natural-copy
 name: Korean-first copy
-category: typography
+category: copy
 uses: [introduce-the-product]
 surfaces: [landing]
 replaces: [CPY-01, KO-07, KO-09]

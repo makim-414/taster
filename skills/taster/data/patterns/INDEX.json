@@ -184,7 +184,7 @@
   {
     "id": "split-section-header",
     "name": "Split section header",
-    "category": "feature-section",
+    "category": "typography",
     "uses": [
       "explain-features",
       "emphasize-text"
@@ -687,7 +687,7 @@
   {
     "id": "action-label-button",
     "name": "Specific action label",
-    "category": "button",
+    "category": "copy",
     "uses": [
       "start-an-action"
     ],
@@ -750,7 +750,7 @@
   {
     "id": "filter-chip",
     "name": "Filter chip",
-    "category": "badge-label",
+    "category": "form-input",
     "uses": [
       "filter-and-search"
     ],
@@ -919,7 +919,7 @@
   {
     "id": "plain-honest-copy",
     "name": "Plain and specific copy",
-    "category": "typography",
+    "category": "copy",
     "uses": [
       "introduce-the-product"
     ],
@@ -937,7 +937,7 @@
   {
     "id": "animated-text",
     "name": "Animated text",
-    "category": "typography",
+    "category": "motion-particle",
     "uses": [
       "emphasize-text"
     ],
@@ -1014,7 +1014,7 @@
   {
     "id": "korean-natural-copy",
     "name": "Korean-first copy",
-    "category": "typography",
+    "category": "copy",
     "uses": [
       "introduce-the-product"
     ],
@@ -1144,7 +1144,7 @@
   {
     "id": "token-themes",
     "name": "Token themes",
-    "category": "layout-shell",
+    "category": "theme-tokens",
     "uses": [
       "set-the-visual-foundation",
       "switch-views"
@@ -1253,7 +1253,7 @@
   {
     "id": "step-workflow-section",
     "name": "Step workflow section",
-    "category": "timeline-stepper",
+    "category": "feature-section",
     "uses": [
       "guide-through-steps",
       "explain-features"

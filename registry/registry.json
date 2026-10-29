@@ -14,7 +14,7 @@
     {
       "id": "blocks/accordion",
       "file": "src/blocks/accordion.tsx",
-      "category": "faq",
+      "category": "tabs-segmented",
       "patterns": [
         "hairline-accordion-faq",
         "product-detail-page",
@@ -58,7 +58,7 @@
     {
       "id": "blocks/avatar",
       "file": "src/blocks/avatar.tsx",
-      "category": "badge-label",
+      "category": "icon",
       "patterns": [
         "avatar-with-fallback"
       ],
@@ -544,7 +544,7 @@
     {
       "id": "motion/gooey-text",
       "file": "src/motion/gooey-text.tsx",
-      "category": "typography",
+      "category": "motion-particle",
       "patterns": [
         "animated-text"
       ],
@@ -577,7 +577,7 @@
     {
       "id": "motion/text-reveal",
       "file": "src/motion/text-reveal.tsx",
-      "category": "typography",
+      "category": "motion-particle",
       "patterns": [
         "animated-text"
       ],
@@ -588,7 +588,7 @@
     {
       "id": "motion/text-scramble",
       "file": "src/motion/text-scramble.tsx",
-      "category": "typography",
+      "category": "motion-particle",
       "patterns": [
         "animated-text"
       ],
@@ -599,7 +599,7 @@
     {
       "id": "motion/typewriter",
       "file": "src/motion/typewriter.tsx",
-      "category": "typography",
+      "category": "motion-particle",
       "patterns": [
         "animated-text"
       ],

@@ -1,0 +1,13 @@
+{
+  "expect": "GAPS",
+  "why": "The gaps list must match the patterns and registry.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "gaps"
+      ],
+      "value": []
+    }
+  ]
+}

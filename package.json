@@ -6,6 +6,8 @@
   "scripts": {
     "build": "node scripts/build-docs.mjs",
     "validate": "node scripts/validate.mjs",
+    "check:taxonomy": "node scripts/check-taxonomy.mjs",
+    "test:taxonomy": "node --test taxonomy/axes.test.mjs",
     "test:detect": "node rules/test-detect.mjs",
     "test:registry": "npm --prefix registry run typecheck && node registry/test-render.mjs"
   }
