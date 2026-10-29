@@ -16,8 +16,10 @@
     "color": "#4c1d95",
     "fonts": {
       "heading": "Inter",
-      "body": "Inter"
+      "body": "Inter",
+      "logo": "Inter"
     },
+    "logoFont": "Inter",
     "tokens": {
       "--brand": "#4c1d95",
       "--accent-fg": "#ffffff",
@@ -33,7 +35,8 @@
       "The site uses Inter, one of the faces generated pages default to (TYP-01, TYP-02). Using IBM Plex instead. If Inter is part of the brand on purpose, set --font back to it and accept the finding.",
       "Success #5bbd74 and failure #fd7468 for a dark page. Use them flat, only for real outcomes; AC-08 allows dots in exactly these colors.",
       "Hue gap to the brand: success 144 degrees, failure 93 degrees.",
-      "Logo is set as text (\"Acme Ledger\"). Ask the owner for the logo file before shipping; do not invent a mark."
+      "Logo is set as text (\"Acme Ledger\"). Ask the owner for the logo file before shipping; do not invent a mark.",
+      "The logo text is set in Inter. It stays the logo's own face (identity.logoFont): consistency checks list it as exempt inside the logo only, and the same face anywhere else is off the system."
     ]
   },
   "axes": {
@@ -380,6 +383,7 @@
     "Success #5bbd74 and failure #fd7468 for a dark page. Use them flat, only for real outcomes; AC-08 allows dots in exactly these colors.",
     "Hue gap to the brand: success 144 degrees, failure 93 degrees.",
     "Logo is set as text (\"Acme Ledger\"). Ask the owner for the logo file before shipping; do not invent a mark.",
+    "The logo text is set in Inter. It stays the logo's own face (identity.logoFont): consistency checks list it as exempt inside the logo only, and the same face anywhere else is off the system.",
     "Balance: color-restraint moved two-hue (0.5) to achromatic (1): \"Type and color do not both shout: the louder the type, the fewer hues around it.\" (loud-type-quiet-color).",
     "Balance: elevation moved floating (0.75) to raised (0.5): \"Large radius and deep soft shadow together are the default generated card; one of the two carries the softness.\" (no-pillow-default)."
   ],
