@@ -42,6 +42,10 @@ module.exports = {
         'sidebar-border': 'var(--sidebar-border)',
         'delta-up': 'var(--delta-up)',
         'delta-down': 'var(--delta-down)',
+        scrim: 'var(--scrim)',
+        'on-scrim': 'var(--on-scrim)',
+        'on-scrim-muted': 'var(--on-scrim-muted)',
+        'on-scrim-ink': 'var(--on-scrim-ink)',
         chart: {
           1: 'var(--chart-1)',
           2: 'var(--chart-2)',
