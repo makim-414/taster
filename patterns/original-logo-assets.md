@@ -5,7 +5,7 @@ category: icon
 uses: [set-the-visual-foundation]
 surfaces: [landing, app]
 replaces: [AC-18]
-components: []
+components: [marketing/logo-wall]
 inspiration: []
 status: draft
 ---
