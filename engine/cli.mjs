@@ -11,6 +11,8 @@ const HELP = `Usage
   node engine/cli.mjs <url-or-file> --brand [--json] [--out <dir>]
   node engine/cli.mjs --rules
   node engine/cli.mjs --explain <rule-id>
+  node engine/cli.mjs add <component-id>... [--dir <dir>] [--from <url>] [--overwrite]
+  node engine/cli.mjs add --list
 
 Options
   --out <dir>       write report.json and annotated-<width>.png into <dir>
@@ -19,6 +21,10 @@ Options
   --brand           read the site's brand (color, typeface, logo) and print a token theme fitted to it
   --widths <list>   viewport widths, default ${VIEWPORTS.map((v) => v.width).join(',')}
                     'responsive' runs ${RESPONSIVE_WIDTHS.join(',')}
+
+add copies registry components into your app with every helper they import and the token files, no shadcn
+needed. --dir defaults to src/components/taster. --from reads a hosted copy (https://taster-six.vercel.app)
+instead of this repository. Files you changed are left alone unless --overwrite.
 
 Exit codes: 0 no findings, 1 findings, 2 error`;
 
@@ -32,7 +38,37 @@ function viewportsFrom(list) {
   });
 }
 
+async function add(argv) {
+  const { values, positionals } = parseArgs({
+    args: argv,
+    allowPositionals: true,
+    options: { dir: { type: 'string' }, from: { type: 'string' }, overwrite: { type: 'boolean' }, list: { type: 'boolean' }, json: { type: 'boolean' } },
+  });
+  const { fetchBundle, loadRegistry, resolveComponents, writeBundle } = await import('./add.mjs');
+  if (values.list) {
+    for (const c of loadRegistry().components) console.log(`${c.id.padEnd(30)} ${c.category}`);
+    return 0;
+  }
+  if (!positionals.length) throw new Error('add needs at least one component id, for example: add blocks/button');
+  const bundle = values.from ? await fetchBundle(positionals, values.from) : resolveComponents(positionals);
+  const dir = values.dir || join('src', 'components', 'taster');
+  const { written, skipped } = writeBundle(bundle, dir, { overwrite: values.overwrite });
+  if (values.json) {
+    console.log(JSON.stringify({ dir, written, skipped, npm: bundle.npm, credits: bundle.credits }, null, 2));
+    return 0;
+  }
+  console.log(`Added to ${dir}:`);
+  for (const f of written) console.log(`  ${f}`);
+  for (const f of skipped) console.log(`  ${f}  (kept your copy, it differs; --overwrite to replace)`);
+  if (bundle.npm.length) console.log(`\nInstall: npm install ${bundle.npm.join(' ')}`);
+  console.log(`\nThen import ${join(dir, 'tokens.css')} once at your app root and add ${join(dir, 'tailwind-preset.cjs')} to your Tailwind presets.`);
+  const upstream = bundle.credits.filter((c) => /MIT|Apache|BSD/i.test(c.credit || ''));
+  if (upstream.length) console.log(`Keep the "Upstream license" lines at the top of copied files; the full texts are in ${join(dir, 'THIRD_PARTY_NOTICES.md')}.`);
+  return 0;
+}
+
 async function main() {
+  if (process.argv[2] === 'add') return add(process.argv.slice(3));
   const { values, positionals } = parseArgs({
     allowPositionals: true,
     options: {
