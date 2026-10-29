@@ -28,7 +28,8 @@ const nextConfig = {
       './node_modules/playwright-core/**',
       './node_modules/@sparticuz/chromium/**',
     ],
-    '/r/[...slug]': ['../engine/add.mjs', '../registry/registry.json', '../registry/src/**', '../registry/THIRD_PARTY_NOTICES.md'],
+    // Keys are globs over route paths, so the brackets of [...slug] would read as a character class.
+    '/r/**': ['../engine/add.mjs', '../registry/registry.json', '../registry/src/**', '../registry/THIRD_PARTY_NOTICES.md'],
     '/api/diagnose': [
       '../engine/*.mjs',
       '../engine/*.js',
