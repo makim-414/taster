@@ -5,7 +5,7 @@
 <title>Docs whose faces differ by role</title>
 <style>
   /* The home headline is in a stock face, but most headings use the display face, the body has its own text face,
-     and the wordmark in the header and footer is set in a third face. */
+     and the wordmark and the tagline in the header and footer are set in a third face. */
   body { margin: 0; padding: 48px; font-family: 'Fixture Text', serif; color: #1a1a1a; background: #ffffff; }
   header, footer { display: flex; gap: 16px; padding: 16px 0; }
   .wordmark { font-family: 'Wordmark Serif', Georgia, serif; font-size: 22px; color: #1a1a1a; text-decoration: none; }
@@ -15,7 +15,7 @@
 </style>
 </head>
 <body>
-  <header><a class="wordmark" href="/"><svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6"></circle></svg><span>Ledgerline</span></a><nav><a href="#guide">Guide</a></nav></header>
+  <header><a class="wordmark" href="/"><svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6"></circle></svg><span>Ledgerline</span></a><p class="wordmark">The ledger guide</p><nav><a href="#guide">Guide</a></nav></header>
   <main>
     <h1>Read the guide</h1>
     <p>Each chapter starts with a heading in the display face.</p>

@@ -139,6 +139,14 @@ window.tasterExtract = function tasterExtract() {
     return textFamily(node.kind === 'text' ? node.el : node.el.closest('a'));
   }
 
+  // The body face: the first paragraph in main, else the first one outside the header, the footer and the logo (a
+  // tagline next to the logo is set like the logo, not like the text). A selector list matches in document order, so
+  // 'main p, p' would take a header paragraph first.
+  function bodyText(skip) {
+    const outside = (p) => visible(p) && !p.closest('header, footer, [role="banner"], [role="contentinfo"]') && !(skip && skip.contains(p));
+    return [...document.querySelectorAll('main p')].find(visible) || [...document.querySelectorAll('p')].find(outside) || document.body;
+  }
+
   // The heading face: the most used across visible h1 to h3 (ties go to the one met first), not only the first h1.
   function headingFamily(skip) {
     const tally = new Map();
@@ -262,7 +270,7 @@ window.tasterExtract = function tasterExtract() {
       color: brandColor(actionEls),
       fonts: {
         heading: headingFamily(logoAt && logoAt.el),
-        body: family(document.querySelector('main p, p') || document.body),
+        body: family(bodyText(logoAt && logoAt.el)),
         logo: logoFamily(logoAt),
       },
       dark: (() => {
