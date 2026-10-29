@@ -28,6 +28,7 @@ source, is in [references/start.md](references/start.md).
 | Brand | the original site, or the owner's color, typeface and logo | a `theme.css` of token overrides (brand color, typeface, success and failure colors fitted to the brand) that every route wears |
 | Rebuild | a diagnosed page with no editable source | the same content on a new page made from patterns, checked clean, shown next to the original |
 | Build | a product, an audience and a surface | a new screen composed only from taxonomy patterns, checked before you hand it over |
+| Screens | more than one screen, and the system from Brand | one screen or one part at a time: proposed, built only after the builder's OK, checked for zero findings and zero drift against the system and the screens before it |
 
 Data this skill reads (all inside this folder):
 
@@ -48,6 +49,8 @@ Prefer its tools; they run the same detector in a real browser for you.
 - `get_pattern { id }` and `get_component { id }`: the swap recipe and copyable code with its tokens.
 - `list_patterns { surface, use, category, family, rule }` and `taxonomy`: for Build.
 - `list_rules`, `explain_rule { id }`.
+- `plan_screens { target, system, out }`, `plan_next { plan }`, `plan_update { plan, event }`: the screen by screen loop in `taster.plan.json`.
+- `check_consistency { screens, system }`: drift between screens and values off the system, at 1440 and 390.
 
 Without the server, follow the steps below with any browser tool, or run `node engine/cli.mjs <url>` from the repository.
 
@@ -75,11 +78,20 @@ owner. Status dots for real outcomes use the theme's `--success` and `--danger`,
 Follow [references/rebuild.md](references/rebuild.md). Diagnose the original, read its content with
 `extract_content`, keep every heading, claim, action and owned image, map each section to a use and a pattern,
 build it on tokens, then check the rebuild: zero measured findings at both widths and every original heading and
-action still present. Flag unsourced numbers and testimonials to the user instead of rewriting them.
+action still present. Flag unsourced numbers and testimonials to the user instead of rewriting them. More than one
+screen: one at a time, as [references/screens.md](references/screens.md) describes.
 
 ## Build
 
-Follow [references/build.md](references/build.md). Choose the surface, list the uses the screen must serve in order, pick one pattern per use from the taxonomy, then compose. Run Diagnose on your own result before you show it.
+Follow [references/build.md](references/build.md). Choose the surface, list the uses the screen must serve in order, pick one pattern per use from the taxonomy, then compose. Run Diagnose on your own result before you show it. Further screens go one at a time through [references/screens.md](references/screens.md).
+
+## Screens, one at a time
+
+Follow [references/screens.md](references/screens.md) whenever the work covers more than one screen, on every route.
+The system comes first (tokens plus the brand theme). Then `plan_screens` lists the screens, and `plan_next` gives one
+step at a time: propose a screen or part to the builder, wait for their explicit yes, build it from the system, and
+check it (zero measured findings, zero drift against the screens already checked, zero values off the system) before
+the next one starts. Never build before the yes; never start the next screen before this one is checked.
 
 ## Icons
 

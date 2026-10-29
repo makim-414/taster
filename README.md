@@ -27,8 +27,16 @@ The answer picks the route. Every route also absorbs the brand: the site's own c
 | Existing site, address only: Diagnose, then Rebuild | a URL (a hosted builder, a template, lost source) | the same words, links and brand on a new page made from patterns, checked clean and shown next to the original |
 | New site: Build | a product, an audience, the kind of screen, your real content | a new screen composed from patterns, checked before you see it |
 
+More than one screen goes one screen, or one part, at a time: the brand and the tokens become the system first,
+then each screen is proposed to the builder, built only after their yes from the components that fit its purpose,
+and checked before the next one starts: zero detector findings, and zero drift in `check_consistency`, which renders
+every screen and reports the same component drawn differently on two screens and any value that is not one of the
+system's tokens. `taster.plan.json` keeps the order and refuses steps out of it
+([screens.md](skills/taster/references/screens.md)).
+
 `examples/rebuild/` is a worked Rebuild: a generated looking landing page (17 rules hit) and its rebuild (0 at both
-widths, every heading, action and nav item kept, brand color kept). `node engine/scripts/check-rebuild-example.mjs`
+widths, every heading, action and nav item kept, brand color kept), plus a second screen built from the same
+components, checked consistent with the first and on the system. `node engine/scripts/check-rebuild-example.mjs`
 proves it.
 
 ## Install

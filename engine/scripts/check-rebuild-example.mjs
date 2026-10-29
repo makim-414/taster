@@ -1,10 +1,15 @@
 // Checks the worked Rebuild example in examples/rebuild/ the way references/rebuild.md asks:
 // the original is slop, the rebuild has zero measured findings at both widths, and every heading,
-// action label and nav item of the original is still on the rebuilt page.
-import { readFileSync } from 'node:fs';
+// action label and nav item of the original is still on the rebuilt page. Then, as references/screens.md asks,
+// the second screen is clean too, both screens draw every component the same way and only from the system
+// (registry tokens plus the absorbed theme), and taster.plan.json records both screens as checked.
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { brandTheme } from '../brand.mjs';
+import { checkConsistency } from '../consistency.mjs';
 import { contentParity, diagnose, extract } from '../diagnose.mjs';
+import { nextStep, readPlan } from '../plan.mjs';
 
 const file = (name) => fileURLToPath(new URL(`../../examples/rebuild/${name}`, import.meta.url));
 const before = file('before.html');
@@ -30,8 +35,27 @@ const theme = brandTheme(contentBefore);
 if (readFileSync(file('theme.css'), 'utf8') !== theme.css) fail('examples/rebuild/theme.css is not what brand_theme gives for before.html (regenerate it with --brand --out)');
 if (!/<link rel="stylesheet" href="theme\.css">/.test(readFileSync(after, 'utf8'))) fail('after.html does not load theme.css');
 
+// Screen by screen: the second screen, consistency across both against the system, and the plan.
+const pricing = file('pricing.html');
+const diagPricing = await diagnose(pricing);
+if (diagPricing.rulesHit !== 0) fail(`pricing.html hits ${diagPricing.rules.map((r) => r.ruleId).join(', ')}`);
+const planFile = file('taster.plan.json');
+const plan = readPlan(planFile);
+const system = (Array.isArray(plan.system) ? plan.system : [plan.system]).map((p) => join(dirname(planFile), p));
+const consistency = await checkConsistency([after, pricing], { system });
+if (!consistency.ok) fail(`the two rebuilt screens are not consistent: ${consistency.drift.map((d) => `${d.role} ${d.property}`).concat(consistency.offSystem.map((f) => `${f.screen} ${f.role} ${f.property} ${f.value}`)).join(' | ')}`);
+// Negative control: the original was not drawn from this system, so the same check must fail on it.
+const control = await checkConsistency([after, before], { system });
+if (control.ok) fail('the consistency check passed the original against the system; it is not measuring anything');
+if (nextStep(plan).action !== 'done') fail(`the plan is not finished: ${nextStep(plan).say}`);
+for (const s of plan.screens) if (!s.output || !existsSync(join(dirname(planFile), s.output))) fail(`plan screen ${s.id} has no output file`);
+if (plan.screens.map((s) => s.output).join() !== 'after.html,pricing.html') fail('the plan should list after.html and pricing.html in build order');
+
 console.log(`before: ${diagBefore.rulesHit} rules hit (${diagBefore.rules.map((r) => r.ruleId).join(' ')})`);
 console.log(`after: 0 rules hit at ${diagAfter.widths.join(' and ')}`);
 console.log(`brand theme: ${Object.keys(theme.tokens).length} tokens absorbed from the original`);
 console.log(`content kept: ${parity.kept} of ${parity.expected} headings, actions and nav items; brand color ${contentAfter.brand.color}`);
+console.log(`pricing: 0 rules hit at ${diagPricing.widths.join(' and ')}`);
+console.log(`consistency: 0 drift, 0 off-system values across ${consistency.screens.length} screens and ${consistency.system.tokens} system tokens; the original against the same system: ${control.findings} findings`);
+console.log(`plan: ${plan.screens.length} screens checked, next step ${nextStep(plan).action}`);
 console.log('REBUILD OK');
