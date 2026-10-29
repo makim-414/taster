@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // MCP server over stdio. Prompt: start (the opening question). Diagnose tools: diagnose, list_rules, explain_rule.
-// Brand tool: brand_theme. Rebuild tool: extract_content. Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
+// Brand tool: brand_theme. System tools: design_system, tune_system, system_for_category. Rebuild tool: extract_content. Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -194,5 +194,67 @@ server.registerTool(
   },
   guard(async () => ({ content: [json(loadTaxonomy())] })),
 );
+
+// Design system tools (engine/system.mjs): brand and references in, balanced axes and every token out.
+{
+  const sys = await import('./system.mjs');
+  const { existsSync } = await import('node:fs');
+  const { dirname } = await import('node:path');
+  const systemArg = z.union([z.string(), z.record(z.string(), z.any())]).describe('path to a taster.system.json, or the system object itself');
+  const load = (s) => (typeof s === 'string' ? sys.readSystem(s) : s);
+  const run = (name, fn) => async (args) => {
+    try {
+      return { content: [json(await fn(args || {}))] };
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: `${name} failed: ${err.message}` }] };
+    }
+  };
+  server.registerTool(
+    'design_system',
+    {
+      title: 'Make the design system',
+      description:
+        "Turn the brand's identity and the tone of references into one balanced design system before any screen is built. Reads the brand site (color, typeface, logo, light or dark) and measures each page in a real browser for the eight axes (radii, spacing and control heights, text contrast, type scale, hues, shadows, motion, borders). Axes come from builder intent first, then the references, then the brand site, then the taxonomy default; balance keeps every design constraint. Returns axes with step names, axisNotes saying where each came from and what balance moved (quoting the principle), every token the axes drive plus the brand tokens, and a theme.css block. With out, writes taster.system.json and theme.css there.",
+      inputSchema: {
+        brand: z.string().optional().describe('the brand site: URL or local HTML file'),
+        references: z.array(z.string()).max(6).optional().describe('pages whose tone the builder likes'),
+        axes: z.record(z.string(), z.number()).optional().describe('builder intent, e.g. { "density": 0.75 }; values on the taxonomy snap steps'),
+        surface: z.string().optional().describe('surface id from the taxonomy, recorded for the screens'),
+        scheme: z.enum(['dark', 'light']).optional(),
+        out: z.string().optional().describe('directory to write taster.system.json and theme.css'),
+      },
+      annotations: { openWorldHint: true },
+    },
+    run('design_system', async ({ brand, references = [], axes, surface, scheme, out }) => {
+      const system = await sys.designSystem({ brand: brand || null, references, intent: { axes, surface, scheme } });
+      return out ? { files: sys.writeSystem(out, system), system } : system;
+    }),
+  );
+  server.registerTool(
+    'tune_system',
+    {
+      title: 'Move a weight',
+      description:
+        'The exchange with the builder: move one or more axes of a design system. The moved axes stay where the builder put them, the others move the least needed to keep every constraint, and the result says which moved and why (the constraint principle). Tokens and theme.css are regenerated. Given a path, the files are rewritten in place.',
+      inputSchema: { system: systemArg, axes: z.record(z.string(), z.number()).describe('e.g. { "roundness": 1 }') },
+    },
+    run('tune_system', async ({ system, axes }) => {
+      const next = sys.tuneSystem(load(system), axes);
+      const summary = next.tuned[next.tuned.length - 1].summary;
+      if (typeof system === 'string' && existsSync(system)) return { summary, files: sys.writeSystem(dirname(system), next), system: next };
+      return { summary, system: next };
+    }),
+  );
+  server.registerTool(
+    'system_for_category',
+    {
+      title: 'Tokens that matter for a part',
+      description: "For one taxonomy category, the axes ordered by relevance with this system's step and the tokens each drives, so the builder of that part knows which values matter most. Parts read these through the alias tokens only.",
+      inputSchema: { system: systemArg, category: z.string().describe('category id, e.g. table, hero, button') },
+      annotations: readOnly,
+    },
+    run('system_for_category', async ({ system, category }) => sys.systemForCategory(load(system), category)),
+  );
+}
 
 await server.connect(new StdioServerTransport());
