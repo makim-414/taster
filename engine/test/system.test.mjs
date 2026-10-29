@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import taxonomy from '../../taxonomy/taxonomy.json' with { type: 'json' };
 import { AXIS_IDS, DEFAULTS, STEPS, balance, validateAxes } from '../../taxonomy/axes.mjs';
 import { brandTheme } from '../brand.mjs';
+import { loadSystem } from '../consistency.mjs';
 import { launch } from '../diagnose.mjs';
 import { axesFromMeasure, composeSystem, contrastReport, designSystem, readPage, readSystem, systemForCategory, systemTokens, tuneSystem, writeSystem } from '../system.mjs';
 
@@ -86,6 +87,26 @@ test('scheme: a transparent body is the canvas, white unless color-scheme or htm
   } finally {
     await browser.close();
   }
+});
+
+test('brand fonts: heading is the most used face across h1 to h3, the logo face is read apart and declared as identity', { timeout: 90000 }, async () => {
+  const browser = await launch();
+  let read;
+  try {
+    read = await readPage(browser, fixture('fonts-docs'));
+  } finally {
+    await browser.close();
+  }
+  // Negative control: only the first h1 was read (Arial) and the logo face was missed.
+  assert.deepEqual(read.content.brand.fonts, { heading: 'Fixture Display', body: 'Fixture Text', logo: 'Wordmark Serif' });
+  const s = composeSystem({ brand: read });
+  assert.match(s.tokens['--font'], /^'Fixture Display', 'Fixture Text'/, '--font still comes from heading and body');
+  assert.ok(!/Wordmark Serif/.test(s.tokens['--font']), 'the logo face is not a system typeface');
+  assert.equal(s.identity.logoFont, 'Wordmark Serif');
+  assert.ok(s.notes.some((n) => /logo text is set in Wordmark Serif/.test(n)));
+  assert.deepEqual(loadSystem(s).identity, { logoFont: 'Wordmark Serif' }, 'the consistency check reads the exemption from the saved system');
+  // A brand without a text logo declares no logo face.
+  assert.equal(composeSystem({ brand: { ...read, content: { ...read.content, brand: { ...read.content.brand, fonts: { heading: 'Fixture Display', body: 'Fixture Text', logo: null } } } } }).identity.logoFont, null);
 });
 
 test('the loud fixture breaks constraints and is balanced, quoting each principle', { timeout: 60000 }, async () => {

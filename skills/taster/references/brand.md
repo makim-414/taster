@@ -21,10 +21,14 @@ the page the same way `extract_content` does and returns:
   - `--font`: the site's typeface when it was a choice. A stock fallback (Arial, Times, system UI) or one of the
     faces generated pages default to (Inter, Geist, Space Grotesk and the rest of TYP-01 and TYP-02) is replaced
     with the Taster default, IBM Plex, and the note says how to put it back if it really is the brand's face. A
-    Hangul family is always in the stack.
+    Hangul family is always in the stack. The heading face is the one most used across the page's h1 to h3 (not
+    only the first h1), the body face is the paragraph's.
   - `--success`, `--danger` (and `--destructive`, `--delta-up`, `--delta-down` with the same values): meaning
     colors fitted to the brand. Readable on the page (lighter on a dark page, darker on a light one) and moved at
     least 35 degrees of hue away from the brand color, so a status dot never reads as brand decoration.
+- `source.fonts.logo`: the face the logo wordmark is set in, read apart from heading and body. It never becomes
+  `--font`; the design system keeps it as `identity.logoFont`, and the consistency check lists that face inside the
+  logo as exempt instead of off the system ([screens.md](screens.md)).
 - `css`: a `:root` block with only the identity. The system's `theme.css` carries the same values plus the tokens
   of the axes; load that one after `registry/src/tokens.css`.
 - `notes`: one line per choice, with the reason. Show them to the user.

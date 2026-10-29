@@ -111,13 +111,43 @@ window.tasterExtract = function tasterExtract() {
     return getComputedStyle(el).fontFamily.split(',')[0].replace(/["']/g, '').trim();
   }
 
-  function logo(header) {
+  // The face the first words inside an element are drawn in (a logo link often wraps an icon and a span).
+  function textFamily(el) {
+    if (!el) return null;
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (clean(n.textContent) && n.parentElement && !n.parentElement.closest(SKIP)) return family(n.parentElement);
+    }
+    return null;
+  }
+
+  function logoNode(header) {
     const scope = header || document.body;
     const img = scope.querySelector('a[href="/"] img, [class*="logo" i] img, img[alt*="logo" i], header img');
-    if (img && visible(img)) return { kind: 'image', ...image(img) };
+    if (img && visible(img)) return { kind: 'image', el: img };
     const text = scope.querySelector('[class*="logo" i], a[href="/"], strong, b');
-    if (text && visible(text) && clean(text.innerText).length <= 40) return { kind: 'text', text: words(textOf(text)) };
+    if (text && visible(text) && clean(text.innerText).length <= 40) return { kind: 'text', el: text };
     return null;
+  }
+  function logo(node) {
+    if (!node) return null;
+    return node.kind === 'image' ? { kind: 'image', ...image(node.el) } : { kind: 'text', text: words(textOf(node.el)) };
+  }
+  // The logo's own face: the wordmark text, or the words next to an image logo inside the same link.
+  function logoFamily(node) {
+    if (!node) return null;
+    return textFamily(node.kind === 'text' ? node.el : node.el.closest('a'));
+  }
+
+  // The heading face: the most used across visible h1 to h3 (ties go to the one met first), not only the first h1.
+  function headingFamily(skip) {
+    const tally = new Map();
+    for (const h of document.querySelectorAll('h1, h2, h3')) {
+      if (!visible(h) || (skip && skip.contains(h))) continue;
+      const f = family(h);
+      if (f) tally.set(f, (tally.get(f) || 0) + 1);
+    }
+    return [...tally.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null;
   }
 
   const header = document.querySelector('header, [role="banner"]');
@@ -216,7 +246,7 @@ window.tasterExtract = function tasterExtract() {
   }
 
   const kept = sections.filter((s) => s.heading || s.text.length || s.actions.length || s.links.length || s.images.length || s.lists.length || s.forms.length);
-  const h1 = document.querySelector('h1');
+  const logoAt = logoNode(header);
   const footerLinks = footer
     ? [...footer.querySelectorAll('a')].filter(visible).map((a) => ({ text: words(textOf(a)), href: abs(a.getAttribute('href')) })).filter((l) => l.text)
     : [];
@@ -227,10 +257,14 @@ window.tasterExtract = function tasterExtract() {
     description: clean(document.querySelector('meta[name="description"]')?.content),
     lang: document.documentElement.lang || null,
     brand: {
-      name: logo(header)?.text || null,
-      logo: logo(header),
+      name: logo(logoAt)?.text || null,
+      logo: logo(logoAt),
       color: brandColor(actionEls),
-      fonts: { heading: family(h1), body: family(document.querySelector('main p, p') || document.body) },
+      fonts: {
+        heading: headingFamily(logoAt && logoAt.el),
+        body: family(document.querySelector('main p, p') || document.body),
+        logo: logoFamily(logoAt),
+      },
       dark: (() => {
         const p = pageBackground();
         return (0.299 * p.r + 0.587 * p.g + 0.114 * p.b) / 255 < 0.35;
