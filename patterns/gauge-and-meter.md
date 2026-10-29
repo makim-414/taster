@@ -5,7 +5,7 @@ category: chart-kpi
 uses: [show-one-number, compare-values]
 surfaces: [dashboard]
 replaces: [AC-08]
-components: [blocks/progress]
+components: [blocks/progress, blocks/meter]
 inspiration: []
 status: stable
 ---

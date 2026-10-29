@@ -71,6 +71,8 @@ Parts whose job is moving a person between places of a site or app, or between v
 
 ### Tabs, segmented control and disclosure
 
+- [On this page](in-page-toc.md) fixes AC-10, AC-01
+- [Pagination](pagination.md) fixes AC-04, RSP-01
 - [Tabs and segmented control](segmented-control.md) fixes AC-04, AC-05, COL-06
 
 ## Foundations
@@ -83,6 +85,7 @@ The shared materials every other part is built from: page frame, item containers
 - [Auth split frame](auth-split-frame.md) fixes LAY-01
 - [Dashboard zones](dashboard-zones.md) fixes AC-14, COL-06, LAY-05
 - [Editorial paper sheet](editorial-paper-sheet.md) fixes CMP-04, COL-01
+- [Master detail split](master-detail-split.md) fixes CMP-02, RSP-01
 - [Plain section surface](plain-section-surface.md) fixes BG-01, CMP-05, COL-03
 - [Product-first section order](product-first-section-order.md) fixes LAY-04
 - [Readable at every width](readable-at-every-width.md) fixes RSP-01, RSP-02, RSP-03, RSP-04, RSP-05
