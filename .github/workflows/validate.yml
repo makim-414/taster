@@ -59,3 +59,27 @@ jobs:
           npm --prefix web start &
           for i in $(seq 1 30); do curl -sf http://localhost:3240 > /dev/null && break; sleep 2; done
           node web/scripts/self-check.mjs
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run this repository's action on the rebuild example
+        id: taster
+        uses: ./
+        with:
+          targets: |
+            examples/rebuild/before.html
+            examples/rebuild/after.html
+          fail-on: none
+          upload-sarif: 'false'
+          sarif-file: taster.sarif
+      - name: The SARIF has findings for before.html and none for after.html
+        run: |
+          node -e '
+            const s = JSON.parse(require("fs").readFileSync("${{ steps.taster.outputs.sarif-file }}", "utf8"));
+            const r = s.runs[0].results;
+            const before = r.filter((x) => x.locations[0].physicalLocation.artifactLocation.uri === "examples/rebuild/before.html").length;
+            const after = r.filter((x) => x.locations[0].physicalLocation.artifactLocation.uri === "examples/rebuild/after.html").length;
+            console.log({ before, after });
+            if (s.version !== "2.1.0" || before < 10 || after !== 0) process.exit(1);
+          '

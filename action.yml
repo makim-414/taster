@@ -1,0 +1,65 @@
+name: Taster
+description: Check pages for the generated UI look (74 rules, measured in a real browser) and report findings on the pull request.
+author: makim-414
+branding:
+  icon: eye
+  color: gray
+inputs:
+  targets:
+    description: URLs or HTML file paths to check, one per line. Paths are relative to the repository root.
+    required: true
+  widths:
+    description: Viewport widths, comma separated, or "responsive" for nine widths.
+    default: '1440,390'
+  fail-on:
+    description: Fail the step for findings at this severity or above. high, medium, low or none.
+    default: high
+  sarif-file:
+    description: Where to write the SARIF report.
+    default: taster.sarif
+  upload-sarif:
+    description: Upload the SARIF to GitHub code scanning (needs security-events write, and code scanning enabled on the repository).
+    default: 'true'
+outputs:
+  sarif-file:
+    description: Path of the SARIF report.
+    value: ${{ inputs.sarif-file }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Install Taster engine and Chromium
+      shell: bash
+      run: |
+        npm ci --prefix "$GITHUB_ACTION_PATH/engine" --omit=dev --no-audit --no-fund
+        npx --prefix "$GITHUB_ACTION_PATH/engine" playwright install --with-deps chromium
+    - name: Diagnose
+      id: diagnose
+      shell: bash
+      env:
+        TARGETS: ${{ inputs.targets }}
+        WIDTHS: ${{ inputs.widths }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        SARIF: ${{ inputs.sarif-file }}
+      run: |
+        mapfile -t list < <(printf '%s\n' "$TARGETS" | sed '/^[[:space:]]*$/d')
+        set +e
+        node "$GITHUB_ACTION_PATH/engine/cli.mjs" "${list[@]}" --widths "$WIDTHS" --sarif "$SARIF" --summary "$GITHUB_STEP_SUMMARY" --fail-on "$FAIL_ON"
+        code=$?
+        set -e
+        echo "exit=$code" >> "$GITHUB_OUTPUT"
+        if [ "$code" -eq 2 ]; then exit 2; fi
+    - name: Upload SARIF
+      if: ${{ always() && inputs.upload-sarif == 'true' && hashFiles(inputs.sarif-file) != '' }}
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.sarif-file }}
+        category: taster
+    - name: Fail on findings
+      if: ${{ steps.diagnose.outputs.exit == '1' }}
+      shell: bash
+      run: |
+        echo "Taster found ${{ inputs.fail-on }} severity findings or worse. See the job summary."
+        exit 1
