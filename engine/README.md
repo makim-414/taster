@@ -1,6 +1,6 @@
 # engine
 
-Runs the slop detector (`rules/detect.js`) in a real Chromium at 1440 and 390 wide, writes an annotated capture per width, and serves the same thing to agents over MCP.
+Runs the slop detector (`rules/detect.js`) in a real Chromium at 1440 and 390 wide, writes an annotated capture per width, and serves the same thing to agents over MCP and to editors over ACP.
 
 `rules/detect.js` has no dependencies. Any browser tool can load it into a page and call `window.tasterDetect({ highlight: true })`, as `skills/taster/references/diagnose.md` describes. This folder is the ready-made runner for when you have Node.
 
@@ -45,12 +45,47 @@ command = "node"
 args = ["/path/to/taster/engine/mcp.mjs"]
 ```
 
+## ACP agent
+
+`acp.mjs` serves the same engine to editors over the [Agent Client Protocol](https://agentclientprotocol.com)
+(JSON-RPC on stdio, protocol version 1, `@agentclientprotocol/sdk`). There is no model inside, so it answers slash
+commands, which it advertises with `available_commands_update` after `session/new`:
+
+- `/start`: the opening question, read from `skills/taster/references/start.md`.
+- `/diagnose <url or file>`: one `tool_call` for the browser run (the annotated captures as its locations), then the
+  findings as text. A relative path is read from the session's `cwd`.
+- `/extract <url>`, `/brand <url>`: content JSON, or the theme CSS and notes.
+- `/explain <rule id>`, `/rules`, `/help`.
+
+Plain text gets a short help reply. `session/cancel` ends the turn with `stopReason: "cancelled"`; a browser run already
+started finishes in the background and its result is dropped.
+
+Zed, in `settings.json`:
+
+```json
+{
+  "agent_servers": {
+    "Taster": { "type": "custom", "command": "node", "args": ["/path/to/taster/engine/start.mjs", "acp"], "env": {} }
+  }
+}
+```
+
+`start.mjs acp` installs the dependencies on first start (the MCP launcher does the same with no argument), then
+serves `acp.mjs`. JetBrains IDEs, in `~/.jetbrains/acp.json`: the same `agent_servers` entry without `type`, with the
+full path of `node` in `command`. With the engine linked or installed globally, `taster-acp` is the same agent.
+
+Try it by hand:
+
+```bash
+printf '%s\n' '{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":1}}' | node engine/acp.mjs
+```
+
 ## Checks
 
 ```bash
 node rules/test-detect.mjs           # fixtures: exact rule sets on slop pages, zero on the clean page at both widths
 node engine/scripts/check-rules.mjs  # rules.json schema, and detect.js checks exactly the measured rules
-npm --prefix engine test             # CLI, MCP and extract
+npm --prefix engine test             # CLI, MCP, ACP and extract
 node engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop, rebuild is clean and keeps the content
 ```
 
