@@ -5,7 +5,7 @@ category: media-gallery
 uses: [browse-media, explain-features]
 surfaces: [landing]
 replaces: [LAY-02]
-components: [blocks/card]
+components: [blocks/card, blocks/coverflow-carousel]
 inspiration: [https://21st.dev/@cult-ui/components/feature-carousel, https://21st.dev/@aayush-duhan/components/card-fan-carousel]
 status: draft
 ---
