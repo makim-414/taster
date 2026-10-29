@@ -75,6 +75,12 @@ node engine/cli.mjs add blocks/button blocks/citations --dir src/components/tast
 Copies each component with every file it imports and the token files; no shadcn or other CLI involved. Add
 `--from https://taster-six.vercel.app` to read the hosted copy instead of a clone. See `registry/README.md`.
 
+### Rules for agents without MCP
+
+`exports/` holds the rules as instruction files for AGENTS.md readers, Claude Code, Cursor, Windsurf, Cline,
+GitHub Copilot and Gemini CLI, generated from `rules/rules.json`. `node engine/cli.mjs export all --dir <your app>`
+puts each one where its tool reads it and keeps your own text in shared files. See `exports/README.md`.
+
 ### Use without installing (hosted MCP)
 
 The same MCP server runs at `https://taster-six.vercel.app/api/mcp` (Streamable HTTP). Add it as a remote MCP
