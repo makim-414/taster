@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // MCP server over stdio. Prompt: start (the opening question). Diagnose tools: diagnose, list_rules, explain_rule.
 // Brand tool: brand_theme. System tools: design_system, tune_system, system_for_category. Rebuild tool: extract_content. Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
+// Screen by screen tools: check_consistency, plan_screens, plan_next, plan_update.
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -11,6 +12,9 @@ import { z } from 'zod';
 import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, viewportFor } from './diagnose.mjs';
 import { brandTheme } from './brand.mjs';
 import { getComponent, getPattern, listPatterns, loadTaxonomy, suggestSwaps } from './catalog.mjs';
+import { checkConsistency, formatConsistencyText } from './consistency.mjs';
+import { applyStep, checkScreen, nextStep, planFromExtract, planPath, planRelative, readPlan, writePlan } from './plan.mjs';
+import { dirname } from 'node:path';
 
 const server = new McpServer({ name: 'taster', version: '0.1.0' });
 const json = (value) => ({ type: 'text', text: JSON.stringify(value, null, 2) });
@@ -256,5 +260,97 @@ server.registerTool(
     run('system_for_category', async ({ system, category }) => sys.systemForCategory(load(system), category)),
   );
 }
+
+// ---- screen by screen: one screen or one part at a time, approved by the builder, checked before the next ----
+const systemArg = z.union([z.string(), z.array(z.string()).min(1)]).optional();
+
+server.registerTool(
+  'check_consistency',
+  {
+    title: 'Check screens against each other and the system',
+    description:
+      'Render each screen (URL or local HTML file) at 1440 and 390 wide and read the computed values of every button, input, card, h1 to h3, body text, link and badge: radius, typeface, size, weight, line height, padding, gap, text, fill and border colors, shadow, transition duration. Returns drift (the same component drawn differently on two screens, with selectors and screen ids) and, when a system is given (theme CSS with :root tokens, or { tokens } JSON; a list loads in order), every value that is not one of its tokens with the nearest token. ok is true only with zero findings.',
+    inputSchema: {
+      screens: z.array(z.string()).min(1).describe('URLs or HTML file paths, in the order the screens were built'),
+      system: systemArg.describe('theme CSS or { tokens } JSON path, or a list such as [tokens.css, theme.css]'),
+      widths: z.array(z.number().int().min(320).max(3840)).max(9).optional(),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: true },
+  },
+  guard(async ({ screens, system, widths }) => {
+    const report = await checkConsistency(screens, { system: system ?? null, widths });
+    return { content: [json(report), { type: 'text', text: formatConsistencyText(report) }] };
+  }),
+);
+
+server.registerTool(
+  'plan_screens',
+  {
+    title: 'Plan the screens',
+    description:
+      'Read the start page and list the screens to work through: the page itself, then every same-site page its nav links to. Each screen gets a draft purpose, optional parts (byPart splits a read page into its sections) and status planned. With out, writes taster.plan.json there. Then call plan_next and follow it: one screen or part at a time, proposed to the builder, built only after their OK, checked before the next.',
+    inputSchema: {
+      target: z.string().describe('the start page: URL or local HTML file'),
+      route: z.enum(['swap', 'rebuild', 'build']).optional().describe('default rebuild'),
+      system: systemArg.describe('the design system file(s) every screen is checked against'),
+      byPart: z.boolean().optional(),
+      out: z.string().optional().describe('folder to write taster.plan.json into'),
+    },
+    annotations: { openWorldHint: true },
+  },
+  guard(async ({ target, route = 'rebuild', system, byPart = false, out }) => {
+    const sys = system == null ? null : (Array.isArray(system) ? system : [system]).map((f) => (out ? planRelative(out, f) : f));
+    const plan = planFromExtract(await extract(target), { route, system: sys && sys.length === 1 ? sys[0] : sys, byPart, baseDir: out || null });
+    const file = out ? writePlan(out, plan) : null;
+    return { content: [json({ file, plan, next: nextStep(plan) })] };
+  }),
+);
+
+server.registerTool(
+  'plan_next',
+  {
+    title: 'The next step',
+    description: 'Read taster.plan.json and return exactly one next action: propose a screen or part, wait for the builder, build it, check it, or done. Never build before the builder approved; never start the next screen before this one is checked.',
+    inputSchema: { plan: z.string().describe('path to taster.plan.json or its folder') },
+    annotations: readOnly,
+  },
+  guard(async ({ plan }) => ({ content: [json(nextStep(readPlan(plan)))] })),
+);
+
+server.registerTool(
+  'plan_update',
+  {
+    title: 'Record a step',
+    description:
+      'Move the screen (or part) in progress one step and save the plan: propose (planned to proposed; may set purpose and parts), revise (the builder asked for changes, back to planned), approve (needs note with the builder\'s own words), build (approved to built; output is the built file or URL), check (built to checked). A check without counts runs diagnose on the output and check_consistency against the checked screens and the system itself, and refuses unless both are zero. Out of order steps are refused with the reason.',
+    inputSchema: {
+      plan: z.string().describe('path to taster.plan.json or its folder'),
+      event: z.object({
+        type: z.enum(['propose', 'revise', 'approve', 'build', 'check']),
+        screen: z.string(),
+        part: z.string().optional(),
+        note: z.string().optional(),
+        purpose: z.string().optional(),
+        parts: z.array(z.union([z.string(), z.object({ id: z.string().optional(), purpose: z.string() })])).optional(),
+        output: z.string().optional(),
+        findings: z.number().int().min(0).optional(),
+        drift: z.number().int().min(0).optional(),
+      }),
+    },
+  },
+  guard(async ({ plan: path, event }) => {
+    const file = planPath(path);
+    const plan = readPlan(file);
+    let check = null;
+    if (event.type === 'check' && (event.findings === undefined || event.drift === undefined)) {
+      check = await checkScreen(plan, event.screen, { baseDir: dirname(file) });
+      if (check.findings || check.drift) return { isError: true, content: [json({ refused: `Not clean: ${check.findings} detector findings, ${check.drift} consistency findings. Fix them and check again.`, check })] };
+      event = { ...event, findings: check.findings, drift: check.drift };
+    }
+    const next = applyStep(plan, event);
+    writePlan(file, next);
+    return { content: [json({ file, next: nextStep(next), plan: next, check })] };
+  }),
+);
 
 await server.connect(new StdioServerTransport());
