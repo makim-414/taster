@@ -55,6 +55,20 @@ MCP 서버(실제 브라우저로 진단, 교체 부품 제안, 패턴·컴포�
 claude mcp add taster -- node /path/to/taster/engine/start.mjs
 ```
 
+### 설치 없이 쓰기 (원격 MCP)
+
+같은 MCP 서버가 `https://taster-six.vercel.app/api/mcp` 에서 돌아갑니다(Streamable HTTP). 원격 MCP 서버로 넣으면
+설치할 것이 없습니다.
+
+```bash
+claude mcp add --transport http taster https://taster-six.vercel.app/api/mcp
+```
+
+Cursor 는 `.cursor/mcp.json` 에 `{ "mcpServers": { "taster": { "url": "https://taster-six.vercel.app/api/mcp" } } }`.
+claude.ai 와 ChatGPT 는 같은 주소를 사용자 지정 커넥터로 넣습니다. 원격 서버에는 로컬 파일을 읽는 두 도구
+(`extract_content`, `brand_theme`)를 뺀 모든 도구가 있고, `diagnose` 는 공개 http(s) 주소만 받으며 사용자마다 횟수
+제한이 있습니다. 로컬 파일과 전체 도구는 위의 플러그인으로 쓰세요.
+
 ### 에디터에서 쓰기 (ACP)
 
 `engine/acp.mjs` 는 [Agent Client Protocol](https://agentclientprotocol.com) 을 말하므로 에이전트 패널이 있는
