@@ -52,6 +52,8 @@ jobs:
         run: npm --prefix web run typecheck
       - name: Build
         run: npm --prefix web run build
+      - name: Routes trace the engine files they read at run time
+        run: node web/scripts/check-traces.mjs
       - name: Address guard, limits and fenced engine on the fixtures
         run: npm --prefix web test
       - name: The page itself has zero findings at 1440 and 390

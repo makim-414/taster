@@ -3,8 +3,24 @@
   "name": "Taster",
   "version": "0.1.0",
   "description": "Outline the habits that make a page look AI generated: 74 rules measured on the page you are viewing.",
-  "action": { "default_title": "Check this page with Taster" },
-  "background": { "service_worker": "background.js" },
-  "permissions": ["activeTab", "scripting"],
-  "homepage_url": "https://github.com/makim-414/taster"
+  "action": {
+    "default_title": "Check this page with Taster",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "homepage_url": "https://github.com/makim-414/taster",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
 }
