@@ -141,6 +141,16 @@ const emoji = /\p{Extended_Pictographic}/u;
   }
 })(ROOT);
 
+// exports/ must match what build-docs would write from the current rules.json.
+{
+  const { renderAll } = await import('../engine/exports.mjs');
+  for (const [rel, content] of Object.entries(renderAll())) {
+    const file = path.join(ROOT, rel);
+    if (!fs.existsSync(file)) err(`${rel} missing (run node scripts/build-docs.mjs)`);
+    else if (fs.readFileSync(file, 'utf8') !== content) err(`${rel} is stale (run node scripts/build-docs.mjs)`);
+  }
+}
+
 if (errors.length) {
   console.log(errors.slice(0, 80).join('\n'));
   console.log(`VALIDATE FAIL ${errors.length}`);
