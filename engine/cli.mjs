@@ -13,6 +13,7 @@ const HELP = `Usage
   node engine/cli.mjs --explain <rule-id>
   node engine/cli.mjs add <component-id>... [--dir <dir>] [--from <url>] [--overwrite]
   node engine/cli.mjs add --list
+  node engine/cli.mjs export <agents|claude|cursor|windsurf|cline|copilot|gemini|all> [--dir <project>]
 
 Options
   --out <dir>       write report.json and annotated-<width>.png into <dir>
@@ -67,8 +68,21 @@ async function add(argv) {
   return 0;
 }
 
+async function exportRules(argv) {
+  const { values, positionals } = parseArgs({ args: argv, allowPositionals: true, options: { dir: { type: 'string' } } });
+  const { TARGETS, writeTarget } = await import('./exports.mjs');
+  const names = positionals[0] === 'all' ? Object.keys(TARGETS) : positionals;
+  if (!names.length) throw new Error(`export needs a target: ${Object.keys(TARGETS).join(', ')} or all`);
+  for (const name of names) {
+    if (!TARGETS[name]) throw new Error(`Unknown target ${name}. Known: ${Object.keys(TARGETS).join(', ')}`);
+    console.log(`${TARGETS[name].label}: ${writeTarget(name, values.dir || '.')}`);
+  }
+  return 0;
+}
+
 async function main() {
   if (process.argv[2] === 'add') return add(process.argv.slice(3));
+  if (process.argv[2] === 'export') return exportRules(process.argv.slice(3));
   const { values, positionals } = parseArgs({
     allowPositionals: true,
     options: {

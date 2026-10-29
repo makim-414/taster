@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, SKILL_DATA, readJson, writeJson, loadPatterns, bundleFiles } from './lib.mjs';
+import { renderAll } from '../engine/exports.mjs';
 
 const patterns = loadPatterns().map((p) => p.data).filter(Boolean);
 const taxonomy = readJson('taxonomy/taxonomy.json');
@@ -63,6 +64,13 @@ const start = '<!-- taxonomy:start -->', end = '<!-- taxonomy:end -->';
 if (readme.includes(start) && readme.includes(end)) {
   const next = readme.slice(0, readme.indexOf(start) + start.length) + '\n' + block + readme.slice(readme.indexOf(end));
   fs.writeFileSync(readmePath, next);
+}
+
+// exports/: the rules as instruction files for agents without MCP (AGENTS.md, Cursor, Windsurf, Cline, Copilot,
+// Gemini, Claude). Rendered after rules.json is rewritten above, so the fix lines stay current.
+for (const [rel, content] of Object.entries(renderAll())) {
+  fs.mkdirSync(path.dirname(path.join(ROOT, rel)), { recursive: true });
+  fs.writeFileSync(path.join(ROOT, rel), content);
 }
 
 // Skill bundle

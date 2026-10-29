@@ -64,6 +64,12 @@ node engine/cli.mjs add blocks/button blocks/citations --dir src/components/tast
 부품마다 그 부품이 import 하는 파일과 토큰 파일을 함께 복사합니다. shadcn 같은 다른 CLI 는 필요 없습니다. 클론
 없이 받으려면 `--from https://taster-six.vercel.app` 를 붙이세요. 자세한 내용은 `registry/README.md`.
 
+### MCP 없는 에이전트용 규칙 파일
+
+`exports/` 에 규칙을 AGENTS.md, Claude Code, Cursor, Windsurf, Cline, GitHub Copilot, Gemini CLI 용 지침 파일로
+뽑아 두었습니다(`rules/rules.json` 에서 생성). `node engine/cli.mjs export all --dir <내 앱>` 은 각 도구가 읽는 자리에
+파일을 넣고, 같이 쓰는 파일에서는 내 글을 그대로 둡니다. 자세한 내용은 `exports/README.md`.
+
 ### 설치 없이 쓰기 (원격 MCP)
 
 같은 MCP 서버가 `https://taster-six.vercel.app/api/mcp` 에서 돌아갑니다(Streamable HTTP). 원격 MCP 서버로 넣으면
