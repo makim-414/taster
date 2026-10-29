@@ -45,6 +45,15 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // The bookmarklet loads these from any site.
+        source: '/taster/:file*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+          { key: 'Cache-Control', value: 'public, max-age=300' },
+        ],
+      },
+      {
         source: '/(.*)',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
