@@ -66,6 +66,20 @@ node engine/cli.mjs https://example.com --brand      # the site's brand as a tok
 
 It uses Playwright's Chromium if installed, otherwise your Google Chrome.
 
+### Use without installing (hosted MCP)
+
+The same MCP server runs at `https://taster-six.vercel.app/api/mcp` (Streamable HTTP). Add it as a remote MCP
+server and there is nothing to install:
+
+```bash
+claude mcp add --transport http taster https://taster-six.vercel.app/api/mcp
+```
+
+In Cursor, `.cursor/mcp.json`: `{ "mcpServers": { "taster": { "url": "https://taster-six.vercel.app/api/mcp" } } }`.
+claude.ai and ChatGPT take the same URL as a custom connector. The hosted server has every tool except the two
+that read local files (`extract_content`, `brand_theme`); `diagnose` takes public http(s) URLs only and is rate
+limited per client. For local files and the full tool set, use the plugin above.
+
 ### Use from an editor (ACP)
 
 `engine/acp.mjs` speaks the [Agent Client Protocol](https://agentclientprotocol.com), so editors with an agent
