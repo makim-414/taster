@@ -3943,11 +3943,6 @@
   },
   "gaps": [
     {
-      "category": "sidebar",
-      "patterns": 1,
-      "components": 0
-    },
-    {
       "category": "theme-tokens",
       "patterns": 1,
       "components": 0
