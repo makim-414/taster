@@ -12,6 +12,22 @@ const nextConfig = {
   serverExternalPackages: ['playwright-core', '@sparticuz/chromium'],
   // engine/diagnose.mjs is imported at run time (not bundled), so the engine files it reads are listed by hand.
   outputFileTracingIncludes: {
+    // engine/http.mjs and engine/server.mjs are also imported at run time; they read the catalog files below.
+    '/api/mcp': [
+      '../engine/*.mjs',
+      '../engine/*.js',
+      '../engine/package.json',
+      '../engine/node_modules/**',
+      '../rules/detect.js',
+      '../rules/rules.json',
+      '../patterns/**',
+      '../taxonomy/**',
+      '../registry/registry.json',
+      '../registry/src/**',
+      '../skills/taster/references/start.md',
+      './node_modules/playwright-core/**',
+      './node_modules/@sparticuz/chromium/**',
+    ],
     '/api/diagnose': [
       '../engine/*.mjs',
       '../engine/*.js',
