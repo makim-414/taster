@@ -2,6 +2,9 @@
 // each visible element by role (button, input, card, h1 to h3, body text, link, badge), and report
 //   drift: the same component drawn differently on two screens (a button radius of 8px here and 4px there), and
 //   off-system values: a radius, spacing step, color, typeface, shadow or duration that is not one of the system's tokens.
+// A system may declare identity exemptions (identity.logoFont): the logo wordmark set in its own face. Inside the site's
+// logo or home link in the header and footer, that face is not an off-system typeface; each such value is reported under
+// exempt, never dropped.
 // Deterministic: the same screens and system give the same report in the same order.
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, extname } from 'node:path';
@@ -95,28 +98,47 @@ export function parseThemeCss(css) {
 }
 
 // Accepts a path to a .css or .json file, a { tokens } object, a plain { '--name': value } object, or a list of these
-// (later ones override earlier ones, the way stylesheets load: tokens.css, then theme.css).
+// (later ones override earlier ones, the way stylesheets load: tokens.css, then theme.css). A { tokens } system
+// (taster.system.json) may carry identity.logoFont; a later one that declares it wins.
 export function loadSystem(input) {
   if (input == null) return null;
   const list = Array.isArray(input) ? input : [input];
   if (!list.length) return null;
   const tokens = {};
   const sources = [];
+  let identity = null;
+  const takeIdentity = (obj, where) => {
+    const id = obj && typeof obj === 'object' && !Array.isArray(obj) ? obj.identity : null;
+    if (id && id.logoFont != null) identity = normIdentity(id, where);
+  };
   for (const item of list) {
     if (typeof item === 'string') {
       if (!existsSync(item)) throw new Error(`System file not found: ${item}`);
       const text = readFileSync(item, 'utf8');
-      if (/\.json$/i.test(item)) Object.assign(tokens, tokenMap(JSON.parse(text), item));
-      else Object.assign(tokens, parseThemeCss(text));
+      if (/\.json$/i.test(item)) {
+        const obj = JSON.parse(text);
+        Object.assign(tokens, tokenMap(obj, item));
+        takeIdentity(obj, item);
+      } else Object.assign(tokens, parseThemeCss(text));
       sources.push(item);
     } else if (item && typeof item === 'object') {
       Object.assign(tokens, tokenMap(item, 'system object'));
+      takeIdentity(item, 'system object');
       sources.push(item.source || 'object');
     } else throw new Error(`Not a system: ${item}`);
   }
   const names = Object.keys(tokens).filter((k) => k.startsWith('--'));
   if (!names.length) throw new Error('The system has no CSS custom properties (expected --name: value tokens)');
-  return { loaded: true, sources, tokens: Object.fromEntries(names.sort().map((k) => [k, String(tokens[k])])) };
+  return { loaded: true, sources, tokens: Object.fromEntries(names.sort().map((k) => [k, String(tokens[k])])), identity };
+}
+
+// { logoFont } with a family name, or null when nothing is declared.
+export function normIdentity(identity, where = 'identity') {
+  if (identity == null) return null;
+  const raw = typeof identity === 'string' ? identity : identity.logoFont;
+  if (raw == null) return null;
+  if (typeof raw !== 'string' || !raw.replace(/["']/g, '').trim()) throw new Error(`${where}: identity.logoFont must be a font family name`);
+  return { logoFont: raw.split(',')[0].replace(/["']/g, '').trim() };
 }
 
 function tokenMap(obj, where) {
@@ -202,6 +224,27 @@ function collectInPage({ tokens, kinds, maxPerRole }) {
     return null;
   }
 
+  // The site's logo: the home link or a logo-classed element in the header and footer, and the header's first link.
+  const logos = new Set();
+  const home = (a) => {
+    const h = a.getAttribute('href');
+    if (h === '/' || h === './') return true;
+    try {
+      const u = new URL(a.href);
+      return /^https?:$/.test(u.protocol) && u.origin === location.origin && u.pathname === '/';
+    } catch {
+      return false;
+    }
+  };
+  for (const zone of document.querySelectorAll('header,[role="banner"],footer,[role="contentinfo"]')) {
+    for (const a of zone.querySelectorAll('a[href]')) if (home(a)) logos.add(a);
+    for (const e of zone.querySelectorAll('[class*="logo" i]')) logos.add(e);
+  }
+  const banner = document.querySelector('header,[role="banner"]');
+  const firstLink = banner && banner.querySelector('a[href]');
+  if (firstLink) logos.add(firstLink);
+  const inLogo = (el) => [...logos].some((l) => l === el || l.contains(el));
+
   const elements = [];
   const counts = {};
   for (const el of document.body.querySelectorAll('*')) {
@@ -219,6 +262,7 @@ function collectInPage({ tokens, kinds, maxPerRole }) {
       role,
       selector: sel(el),
       text: clean(el.innerText || el.value || el.getAttribute('aria-label') || '').slice(0, 40),
+      logo: inLogo(el),
       w: r.width,
       h: r.height,
       style: {
@@ -555,21 +599,33 @@ function offSystem(prop, el, allowed) {
   return null;
 }
 
-export function checkSystem(collected, { widths, screens }) {
+// Off-system values, and apart from them the values an identity exemption covers: only font-family, only inside the
+// logo, only the declared face. Returns { offSystem, exempt }.
+export function checkSystem(collected, { widths, screens, identity = null }) {
   const out = [];
+  const exempt = [];
+  const logoFace = identity && identity.logoFont ? identity.logoFont.toLowerCase() : null;
+  const reason = logoFace ? `logo face declared by the system identity (${identity.logoFont})` : null;
+  const sorted = (found) =>
+    [...found.values()]
+      .sort((a, b) => a._sort[0] - b._sort[0] || a._sort[1] - b._sort[1] || (a._sort[2] < b._sort[2] ? -1 : a._sort[2] > b._sort[2] ? 1 : 0))
+      .map(({ _sort, ...f }) => f);
   for (const width of widths) {
     for (const screen of screens) {
       const { elements, allowed } = collected[screen.id][width];
       if (!allowed) continue;
       const sets = allowedSets(allowed);
       const found = new Map();
+      const spared = new Map();
       for (const el of elements) {
         for (const prop of ROLE_PROPS[el.role]) {
           const miss = offSystem(prop, el, sets);
           if (!miss) continue;
+          const isExempt = logoFace && prop === 'fontFamily' && el.logo && familyList(el.style.fontFamily)[0] === logoFace;
+          const into = isExempt ? spared : found;
           const k = `${el.role}|${prop}|${miss.value}`;
-          if (!found.has(k)) {
-            found.set(k, {
+          if (!into.has(k)) {
+            into.set(k, {
               width,
               screen: screen.id,
               role: el.role,
@@ -578,20 +634,20 @@ export function checkSystem(collected, { widths, screens }) {
               value: miss.value,
               count: 0,
               selectors: [],
-              nearest: miss.nearest ? { token: miss.nearest.token, value: miss.nearest.value } : null,
+              ...(isExempt ? { reason } : { nearest: miss.nearest ? { token: miss.nearest.token, value: miss.nearest.value } : null }),
               _sort: [ROLES.indexOf(el.role), PROP_ORDER.indexOf(prop), miss.value],
             });
           }
-          const f = found.get(k);
+          const f = into.get(k);
           f.count++;
           if (f.selectors.length < MAX_SELECTORS && !f.selectors.includes(el.selector)) f.selectors.push(el.selector);
         }
       }
-      const list = [...found.values()].sort((a, b) => a._sort[0] - b._sort[0] || a._sort[1] - b._sort[1] || (a._sort[2] < b._sort[2] ? -1 : a._sort[2] > b._sort[2] ? 1 : 0));
-      out.push(...list.map(({ _sort, ...f }) => f));
+      out.push(...sorted(found));
+      exempt.push(...sorted(spared));
     }
   }
-  return out;
+  return { offSystem: out, exempt };
 }
 
 // ---- entry points ----
@@ -615,10 +671,14 @@ export function screenIds(targets) {
   });
 }
 
-// screens: URLs, file paths or { id, source }. system: anything loadSystem accepts, or null.
-export async function checkConsistency(targets, { system = null, widths = CONSISTENCY_WIDTHS, timeout = 30000 } = {}) {
+// screens: URLs, file paths or { id, source }. system: anything loadSystem accepts, or null. identity: { logoFont } (or
+// the family name) to exempt the logo face; it overrides what the system declares.
+export async function checkConsistency(targets, { system = null, identity = null, widths = CONSISTENCY_WIDTHS, timeout = 30000 } = {}) {
   if (!Array.isArray(targets) || !targets.length) throw new Error('Give at least one screen');
-  const sys = system == null ? null : system.loaded === true ? system : loadSystem(system);
+  let sys = system == null ? null : system.loaded === true ? system : loadSystem(system);
+  const declared = normIdentity(identity, 'identity option');
+  if (declared && !sys) throw new Error('An identity exemption needs a system to check against');
+  if (declared) sys = { ...sys, identity: declared };
   if (targets.length < 2 && !sys) throw new Error('Give two or more screens to compare, or one screen and a system');
   const screens = screenIds(targets).map((s) => ({ ...s, url: toUrl(s.source) }));
   const ids = screens.map((s) => s.id);
@@ -641,7 +701,8 @@ export async function checkConsistency(targets, { system = null, widths = CONSIS
 
 export function buildReport(collected, { screens, widths, system }) {
   const drift = compareScreens(collected, { widths, screens });
-  const offSystemFindings = system ? checkSystem(collected, { widths, screens }) : [];
+  const identity = system ? system.identity || null : null;
+  const { offSystem: offSystemFindings, exempt } = system ? checkSystem(collected, { widths, screens, identity }) : { offSystem: [], exempt: [] };
   let systemSummary = null;
   if (system) {
     const first = collected[screens[0].id][widths[0]].allowed;
@@ -651,6 +712,7 @@ export function buildReport(collected, { screens, widths, system }) {
       tokens: Object.keys(system.tokens).length,
       kinds,
       unchecked: SYSTEM_KINDS.filter((k) => !kinds[k]),
+      identity,
     };
   }
   const roles = Object.fromEntries(
@@ -664,6 +726,7 @@ export function buildReport(collected, { screens, widths, system }) {
     roles,
     drift,
     offSystem: offSystemFindings,
+    exempt,
     findings: drift.length + offSystemFindings.length,
     ok: drift.length + offSystemFindings.length === 0,
   };
@@ -686,6 +749,11 @@ export function formatConsistencyText(report) {
     out.push('', `Off system: ${report.offSystem.length}`);
     for (const f of report.offSystem) {
       out.push(`  ${f.screen}  ${f.role} ${f.property} ${f.value} at ${f.width}  (${f.count}: ${f.selectors.join(', ')})${f.nearest ? `  nearest ${f.nearest.token} ${f.nearest.value}` : ''}`);
+    }
+    if (report.system.identity) {
+      const ex = report.exempt || [];
+      out.push('', `Exempt as identity (logo face ${report.system.identity.logoFont}), not counted: ${ex.length}`);
+      for (const f of ex) out.push(`  ${f.screen}  ${f.role} ${f.property} ${f.value} at ${f.width}  (${f.count}: ${f.selectors.join(', ')})`);
     }
   }
   out.push('', report.ok ? 'CONSISTENCY OK' : `CONSISTENCY FAIL ${report.findings} finding${report.findings === 1 ? '' : 's'}`);

@@ -339,6 +339,7 @@ export async function checkScreen(plan, screenId, { baseDir = null } = {}) {
     const mine = (f) => (f.screen ? f.screen === screen.id : f.values.some((v) => v.screens.some((s) => s.id === screen.id)));
     consistency.drift = consistency.drift.filter(mine);
     consistency.offSystem = consistency.offSystem.filter(mine);
+    consistency.exempt = (consistency.exempt || []).filter(mine);
     consistency.findings = consistency.drift.length + consistency.offSystem.length;
     consistency.ok = consistency.findings === 0;
   }

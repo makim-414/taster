@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { buildReport, checkConsistency, loadSystem, parseThemeCss, tokenKind } from '../consistency.mjs';
+import { buildReport, checkConsistency, formatConsistencyText, loadSystem, parseThemeCss, tokenKind } from '../consistency.mjs';
 
 const screen = (name) => fileURLToPath(new URL(`./fixtures/screens/${name}`, import.meta.url));
 const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
@@ -74,6 +74,39 @@ test('a system the screens were not built from flags what they use; drift betwee
   const at1440 = report.offSystem.filter((f) => f.width === 1440).map((f) => `${f.screen} ${f.role} ${f.property} ${f.value}`);
   for (const want of ['home card border-radius 10px', 'home button background-color rgba(31, 79, 138, 1)', 'home badge padding 4px 8px', 'pricing card border-radius 10px']) assert.ok(at1440.includes(want), `${want} not in ${at1440.join(' | ')}`);
   assert.deepEqual(report.system.unchecked, ['shadow', 'duration']);
+});
+
+test('identity: the declared logo face is exempt inside the logo only, reported apart, never silently', { timeout: 180000 }, async () => {
+  const json = JSON.parse(readFileSync(screen('system.json'), 'utf8'));
+  const fonts = (r) => r.offSystem.filter((f) => f.property === 'font-family').map((f) => `${f.width} ${f.role} ${f.selectors[0].split(' > ').pop().replace(/:nth-of-type\(\d+\)/, '')}`);
+  // Negative control: with no identity declared the wordmark in the header and the footer is off the system.
+  const plain = await checkConsistency([screen('logo.html')], { system: json });
+  assert.deepEqual(fonts(plain), ['1440 body p.wordmark', '1440 link a.wordmark', '390 body p.wordmark', '390 link a.wordmark']);
+  assert.equal(plain.offSystem.find((f) => f.role === 'link').count, 2);
+  assert.deepEqual(plain.exempt, []);
+
+  // Declared by the system (taster.system.json identity.logoFont): only the logo links leave the findings.
+  const declared = await checkConsistency([screen('logo.html')], { system: { ...json, identity: { logoFont: 'Wordmark Serif' } } });
+  assert.deepEqual(fonts(declared), ['1440 body p.wordmark', '390 body p.wordmark'], 'the same face on body text stays a finding');
+  assert.deepEqual(declared.exempt.map((e) => [e.width, e.role, e.property, e.value, e.count, e.reason]), [
+    [1440, 'link', 'font-family', 'wordmark serif, georgia, serif', 2, 'logo face declared by the system identity (Wordmark Serif)'],
+    [390, 'link', 'font-family', 'wordmark serif, georgia, serif', 2, 'logo face declared by the system identity (Wordmark Serif)'],
+  ]);
+  assert.deepEqual(declared.system.identity, { logoFont: 'Wordmark Serif' });
+  assert.equal(declared.findings, plain.findings - 2);
+  const text = formatConsistencyText(declared);
+  assert.match(text, /Exempt as identity \(logo face Wordmark Serif\), not counted: 2\n {2}logo {2}link font-family wordmark serif, georgia, serif at 1440 {2}\(2: /);
+
+  // The option works with a theme CSS that has no identity, and only for the declared face.
+  const option = await checkConsistency([screen('logo.html')], { system: screen('system.css'), identity: { logoFont: 'Wordmark Serif' } });
+  assert.equal(option.exempt.length, 2);
+  const other = await checkConsistency([screen('logo.html')], { system: screen('system.css'), identity: { logoFont: 'Georgia' } });
+  assert.deepEqual(other.exempt, []);
+  assert.equal(other.offSystem.filter((f) => f.role === 'link' && f.property === 'font-family').length, 2);
+  assert.throws(() => loadSystem({ ...json, identity: { logoFont: 12 } }), /identity.logoFont must be a font family name/);
+  const cliRun = run('--consistency', screen('logo.html'), '--system', screen('system.css'), '--logo-font', 'Wordmark Serif');
+  assert.equal(cliRun.status, 1, 'the body text in the logo face is still a finding');
+  assert.match(cliRun.stdout, /Exempt as identity \(logo face Wordmark Serif\), not counted: 2/);
 });
 
 // Synthetic samples: tolerance and variants without a browser.
