@@ -5,7 +5,7 @@ category: chart-kpi
 uses: [show-one-number, explain-on-demand]
 surfaces: [dashboard]
 replaces: [AC-11, CMP-06, COL-01, CPY-02]
-components: [blocks/kpi, blocks/trend]
+components: [blocks/kpi, blocks/trend, blocks/stat-strip]
 inspiration: []
 status: stable
 ---

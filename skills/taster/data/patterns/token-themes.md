@@ -5,7 +5,7 @@ category: theme-tokens
 uses: [set-the-visual-foundation, switch-views]
 surfaces: [landing, app, dashboard]
 replaces: [CMP-04, CMP-11, COL-02, COL-03, COL-05, COL-08]
-components: [blocks/toggle]
+components: [blocks/toggle, blocks/theme-scope]
 inspiration: []
 status: stable
 ---

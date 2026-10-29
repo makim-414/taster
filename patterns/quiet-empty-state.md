@@ -5,7 +5,7 @@ category: empty-state
 uses: [handle-no-data]
 surfaces: [app, dashboard]
 replaces: [AC-07, AC-11, CPY-02]
-components: [blocks/skeleton]
+components: [blocks/skeleton, blocks/empty-state]
 inspiration: []
 status: stable
 ---
