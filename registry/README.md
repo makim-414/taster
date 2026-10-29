@@ -1,12 +1,24 @@
 # Registry
 
 Portable React and TypeScript components with neutral design tokens. There is no package to
-install. You copy the files you need into your app, the same way you would with shadcn/ui.
+install and no other CLI to set up: `taster add` copies the files a component needs into your app.
 
-43 components, MIT licensed. Every entry is listed in `registry.json` with its file, category,
+57 components, MIT licensed. Every entry is listed in `registry.json` with its file, category,
 npm dependencies and credit.
 
-## Copy a component into your app
+## Add a component to your app
+
+```bash
+node engine/cli.mjs add blocks/button blocks/dialog --dir src/components/taster
+node engine/cli.mjs add --list
+```
+
+It follows every relative import (helpers such as `_cn.ts`, other components, icons), adds `tokens.css`,
+`tailwind-preset.cjs` and `THIRD_PARTY_NOTICES.md`, prints the npm packages to install, and leaves any file you
+changed alone unless you pass `--overwrite`. Without a clone, read from the hosted copy:
+`--from https://taster-six.vercel.app` (the same files, served at `/r/<id>.json`; `/r/index.json` lists the ids).
+
+## Copy a component by hand
 
 1. Tokens first. Components read CSS variables only, so nothing renders correctly without them.
    - Copy `src/tokens.css` and import it once at your app root.

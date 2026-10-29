@@ -55,6 +55,15 @@ MCP 서버(실제 브라우저로 진단, 교체 부품 제안, 패턴·컴포�
 claude mcp add taster -- node /path/to/taster/engine/start.mjs
 ```
 
+### 내 앱에 부품 넣기
+
+```bash
+node engine/cli.mjs add blocks/button blocks/citations --dir src/components/taster
+```
+
+부품마다 그 부품이 import 하는 파일과 토큰 파일을 함께 복사합니다. shadcn 같은 다른 CLI 는 필요 없습니다. 클론
+없이 받으려면 `--from https://taster-six.vercel.app` 를 붙이세요. 자세한 내용은 `registry/README.md`.
+
 ### 설치 없이 쓰기 (원격 MCP)
 
 같은 MCP 서버가 `https://taster-six.vercel.app/api/mcp` 에서 돌아갑니다(Streamable HTTP). 원격 MCP 서버로 넣으면

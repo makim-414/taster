@@ -66,6 +66,15 @@ node engine/cli.mjs https://example.com --brand      # the site's brand as a tok
 
 It uses Playwright's Chromium if installed, otherwise your Google Chrome.
 
+### Add components to your app
+
+```bash
+node engine/cli.mjs add blocks/button blocks/citations --dir src/components/taster
+```
+
+Copies each component with every file it imports and the token files; no shadcn or other CLI involved. Add
+`--from https://taster-six.vercel.app` to read the hosted copy instead of a clone. See `registry/README.md`.
+
 ### Use without installing (hosted MCP)
 
 The same MCP server runs at `https://taster-six.vercel.app/api/mcp` (Streamable HTTP). Add it as a remote MCP
@@ -136,7 +145,7 @@ rules/               rules.json, detect.js (runs in the page), fixtures and test
 engine/              runs detect.js at two widths: CLI, MCP server (start prompt, diagnose, extract, swap tools), ACP agent, tests
 examples/rebuild/    a worked Rebuild, before and after, with its own check
 commands/            the /taster command for Claude Code
-registry/            copyable React components, tokens, a demo page and a render test
+registry/            React components (taster add copies them into your app), tokens, a demo page and a render test
 scripts/             build-docs.mjs (derives links and the skill bundle), validate.mjs
 ```
 
