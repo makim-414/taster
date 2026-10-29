@@ -61,6 +61,12 @@ names the constraint; ask which one gives way.
 every screen and in every part. Components read the alias tokens only (`var(--r-card)`, `var(--sp-4)`,
 `var(--sh-card)`, `var(--dur-press)`); never type a value from the system into a component.
 
+`taster.system.json` keeps the brand under `identity` (name, logo, color, fonts, tokens, notes). `identity.logoFont`
+is the face the logo wordmark is set in, read apart from the heading and body faces. It is not a system typeface:
+`--font` still comes from heading and body. The consistency check reads it as an identity exemption, so that face
+inside the site's logo is listed as exempt instead of off the system ([screens.md](screens.md)). Point the plan's
+system at `taster.system.json` (or end the list with it) so every screen check carries it.
+
 For one part, `system_for_category { system, category }` lists the axes in order of `taxonomy.relevance` for that
 category, with this system's step and the tokens each drives, so the part's builder knows which values matter most.
 `copy` has none: wording is governed by rules.
