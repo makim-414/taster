@@ -32,7 +32,7 @@ source, is in [references/start.md](references/start.md).
 Data this skill reads (all inside this folder):
 
 - [data/rules.json](data/rules.json): the slop rules. `detect.level` says how each is checked: `deterministic` and `heuristic` rules run in the browser through [data/detect.js](data/detect.js); `manual` rules you judge from the capture.
-- [data/taxonomy.json](data/taxonomy.json): families, categories, uses (what the end user is trying to do) and surfaces (landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat). Its `iconography` block is the icon slot map: control, explanatory, identity, data marker and no icon, each with when it needs an icon and what to use instead.
+- [data/taxonomy.json](data/taxonomy.json): families and categories, uses (what the end user is trying to do) and surfaces (landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat). Every category has a definition, `includes`, `excludes` (each naming the category the excluded thing goes to) and examples. `classify` is the decision key: describe a part with the yes or no `features`, and the first matching step names its one category ([data/classify.mjs](data/classify.mjs) runs it). `axes` are the weighting dials (density, contrast, roundness, type-expression, color-restraint, elevation, motion, stroke), each listing the tokens it drives; `snap` gives their allowed steps, `relevance` says which axes matter per category, and `constraints` are the design principles that keep a setting balanced ([data/axes.mjs](data/axes.mjs) exports `validateAxes` and `balance`). `ruleMap` ties every rule to its categories and axis; `gaps` lists categories that still lack components. Its `iconography` block is the icon slot map: control, explanatory, identity, data marker and no icon, each with when it needs an icon and what to use instead.
 - [data/patterns/INDEX.json](data/patterns/INDEX.json) and `data/patterns/<id>.md`: one reusable design answer per file. Every rule lists its fix patterns in `fix_patterns`.
 - [data/registry.json](data/registry.json): token based React components you can copy. Source lives in the repository under `registry/src/`; if this folder was installed alone, fetch the file from `https://raw.githubusercontent.com/makim-414/taster/main/registry/<file>`.
 
@@ -79,7 +79,7 @@ action still present. Flag unsourced numbers and testimonials to the user instea
 
 ## Build
 
-Follow [references/build.md](references/build.md). Choose the surface, list the uses the screen must serve in order, pick one pattern per use from the taxonomy, then compose. Run Diagnose on your own result before you show it.
+Follow [references/build.md](references/build.md). Choose the surface, list the uses the screen must serve in order, pick one pattern per use from the taxonomy, set the weighting axes with the builder and balance them, then compose. Run Diagnose on your own result before you show it.
 
 ## Icons
 

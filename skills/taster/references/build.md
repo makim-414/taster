@@ -18,6 +18,16 @@ Read the `uses` in the taxonomy and pick the ones this screen must serve, in rea
 usually: introduce the product, show how it works, prove trust, compare plans, answer doubts, ask for the action.
 A dashboard is usually: show one number, show a trend, compare items, act on a row.
 
+## 2b. Set the weights
+
+Agree the tone with the builder on the `axes` in `data/taxonomy.json`: density, contrast, roundness,
+type-expression, color-restraint, elevation, motion and stroke. Start from each axis `default`, or from the brand theme
+if one was absorbed. Each axis only takes the values in `snap`; offer the step names, never a free number. When the
+builder moves one axis, run `balance(settings, axis)` from `data/axes.mjs`: it keeps that axis where it was put and
+moves the others the least amount needed to satisfy every `constraint`. Tell the builder which other axes moved and
+quote the constraint's `principle`. The `drives` list of each axis names the tokens in `registry/src/tokens.css` that
+the setting changes; `relevance` says which axes matter most for the categories this screen uses.
+
 ## 3. Pick one pattern per use
 
 From `data/patterns/INDEX.json`, filter by surface and use. Prefer patterns with `status: stable` and with

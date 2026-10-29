@@ -11,7 +11,9 @@ It ships three things the agent uses together:
   breaks mid word. Most are checked in a real browser by `rules/detect.js`.
 - **A taxonomy of patterns.** Reusable design answers organized by what the visitor is trying to do (show one
   number, compare plans, prove trust, label a state) and where (landing, dashboard, app, store, editorial, sign in,
-  AI chat). Every rule points to the patterns that fix it.
+  AI chat). Every UI part falls in exactly one category through a machine decision key, and eight weighting axes
+  (density, contrast, roundness, type expression, color restraint, elevation, motion, stroke) carry a brand's tone
+  into tokens. Every rule points to the patterns that fix it.
 - **A registry of components.** Token based React components you copy into your app. No package to install, no
   brand to undo.
 
@@ -72,33 +74,40 @@ without the AI look", or "Build a pricing page for this product without generic 
 
 ## Taxonomy at a glance
 
+Every category has a one sentence definition, what it includes, what it excludes and where that goes instead, and
+generic examples. A decision key over 33 yes or no features gives every UI part exactly one category, first match
+wins. The weighting axes drive named properties in `registry/src/tokens.css`, snap to fixed steps so a setting never
+sits in an ambiguous middle, and are kept balanced by design principles written as linear constraints (a dense screen
+cannot carry poster type, deep shadows need a restrained palette). `taxonomy/axes.mjs` validates and balances a
+setting. Read [taxonomy/SCHEMA.md](taxonomy/SCHEMA.md).
+
 <!-- taxonomy:start -->
-112 patterns, 74 rules, 44 components, 40 uses, 7 surfaces.
+112 patterns, 74 rules, 44 components, 33 categories in 8 families, 40 uses, 7 surfaces, 8 weighting axes, 10 constraints.
 
 | Family | Categories | Patterns |
 |---|---|---|
-| Page sections | Hero, Feature section, Pricing, Call to action, Testimonial and proof, FAQ | 23 |
-| Navigation | Navigation header, Footer, Sidebar, Command palette, Tabs and segmented control | 7 |
-| Foundations | Layout and shell, Card, Typography, Icon and mark | 28 |
-| Actions and inputs | Button, Form and input | 8 |
-| Feedback and overlays | Badge and label, Toast and alert, Empty and error state, Loader and skeleton, Modal, drawer and menu | 13 |
-| Data display | Chart and KPI, Table, Timeline and stepper, Map | 17 |
-| Media, commerce and AI | Media and gallery, Commerce, Chat and AI | 11 |
-| Motion and effects | Motion and particles, 3D scene | 5 |
+| Page sections | Hero; Feature and content section; Pricing; Call to action; Testimonial, quote and proof; FAQ | 23 |
+| Navigation | Navigation header; Footer; Sidebar; Command palette and shortcuts; Tabs, segmented control and disclosure | 7 |
+| Foundations | Layout and shell; Card and list; Typography; Copy and voice; Icon and mark; Theme and tokens | 29 |
+| Actions and inputs | Button; Form and input | 8 |
+| Feedback and overlays | Badge and label; Toast and alert; Empty and error state; Loader and skeleton; Overlay: dialog, drawer, popover and menu | 12 |
+| Data display | Chart and KPI; Table and data grid; Timeline, stepper and calendar; Map | 16 |
+| Media, commerce and AI | Media and gallery; Commerce; Chat and AI | 11 |
+| Motion and effects | Motion effect and particles; 3D scene | 6 |
 <!-- taxonomy:end -->
 
 ## Repository
 
 ```text
 skills/taster/      the skill (SKILL.md, references, and a generated data/ bundle)
-taxonomy/            families, categories, uses, surfaces
+taxonomy/            categories with their decision key, uses, surfaces, weighting axes and constraints (SCHEMA.md)
 patterns/            one Markdown file per pattern, plus INDEX.json
 rules/               rules.json, detect.js (runs in the page), fixtures and tests
 engine/              runs detect.js at two widths: CLI, MCP server (start prompt, diagnose, extract, swap tools), tests
 examples/rebuild/    a worked Rebuild, before and after, with its own check
 commands/            the /taster command for Claude Code
 registry/            copyable React components, tokens, a demo page and a render test
-scripts/             build-docs.mjs (derives links and the skill bundle), validate.mjs
+scripts/             build-docs.mjs (derives links, gaps and the skill bundle), validate.mjs, check-taxonomy.mjs
 ```
 
 Edit sources, then run:
@@ -106,6 +115,8 @@ Edit sources, then run:
 ```bash
 node scripts/build-docs.mjs
 node scripts/validate.mjs
+node scripts/check-taxonomy.mjs
+node --test taxonomy/axes.test.mjs
 node rules/test-detect.mjs
 npm --prefix engine test
 node engine/scripts/check-rebuild-example.mjs
