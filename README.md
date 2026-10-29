@@ -81,6 +81,26 @@ Copies each component with every file it imports and the token files; no shadcn 
 GitHub Copilot and Gemini CLI, generated from `rules/rules.json`. `node engine/cli.mjs export all --dir <your app>`
 puts each one where its tool reads it and keeps your own text in shared files. See `exports/README.md`.
 
+### Check pull requests (GitHub Action)
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+steps:
+  - uses: actions/checkout@v4
+  - uses: makim-414/taster@main
+    with:
+      targets: |
+        dist/index.html
+        https://staging.example.com/pricing
+      fail-on: high
+```
+
+It writes the findings to the job summary and as SARIF, uploads the SARIF to code scanning so they show on the
+changed files, and fails the step for findings at `fail-on` or worse. Without code scanning, set
+`upload-sarif: 'false'`. The CLI does the same locally: `node engine/cli.mjs <targets...> --sarif taster.sarif`.
+
 ### Use without installing (hosted MCP)
 
 The same MCP server runs at `https://taster-six.vercel.app/api/mcp` (Streamable HTTP). Add it as a remote MCP
