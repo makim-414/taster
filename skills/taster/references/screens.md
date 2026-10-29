@@ -59,13 +59,42 @@ Call `plan_next { plan }` and do exactly the one thing it returns. Then record w
 4. **Check.** Record `{ type: "check", screen }` with no counts and the tool runs the check itself: Diagnose on the
    output at 1440 and 390 (zero measured findings), then `check_consistency` of this screen against every screen
    already checked and against the system (zero drift, zero values off the system). It refuses to mark the screen
-   checked until both are zero. Fix what it lists and check again. After three failed checks on the same finding,
+   checked until both are zero, or until every finding left is an accepted exception (below). Fix what it lists and check again. After three failed checks on the same finding,
    stop and tell the builder what is in the way.
 5. **Show.** Show the builder the checked screen next to its original (or next to the screens before it), with the
-   two counts. Then `plan_next` again.
+   two counts and any accepted exceptions. Then `plan_next` again.
 
 The plan enforces the order: no build before approval, no next part before this part is checked, no next screen
 before this screen is checked. An out of order step is refused with the reason.
+
+## Accepted exceptions
+
+Some findings cannot be fixed by the one doing the work. On a stylesheet-only route (a swap or a skin over a site
+whose markup you cannot edit), a symbol inside a link's text (AC-03), an em dash in the copy (AC-02) or a value set
+inline in the markup stays whatever the stylesheet does. Without a way to record that, the screen can never be
+checked and the plan stops at the first screen. Do not fake the counts; record the exception instead:
+
+```json
+{ "type": "accept", "screen": "home", "rule": "AC-03",
+  "reason": "The arrow is part of the footer link text; removing it needs a markup change",
+  "by": "<the builder's own words approving it>" }
+```
+
+- Ask the builder first, show them the finding and why it cannot be fixed here, and record their answer in `by`, the
+  same way `approve` records theirs in `note`. Both `reason` and `by` are required.
+- `rule` is a detector rule id (`AC-03`), or a consistency finding named `drift:<role>:<property>` or
+  `off-system:<role>:<property>` (`off-system:link:font-family`). The refused check lists what is left in exactly
+  these names (`check.unaccepted`). One accept covers that rule on that screen, at both widths.
+- Accept is recorded on the screen (not on a part), while the screen is proposed, approved or built. It does not
+  change the status.
+- A check then passes when every remaining finding is one of the screen's accepted exceptions; any other finding
+  still blocks it. Recording a check with counts yourself needs `remaining`, the list of what is left.
+- Accepted exceptions are never hidden: they stay in `taster.plan.json` under the screen's `accepted`, in its notes,
+  and in every `plan_next` as `accepted`. The last `plan_next` (`done`) names them again. Hand them to whoever owns
+  the markup as the list of changes still to make.
+
+The logo wordmark in its own face is not an exception to accept: declare it as the system's identity instead (see
+identity exemptions below).
 
 ## Part by part
 

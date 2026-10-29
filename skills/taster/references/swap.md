@@ -39,4 +39,6 @@ Before and after captures side by side, the list of rules cleared, and anything 
 Swap one screen at a time ([screens.md](screens.md)), with the route set to `swap` so each screen's output is its
 own source. Propose the swaps for a screen, swap only after the builder's yes, then check it: zero findings, and zero
 drift in `check_consistency` against the screens already swapped and the tokens. Shared components fixed on one
-screen usually fix the next; the consistency check shows where they did not.
+screen usually fix the next; the consistency check shows where they did not. A finding only a markup change can
+clear (a symbol inside link text, copy with an em dash) is recorded as an accepted exception with the builder's
+OK, never left out of the counts ([screens.md](screens.md#accepted-exceptions)).

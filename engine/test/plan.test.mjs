@@ -140,6 +140,50 @@ test('part by part: the screen plan is approved first, parts go one at a time, t
   assert.deepEqual([nextStep(plan).action, nextStep(plan).screen], ['propose', 'products']);
 });
 
+test('accept: a named exception the builder approved lets the check pass; anything else still blocks, and the list stays in the output', () => {
+  let plan = step(fresh(), { type: 'propose', screen: 'home' }, { type: 'approve', screen: 'home', note: 'yes' }, { type: 'build', screen: 'home', output: 'home.html' });
+  const left = { findings: 1, drift: 1, remaining: ['AC-03', 'off-system:link:font-family'] };
+  // Negative control: without an accepted exception the check refuses and names what is left.
+  assert.throws(() => applyStep(plan, { type: 'check', screen: 'home', ...left }), /not clean: 1 detector findings, 1 consistency findings[^]*AC-03, off-system:link:font-family/);
+  const why = 'The symbol is in the markup text; a stylesheet cannot remove it';
+  const ok = 'Accepted, the docs team changes the markup later';
+  for (const [e, re] of [
+    [{ type: 'accept', screen: 'home', rule: 'AC-03', by: ok }, /accept needs a reason/],
+    [{ type: 'accept', screen: 'home', rule: 'AC-03', reason: why }, /accept needs the builder's own words in by/],
+    [{ type: 'accept', screen: 'home', rule: 'everything', reason: why, by: ok }, /rule must be a detector rule id/],
+    [{ type: 'accept', screen: 'home', part: 'hero', rule: 'AC-03', reason: why, by: ok }, /recorded on the screen/],
+    [{ type: 'accept', screen: 'products', rule: 'AC-03', reason: why, by: ok }, /"products" has to wait/],
+  ]) assert.throws(() => applyStep(plan, e), re, JSON.stringify(e));
+  assert.throws(() => applyStep(fresh(), { type: 'accept', screen: 'home', rule: 'AC-03', reason: why, by: ok }), /is planned; "accept" needs it proposed, approved or built/);
+
+  plan = step(plan, { type: 'accept', screen: 'home', rule: 'AC-03', reason: why, by: ok });
+  assert.deepEqual(plan.screens[0].accepted, [{ rule: 'AC-03', reason: why, by: ok }]);
+  assert.equal(plan.screens[0].status, 'built', 'accept does not move the status');
+  assert.match(plan.screens[0].notes, /accepted exception AC-03: The symbol is in the markup text; a stylesheet cannot remove it \(builder: Accepted, the docs team changes the markup later\)/);
+  assert.throws(() => applyStep(plan, { type: 'check', screen: 'home', ...left }), /not accepted: off-system:link:font-family/);
+  assert.throws(() => applyStep(plan, { type: 'accept', screen: 'home', rule: 'AC-03', reason: why, by: ok }), /AC-03 is already accepted/);
+  plan = step(plan, { type: 'accept', screen: 'home', rule: 'off-system:link:font-family', reason: 'The wordmark keeps its own face', by: ok });
+
+  const n = nextStep(plan);
+  assert.equal(n.action, 'check');
+  assert.match(n.say, /Accepted exceptions on this screen, approved by the builder: AC-03 \(The symbol is in the markup text[^)]*\), off-system:link:font-family \(The wordmark keeps its own face\)\. The check passes when every remaining finding is one of these; any other finding still has to be fixed\./);
+  assert.deepEqual(n.accepted.map((a) => [a.screen, a.rule]), [['home', 'AC-03'], ['home', 'off-system:link:font-family']]);
+  assert.throws(() => applyStep(plan, { type: 'check', screen: 'home', findings: 1, drift: 1 }), /list the remaining findings in remaining/);
+  plan = step(plan, { type: 'check', screen: 'home', ...left });
+  assert.equal(plan.screens[0].status, 'checked');
+  assert.match(plan.screens[0].notes, /checked: 1 findings, 1 drift, every one an accepted exception \(AC-03, off-system:link:font-family\)/);
+
+  plan = step(plan, { type: 'propose', screen: 'products' }, { type: 'approve', screen: 'products', note: 'ok' }, { type: 'build', screen: 'products' }, { type: 'check', screen: 'products', ...clean });
+  const done = nextStep(plan);
+  assert.equal(done.action, 'done');
+  assert.match(done.say, /2 accepted exceptions stay on record[^]*home AC-03/);
+  assert.equal(done.accepted.length, 2);
+  assert.deepEqual(nextStep(fresh()).accepted, []);
+  const hand = structuredClone(plan);
+  hand.screens[0].accepted[0].by = ' ';
+  assert.throws(() => validatePlan(hand), /accepted\[0\]: by needs the builder's own words/);
+});
+
 test('validatePlan refuses a hand-edited plan that skips ahead', () => {
   const plan = fresh();
   plan.screens[1].status = 'approved';
@@ -204,6 +248,45 @@ test('MCP: plan_screens, plan_update runs the real check and refuses a drifted s
     assert.ok(!cons.isError, cons.content[0].text);
     assert.equal(JSON.parse(cons.content[0].text).ok, false);
     assert.match(cons.content[1].text, /CONSISTENCY FAIL/);
+  } finally {
+    await client.close();
+    rmSync(out, { recursive: true, force: true });
+  }
+});
+
+test('MCP: an accepted exception lets plan_update check a screen whose remaining findings the builder approved', { timeout: 240000 }, async () => {
+  const out = mkdtempSync(join(tmpdir(), 'taster-plan-accept-'));
+  const client = new Client({ name: 'taster-test', version: '0.1.0' });
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [server] }));
+  const call = async (name, args) => {
+    const r = await client.callTool({ name, arguments: args });
+    return { error: !!r.isError, body: r.content[0].text.startsWith('{') ? JSON.parse(r.content[0].text) : r.content[0].text };
+  };
+  const update = (event) => call('plan_update', { plan: out, event });
+  try {
+    await call('plan_screens', { target: screen('home.html'), system: screen('system.css'), out });
+    await update({ type: 'propose', screen: 'home' });
+    await update({ type: 'approve', screen: 'home', note: 'go' });
+    await update({ type: 'build', screen: 'home', output: screen('drifted.html') });
+    // Negative control: the off-system values refuse the check and are named the way accept names them.
+    const refused = await update({ type: 'check', screen: 'home' });
+    assert.ok(refused.error);
+    const left = refused.body.check.unaccepted;
+    assert.ok(left.includes('off-system:button:border-radius') && left.includes('off-system:badge:background-color'), left.join(', '));
+    assert.match(refused.body.refused, /Not accepted: .*off-system:button:border-radius/);
+
+    const noWords = await update({ type: 'accept', screen: 'home', rule: left[0], reason: 'needs a markup change' });
+    assert.ok(noWords.error && /builder's own words/.test(noWords.body), 'accept without the builder words is refused');
+    for (const rule of left) {
+      const r = await update({ type: 'accept', screen: 'home', rule, reason: 'The markup sets it inline; the stylesheet cannot reach it', by: 'Accept it for now' });
+      assert.ok(!r.error, JSON.stringify(r.body));
+    }
+    const passed = await update({ type: 'check', screen: 'home' });
+    assert.ok(!passed.error, JSON.stringify(passed.body));
+    assert.equal(passed.body.plan.screens[0].status, 'checked');
+    assert.equal(passed.body.next.screen, 'pricing');
+    assert.deepEqual(passed.body.next.accepted.map((a) => a.rule), left, 'accepted exceptions stay in the next step');
+    assert.match(passed.body.plan.screens[0].notes, /every one an accepted exception/);
   } finally {
     await client.close();
     rmSync(out, { recursive: true, force: true });

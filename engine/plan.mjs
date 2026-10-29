@@ -9,9 +9,14 @@
 //   "screens": [
 //     { "id": "home", "source": "https://example.com/", "output": "home.html" | null, "purpose": "...",
 //       "parts": [ { "id": "hero", "purpose": "...", "status": "planned" } ],
-//       "status": "planned" | "proposed" | "approved" | "built" | "checked", "notes": "" }
+//       "status": "planned" | "proposed" | "approved" | "built" | "checked", "notes": "",
+//       "accepted": [ { "rule": "AC-03", "reason": "...", "by": "<the builder's words>" } ] }
 //   ]
 // }
+//
+// accepted lists the named exceptions the builder approved on a screen: findings that need a change outside the
+// builder's control (markup on a stylesheet-only route). A check passes when every remaining finding is one of them.
+// They stay in the plan and in every nextStep, never hidden.
 //
 // Paths in the plan are relative to the plan file.
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
@@ -24,7 +29,12 @@ export const PLAN_VERSION = 1;
 export const PLAN_FILE = 'taster.plan.json';
 export const ROUTES = ['swap', 'rebuild', 'build'];
 export const STATUSES = ['planned', 'proposed', 'approved', 'built', 'checked'];
-export const EVENTS = ['propose', 'revise', 'approve', 'build', 'check'];
+export const EVENTS = ['propose', 'revise', 'approve', 'build', 'check', 'accept'];
+
+// A finding as an accepted exception names it: a detector rule id (AC-03), or a consistency finding as
+// drift:<role>:<property> or off-system:<role>:<property> (off-system:link:font-family).
+export const FINDING_KEY = /^([A-Z]{2,4}-\d{2}|(drift|off-system):[a-z0-9]+:[a-z-]+)$/;
+const ACCEPT_STATUSES = ['proposed', 'approved', 'built'];
 
 const ASSET = /\.(pdf|png|jpe?g|gif|webp|svg|zip|mp4|mov|mp3|json|xml|txt|css|js)$/i;
 const slug = (s) =>
@@ -151,6 +161,21 @@ export function validatePlan(plan) {
     if (!STATUSES.includes(s.status)) errs.push(`${at}: status must be one of ${STATUSES.join(', ')}`);
     if (!(s.notes === undefined || typeof s.notes === 'string')) errs.push(`${at}: notes must be text`);
     if (!Array.isArray(s.parts)) errs.push(`${at}: parts must be a list`);
+    if (s.accepted !== undefined) {
+      if (!Array.isArray(s.accepted)) errs.push(`${at}: accepted must be a list`);
+      else {
+        const rules = new Set();
+        s.accepted.forEach((a, k) => {
+          const aat = `${at}.accepted[${k}]`;
+          if (!a || typeof a !== 'object') return errs.push(`${aat} is not an object`);
+          if (typeof a.rule !== 'string' || !FINDING_KEY.test(a.rule)) errs.push(`${aat}: rule must be a detector rule id or drift:<role>:<property> / off-system:<role>:<property>`);
+          else if (rules.has(a.rule)) errs.push(`${aat}: rule ${a.rule} repeats`);
+          rules.add(a.rule);
+          if (typeof a.reason !== 'string' || !a.reason.trim()) errs.push(`${aat}: reason is required`);
+          if (typeof a.by !== 'string' || !a.by.trim()) errs.push(`${aat}: by needs the builder's own words`);
+        });
+      }
+    }
     const pids = new Set();
     let partOpen = -1;
     (s.parts || []).forEach((p, j) => {
@@ -180,17 +205,33 @@ function active(plan) {
 
 const progress = (plan) => ({ checked: plan.screens.filter((s) => s.status === 'checked').length, total: plan.screens.length });
 
+// Every accepted exception in the plan, in screen order. nextStep always returns it, so none is ever out of sight.
+export function acceptedExceptions(plan) {
+  return plan.screens.flatMap((s) => (s.accepted || []).map((a) => ({ screen: s.id, rule: a.rule, reason: a.reason, by: a.by })));
+}
+const acceptedLine = (list) => list.map((a) => `${a.rule} (${a.reason})`).join(', ');
+
 // Exactly one next action. It never says build before the builder approved, and never moves to a new screen or part
 // before the current one is checked.
 export function nextStep(plan) {
   validatePlan(plan);
   const { screen, part } = active(plan);
-  const base = { progress: progress(plan) };
-  if (!screen) return { ...base, action: 'done', screen: null, part: null, say: 'Every screen is built and checked against the system and the other screens. Show the builder the finished set.' };
+  const accepted = acceptedExceptions(plan);
+  const base = { progress: progress(plan), accepted };
+  if (!screen) {
+    const open = accepted.length
+      ? ` ${accepted.length} accepted exception${accepted.length === 1 ? '' : 's'} stay on record for whoever can change the markup: ${accepted.map((a) => `${a.screen} ${a.rule} (${a.reason})`).join('; ')}. List them with the finished set.`
+      : '';
+    return { ...base, action: 'done', screen: null, part: null, say: `Every screen is built and checked against the system and the other screens. Show the builder the finished set.${open}` };
+  }
   const name = `screen "${screen.id}" (${screen.purpose})`;
   const checkedIds = plan.screens.filter((s) => s.status === 'checked').map((s) => s.id);
+  const mine = screen.accepted || [];
+  const acceptSay = mine.length
+    ? ` Accepted exceptions on this screen, approved by the builder: ${acceptedLine(mine)}. The check passes when every remaining finding is one of these; any other finding still has to be fixed.`
+    : ' A finding that needs a change outside the builder\'s control (markup on a stylesheet-only route) can be accepted only with their OK: plan_update { type: "accept", screen, rule, reason, by: "<their words>" }.';
   const checkSay = (what) =>
-    `Check ${what}: diagnose it at 1440 and 390 (zero measured findings), then check_consistency against ${checkedIds.length ? `the checked screens (${checkedIds.join(', ')})` : 'no other screen yet'}${plan.system ? ' and the system' : ''} (zero drift, zero off-system values). Record it with plan_update { type: "check" }; fix and check again until both are zero.`;
+    `Check ${what}: diagnose it at 1440 and 390 (zero measured findings), then check_consistency against ${checkedIds.length ? `the checked screens (${checkedIds.join(', ')})` : 'no other screen yet'}${plan.system ? ' and the system' : ''} (zero drift, zero off-system values). Record it with plan_update { type: "check" }; fix and check again until both are zero.${acceptSay}`;
   if (screen.status === 'planned') {
     return { ...base, action: 'propose', screen: screen.id, part: null, say: `Propose ${name} to the builder: what it is for, the uses it serves in order, the pattern and components for each, and${screen.parts.length ? ' the parts you will build one at a time' : ' whether to build it whole or part by part'}. Show it, record plan_update { type: "propose" }, and stop until they answer.` };
   }
@@ -229,6 +270,7 @@ export function applyStep(plan, event) {
   validatePlan(plan);
   const e = event || {};
   if (!EVENTS.includes(e.type)) throw new Error(`Unknown event "${e.type}". Events: ${EVENTS.join(', ')}`);
+  if (e.type === 'accept' && e.part != null) throw new Error('An accepted exception is recorded on the screen; leave out part');
   const next = structuredClone(plan);
   const { screen: current } = active(next);
   if (!current) throw new Error('Every screen is already checked; the plan is done');
@@ -286,13 +328,39 @@ export function applyStep(plan, event) {
     case 'check': {
       need('built');
       for (const k of ['findings', 'drift']) if (!Number.isInteger(e[k]) || e[k] < 0) throw new Error(`${label}: check needs ${k} as a count (run diagnose and check_consistency, or let plan_update run them)`);
-      if (e.findings || e.drift) throw new Error(`${label} is not clean: ${e.findings} detector findings, ${e.drift} consistency findings. Fix them and check again`);
-      unit.status = 'checked';
-      addNote(unit, `checked: 0 findings, 0 drift${e.note ? `; ${e.note}` : ''}`);
+      const dirty = `${label} is not clean: ${e.findings} detector findings, ${e.drift} consistency findings`;
+      if (e.findings || e.drift) {
+        const accepted = (screen.accepted || []).map((a) => a.rule);
+        const remaining = Array.isArray(e.remaining) ? [...new Set(e.remaining.map(String))] : [];
+        if (!remaining.length) {
+          throw new Error(accepted.length ? `${dirty}. To match them against the accepted exceptions (${accepted.join(', ')}), list the remaining findings in remaining, or let plan_update run the check` : `${dirty}. Fix them and check again`);
+        }
+        const open = remaining.filter((r) => !accepted.includes(r));
+        if (open.length) {
+          throw new Error(`${dirty} (${remaining.join(', ')}); not accepted: ${open.join(', ')}. Fix them and check again, or, when one needs a change outside the builder's control, ask the builder and record { type: "accept", screen: "${screen.id}", rule, reason, by: "<their words>" }`);
+        }
+        unit.status = 'checked';
+        addNote(unit, `checked: ${e.findings} findings, ${e.drift} drift, every one an accepted exception (${remaining.join(', ')})${e.note ? `; ${e.note}` : ''}`);
+      } else {
+        unit.status = 'checked';
+        addNote(unit, `checked: 0 findings, 0 drift${e.note ? `; ${e.note}` : ''}`);
+      }
       if (unit !== screen && screen.parts.every((p) => p.status === 'checked')) {
         screen.status = 'built';
         addNote(screen, 'every part checked; check the whole screen next');
       }
+      break;
+    }
+    case 'accept': {
+      if (!ACCEPT_STATUSES.includes(screen.status)) throw new Error(`${label} is ${screen.status}; "accept" needs it ${ACCEPT_STATUSES.slice(0, -1).join(', ')} or ${ACCEPT_STATUSES.at(-1)}`);
+      const rule = String(e.rule || '').trim();
+      if (!FINDING_KEY.test(rule)) throw new Error(`${label}: rule must be a detector rule id (AC-03) or drift:<role>:<property> / off-system:<role>:<property>, got "${rule}"`);
+      if (!e.reason || !String(e.reason).trim()) throw new Error(`${label}: accept needs a reason: why the finding cannot be fixed here (for example, it needs a markup change)`);
+      if (!e.by || !String(e.by).trim()) throw new Error(`${label}: accept needs the builder's own words in by, so the exception is on record as theirs`);
+      screen.accepted = screen.accepted || [];
+      if (screen.accepted.some((a) => a.rule === rule)) throw new Error(`${label}: ${rule} is already accepted`);
+      screen.accepted.push({ rule, reason: String(e.reason).trim(), by: String(e.by).trim() });
+      addNote(screen, `accepted exception ${rule}: ${String(e.reason).trim()} (builder: ${String(e.by).trim()})`);
       break;
     }
     default:
@@ -343,10 +411,19 @@ export async function checkScreen(plan, screenId, { baseDir = null } = {}) {
     consistency.findings = consistency.drift.length + consistency.offSystem.length;
     consistency.ok = consistency.findings === 0;
   }
+  // Each finding left, named the way an accepted exception names it.
+  const remaining = [
+    ...report.rules.map((r) => r.ruleId),
+    ...(consistency ? consistency.drift.map((d) => `drift:${d.role}:${d.property}`) : []),
+    ...(consistency ? consistency.offSystem.map((f) => `off-system:${f.role}:${f.property}`) : []),
+  ].filter((k, i, all) => all.indexOf(k) === i);
+  const accepted = (screen.accepted || []).map((a) => a.rule);
   return {
     screen: screen.id,
     findings: report.rulesHit,
     drift: consistency ? consistency.findings : 0,
+    remaining,
+    unaccepted: remaining.filter((k) => !accepted.includes(k)),
     diagnose: { url: report.url, widths: report.widths, rulesHit: report.rulesHit, rules: report.rules.map((r) => ({ ruleId: r.ruleId, name: r.name, counts: r.counts })) },
     consistency,
   };
