@@ -45,7 +45,100 @@ import {
   TextScramble,
   Typewriter,
   Icon, IconLabel,
+  GlassLogoReveal,
+  MeshDrift, MESH_PALETTES, type MeshPalette,
+  DigitSwap,
+  LiquidNav,
+  GlassFolder,
+  SideFolder,
+  CoverflowCarousel, type CoverflowItem,
+  SelectMenu,
+  Citation, Citations, type CitationItem,
+  TreeView, useTree, type NodeReader,
+  SessionList,
+  SensitiveInput,
+  OrbitIllustration,
 } from '../../src'
+
+
+// A neutral geometric mark for the glass reveal demo. Not a real brand.
+const DEMO_MARK = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 10h80v22H61v58H39V32H10z"/></svg>'
+
+function DigitSwapDemo() {
+  const [shown, setShown] = React.useState(false)
+  return (
+    <div className="flex flex-col items-start gap-4">
+      <div className="text-sm text-text-subtle">Card number</div>
+      <DigitSwap
+        value={shown ? '4242 4242 4242 0806' : '\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 0806'}
+        animationKey={shown ? 'shown' : 'masked'}
+        direction={shown ? 'up' : 'down'}
+        suffixLength={4}
+        glyphClassName={shown ? 'text-text' : 'text-text-muted'}
+        suffixClassName="text-text"
+        className="text-title tabular-nums"
+      />
+      <Button variant="outline" aria-pressed={shown} onClick={() => setShown((v) => !v)}>{shown ? 'Hide number' : 'Show number'}</Button>
+    </div>
+  )
+}
+
+// Abstract posters drawn as SVG so the demo ships no images and no real artwork.
+function poster(i: number, title: string): string {
+  const shades = ['#1c1c1e', '#2a2a2d', '#3a3a3e', '#4b4b50', '#5e5e63']
+  const bg = shades[i % shades.length]
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600"><rect width="400" height="600" fill="${bg}"/><circle cx="${120 + i * 40}" cy="${220 + (i % 2) * 60}" r="${90 + i * 12}" fill="none" stroke="#d4d4d8" stroke-width="2"/><rect x="40" y="470" width="${160 + i * 20}" height="6" fill="#d4d4d8"/><text x="40" y="440" font-family="sans-serif" font-size="34" font-weight="600" fill="#f4f4f5">${title}</text></svg>`
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
+}
+const COVERS: CoverflowItem[] = ['Field notes', 'Ten rules', 'Before and after', 'Two widths', 'The swap'].map((t, i) => ({
+  id: `c${i}`,
+  title: t,
+  subtitle: `Issue ${String(i + 1).padStart(2, '0')}, 2026`,
+  image: poster(i, t),
+  description: 'A sample cover drawn for the demo.',
+}))
+
+const CITES: CitationItem[] = [
+  { id: 'apg', title: 'ARIA Authoring Practices: tree view', domain: 'w3.org', url: 'https://www.w3.org/WAI/ARIA/apg/patterns/treeview/' },
+  { id: 'wcag', title: 'Understanding SC 2.5.8 Target Size', domain: 'w3.org', url: 'https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html' },
+  { id: 'mdn', title: 'prefers-reduced-motion', domain: 'developer.mozilla.org', url: 'https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-motion' },
+]
+
+interface Unit { id: string; name: string; children?: Unit[] }
+const UNITS: Unit[] = [
+  { id: 'commercial', name: 'Commercial', children: [{ id: 'cc-1100', name: 'Sales, CC-1100' }, { id: 'cc-1200', name: 'Marketing, CC-1200' }] },
+  { id: 'product', name: 'Product', children: [{ id: 'cc-2100', name: 'Engineering, CC-2100' }, { id: 'cc-2200', name: 'Design, CC-2200' }] },
+  { id: 'cc-3100', name: 'Customer service, CC-3100' },
+]
+const UNIT_READER: NodeReader<Unit> = { key: (u) => u.id, children: (u) => u.children, label: (u) => u.name }
+
+function TreeDemo() {
+  const tree = useTree(UNITS, { reader: UNIT_READER, defaultExpanded: ['commercial'], defaultActive: 'cc-1200', defaultChecked: ['cc-1100'] })
+  return (
+    <div className="max-w-sm rounded-lg border border-border p-1">
+      <TreeView tree={tree} label="Cost centres" checkable>{(e) => e.node.name}</TreeView>
+    </div>
+  )
+}
+
+function SelectMenuDemo() {
+  const [lang, setLang] = React.useState('en')
+  return (
+    <div className="max-w-xs">
+      <SelectMenu
+        aria-label="Language"
+        value={lang}
+        onValueChange={setLang}
+        items={[
+          { value: 'en', label: 'English', hint: 'en' },
+          { value: 'ko', label: '한국어', hint: 'ko' },
+          { value: 'ja', label: '日本語', hint: 'ja' },
+          { value: 'de', label: 'Deutsch', hint: 'de', disabled: true },
+        ]}
+      />
+    </div>
+  )
+}
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -221,6 +314,7 @@ function TogglesDemo() {
         <Checkbox label="Accept the terms" checked={a} onChange={(e) => setA(e.target.checked)} />
         <Checkbox label="Subscribe to the newsletter" checked={b} onChange={(e) => setB(e.target.checked)} />
         <Checkbox label="Disabled option" checked disabled />
+        <Checkbox dashed label="Connect a domain (empty slot)" />
       </div>
       <div className="flex flex-col gap-3">
         <Switch label="Notifications" checked={c} onChange={(e) => setC(e.target.checked)} />
@@ -660,6 +754,96 @@ export function Sections() {
       <Section id="motion/typewriter" title="Typewriter">
         <p className="text-h2 font-semibold text-text">Check your <Typewriter words={['landing page', 'dashboard', 'store']} /></p>
       </Section>
+
+      <Section id="motion/glass-logo-reveal" title="Glass logo reveal">
+        <GlassLogoReveal logo={DEMO_MARK} label="Sample mark" className="h-[360px] w-full rounded-lg border border-border" />
+      </Section>
+
+      <Section id="motion/mesh-drift" title="Mesh drift, palette variations">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {(Object.keys(MESH_PALETTES) as MeshPalette[]).map((name) => (
+            <div key={name} className="relative h-40 overflow-hidden rounded-lg border border-border">
+              <MeshDrift palette={name} className="absolute inset-0" />
+              <span className="absolute bottom-2 left-2 rounded-sm bg-bg px-1.5 py-0.5 text-caption text-text">{name}</span>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section id="motion/digit-swap" title="Digit swap"><DigitSwapDemo /></Section>
+
+      <Section id="blocks/liquid-nav" title="Liquid nav">
+        <div className="flex justify-center py-6"><LiquidNav /></div>
+      </Section>
+
+      <Section id="blocks/glass-folder" title="Glass folder">
+        <div className="flex flex-wrap items-end justify-center gap-10 py-4">
+          <GlassFolder label="Exports" art="glacier" seed={3} />
+          <GlassFolder
+            label="Archive"
+            tone="dark"
+            art="none"
+            action="more"
+            labelPlacement="top-left"
+            files={[{ name: 'Lookbook 2026', meta: '38 images', art: 'dusk' }, { name: 'Invoices', meta: '12 PDFs' }, { name: 'Contract.pdf', meta: 'PDF, 320 KB' }]}
+            menu={[{ label: 'Rename' }, { label: 'Share' }, { label: 'Move to trash', danger: true }]}
+          />
+        </div>
+      </Section>
+
+      <Section id="blocks/side-folder" title="Side folder">
+        <article className="max-w-xs">
+          <SideFolder />
+          <h3 className="mt-3 text-title font-semibold text-text">Every export in one place</h3>
+          <p className="mt-1 text-sm text-text-muted">Reports, captures and fix lists land in the same folder.</p>
+        </article>
+      </Section>
+
+      <Section id="blocks/coverflow-carousel" title="Coverflow carousel">
+        <CoverflowCarousel items={COVERS} layout="poster" initialIndex={2} label="Sample covers" />
+      </Section>
+
+      <Section id="blocks/select-menu" title="Select menu"><SelectMenuDemo /></Section>
+
+      <Section id="blocks/citations" title="Citations">
+        <div className="max-w-lg space-y-3">
+          <p className="text-sm leading-6 text-text">
+            Controls are 44px on touch screens <Citation citationId="wcag" index={2} idPrefix="demo-src" /> and the tree follows the
+            authoring practices <Citation citationId="apg" index={1} idPrefix="demo-src" />.
+          </p>
+          <Citations citations={CITES} idPrefix="demo-src" />
+        </div>
+      </Section>
+
+      <Section id="blocks/tree-view" title="Tree view"><TreeDemo /></Section>
+
+      <Section id="blocks/session-list" title="Session list">
+        <SessionList
+          sessions={[
+            { id: '1', device: 'Chrome on macOS', location: 'Seoul, KR', lastActive: 'just now', current: true, kind: 'desktop' },
+            { id: '2', device: 'Safari on iPhone', location: 'Seoul, KR', lastActive: '2 hours ago', kind: 'mobile' },
+            { id: '3', device: 'Firefox on Windows', location: 'Berlin, DE', lastActive: 'yesterday', kind: 'desktop' },
+            { id: '4', device: 'Chrome on iPad', location: 'Austin, US', lastActive: '3 days ago', kind: 'tablet' },
+          ]}
+        />
+      </Section>
+
+      <Section id="blocks/sensitive-input" title="Sensitive input">
+        <div className="flex max-w-sm flex-col gap-2">
+          <label htmlFor="demo-sensitive" className="text-sm font-medium text-text">Sample value</label>
+          <SensitiveInput id="demo-sensitive" defaultValue="demo_value_not_a_credential" showCopy />
+        </div>
+      </Section>
+
+      <Section id="blocks/orbit-illustration" title="Orbit illustration">
+        <article className="max-w-xs">
+          <OrbitIllustration />
+          <h3 className="mt-3 text-title font-semibold text-text">Enrich new leads</h3>
+          <p className="mt-1 text-sm text-text-muted">Company and contact data land in every record.</p>
+        </article>
+      </Section>
+
+
     </>
   )
 }
