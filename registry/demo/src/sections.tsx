@@ -140,6 +140,7 @@ function SelectMenuDemo() {
     </div>
   )
 }
+import { ContentSections, ContentFooters } from './sections-content'
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -372,6 +373,7 @@ const STEPS: ShowcaseStep[] = [
 export function Sections() {
   return (
     <>
+      <ContentSections />
       <Section id="blocks/accordion" title="Accordion"><AccordionDemo /></Section>
 
       <Section id="blocks/alert" title="Alert">
@@ -846,6 +848,7 @@ export function Sections() {
 
 
       <AppSections />
+      <ContentFooters />
     </>
   )
 }

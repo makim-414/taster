@@ -5,7 +5,7 @@ category: footer
 uses: [navigate-the-site]
 surfaces: [editorial, app]
 replaces: [CMP-10]
-components: []
+components: [marketing/slim-footer]
 inspiration: []
 status: stable
 ---

@@ -5,7 +5,7 @@ category: faq
 uses: [answer-questions]
 surfaces: [landing]
 replaces: [AC-03, CMP-04]
-components: [blocks/accordion]
+components: [blocks/accordion, marketing/faq-groups]
 inspiration: []
 status: stable
 ---

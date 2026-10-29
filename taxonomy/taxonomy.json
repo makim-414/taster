@@ -3941,13 +3941,7 @@
       "axis": "density"
     }
   },
-  "gaps": [
-    {
-      "category": "3d",
-      "patterns": 1,
-      "components": 0
-    }
-  ],
+  "gaps": [],
   "iconography": {
     "summary": "Where an icon belongs and what it must look like. Decide the slot first, then whether the slot needs an icon at all, then draw it from the one set. Pattern: icon-placement.",
     "set": {

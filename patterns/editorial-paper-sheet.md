@@ -5,7 +5,7 @@ category: layout-shell
 uses: [organize-the-page, read-long-text]
 surfaces: [editorial]
 replaces: [CMP-04, COL-01]
-components: []
+components: [content/article]
 inspiration: []
 status: draft
 ---
