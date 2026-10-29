@@ -352,7 +352,7 @@
       "why": "Borrowed 'developer' flavor. It lowers readability and has nothing to do with the content. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
-        "signal": "Element with its own text outside code, pre, kbd, samp and var whose first available family in the computed stack is monospace. Short texts (labels, captions, numbers) matter most.",
+        "signal": "Element with its own text outside code, pre, kbd, samp and var, and outside fields and code editors (textarea, input, contenteditable regions, role=textbox, and CodeMirror, Monaco and Ace containers), whose first available family in the computed stack is monospace. Short texts (labels, captions, numbers) matter most.",
         "selectors": [
           "span",
           "small",
@@ -369,7 +369,15 @@
             "pre",
             "kbd",
             "samp",
-            "var"
+            "var",
+            "textarea",
+            "input",
+            "[contenteditable]",
+            "[role=textbox]",
+            "[class^=cm-]",
+            "[class*=CodeMirror]",
+            "[class*=monaco]",
+            "[class^=ace_]"
           ],
           "text_max_chars": 80
         }
