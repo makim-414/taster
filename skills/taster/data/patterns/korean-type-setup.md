@@ -5,7 +5,7 @@ category: typography
 uses: [read-long-text]
 surfaces: [landing, editorial, app]
 replaces: [KO-02, KO-03, KO-04, KO-05, KO-06, KO-08, KO-11]
-components: []
+components: [content/prose]
 inspiration: []
 status: stable
 ---

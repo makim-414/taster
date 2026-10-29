@@ -5,7 +5,7 @@ category: commerce
 uses: [sell-a-product]
 surfaces: [commerce]
 replaces: [LAY-04]
-components: [blocks/card, blocks/button]
+components: [blocks/card, blocks/button, commerce/product-card]
 inspiration: []
 status: stable
 ---

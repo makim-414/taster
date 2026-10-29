@@ -5,7 +5,7 @@ category: 3d
 uses: [set-the-mood, introduce-the-product, show-relationships]
 surfaces: [landing, dashboard]
 replaces: [BG-01, MOT-01]
-components: []
+components: [scene/point-globe]
 inspiration: [https://github.com/shuding/cobe, https://blog.maximeheckel.co/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/]
 status: draft
 ---
