@@ -71,8 +71,8 @@ It uses Playwright's Chromium if installed, otherwise your Google Chrome.
 `engine/acp.mjs` speaks the [Agent Client Protocol](https://agentclientprotocol.com), so editors with an agent
 panel can run Taster directly. It has no model inside: it answers slash commands with the engine's results
 (`/start`, `/diagnose <url or file>`, `/extract <url>`, `/brand <url>`, `/explain <rule id>`, `/rules`, `/help`).
-For swaps and rebuilds, use the skill inside an agent that speaks MCP. Install the engine first
-(`npm --prefix engine install`), then in Zed's `settings.json`:
+For swaps and rebuilds, use the skill inside an agent that speaks MCP. Point the editor at
+`engine/start.mjs acp`, which installs the engine's dependencies on first start. In Zed's `settings.json`:
 
 ```json
 {
@@ -80,15 +80,16 @@ For swaps and rebuilds, use the skill inside an agent that speaks MCP. Install t
     "Taster": {
       "type": "custom",
       "command": "node",
-      "args": ["/path/to/taster/engine/acp.mjs"],
+      "args": ["/path/to/taster/engine/start.mjs", "acp"],
       "env": {}
     }
   }
 }
 ```
 
-JetBrains IDEs read the same `agent_servers` shape (without `type`) from `~/.jetbrains/acp.json`. Other ACP
-clients (Neovim, Emacs, and more) take the same command and arguments.
+JetBrains IDEs read the same `agent_servers` shape (without `type`) from `~/.jetbrains/acp.json`; they want the
+full path of the executable, so put the output of `which node` in `command`. Other ACP clients (Neovim, Emacs,
+and more) take the same command and arguments.
 
 Then type `/taster` in Claude Code (or ask your agent to start Taster). It asks whether your site exists or is new
 and takes it from there. You can also ask directly: "Diagnose this site for AI slop", "Rebuild my Lovable site

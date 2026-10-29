@@ -60,8 +60,8 @@ claude mcp add taster -- node /path/to/taster/engine/start.mjs
 `engine/acp.mjs` 는 [Agent Client Protocol](https://agentclientprotocol.com) 을 말하므로 에이전트 패널이 있는
 에디터에서 Taster 를 바로 돌릴 수 있습니다. 안에 모델은 없고 슬래시 명령에 엔진 결과로 답합니다(`/start`,
 `/diagnose <주소나 파일>`, `/extract <주소>`, `/brand <주소>`, `/explain <규칙 id>`, `/rules`, `/help`). 교체나
-다시 짓기는 MCP 를 쓰는 에이전트 안에서 스킬로 하세요. 먼저 `npm --prefix engine install` 로 엔진을 설치한 뒤
-Zed 의 `settings.json` 에 넣습니다.
+다시 짓기는 MCP 를 쓰는 에이전트 안에서 스킬로 하세요. 에디터에는 `engine/start.mjs acp` 를 넣으면 됩니다. 처음
+켤 때 엔진 의존성을 알아서 설치합니다. Zed 의 `settings.json` 에는 이렇게 넣습니다.
 
 ```json
 {
@@ -69,15 +69,16 @@ Zed 의 `settings.json` 에 넣습니다.
     "Taster": {
       "type": "custom",
       "command": "node",
-      "args": ["/path/to/taster/engine/acp.mjs"],
+      "args": ["/path/to/taster/engine/start.mjs", "acp"],
       "env": {}
     }
   }
 }
 ```
 
-JetBrains IDE 는 같은 `agent_servers` 모양(`type` 없이)을 `~/.jetbrains/acp.json` 에서 읽습니다. 다른 ACP
-클라이언트(Neovim, Emacs 등)도 같은 명령과 인자를 넣으면 됩니다.
+JetBrains IDE 는 같은 `agent_servers` 모양(`type` 없이)을 `~/.jetbrains/acp.json` 에서 읽습니다. 실행 파일의 전체
+경로를 원하므로 `command` 에는 `which node` 결과를 넣으세요. 다른 ACP 클라이언트(Neovim, Emacs 등)도 같은 명령과
+인자를 넣으면 됩니다.
 
 설치한 뒤 Claude Code 에서 `/taster` 를 치면(또는 에이전트에게 "Taster 시작해줘") 이미 있는 사이트인지 새로
 지을지부터 묻고 이어 갑니다. 바로 말해도 됩니다. "이 사이트 슬롭 진단해줘", "러버블로 만든 내 사이트 AI 티 안

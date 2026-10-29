@@ -231,8 +231,10 @@ const isMain = (() => {
     return false;
   }
 })();
-if (isMain) {
+// Serve on this process's stdio until the editor closes it. start.mjs calls this after its first-run install.
+export function serve() {
   const stream = ndJsonStream(Writable.toWeb(process.stdout), Readable.toWeb(process.stdin));
   const connection = createAgent().connect(stream);
   connection.closed.then(() => process.exit(0));
 }
+if (isMain) serve();

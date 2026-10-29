@@ -65,13 +65,14 @@ Zed, in `settings.json`:
 ```json
 {
   "agent_servers": {
-    "Taster": { "type": "custom", "command": "node", "args": ["/path/to/taster/engine/acp.mjs"], "env": {} }
+    "Taster": { "type": "custom", "command": "node", "args": ["/path/to/taster/engine/start.mjs", "acp"], "env": {} }
   }
 }
 ```
 
-JetBrains IDEs, in `~/.jetbrains/acp.json`: the same `agent_servers` entry without `type`. With the engine linked or
-installed globally, `taster-acp` is the same command.
+`start.mjs acp` installs the dependencies on first start (the MCP launcher does the same with no argument), then
+serves `acp.mjs`. JetBrains IDEs, in `~/.jetbrains/acp.json`: the same `agent_servers` entry without `type`, with the
+full path of `node` in `command`. With the engine linked or installed globally, `taster-acp` is the same agent.
 
 Try it by hand:
 

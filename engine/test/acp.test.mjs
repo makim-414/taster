@@ -4,11 +4,12 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const agentPath = fileURLToPath(new URL('../acp.mjs', import.meta.url));
+const launcherPath = fileURLToPath(new URL('../start.mjs', import.meta.url));
 const fixturesDir = fileURLToPath(new URL('./fixtures/', import.meta.url));
 
 // A bare JSON-RPC client over the agent's stdio, so the test checks the wire format an editor sees.
-function start() {
-  const child = spawn(process.execPath, [agentPath], { stdio: ['pipe', 'pipe', 'inherit'] });
+function start(args = [agentPath]) {
+  const child = spawn(process.execPath, args, { stdio: ['pipe', 'pipe', 'inherit'] });
   const messages = [];
   const waiters = [];
   let buffer = '';
@@ -130,6 +131,23 @@ test('the ACP agent answers slash commands over stdio', { timeout: 120000 }, asy
     assert.equal(c.child.exitCode, null);
   } finally {
     c.child.stdin.end();
+    c.child.kill();
+  }
+});
+
+// Editors are told to run `start.mjs acp` (it installs dependencies on first start), so that path must serve ACP too.
+test('the launcher serves the ACP agent with the acp argument', { timeout: 60000 }, async () => {
+  const c = start([launcherPath, 'acp']);
+  try {
+    const init = await c.request('initialize', { protocolVersion: 1, clientCapabilities: {} });
+    assert.equal(init.result.protocolVersion, 1);
+    assert.equal(init.result.agentInfo.name, 'taster');
+    const session = await c.request('session/new', { cwd: fixturesDir, mcpServers: [] });
+    const { sessionId } = session.result;
+    const res = await c.request('session/prompt', { sessionId, prompt: [{ type: 'text', text: '/explain AC-01' }] });
+    assert.equal(res.result.stopReason, 'end_turn');
+    assert.match(textOf(c.updates(sessionId)), /AC-01/);
+  } finally {
     c.child.kill();
   }
 });
