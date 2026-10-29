@@ -82,7 +82,7 @@ cannot carry poster type, deep shadows need a restrained palette). `taxonomy/axe
 setting. Read [taxonomy/SCHEMA.md](taxonomy/SCHEMA.md).
 
 <!-- taxonomy:start -->
-112 patterns, 74 rules, 44 components, 33 categories in 8 families, 40 uses, 7 surfaces, 8 weighting axes, 10 constraints.
+112 patterns, 74 rules, 84 components, 33 categories in 8 families, 40 uses, 7 surfaces, 8 weighting axes, 10 constraints.
 
 | Family | Categories | Patterns |
 |---|---|---|

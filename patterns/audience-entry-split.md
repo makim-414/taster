@@ -5,7 +5,7 @@ category: cta
 uses: [ask-for-action, navigate-the-site]
 surfaces: [landing]
 replaces: [LAY-02]
-components: [blocks/card]
+components: [blocks/card, marketing/audience-split]
 inspiration: []
 status: stable
 ---

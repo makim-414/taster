@@ -46,6 +46,7 @@ import {
   Typewriter,
   Icon, IconLabel,
 } from '../../src'
+import { ContentSections, ContentFooters } from './sections-content'
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -277,6 +278,7 @@ const STEPS: ShowcaseStep[] = [
 export function Sections() {
   return (
     <>
+      <ContentSections />
       <Section id="blocks/accordion" title="Accordion"><AccordionDemo /></Section>
 
       <Section id="blocks/alert" title="Alert">
@@ -660,6 +662,8 @@ export function Sections() {
       <Section id="motion/typewriter" title="Typewriter">
         <p className="text-h2 font-semibold text-text">Check your <Typewriter words={['landing page', 'dashboard', 'store']} /></p>
       </Section>
+
+      <ContentFooters />
     </>
   )
 }

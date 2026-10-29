@@ -5,7 +5,7 @@ category: media-gallery
 uses: [browse-media]
 surfaces: [app, editorial]
 replaces: []
-components: [blocks/skeleton]
+components: [blocks/skeleton, media/gallery-lightbox, media/snap-carousel]
 inspiration: []
 status: stable
 ---

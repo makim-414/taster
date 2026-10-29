@@ -5,7 +5,7 @@ category: pricing
 uses: [compare-plans]
 surfaces: [landing]
 replaces: [AC-08, AC-11]
-components: [blocks/table]
+components: [blocks/table, marketing/plan-table]
 inspiration: []
 status: stable
 ---

@@ -3,7 +3,7 @@
 Portable React and TypeScript components with neutral design tokens. There is no package to
 install. You copy the files you need into your app, the same way you would with shadcn/ui.
 
-43 components, MIT licensed. Every entry is listed in `registry.json` with its file, category,
+84 components, MIT licensed. Every entry is listed in `registry.json` with its file, category,
 npm dependencies and credit.
 
 ## Copy a component into your app
@@ -27,6 +27,16 @@ npm dependencies and credit.
 6. Everything under `motion/`, and `marketing/pricing-cards`, `marketing/reveal-faq` and
    `marketing/step-showcase`, also need `src/motion/_motion.ts` (reduced motion, in-view and
    keyframe helpers, no dependency). Each of them honors `prefers-reduced-motion`.
+7. The page section, content, media, commerce, chat and scene components (`marketing/*` other than
+   the four above, `content/*`, `media/*`, `commerce/*`, `chat/*`, `scene/*`) have no npm
+   dependency and draw their own small line glyphs inline. These also need `src/motion/_motion.ts`:
+   `content/prose`, `content/article` (which also needs `content/prose`), `media/snap-carousel`,
+   `chat/tool-call`, `chat/agent-status`, `scene/point-globe`. `marketing/photo-hero`,
+   `media/before-after` and `media/gallery-lightbox` read `--on-scrim`, `--on-scrim-muted` and
+   `--on-scrim-ink` from `tokens.css`.
+8. Items in lists that can mix languages (feature rows, FAQ, products, cart lines, carousel items,
+   chat messages, case studies) take a `lang` field. Set `lang="ko"` on Korean items so the Korean
+   type rules in `tokens.css` (13px floor, words kept whole) apply to them.
 
 Example for a button and a dialog:
 

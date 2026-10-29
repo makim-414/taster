@@ -606,6 +606,461 @@
       "deps": [],
       "license": "MIT",
       "credit": null
+    },
+    {
+      "id": "marketing/product-hero",
+      "file": "src/marketing/product-hero.tsx",
+      "category": "hero",
+      "patterns": [
+        "asymmetric-product-hero",
+        "real-product-frame"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/split-form-hero",
+      "file": "src/marketing/split-form-hero.tsx",
+      "category": "hero",
+      "patterns": [
+        "in-hero-form-flow"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/photo-hero",
+      "file": "src/marketing/photo-hero.tsx",
+      "category": "hero",
+      "patterns": [
+        "photo-led-hero"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/feature-rows",
+      "file": "src/marketing/feature-rows.tsx",
+      "category": "feature-section",
+      "patterns": [
+        "content-matched-grid",
+        "real-product-frame"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/feature-grid",
+      "file": "src/marketing/feature-grid.tsx",
+      "category": "feature-section",
+      "patterns": [
+        "content-matched-grid"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/plan-table",
+      "file": "src/marketing/plan-table.tsx",
+      "category": "pricing",
+      "patterns": [
+        "plan-comparison-table"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/usage-estimator",
+      "file": "src/marketing/usage-estimator.tsx",
+      "category": "pricing",
+      "patterns": [
+        "usage-cost-estimator"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/plan-rows",
+      "file": "src/marketing/plan-rows.tsx",
+      "category": "pricing",
+      "patterns": [
+        "plan-cards"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/cta-band",
+      "file": "src/marketing/cta-band.tsx",
+      "category": "cta",
+      "patterns": [
+        "neutral-cta-band"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/inline-signup",
+      "file": "src/marketing/inline-signup.tsx",
+      "category": "cta",
+      "patterns": [
+        "neutral-cta-band"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/audience-split",
+      "file": "src/marketing/audience-split.tsx",
+      "category": "cta",
+      "patterns": [
+        "audience-entry-split"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/customer-quote",
+      "file": "src/marketing/customer-quote.tsx",
+      "category": "testimonial",
+      "patterns": [
+        "outcome-quote-card",
+        "plain-pull-quote"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/case-study-card",
+      "file": "src/marketing/case-study-card.tsx",
+      "category": "testimonial",
+      "patterns": [
+        "media-tile-card",
+        "outcome-quote-card"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/logo-wall",
+      "file": "src/marketing/logo-wall.tsx",
+      "category": "testimonial",
+      "patterns": [
+        "monochrome-logo-strip",
+        "original-logo-assets"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "content/pull-quote",
+      "file": "src/content/pull-quote.tsx",
+      "category": "testimonial",
+      "patterns": [
+        "plain-pull-quote"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/faq-groups",
+      "file": "src/marketing/faq-groups.tsx",
+      "category": "faq",
+      "patterns": [
+        "hairline-accordion-faq"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/site-footer",
+      "file": "src/marketing/site-footer.tsx",
+      "category": "footer",
+      "patterns": [
+        "multi-column-footer"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/slim-footer",
+      "file": "src/marketing/slim-footer.tsx",
+      "category": "footer",
+      "patterns": [
+        "slim-legal-footer"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/site-header",
+      "file": "src/marketing/site-header.tsx",
+      "category": "nav-header",
+      "patterns": [
+        "site-header"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "marketing/breadcrumb",
+      "file": "src/marketing/breadcrumb.tsx",
+      "category": "nav-header",
+      "patterns": [
+        "app-bars",
+        "site-header"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "content/section-heading",
+      "file": "src/content/section-heading.tsx",
+      "category": "typography",
+      "patterns": [
+        "plain-headline-and-eyebrow",
+        "split-section-header"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "content/prose",
+      "file": "src/content/prose.tsx",
+      "category": "typography",
+      "patterns": [
+        "korean-line-breaking",
+        "korean-type-setup",
+        "long-form-prose"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "content/article",
+      "file": "src/content/article.tsx",
+      "category": "typography",
+      "patterns": [
+        "editorial-paper-sheet",
+        "long-form-prose"
+      ],
+      "deps": [
+        "content/prose"
+      ],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "content/footnotes",
+      "file": "src/content/footnotes.tsx",
+      "category": "typography",
+      "patterns": [
+        "long-form-prose"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "content/code-block",
+      "file": "src/content/code-block.tsx",
+      "category": "typography",
+      "patterns": [
+        "long-form-prose"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "media/gallery-lightbox",
+      "file": "src/media/gallery-lightbox.tsx",
+      "category": "media-gallery",
+      "patterns": [
+        "media-thumb-strip"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "media/before-after",
+      "file": "src/media/before-after.tsx",
+      "category": "media-gallery",
+      "patterns": [
+        "before-after-compare"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "media/snap-carousel",
+      "file": "src/media/snap-carousel.tsx",
+      "category": "media-gallery",
+      "patterns": [
+        "focus-card-carousel",
+        "media-thumb-strip"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "commerce/product-card",
+      "file": "src/commerce/product-card.tsx",
+      "category": "commerce",
+      "patterns": [
+        "editorial-storefront-home",
+        "media-tile-card"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "commerce/product-gallery",
+      "file": "src/commerce/product-gallery.tsx",
+      "category": "commerce",
+      "patterns": [
+        "product-detail-page"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "commerce/buy-box",
+      "file": "src/commerce/buy-box.tsx",
+      "category": "commerce",
+      "patterns": [
+        "cart-and-checkout",
+        "product-detail-page"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "commerce/cart",
+      "file": "src/commerce/cart.tsx",
+      "category": "commerce",
+      "patterns": [
+        "cart-and-checkout"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "chat/chat-thread",
+      "file": "src/chat/chat-thread.tsx",
+      "category": "chat-ai",
+      "patterns": [
+        "agent-chat-thread"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "chat/message-composer",
+      "file": "src/chat/message-composer.tsx",
+      "category": "chat-ai",
+      "patterns": [
+        "agent-chat-thread"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "chat/tool-call",
+      "file": "src/chat/tool-call.tsx",
+      "category": "chat-ai",
+      "patterns": [
+        "tool-call-disclosure"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "chat/agent-status",
+      "file": "src/chat/agent-status.tsx",
+      "category": "chat-ai",
+      "patterns": [
+        "agent-status-line"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "chat/approval-step",
+      "file": "src/chat/approval-step.tsx",
+      "category": "chat-ai",
+      "patterns": [
+        "ask-human-step"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "motion/scroll-enter",
+      "file": "src/motion/scroll-enter.tsx",
+      "category": "motion-particle",
+      "patterns": [
+        "scroll-reveal-wrapper"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "motion/point-field",
+      "file": "src/motion/point-field.tsx",
+      "category": "motion-particle",
+      "patterns": [
+        "ambient-background"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
+      "id": "scene/point-globe",
+      "file": "src/scene/point-globe.tsx",
+      "category": "3d",
+      "patterns": [
+        "webgl-scene"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
     }
   ]
 }
