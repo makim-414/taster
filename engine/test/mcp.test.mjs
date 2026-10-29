@@ -13,7 +13,7 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [server] }));
   try {
     const { tools } = await client.listTools();
-    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,suggest_swaps,taxonomy');
+    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,check_consistency,diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,plan_next,plan_screens,plan_update,suggest_swaps,taxonomy');
 
     // The opening question comes from the skill's start guide, so the prompt and the skill say the same thing.
     const { prompts } = await client.listPrompts();

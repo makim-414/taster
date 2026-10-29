@@ -19,6 +19,8 @@ node engine/cli.mjs ./page.html --json --widths 1440 # one width, JSON to stdout
 node engine/cli.mjs https://example.com --widths responsive  # 360 to 1440 in nine steps, for the RSP rules
 node engine/cli.mjs https://example.com --extract    # content JSON for a rebuild (content.json with --out)
 node engine/cli.mjs https://example.com --brand      # brand theme CSS and notes (theme.css with --out, JSON with --json)
+node engine/cli.mjs --consistency a.html b.html --system tokens.css --system theme.css  # drift between screens, values off the system
+node engine/cli.mjs --plan https://example.com --out work --system theme.css  # taster.plan.json: the screens, one at a time
 node engine/cli.mjs --rules                          # every rule, how it is checked, severity
 node engine/cli.mjs --explain KO-01                  # what, why, how it is found, fix
 ```
@@ -30,6 +32,8 @@ Exit code is 0 with no findings, 1 with findings, 2 on error. The report groups 
 Prompt: `start` (the opening question: does the site already exist, or are we building a new one?).
 
 Tools: `diagnose` (report plus one capture per width), `brand_theme` (the site's brand color, typeface and logo as token overrides, with success and failure colors fitted to them), `extract_content` (the page's content in reading order, for a rebuild), `list_rules`, `explain_rule`, and the swap tools `suggest_swaps`, `list_patterns`, `get_pattern`, `get_component`, `taxonomy`.
+
+Screen by screen (`skills/taster/references/screens.md`): `check_consistency` (render every screen at 1440 and 390 and report the same component drawn differently on two screens, and every radius, spacing step, typeface, color, shadow or duration that is not one of the system's tokens), `plan_screens` (the start page and its same-site nav pages as `taster.plan.json`), `plan_next` (exactly one next step) and `plan_update` (records propose, revise, approve, build and check; refuses a build before the builder's approval and a new screen before the last one is checked, and runs the check itself).
 
 Claude Code:
 
@@ -50,8 +54,8 @@ args = ["/path/to/taster/engine/mcp.mjs"]
 ```bash
 node rules/test-detect.mjs           # fixtures: exact rule sets on slop pages, zero on the clean page at both widths
 node engine/scripts/check-rules.mjs  # rules.json schema, and detect.js checks exactly the measured rules
-npm --prefix engine test             # CLI, MCP and extract
-node engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop, rebuild is clean and keeps the content
+npm --prefix engine test             # CLI, MCP, extract, consistency and the plan steps
+node engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop, both rebuilt screens are clean, consistent and on the system
 ```
 
 To add a measured rule: write the check in `rules/detect.js` (`flag('XX-00', el, evidence)`), set its `detect.level` to `deterministic` in `rules/rules.json`, make a fixture in `rules/fixtures/` hit it and add the id to `rules/fixtures/expected.json`. The clean fixture must stay at zero.
