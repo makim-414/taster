@@ -37,6 +37,23 @@ Taster 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 읽
 제목·버튼·메뉴는 하나도 빠지지 않고 브랜드 색도 그대로입니다. `node engine/scripts/check-rebuild-example.mjs` 로
 확인합니다.
 
+## 디자인 시스템
+
+화면을 짓기 전에 브랜드와 만드는 사람의 의도를 먼저 하나의 디자인 시스템으로 만듭니다. 브랜드 사이트와 마음에 드는
+톤의 페이지 한두 개를 넣으면 실제 브라우저에서 잽니다(모서리 둥글기, 간격과 버튼 높이, 글자 대비, 글자 크기 비율,
+색상 수, 그림자, 움직임, 테두리). 여덟 축을 각각 이름 있는 단계에 놓고, 제약으로 적은 디자인 원칙에 맞춰 균형을
+잡으므로 애매한 중간값이 생기지 않습니다. 축 하나를 움직이면 나머지는 꼭 필요한 만큼만 따라 움직이고, 어떤 원칙
+때문에 움직였는지 그대로 알려 줍니다. 결과는 `taster.system.json` 과 `theme.css` 입니다. 축이 정하는 모든 토큰과
+브랜드가 들어 있고, 글자 대비는 WCAG AA 이상입니다. 모든 화면과 부품이 이 파일을 불러 씁니다.
+
+```bash
+node engine/cli.mjs --system https://your-site.example --ref ./a-page-you-like.html --out system
+node engine/cli.mjs --tune system/taster.system.json roundness=1
+```
+
+MCP 도구: `design_system`, `tune_system`, `system_for_category`. 측정값이 단계로, 단계가 토큰으로 바뀌는 방식은
+`skills/taster/references/system.md` 에 있습니다.
+
 ## 설치
 
 스킬을 지원하는 에이전트:

@@ -23,16 +23,22 @@ Call `extract_content { target }` (or `node engine/cli.mjs <url> --extract`). It
 
 Emoji and pictographs are already removed; they were decoration, not content.
 
-## 3. Absorb the brand
+## 3. Absorb the brand and make the system
 
-Call `brand_theme { target }` on the original and save its `css` as `theme.css` ([brand.md](brand.md)). It carries
-the brand color and the typeface when they were real choices, and fits success and failure colors to them. Show its
-notes, and confirm the brand color, typeface and logo file with the owner.
+Call `brand_theme { target }` on the original ([brand.md](brand.md)). It carries the brand color and the typeface
+when they were real choices, and fits success and failure colors to them. Show its notes, and confirm the brand
+color, typeface and logo file with the owner.
+
+Then make the design system with the builder ([system.md](system.md)): `design_system { brand: <original>,
+references, out }`. With no references the original's own tone sets the axes, and balance repairs the combinations
+that read as generated (for example pillow cards with deep shadows, or poster type with many hues). Propose the axes
+by step name, let the owner move weights with `tune_system`, and save `taster.system.json` and `theme.css`.
 
 ## 4. Decide what stays
 
 Keep: every heading, every paragraph that carries a claim or a fact, every action and where it goes, nav and
-footer links, images the owner made or owns, and the logo. The brand color and typeface are already in `theme.css`.
+footer links, images the owner made or owns, and the logo. The brand color, typeface and tone are already in the
+system's `theme.css`.
 
 Drop: decoration the detector flagged (blobs, glows, gradient text, tinted pills, icon tiles, tracking wide
 eyebrows), duplicate calls to action that go to the same place, placeholder copy.
@@ -60,8 +66,9 @@ Ask once: "Where should the new site live?" If the user has no preference, build
 - a plain HTML and CSS page with `registry/src/tokens.css` for a quick preview they can open, and
 - the same page as React components from the registry when they will keep developing it.
 
-Bring the brand in through tokens only: load `theme.css` after `registry/src/tokens.css`, and keep the logo as the
-owner's file. One accent color at most.
+Bring the brand and the tone in through tokens only: load the system's `theme.css` after `registry/src/tokens.css`,
+read the alias tokens in every part (`system_for_category` lists the ones that matter per part), and keep the logo as
+the owner's file. One accent color at most.
 
 ## 7. Check and compare
 

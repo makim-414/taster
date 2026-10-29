@@ -19,6 +19,8 @@ node engine/cli.mjs ./page.html --json --widths 1440 # one width, JSON to stdout
 node engine/cli.mjs https://example.com --widths responsive  # 360 to 1440 in nine steps, for the RSP rules
 node engine/cli.mjs https://example.com --extract    # content JSON for a rebuild (content.json with --out)
 node engine/cli.mjs https://example.com --brand      # brand theme CSS and notes (theme.css with --out, JSON with --json)
+node engine/cli.mjs --system https://example.com --ref ./liked.html --out sys  # design system: taster.system.json, theme.css
+node engine/cli.mjs --tune sys/taster.system.json density=0.75  # move a weight, rebalance, say what moved
 node engine/cli.mjs --rules                          # every rule, how it is checked, severity
 node engine/cli.mjs --explain KO-01                  # what, why, how it is found, fix
 ```
@@ -29,7 +31,7 @@ Exit code is 0 with no findings, 1 with findings, 2 on error. The report groups 
 
 Prompt: `start` (the opening question: does the site already exist, or are we building a new one?).
 
-Tools: `diagnose` (report plus one capture per width), `brand_theme` (the site's brand color, typeface and logo as token overrides, with success and failure colors fitted to them), `extract_content` (the page's content in reading order, for a rebuild), `list_rules`, `explain_rule`, and the swap tools `suggest_swaps`, `list_patterns`, `get_pattern`, `get_component`, `taxonomy`.
+Tools: `diagnose` (report plus one capture per width), `brand_theme` (the site's brand color, typeface and logo as token overrides, with success and failure colors fitted to them), `extract_content` (the page's content in reading order, for a rebuild), `design_system`, `tune_system` and `system_for_category` (the design system, see `skills/taster/references/system.md`), `list_rules`, `explain_rule`, and the swap tools `suggest_swaps`, `list_patterns`, `get_pattern`, `get_component`, `taxonomy`.
 
 Claude Code:
 
