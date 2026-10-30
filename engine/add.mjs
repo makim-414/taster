@@ -41,6 +41,7 @@ export function resolveComponents(ids, { tokens = true } = {}) {
   const files = new Map();
   const npm = new Set();
   const credits = [];
+  const hints = [];
   const queue = [];
   for (const id of ids) {
     const c = registry.components.find((x) => x.id === id);
@@ -56,6 +57,7 @@ export function resolveComponents(ids, { tokens = true } = {}) {
     if (comp) {
       for (const d of comp.deps || []) if (!/^(blocks|motion|marketing|icons)\//.test(d)) npm.add(d);
       if (comp.credit) credits.push({ id: comp.id, license: comp.license, credit: comp.credit });
+      if (comp.hint) hints.push(comp.hint);
     }
     for (const spec of relativeImports(content)) queue.push(resolveRelative(rel, spec));
   }
@@ -75,6 +77,7 @@ export function resolveComponents(ids, { tokens = true } = {}) {
     files: [...files].map(([path, content]) => ({ path: path.replace(/^src\//, ''), content })),
     npm: [...npm].sort(),
     credits,
+    hints,
   };
 }
 
@@ -101,6 +104,7 @@ export async function fetchBundle(ids, from) {
   const files = new Map();
   const npm = new Set();
   const credits = [];
+  const hints = [];
   for (const id of ids) {
     const url = new URL(`/r/${id}.json`, from);
     const res = await fetch(url);
@@ -109,6 +113,7 @@ export async function fetchBundle(ids, from) {
     for (const f of b.files) files.set(f.path, f.content);
     for (const p of b.npm) npm.add(p);
     credits.push(...(b.credits || []));
+    hints.push(...(b.hints || []));
   }
-  return { ids, files: [...files].map(([path, content]) => ({ path, content })), npm: [...npm].sort(), credits };
+  return { ids, files: [...files].map(([path, content]) => ({ path, content })), npm: [...npm].sort(), credits, hints };
 }

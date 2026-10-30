@@ -124,7 +124,7 @@ export function Diagnose({ initialUrl, ruleCount }: { initialUrl: string; ruleCo
       <footer className="colophon">
         <p>
           검사기는 저장소의 rules/detect.js 하나입니다. 이 화면도 같은 검사기로 잽니다. 보고 있는 페이지에서 바로 재려면{' '}
-          <a href="/bookmarklet">북마클릿과 확장</a>. MIT 라이선스,{' '}
+          <a href="/bookmarklet">북마클릿과 확장</a>. 에이전트 오브 변형은 <a href="/orbs">오브 조절</a>. MIT 라이선스,{' '}
           <a href="https://github.com/makim-414/taster">GitHub 저장소</a>.
         </p>
       </footer>
