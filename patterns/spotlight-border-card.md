@@ -5,7 +5,7 @@ category: card
 uses: [organize-the-page]
 surfaces: [landing]
 replaces: [COL-07]
-components: [blocks/card]
+components: [blocks/card, blocks/spotlight-card]
 inspiration: []
 status: draft
 ---

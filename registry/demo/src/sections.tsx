@@ -58,6 +58,7 @@ import {
   SessionList,
   SensitiveInput,
   OrbitIllustration,
+  SpotlightCard,
 } from '../../src'
 
 
@@ -816,6 +817,22 @@ export function Sections() {
       </Section>
 
       <Section id="blocks/tree-view" title="Tree view"><TreeDemo /></Section>
+
+      <Section id="blocks/spotlight-card" title="Spotlight card">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {[
+            ['Diagnose', 'Open any page at two widths and list every finding by rule.'],
+            ['Swap', 'Each finding names the pattern and component that replace it.'],
+            ['Build', 'Start a new screen from patterns that do not read as generated.'],
+          ].map(([title, body]) => (
+            <SpotlightCard key={title} href="#blocks/spotlight-card" className="p-5">
+              <h3 className="text-title font-semibold text-text">{title}</h3>
+              <p className="mt-1 text-sm text-text-muted">{body}</p>
+            </SpotlightCard>
+          ))}
+        </div>
+      </Section>
+
 
       <Section id="blocks/session-list" title="Session list">
         <SessionList
