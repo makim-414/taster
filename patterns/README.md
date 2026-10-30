@@ -220,6 +220,7 @@ Galleries, storefront pages and assistant interfaces.
 
 - [Agent chat thread and composer](agent-chat-thread.md)
 - [Agent status line](agent-status-line.md) fixes AC-07
+- [Agent thinking orb](agent-thinking-orb.md) fixes AC-07
 - [Ask-human step](ask-human-step.md)
 - [Sourced answer block](sourced-answer-block.md) fixes CMP-06, CPY-01
 - [Tool call disclosure](tool-call-disclosure.md)

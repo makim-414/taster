@@ -2194,5 +2194,24 @@
     ],
     "components": [],
     "summary": "Layout habits that keep text readable from 360px to 1440px (content box columns, shrinkable children, planned narrow forms) and the nine widths to check them at."
+  },
+  {
+    "id": "agent-thinking-orb",
+    "name": "Agent thinking orb",
+    "category": "chat-ai",
+    "uses": [
+      "show-progress",
+      "ask-the-assistant"
+    ],
+    "surfaces": [
+      "ai-chat"
+    ],
+    "replaces": [
+      "AC-07"
+    ],
+    "components": [
+      "motion/thinking-orb"
+    ],
+    "summary": "A dotted orb whose state matches what the agent is doing, made your own with a recipe of plain data, with the step named in words beside it."
   }
 ]

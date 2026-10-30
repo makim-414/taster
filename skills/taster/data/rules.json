@@ -287,6 +287,7 @@
       "fix": "Neutral text with a neutral spinner.",
       "fix_patterns": [
         "agent-status-line",
+        "agent-thinking-orb",
         "live-step-list",
         "progress-and-spinner",
         "quiet-empty-state",

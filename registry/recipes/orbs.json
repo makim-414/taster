@@ -1,0 +1,13 @@
+[
+  { "id": "quiet-orbit", "name": "Quiet orbit", "by": "taster", "note": "Fewer particles, slower. For an agent that works for a long time.", "state": "working", "speed": 0.6, "dots": 0.7, "dotSize": 0.85, "opts": { "ghostA": 0.3, "particles": 2 } },
+  { "id": "fine-globe", "name": "Fine globe", "by": "taster", "note": "A denser sphere with a softer scan, for search and retrieval.", "state": "searching", "speed": 0.75, "dots": 1.5, "dotSize": 0.7, "opts": { "scanMul": 2.5, "dimBase": 0.55 } },
+  { "id": "hard-scan", "name": "Hard scan", "by": "taster", "note": "The sphere stays dim until the meridian passes.", "state": "searching", "speed": 1, "dotSize": 0.9, "opts": { "scanMul": 7, "dimBase": 0.2 } },
+  { "id": "slow-solve", "name": "Slow solve", "by": "taster", "note": "Quarter turns at half speed, so each move can be seen.", "state": "solving", "speed": 0.5, "dotSize": 1.1 },
+  { "id": "voice-wave", "name": "Voice wave", "by": "taster", "note": "For a voice mode: tinted with the brand and a little bolder.", "state": "listening", "speed": 0.8, "dotSize": 1.2, "tint": "brand" },
+  { "id": "sparse-web", "name": "Sparse web", "by": "taster", "note": "Fewer links and thin lines, for tool calls between services.", "state": "connecting", "speed": 0.7, "opts": { "thr": 0.55, "signals": 3, "lineW": 0.5 } },
+  { "id": "tight-plait", "name": "Tight plait", "by": "taster", "note": "More turns per strand, for merging several sources.", "state": "weaving", "speed": 0.8, "opts": { "turns": 6 } },
+  { "id": "wide-sash", "name": "Wide sash", "by": "taster", "note": "A calmer band that spins, for writing long answers.", "state": "composing", "speed": 0.7, "opts": { "bandMul": 5.5, "wobMul": 0.6, "spin": 0.4 } },
+  { "id": "still-ring", "name": "Still ring", "by": "taster", "note": "Barely moves. For waiting on the user, not working.", "state": "breathing", "speed": 0.4, "opts": { "wobMul": 0.18 } },
+  { "id": "held-square", "name": "Held square", "by": "taster", "note": "The outline stays a square, for building a layout or a file.", "state": "shaping", "speed": 0.8, "opts": { "shape": 2 } },
+  { "id": "held-triangle", "name": "Held triangle", "by": "taster", "note": "The outline stays a triangle, for a warning that is still in progress.", "state": "shaping", "speed": 0.8, "opts": { "shape": 1, "spread": 1.2 } }
+]
