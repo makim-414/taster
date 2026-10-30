@@ -766,6 +766,20 @@
       "deps": [],
       "license": "MIT",
       "credit": "Written for this registry; idea from Spotlight Card by jahed on 21st.dev, license unknown (no code taken)"
+    },
+    {
+      "id": "motion/thinking-orb",
+      "file": "src/motion/thinking-orb.tsx",
+      "category": "motion-particle",
+      "patterns": [
+        "agent-thinking-orb"
+      ],
+      "deps": [
+        "thinking-orbs"
+      ],
+      "license": "MIT",
+      "credit": "thinking-orbs by Jakub Antalik, MIT, https://github.com/Jakubantalik/Libraries.dev",
+      "hint": "Make it yours before you ship it: https://taster-six.vercel.app/orbs"
     }
   ]
 }

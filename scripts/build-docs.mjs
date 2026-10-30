@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, SKILL_DATA, readJson, writeJson, loadPatterns, bundleFiles } from './lib.mjs';
 import { renderAll } from '../engine/exports.mjs';
-import { extensionRules } from './lib.mjs';
+import { extensionRules, orbRecipesModule } from './lib.mjs';
 
 const patterns = loadPatterns().map((p) => p.data).filter(Boolean);
 const taxonomy = readJson('taxonomy/taxonomy.json');
@@ -78,6 +78,9 @@ for (const [rel, content] of Object.entries(renderAll())) {
 // (served by web/app/taster) inject the same files.
 fs.copyFileSync(path.join(ROOT, 'rules/detect.js'), path.join(ROOT, 'extension/detect.js'));
 fs.writeFileSync(path.join(ROOT, 'extension/rules.js'), extensionRules(rules.rules));
+
+// Thinking orb recipes: contributors edit the JSON, the component imports the module.
+fs.writeFileSync(path.join(ROOT, 'registry/src/motion/orb-recipes.ts'), orbRecipesModule(readJson('registry/recipes/orbs.json')));
 
 // Skill bundle
 fs.rmSync(SKILL_DATA, { recursive: true, force: true });
