@@ -755,6 +755,17 @@
       "deps": [],
       "license": "MIT",
       "credit": "Written for this registry; idea from a 21st.dev Enrichment Orbit whose source could not be traced (no code taken)"
+    },
+    {
+      "id": "blocks/spotlight-card",
+      "file": "src/blocks/spotlight-card.tsx",
+      "category": "card",
+      "patterns": [
+        "spotlight-border-card"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Written for this registry; idea from Spotlight Card by jahed on 21st.dev, license unknown (no code taken)"
     }
   ]
 }
