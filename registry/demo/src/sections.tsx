@@ -59,6 +59,7 @@ import {
   SensitiveInput,
   OrbitIllustration,
   SpotlightCard,
+  ThinkingOrb, ORB_RECIPES,
 } from '../../src'
 
 
@@ -817,6 +818,18 @@ export function Sections() {
       </Section>
 
       <Section id="blocks/tree-view" title="Tree view"><TreeDemo /></Section>
+
+      <Section id="motion/thinking-orb" title="Thinking orb, recipes">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {ORB_RECIPES.slice(0, 8).map((r) => (
+            <div key={r.id} className="flex flex-col items-start gap-2">
+              <ThinkingOrb recipe={r} size={64} />
+              <span className="text-sm text-text-muted">{r.name}</span>
+            </div>
+          ))}
+        </div>
+      </Section>
+
 
       <Section id="blocks/spotlight-card" title="Spotlight card">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
