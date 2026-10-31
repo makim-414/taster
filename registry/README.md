@@ -3,7 +3,7 @@
 Portable React and TypeScript components with neutral design tokens. There is no package to
 install and no other CLI to set up: `taster add` copies the files a component needs into your app.
 
-59 components, MIT licensed. Every entry is listed in `registry.json` with its file, category,
+60 components, MIT licensed. Every entry is listed in `registry.json` with its file, category,
 npm dependencies and credit.
 
 ## Add a component to your app
