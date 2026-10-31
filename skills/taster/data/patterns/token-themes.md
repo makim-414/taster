@@ -5,7 +5,7 @@ category: layout-shell
 uses: [set-the-visual-foundation, switch-views]
 surfaces: [landing, app, dashboard]
 replaces: [CMP-04, CMP-11, COL-02, COL-03, COL-05, COL-08]
-components: [blocks/toggle]
+components: [blocks/toggle, blocks/appearance-picker]
 inspiration: []
 status: stable
 ---
@@ -22,8 +22,8 @@ It prevents four common failures: a single dark mode with no light option, a nea
 - Layer 2, roles: `--bg`, `--bg-elev`, `--bg-sunken`, `--border`, `--text`, `--text-muted`, `--text-subtle`, `--accent`, `--success`, `--warning`, `--danger`.
 - Layer 3, component tokens: only when a component needs its own knob, such as `--sidebar` or `--card-radius`.
 - Brand slot: one variable, `--brand`, defaults to near white (dark) or ink (light). A theme sets this and, if data uses color, the `--chart-*` ramp. Nothing else.
-- Modes: dark is the `:root` default, light is `:root[data-theme="light"]` and a `.theme-light` class. Both define every role. `color-scheme` is set to match.
-- Switch: a toggle that writes `data-theme` on `<html>` and stores the choice. First visit follows `prefers-color-scheme`.
+- Modes: dark is the `:root` default with a `.theme-dark` class, light is `:root[data-theme="light"]` and a `.theme-light` class. Both define every role. `color-scheme` is set to match.
+- Switch: a toggle that writes `data-theme` on `<html>` and stores the choice. First visit follows `prefers-color-scheme`. When the mode is a large part of the service, use `appearance-picker` on the settings page instead.
 
 ## Do
 
