@@ -3,7 +3,7 @@ import { ThinkingOrb as Orb, type ThinkingOrbProps as OrbProps } from 'thinking-
 import { luminance, resolveColor } from './_color'
 import { sanitizeRecipe, type OrbRecipe } from './_orb-recipe'
 
-export { ORB_KNOBS, ORB_STATES, decodeRecipe, encodeRecipe, recipeToCode, sanitizeRecipe } from './_orb-recipe'
+export { ORB_KNOBS, ORB_STATES, sanitizeRecipe } from './_orb-recipe'
 export type { NamedOrbRecipe, OrbKnob, OrbRecipe, OrbRecipeState } from './_orb-recipe'
 export { ORB_RECIPES } from './orb-recipes'
 
@@ -13,8 +13,7 @@ export { ORB_RECIPES } from './orb-recipes'
 // from the --bg token rather than the OS, so the ink stays right when the OS and the page disagree.
 // Upstream license: MIT, Copyright (c) 2026 Jakub Antalik. Full text in THIRD_PARTY_NOTICES.md.
 //
-// Do not ship the same default orb as everyone else: pick or make a recipe (https://taster-six.vercel.app/orbs) and match
-// the state to what the agent is doing. See patterns/agent-thinking-orb.md.
+// Do not ship the same default orb as everyone else: pick or make a recipe and match the state to what the agent is doing. See patterns/agent-thinking-orb.md.
 
 export interface ThinkingOrbProps extends Omit<OrbProps, 'color' | 'opts'> {
   /** A variation as data. Explicit props win over it. */
