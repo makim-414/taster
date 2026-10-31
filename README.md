@@ -107,12 +107,6 @@ changed files, and fails the step for findings at `fail-on` or worse. Without co
 bookmarks bar and click it on any page to outline the findings and list the rules hit. For sites that block injected
 scripts, load `extension/` as an unpacked extension in Chrome or Edge (it asks only for `activeTab` and `scripting`).
 
-### Make the thinking orb yours
-
-An orb every product shares is the next default look. [taster-six.vercel.app/orbs](https://taster-six.vercel.app/orbs)
-turns [thinking-orbs](https://libraries.dev/orbs) by Jakub Antalik into recipes: tune it, share the address, copy the code.
-Add a good one to `registry/recipes/orbs.json` and it joins the gallery under your handle.
-
 ### Use without installing (hosted MCP)
 
 The same MCP server runs at `https://taster-six.vercel.app/api/mcp` (Streamable HTTP). Add it as a remote MCP
