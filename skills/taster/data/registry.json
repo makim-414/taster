@@ -780,6 +780,18 @@
       "license": "MIT",
       "credit": "thinking-orbs by Jakub Antalik, MIT, https://github.com/Jakubantalik/Libraries.dev",
       "hint": "Make it yours before you ship it: https://taster-six.vercel.app/orbs"
+    },
+    {
+      "id": "blocks/appearance-picker",
+      "file": "src/blocks/appearance-picker.tsx",
+      "category": "form-input",
+      "patterns": [
+        "appearance-picker",
+        "token-themes"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": "Written for this registry; idea from Campsite ThemePicker via 21st.dev, CC BY-NC 4.0 (no code taken)"
     }
   ]
 }
