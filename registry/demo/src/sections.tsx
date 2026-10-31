@@ -59,6 +59,7 @@ import {
   SensitiveInput,
   OrbitIllustration,
   SpotlightCard,
+  AppearancePicker,
   ThinkingOrb, ORB_RECIPES,
 } from '../../src'
 
@@ -843,6 +844,13 @@ export function Sections() {
               <p className="mt-1 text-sm text-text-muted">{body}</p>
             </SpotlightCard>
           ))}
+        </div>
+      </Section>
+
+
+      <Section id="blocks/appearance-picker" title="Appearance picker">
+        <div className="max-w-xl">
+          <AppearancePicker storageKey="taster-demo-theme" />
         </div>
       </Section>
 
