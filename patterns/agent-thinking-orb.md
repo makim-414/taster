@@ -20,7 +20,7 @@ Do not use it for page loads or short fetches, where a skeleton is honest. Do no
 
 - The orb, at 64 for an avatar, 32 for a compact row, 20 inline with text.
 - A state that matches the work: searching for retrieval, connecting for tool calls, composing while writing, weaving when merging sources, shaping while building a file, breathing while waiting on the person.
-- A recipe: state, speed, dot count, dot size, tint and the state's own knobs, as plain data. Make one at https://taster-six.vercel.app/orbs, where the address holds it, so it can be shared.
+- A recipe: state, speed, dot count, dot size, tint and the state's own knobs, as plain data, so it can be saved in a file. `registry/recipes/orbs.json` has examples to start from.
 - A line of text next to it that names the step in words. The orb alone is not a status.
 - Past `frame`, the shape itself can change: your own mark drawn in dots.
 

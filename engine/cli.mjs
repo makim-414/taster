@@ -66,7 +66,6 @@ async function add(argv) {
   for (const f of skipped) console.log(`  ${f}  (kept your copy, it differs; --overwrite to replace)`);
   if (bundle.npm.length) console.log(`\nInstall: npm install ${bundle.npm.join(' ')}`);
   console.log(`\nThen import ${join(dir, 'tokens.css')} once at your app root and add ${join(dir, 'tailwind-preset.cjs')} to your Tailwind presets.`);
-  for (const hint of bundle.hints || []) console.log(`\n${hint}`);
   const upstream = bundle.credits.filter((c) => /MIT|Apache|BSD/i.test(c.credit || ''));
   if (upstream.length) console.log(`Keep the "Upstream license" lines at the top of copied files; the full texts are in ${join(dir, 'THIRD_PARTY_NOTICES.md')}.`);
   return 0;
