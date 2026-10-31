@@ -128,6 +128,7 @@ Buttons and every way a person types, picks or submits something.
 
 ### Form and input
 
+- [Appearance picker](appearance-picker.md) fixes CMP-11
 - [Checkbox and switch](checkbox-and-switch.md)
 - [Lead capture form](lead-capture-form.md) fixes AC-12, CMP-10
 - [Search and filter bar](search-and-filter-bar.md)
