@@ -2213,5 +2213,25 @@
       "motion/thinking-orb"
     ],
     "summary": "A dotted orb whose state matches what the agent is doing, made your own with a recipe of plain data, with the step named in words beside it."
+  },
+  {
+    "id": "appearance-picker",
+    "name": "Appearance picker",
+    "category": "form-input",
+    "uses": [
+      "set-the-visual-foundation",
+      "switch-views"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-11"
+    ],
+    "components": [
+      "blocks/appearance-picker"
+    ],
+    "summary": "Three radio cards for light, dark and system on the settings page, each showing a small screen drawn with the real tokens, for services where the mode matters."
   }
 ]
