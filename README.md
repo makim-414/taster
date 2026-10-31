@@ -31,6 +31,10 @@ The answer picks the route. Every route also absorbs the brand: the site's own c
 widths, every heading, action and nav item kept, brand color kept). `node engine/scripts/check-rebuild-example.mjs`
 proves it.
 
+`examples/icon-slots/` shows five worked variations for each icon slot (control, explanatory, identity, data marker,
+no icon), the same 25 that `taxonomy.json` lists. `node engine/scripts/check-icon-slots-example.mjs` checks that the page
+matches the taxonomy and has 0 findings at both widths.
+
 ## Install
 
 Any agent that supports skills:
@@ -182,6 +186,7 @@ patterns/            one Markdown file per pattern, plus INDEX.json
 rules/               rules.json, detect.js (runs in the page), fixtures and tests
 engine/              runs detect.js at two widths: CLI, MCP server (start prompt, diagnose, extract, swap tools), ACP agent, tests
 examples/rebuild/    a worked Rebuild, before and after, with its own check
+examples/icon-slots/ five variations per icon slot, matched to the taxonomy, with its own check
 commands/            the /taster command for Claude Code
 registry/            React components (taster add copies them into your app), tokens, a demo page and a render test
 scripts/             build-docs.mjs (derives links and the skill bundle), validate.mjs

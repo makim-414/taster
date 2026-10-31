@@ -38,6 +38,9 @@ set at one stroke weight and the three sizes (the registry `icons/icon` componen
 line of their label, and are `aria-hidden` unless they are the only content of a control. Logos and partner marks are
 the original files, never redrawn. Most feature cards end up with no icon.
 
+Each slot lists five `variations` with `use_when` and `shows`. Pick the one whose `use_when` matches the spot and
+follow its `shows`; `examples/icon-slots/index.html` in the repository renders all 25.
+
 ## 5. Check before you show
 
 Run Diagnose on the result at 1440 and 390, ICO rules included. Show the user the screen together with the clean detector report.

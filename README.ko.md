@@ -33,6 +33,10 @@ Taster 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 읽
 제목·버튼·메뉴는 하나도 빠지지 않고 브랜드 색도 그대로입니다. `node engine/scripts/check-rebuild-example.mjs` 로
 확인합니다.
 
+`examples/icon-slots/` 에는 아이콘 자리(조작, 설명용, 식별 마크, 데이터 표식, 아이콘 없음)마다 변형 5개씩, `taxonomy.json` 에
+적힌 25개가 그대로 있습니다. `node engine/scripts/check-icon-slots-example.mjs` 가 분류 체계와 맞는지, 두 폭 모두 0건인지
+확인합니다.
+
 ## 설치
 
 스킬을 지원하는 에이전트:

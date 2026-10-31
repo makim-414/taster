@@ -81,6 +81,14 @@ for (const p of files) {
       for (const r of s.rules || []) if (!ruleIds.has(r)) err(`icon slot ${s.id} unknown rule ${r}`);
       for (const pid of s.patterns || []) if (!fileIds.has(pid)) err(`icon slot ${s.id} unknown pattern ${pid}`);
       if (s.id !== 'no-icon' && !(s.patterns || []).length) err(`icon slot ${s.id} needs at least one pattern`);
+      // Five worked variations per slot, rendered in examples/icon-slots/ (checked there by engine/scripts/check-icon-slots-example.mjs).
+      const vars = s.variations || [];
+      if (vars.length !== 5) err(`icon slot ${s.id} needs 5 variations, has ${vars.length}`);
+      for (const v of vars) {
+        if (!kebab.test(v.id || '')) err(`icon slot ${s.id} variation id not kebab-case: ${v.id}`);
+        for (const k of ['name', 'use_when', 'shows']) if (!v[k]) err(`icon slot ${s.id} variation ${v.id} missing ${k}`);
+      }
+      if (new Set(vars.map((v) => v.id)).size !== vars.length) err(`icon slot ${s.id} has duplicate variation ids`);
     }
   }
 }
