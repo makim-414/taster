@@ -82,12 +82,6 @@ node engine/cli.mjs add blocks/button blocks/citations --dir src/components/tast
 아무 페이지에서나 누르면, 걸린 곳에 테두리를 치고 규칙 목록을 띄웁니다. 외부 스크립트를 막는 사이트에서는
 `extension/` 폴더를 크롬이나 엣지에 압축해제 확장으로 불러오세요(`activeTab`, `scripting` 권한만 씁니다).
 
-### 오브를 내 것으로
-
-모두가 같은 오브를 쓰면 그것이 다음 기본값이 됩니다. [taster-six.vercel.app/orbs](https://taster-six.vercel.app/orbs) 에서
-Jakub Antalik 의 [thinking-orbs](https://libraries.dev/orbs) 를 조절하고, 주소로 공유하고, 코드로 가져가세요. 잘 나온
-변형을 `registry/recipes/orbs.json` 에 더하면 만든 사람 이름으로 모음집에 실립니다.
-
 ### 설치 없이 쓰기 (원격 MCP)
 
 같은 MCP 서버가 `https://taster-six.vercel.app/api/mcp` 에서 돌아갑니다(Streamable HTTP). 원격 MCP 서버로 넣으면

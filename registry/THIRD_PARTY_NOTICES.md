@@ -484,7 +484,7 @@ SOFTWARE.
 Source: https://github.com/Jakubantalik/Libraries.dev (https://libraries.dev/orbs), by Jakub Antalik
 License: MIT (package LICENSE).
 
-Used for: `motion/thinking-orb` and the `/orbs` page import the package as a dependency; its code is not copied here. Taster adds the recipe format, token tint and token theme around it.
+Used for: `motion/thinking-orb` imports the package as a dependency; its code is not copied here. Taster adds the recipe format, token tint and token theme around it.
 
 ```text
 MIT License
