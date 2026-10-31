@@ -2076,6 +2076,7 @@
       },
       "fix": "Define both modes in tokens.",
       "fix_patterns": [
+        "appearance-picker",
         "token-themes"
       ],
       "severity": "low",
