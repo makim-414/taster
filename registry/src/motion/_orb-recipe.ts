@@ -1,6 +1,5 @@
-// What a thinking orb variation is, as plain data: a recipe can be saved in a file, put in a share link and added to
-// the gallery by a pull request. No dependency, so the component, the /orbs page and the validator share this file.
-// Every value is checked here, because a recipe can arrive from a link.
+// What a thinking orb variation is, as plain data: a recipe can be saved in a file and added to the examples by a pull
+// request. No dependency. Every value is checked here, because a recipe can come from outside the code.
 
 export const ORB_STATES = ['working', 'searching', 'solving', 'listening', 'connecting', 'weaving', 'composing', 'breathing', 'shaping'] as const
 export type OrbRecipeState = (typeof ORB_STATES)[number]
@@ -100,34 +99,4 @@ export function sanitizeRecipe(input: unknown): OrbRecipe | null {
     if (Object.keys(opts).length) out.opts = opts
   }
   return out
-}
-
-/** A recipe as a short URL-safe string, for share links. */
-export function encodeRecipe(recipe: OrbRecipe): string {
-  const bytes = new TextEncoder().encode(JSON.stringify(recipe))
-  let bin = ''
-  bytes.forEach((b) => (bin += String.fromCharCode(b)))
-  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-}
-
-/** The reverse of encodeRecipe. Null for anything that does not decode to a valid recipe. */
-export function decodeRecipe(text: string): OrbRecipe | null {
-  try {
-    if (text.length > 2000) return null
-    const bin = atob(text.replace(/-/g, '+').replace(/_/g, '/'))
-    return sanitizeRecipe(JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)))))
-  } catch {
-    return null
-  }
-}
-
-/** The JSX for a recipe, for copying. Leaves out what is at its default. */
-export function recipeToCode(recipe: OrbRecipe, size = 64): string {
-  const props = [`state="${recipe.state}"`, `size={${size}}`]
-  if (recipe.speed !== undefined && recipe.speed !== 1) props.push(`speed={${recipe.speed}}`)
-  if (recipe.dots !== undefined && recipe.dots !== 1) props.push(`dots={${recipe.dots}}`)
-  if (recipe.dotSize !== undefined && recipe.dotSize !== 1) props.push(`dotSize={${recipe.dotSize}}`)
-  if (recipe.tint && recipe.tint !== 'ink') props.push(recipe.tint === 'brand' ? 'tint="brand"' : `tint="${recipe.tint}"`)
-  if (recipe.opts) props.push(`opts={${JSON.stringify(recipe.opts).replace(/"/g, '')}}`)
-  return `<ThinkingOrb ${props.join(' ')} />`
 }
