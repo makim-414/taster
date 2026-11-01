@@ -42,6 +42,8 @@
     "taxonomy/",
     "registry/registry.json",
     "registry/src/",
+    "registry/stage/",
+    "registry/previews/",
     "registry/THIRD_PARTY_NOTICES.md",
     "registry/README.md",
     "skills/taster/",
