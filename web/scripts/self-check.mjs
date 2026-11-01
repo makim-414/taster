@@ -64,6 +64,24 @@ try {
       await page.close();
     }
   }
+  // The gallery pages. The components inside frames are the registry's business; this measures the page around them.
+  for (const width of [1440, 390]) {
+    for (const path of ['/components', '/components/blocks/button', '/components/blocks/banner-hero', '/board?ids=blocks/button,blocks/card&brand=e4002b']) {
+      const page = await browser.newPage({ viewport: { width, height: width === 390 ? 844 : 900 } });
+      const errors = [];
+      page.on('pageerror', (e) => errors.push(e.message));
+      await page.goto(BASE + path, { waitUntil: 'networkidle' });
+      await page.evaluate(() => document.querySelectorAll('details').forEach((d) => (d.open = true)));
+      await page.addScriptTag({ content: DETECT });
+      const report = await page.evaluate(() => window.tasterDetect({ maxPerRule: 10 }));
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+      console.log(`${path} at ${width}: ${report.findings.length} findings, pageerror ${errors.length}, horizontal overflow ${overflow}`);
+      for (const f of report.findings) console.log(`  ${f.ruleId} ${f.selector} ${JSON.stringify(f.evidence || '')}`);
+      for (const e of errors) console.log(`  pageerror ${e}`);
+      if (report.findings.length || errors.length || overflow) failures++;
+      await page.close();
+    }
+  }
 } finally {
   await browser.close();
 }
