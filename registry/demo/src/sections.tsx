@@ -60,6 +60,10 @@ import {
   OrbitIllustration,
   SpotlightCard,
   AppearancePicker,
+  CurvedStreamHero,
+  BannerHero,
+  WireframeForm,
+  LightBeams,
   ThinkingOrb, ORB_RECIPES,
 } from '../../src'
 
@@ -851,6 +855,48 @@ export function Sections() {
       <Section id="blocks/appearance-picker" title="Appearance picker">
         <div className="max-w-xl">
           <AppearancePicker storageKey="taster-demo-theme" />
+        </div>
+      </Section>
+
+
+      <Section id="blocks/curved-stream-hero" title="Curved stream hero">
+        <CurvedStreamHero
+          title="Every frame, brought into focus."
+          description="One row of your own work, flat in the middle and bending toward the viewer at the edges."
+          images={COVERS.map((c) => ({ src: c.image, alt: '' }))}
+        />
+      </Section>
+
+
+      <Section id="blocks/banner-hero" title="Banner hero">
+        <BannerHero
+          fullHeight={false}
+          style={{ minHeight: 520 }}
+          image={{ src: COVERS[1].image, alt: '' }}
+          notice="New: the spring catalog is open"
+          title="A full picture, and one clear sentence."
+          description="The photograph carries the page. The scrim comes from the surface token, so the words stay readable."
+          actions={<><Button>Start now</Button><Button variant="ghost">See the work</Button></>}
+        />
+      </Section>
+
+
+      <Section id="motion/wireframe-form" title="Wireframe form">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {([['Built in', { form: 'star' as const }], ['From a name', { form: 'generated' as const, seed: 'Taster' }], ['From a mark', { mark: 'M10 10h80v22H61v58H39V32H10z' }]] as const).map(([label, props]) => (
+            <div key={label} className="relative h-56 overflow-hidden rounded-card border border-border bg-bg">
+              <WireframeForm {...props} scale={0.7} />
+              <span className="absolute bottom-3 left-3 text-sm text-text-muted">{label}</span>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+
+      <Section id="motion/light-beams" title="Light beams">
+        <div className="relative flex h-72 items-center justify-center overflow-hidden rounded-card border border-border bg-bg">
+          <LightBeams />
+          <p className="relative text-title font-semibold text-text">Background only. The words are yours.</p>
         </div>
       </Section>
 

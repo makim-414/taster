@@ -39,6 +39,7 @@ from that. If they have nothing, keep the Taster defaults and say so.
   face.
 - Rebuild and Build: every component reads the alias tokens, so loading `theme.css` after `tokens.css` is enough.
   Do not type brand values into components.
+- Backgrounds: `motion/wireframe-form` and `motion/light-beams` read `--brand`, so they change with the theme. For a wire form that belongs to this brand, pass the brand name as `seed` with `form="generated"`, or the path of the original mark as `mark`. It stays a background: the logo itself is still the original file.
 - Status: a dot or a mark for a real outcome uses `--success` or `--danger`, flat and still. The detector (AC-08)
   passes a dot in exactly these page colors and still flags a dot in any other hue, or one that glows or pulses.
   States that are not outcomes (queued, processing, draft) stay neutral and say the state in words.
