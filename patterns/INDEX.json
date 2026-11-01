@@ -60,7 +60,8 @@
       "LAY-01"
     ],
     "components": [
-      "blocks/button"
+      "blocks/button",
+      "blocks/banner-hero"
     ],
     "summary": "Real photography carries the hero: a full-bleed photo with a gentle bottom scrim, or a serif headline over two or three overlapping photos. Film grain and slightly muted tone replace the glossy AI photo look."
   },
@@ -2095,7 +2096,9 @@
       "COL-01",
       "COL-03"
     ],
-    "components": [],
+    "components": [
+      "motion/light-beams"
+    ],
     "summary": "A GPU or canvas point cloud in neutral tones that forms shapes slowly, or thin noise-driven lines on a calm surface, replacing purple orbs and aurora blobs."
   },
   {
@@ -2233,5 +2236,48 @@
       "blocks/appearance-picker"
     ],
     "summary": "Three radio cards for light, dark and system on the settings page, each showing a small screen drawn with the real tokens, for services where the mode matters."
+  },
+  {
+    "id": "brand-wire-form",
+    "name": "Brand wire form",
+    "category": "motion-particle",
+    "uses": [
+      "set-the-mood"
+    ],
+    "surfaces": [
+      "landing",
+      "auth-onboarding"
+    ],
+    "replaces": [
+      "BG-01",
+      "COL-01",
+      "COL-03"
+    ],
+    "components": [
+      "motion/wireframe-form"
+    ],
+    "summary": "One thin line figure turning slowly behind a short hero, in the brand color, built from the brand name or extruded from the brand's own mark."
+  },
+  {
+    "id": "curved-image-stream-hero",
+    "name": "Curved image stream hero",
+    "category": "hero",
+    "uses": [
+      "introduce-the-product",
+      "browse-media"
+    ],
+    "surfaces": [
+      "landing",
+      "commerce",
+      "editorial"
+    ],
+    "replaces": [
+      "BG-01",
+      "LAY-02"
+    ],
+    "components": [
+      "blocks/curved-stream-hero"
+    ],
+    "summary": "A short headline above one endless row of real pictures that flatten in the middle and bend toward the viewer at the edges, with a visible pause."
   }
 ]
