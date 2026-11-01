@@ -52,7 +52,7 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
     assert.ok((await client.callTool({ name: 'browse_components', arguments: { ids: ['blocks/nope'] } })).isError);
     assert.match((await client.callTool({ name: 'browse_components', arguments: { query: 'zzzqqq' } })).content[0].text, /No component matches/);
 
-    // The picture really wears the brand: the same component renders differently and reds show up.
+    // The picture changes with the brand: the same component renders differently for each look.
     const preview = (args) => client.callTool({ name: 'preview_component', arguments: { id: 'blocks/button', theme: 'light', width: 600, ...args } });
     const plain = await preview({});
     const red = await preview({ brand: '#e4002b' });
