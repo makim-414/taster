@@ -1,25 +1,27 @@
 // The Taster MCP server, shared by the stdio entry (mcp.mjs) and the hosted HTTP endpoint (http.mjs).
 // Prompt: start (the opening question). Diagnose tools: diagnose, list_rules, explain_rule.
 // Brand tool: brand_theme. Rebuild tool: extract_content. Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
+// Choosing tools: browse_components and preview_component answer with pictures and links to the live gallery.
 // Hosted mode has no local files and opens pages only through the host's fenced browser, so it swaps the local
-// diagnose for `remote.diagnose` (public http(s) URLs only) and leaves out extract_content and brand_theme.
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+// diagnose for `remote.diagnose` (public http(s) URLs only), brand_theme for `remote.brand` when the host gives one,
+// leaves out extract_content, and answers preview_component with the still and the live link instead of a render.
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, viewportFor } from './diagnose.mjs';
+import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, launch, viewportFor } from './diagnose.mjs';
 import { brandTheme } from './brand.mjs';
-import { getComponent, getPattern, listPatterns, loadTaxonomy, suggestSwaps } from './catalog.mjs';
+import { boardUrl, browseComponents, componentUrl, getComponent, getPattern, listPatterns, loadTaxonomy, previewPath, stagePath, suggestSwaps } from './catalog.mjs';
 
 const json = (value) => ({ type: 'text', text: JSON.stringify(value, null, 2) });
 const START_GUIDE = fileURLToPath(new URL('../skills/taster/references/start.md', import.meta.url));
 
 /**
  * Build a Taster MCP server.
- * @param {{ remote?: { diagnose: (url: string) => Promise<{ report: unknown, shots?: Record<string, string> }> } }} [options]
- *   remote: hosted mode; diagnose goes through this function instead of a local browser.
+ * @param {{ remote?: { diagnose: (url: string) => Promise<{ report: unknown, shots?: Record<string, string> }>, brand?: (url: string) => Promise<unknown> } }} [options]
+ *   remote: hosted mode; diagnose (and brand, when given) go through these functions instead of a local browser.
  */
 export function createServer({ remote } = {}) {
   const server = new McpServer({ name: 'taster', version: '0.1.0' });
@@ -44,6 +46,26 @@ export function createServer({ remote } = {}) {
       ],
     }),
   );
+
+  if (remote?.brand) {
+    server.registerTool(
+      'brand_theme',
+      {
+        title: "Absorb a site's brand",
+        description:
+          "Open a public http(s) URL, read its brand (the solid color on its own buttons and links, its typeface, light or dark) and return token overrides: tokens, css to save as theme.css after the tokens, and notes. Pass tokens to preview_component or the brand color to browse_components to see components in this brand.",
+        inputSchema: { target: z.string().describe('public http(s) URL') },
+        annotations: { readOnlyHint: true, openWorldHint: true },
+      },
+      async ({ target }) => {
+        try {
+          return { content: [json(await remote.brand(target))] };
+        } catch (err) {
+          return { isError: true, content: [{ type: 'text', text: `brand_theme failed: ${err.message}` }] };
+        }
+      },
+    );
+  }
 
   if (remote) {
     server.registerTool(
@@ -167,6 +189,95 @@ export function createServer({ remote } = {}) {
     }
   };
   const readOnly = { readOnlyHint: true, idempotentHint: true };
+
+  const lookInput = {
+    theme: z.enum(['dark', 'light']).optional().describe('default dark'),
+    brand: z.string().regex(/^#?[0-9a-fA-F]{6}$/).optional().describe('brand color as hex, for the live links (and the render in preview_component)'),
+  };
+
+  server.registerTool(
+    'browse_components',
+    {
+      title: 'Browse components with pictures',
+      description:
+        'Show components as pictures so the user can choose by eye. Returns numbered candidates, each with a still, what it is for, and a live page the user can click and recolor, plus one board link that puts them side by side with a pick button. Show every picture and both links, ask which number, and wait for the answer before writing code. Then call get_component on the choice. Filters combine with AND and the query ranks what is left.',
+      inputSchema: {
+        query: z.string().optional().describe('what the user wants, such as "hero with photo" or "pricing"'),
+        category: z.string().optional().describe('taxonomy category id, such as hero'),
+        family: z.string().optional().describe('taxonomy family id, such as page-sections'),
+        use: z.string().optional().describe('what the visitor is doing, a taxonomy use id'),
+        surface: z.string().optional().describe('landing, dashboard, app, commerce, editorial, auth-onboarding or ai-chat'),
+        ids: z.array(z.string()).max(8).optional().describe('exact component ids, to show a chosen few again'),
+        limit: z.number().int().min(1).max(8).optional().describe('how many, default 6'),
+        ...lookInput,
+      },
+      annotations: readOnly,
+    },
+    guard(async ({ theme = 'dark', brand, limit = 6, ...filters }) => {
+      const found = browseComponents({ ...filters, limit });
+      if (!found.length) return { content: [{ type: 'text', text: 'No component matches. Try a wider query, or call taxonomy to see the categories.' }] };
+      const look = { theme, brand };
+      const content = [{ type: 'text', text: `${found.length} candidates. Board with all of them, live, with a pick button: ${boardUrl(found.map((c) => c.id), look)}` }];
+      found.forEach((c, i) => {
+        content.push({
+          type: 'text',
+          text: `${i + 1}. ${c.id} (${c.categoryName})${c.summary ? `: ${c.summary}` : ''}\nFixes: ${c.fixes.join(', ') || 'none listed'}. Packages: ${c.deps.join(', ') || 'none'}. License: ${c.license || 'not stated'}.\nLive: ${componentUrl(c.id, look)}`,
+        });
+        content.push({ type: 'image', mimeType: 'image/jpeg', data: readFileSync(previewPath(c.id, theme)).toString('base64') });
+      });
+      content.push({ type: 'text', text: 'Ask the user which number they like, or what is off about all of them. For the brand on one, call preview_component. Do not write code until they choose.' });
+      return { content };
+    }),
+  );
+
+  server.registerTool(
+    'preview_component',
+    {
+      title: 'Preview a component in a brand',
+      description: remote
+        ? 'A still of one component and a live page that opens in the given brand color and theme, where the user can click it and change the color. For a render in the brand as a picture, use the local server.'
+        : 'Render one component in a real browser wearing a brand (brand color, or the tokens from brand_theme) and return it as a picture, plus a live page the user can click and recolor. Use it to show the shortlist in their brand before writing code.',
+      inputSchema: {
+        id: z.string().describe('registry component id, such as blocks/button'),
+        width: z.number().int().min(320).max(1600).optional().describe('frame width, default 900; use 390 to see the phone layout'),
+        tokens: z.record(z.string(), z.string()).optional().describe('token overrides, for example the tokens from brand_theme'),
+        ...lookInput,
+      },
+      annotations: { readOnlyHint: true },
+    },
+    guard(async ({ id, width = 900, tokens, theme = 'dark', brand }) => {
+      const [item] = browseComponents({ ids: [id] });
+      const hex = brand ? `#${brand.replace('#', '')}` : tokens?.['--brand'];
+      const live = componentUrl(item.id, { theme, brand: hex });
+      if (remote) {
+        return {
+          content: [
+            { type: 'text', text: `${item.id}. The still shows the default look. Live in the brand: ${live}` },
+            { type: 'image', mimeType: 'image/jpeg', data: readFileSync(previewPath(item.id, theme)).toString('base64') },
+          ],
+        };
+      }
+      if (!existsSync(stagePath())) throw new Error('registry/stage/index.html is missing. Run: npm --prefix registry run build-stage');
+      const all = { ...(tokens || {}), ...(hex ? { '--brand': hex } : {}) };
+      const browser = await launch();
+      try {
+        const page = await browser.newPage({ viewport: { width, height: Math.round(width * 0.625) }, deviceScaleFactor: 1.5 });
+        const look = encodeURIComponent(JSON.stringify({ theme, tokens: all }));
+        await page.goto(`${pathToFileURL(stagePath()).href}?only=${encodeURIComponent(item.id)}&look=${look}`);
+        await page.waitForSelector(`[data-registry-id="${item.id}"]`, { timeout: 15000 });
+        await page.waitForTimeout(1400);
+        const shot = await page.screenshot({ type: 'jpeg', quality: 80 });
+        return {
+          content: [
+            { type: 'text', text: `${item.id} at ${width} wide, ${theme}${hex ? `, brand ${hex}` : ''}. Live, to click and recolor: ${live}` },
+            { type: 'image', mimeType: 'image/jpeg', data: shot.toString('base64') },
+          ],
+        };
+      } finally {
+        await browser.close();
+      }
+    }),
+  );
 
   server.registerTool(
     'suggest_swaps',
