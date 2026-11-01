@@ -20,17 +20,17 @@
 .text-button { padding: 0 var(--sp-2); border: 0; background: none; color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px; }
 .gallery-page button:focus-visible, .gallery-page a:focus-visible, .gallery-page input:focus-visible, .gallery-page select:focus-visible, .gallery-page summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 
-.lookbar { display: grid; gap: var(--sp-3); padding: var(--sp-4); border-radius: var(--r-card); background: var(--bg-sunken); }
+.lookbar { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); padding: var(--sp-4); border-radius: var(--r-card); background: var(--bg-sunken); }
 .lookbar-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); min-width: 0; }
 .seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); overflow: hidden; }
 .seg-item { padding: 0 var(--sp-4); border: 0; border-radius: 0; background: none; color: var(--text-muted); }
 .seg-item[aria-pressed='true'] { background: var(--text); color: var(--bg); font-weight: var(--w-med); }
-.color-field, .url-field, .select-field { display: flex; align-items: center; gap: var(--sp-2); min-width: 0; font-size: var(--t-body); color: var(--text-muted); }
+.color-field, .url-field, .select-field { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); min-width: 0; font-size: var(--t-body); color: var(--text-muted); }
 .url-field { flex: 1 1 18rem; flex-wrap: wrap; }
 .url-field span, .color-field span, .select-field span { white-space: nowrap; }
 .color-field input[type='color'] { width: 44px; height: 44px; padding: var(--sp-1); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); cursor: pointer; }
 .gallery-page input[type='text'], .gallery-page input[type='search'], .gallery-page select { min-height: 44px; padding: 0 var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); color: var(--text); font: inherit; font-size: 16px; }
-.color-field input[type='text'] { width: 7.5rem; }
+.color-field input[type='text'] { flex: 1 1 6rem; width: 7.5rem; min-width: 0; }
 .url-field input { flex: 1 1 12rem; min-width: 0; }
 .lookbar-note { margin: 0; font-size: var(--t-sm); color: var(--text-muted); }
 
