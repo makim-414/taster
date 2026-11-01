@@ -28,8 +28,13 @@ test('hosted MCP answers initialize, lists only the hosted tools and runs them',
 
   const { tools } = await rpc('tools/list', {}, fake);
   const names = tools.map((t) => t.name).sort();
-  assert.deepEqual(names, ['diagnose', 'explain_rule', 'get_component', 'get_pattern', 'list_patterns', 'list_rules', 'suggest_swaps', 'taxonomy']);
+  assert.deepEqual(names, ['browse_components', 'diagnose', 'explain_rule', 'get_component', 'get_pattern', 'list_patterns', 'list_rules', 'preview_component', 'suggest_swaps', 'taxonomy']);
   assert.ok(!names.includes('extract_content') && !names.includes('brand_theme'), 'local-file tools stay out of hosted mode');
+
+  // Hosted, a preview is the still plus the live link, since there is no render without a local browser.
+  const still = await rpc('tools/call', { name: 'preview_component', arguments: { id: 'blocks/button', brand: '#e4002b' } }, fake);
+  assert.ok(still.content.some((c) => c.type === 'image'));
+  assert.match(still.content[0].text, /brand=e4002b/);
 
   const rule = await rpc('tools/call', { name: 'explain_rule', arguments: { id: 'AC-01' } }, fake);
   assert.match(rule.content[0].text, /"id": "AC-01"/);

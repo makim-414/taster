@@ -23,6 +23,9 @@ A dashboard is usually: show one number, show a trend, compare items, act on a r
 From `data/patterns/INDEX.json`, filter by surface and use. Prefer patterns with `status: stable` and with
 registry components. Read each pattern's "Do" and "Don't" before you write the section.
 
+Any block the visitor will see is the user's call, not yours: follow [choose.md](choose.md) and let them pick by eye
+before you write it.
+
 ## 4. Compose
 
 - Tokens first (`registry/src/tokens.css` or the user's tokens), then layout, then components, then copy.
