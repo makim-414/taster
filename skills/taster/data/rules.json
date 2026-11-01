@@ -752,6 +752,7 @@
       "fix": "Pick one brand color and use it flat. If a gradient is needed, keep it within one hue and low contrast.",
       "fix_patterns": [
         "ambient-background",
+        "brand-wire-form",
         "editorial-paper-sheet",
         "flat-solid-button",
         "kpi-stat-tile",
@@ -875,6 +876,7 @@
       "fix": "If a dark theme is needed, separate surfaces with gray steps and keep the accent flat.",
       "fix_patterns": [
         "ambient-background",
+        "brand-wire-form",
         "photo-led-hero",
         "plain-section-surface",
         "token-themes"
@@ -1395,6 +1397,7 @@
         "audience-entry-split",
         "connection-diagram",
         "content-matched-grid",
+        "curved-image-stream-hero",
         "focus-card-carousel",
         "icon-placement",
         "media-tile-card",
@@ -2111,6 +2114,8 @@
       "fix": "Show the product, a real photo, or nothing. A flat background is a valid choice.",
       "fix_patterns": [
         "ambient-background",
+        "brand-wire-form",
+        "curved-image-stream-hero",
         "photo-led-hero",
         "plain-section-surface",
         "scroll-driven-product-hero",
