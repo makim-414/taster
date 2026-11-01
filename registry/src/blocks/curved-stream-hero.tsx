@@ -45,7 +45,7 @@ const CSS = `
 .ds-cstream-pause{align-self:center;min-height:44px;padding-inline:var(--sp-3);border:0;background:none;color:var(--text-muted);font:inherit;font-size:var(--t-sm);cursor:pointer}
 .ds-cstream-pause:hover{color:var(--text)}
 .ds-cstream-pause:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
-@media (min-width:1024px) and (hover:hover) and (pointer:fine){.ds-cstream-pause{min-height:0;padding-block:var(--sp-1)}}
+@media (min-width:1024px) and (not (pointer:coarse)){.ds-cstream-pause{min-height:0;padding-block:var(--sp-1)}}
 `
 
 export function CurvedStreamHero({
