@@ -75,3 +75,10 @@ list of motion components is also left out until their source and license are cl
 ## License
 
 MIT. See `THIRD_PARTY_NOTICES.md` for the credits that come with it.
+
+## Stage and previews
+
+`stage/index.html` is the demo page as one file; `?only=<id>` shows one component and `?look=<json>` sets its theme and
+tokens. `previews/` holds a still of each component, light and dark. The gallery on the web and the MCP tools
+`browse_components` and `preview_component` use both. After changing a component or its demo, run
+`npm run build-stage`; `scripts/validate.mjs` fails until you do.
