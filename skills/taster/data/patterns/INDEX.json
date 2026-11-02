@@ -379,7 +379,8 @@
     "surfaces": [
       "landing",
       "commerce",
-      "editorial"
+      "editorial",
+      "developer-docs"
     ],
     "replaces": [
       "AC-01",
@@ -801,7 +802,8 @@
       "commerce",
       "editorial",
       "auth-onboarding",
-      "ai-chat"
+      "ai-chat",
+      "developer-docs"
     ],
     "replaces": [
       "ICO-01",
@@ -961,7 +963,8 @@
       "read-long-text"
     ],
     "surfaces": [
-      "editorial"
+      "editorial",
+      "developer-docs"
     ],
     "replaces": [
       "KO-03",
@@ -1047,6 +1050,26 @@
       "blocks/app-shell"
     ],
     "summary": "Sidebar, sticky top bar and content area as one reusable frame; the sidebar becomes a drawer on small screens and the brand is a prop."
+  },
+  {
+    "id": "language-playground",
+    "name": "Language playground in the site shell",
+    "category": "layout-shell",
+    "uses": [
+      "start-an-action",
+      "organize-the-page",
+      "navigate-the-site"
+    ],
+    "surfaces": [
+      "developer-docs"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/button",
+      "blocks/dropdown",
+      "blocks/tabs"
+    ],
+    "summary": "Keep the landing header, page column and light page on the playground of a language or developer tool site; make only the code card dark, let the code fill it and open the output under the code on the first Run."
   },
   {
     "id": "product-first-section-order",
@@ -2186,7 +2209,8 @@
       "commerce",
       "editorial",
       "auth-onboarding",
-      "ai-chat"
+      "ai-chat",
+      "developer-docs"
     ],
     "replaces": [
       "RSP-01",
