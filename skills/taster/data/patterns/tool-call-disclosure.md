@@ -5,7 +5,7 @@ category: chat-ai
 uses: [ask-the-assistant, show-progress]
 surfaces: [ai-chat]
 replaces: []
-components: [blocks/accordion]
+components: [blocks/accordion, chat/tool-call]
 inspiration: []
 status: stable
 ---

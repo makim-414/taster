@@ -5,7 +5,7 @@ category: hero
 uses: [introduce-the-product, show-one-number]
 surfaces: [landing, dashboard]
 replaces: [AC-17, CMP-06, CMP-07, LAY-01]
-components: [blocks/button]
+components: [blocks/button, marketing/product-hero]
 inspiration: []
 status: stable
 ---

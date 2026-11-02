@@ -5,7 +5,7 @@ category: pricing
 uses: [compare-plans, enter-data]
 surfaces: [landing, app]
 replaces: []
-components: [blocks/input]
+components: [blocks/input, blocks/slider, marketing/usage-estimator]
 inspiration: []
 status: draft
 ---

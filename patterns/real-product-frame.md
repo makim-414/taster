@@ -5,7 +5,7 @@ category: feature-section
 uses: [explain-features]
 surfaces: [landing]
 replaces: [AC-17, CMP-07]
-components: []
+components: [marketing/product-hero, marketing/feature-rows]
 inspiration: [https://21st.dev/@meschacirung/components/content-7]
 status: draft
 ---

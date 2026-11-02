@@ -3,7 +3,7 @@ id: icon-placement
 name: Icon placement map
 category: icon
 uses: [set-the-visual-foundation, explain-features, navigate-the-app, navigate-the-site]
-surfaces: [landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat]
+surfaces: [landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat, developer-docs]
 replaces: [ICO-01, ICO-02, ICO-03, ICO-04, CMP-03, LAY-02]
 components: [icons/icon]
 inspiration: []
@@ -14,7 +14,7 @@ status: stable
 
 Use it before any icon goes on a page, and whenever a diagnosis reports an ICO rule. The question is never "which icon fits this card". It is "which slot is this, and does that slot need an icon at all". Generated pages fail here: in our 198 site measurement the same few stock icons on repeat (ICO-01) showed up on 78 of 100 builder made pages and on none of the 88 hand made pages outside the control group. The fix is not to ban icons. It is to put the right kind of mark in the right slot, from one set, and to leave the other slots empty.
 
-The slot list lives in `taxonomy.json` under `iconography.slots`, so tools and agents read the same map:
+The slot list lives in `taxonomy.json` under `iconography.slots`, so tools and agents read the same map. Each slot also lists five worked `variations` (for example an icon-only toolbar, a number instead of an icon, a marked placeholder for a missing logo), rendered side by side in `examples/icon-slots/`:
 
 | Slot | It is | Keep an icon when | Otherwise |
 |---|---|---|---|

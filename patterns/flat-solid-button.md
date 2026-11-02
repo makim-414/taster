@@ -5,7 +5,7 @@ category: button
 uses: [start-an-action]
 surfaces: [landing, app, dashboard]
 replaces: [AC-16, COL-01, COL-07, RSP-06]
-components: [blocks/button]
+components: [blocks/button, blocks/button-group, blocks/copy-button]
 inspiration: [https://ui.shadcn.com/docs/components/button]
 status: stable
 ---

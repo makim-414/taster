@@ -5,7 +5,7 @@ category: feature-section
 uses: [explain-features]
 surfaces: [landing, commerce]
 replaces: [LAY-02, LAY-05, LAY-06]
-components: [blocks/card, blocks/separator]
+components: [blocks/card, blocks/separator, marketing/feature-rows, marketing/feature-grid]
 inspiration: []
 status: stable
 ---

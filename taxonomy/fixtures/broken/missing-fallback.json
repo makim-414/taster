@@ -1,0 +1,15 @@
+{
+  "expect": "FALLBACK",
+  "why": "Without an unconditional last step some parts get no category.",
+  "patch": [
+    {
+      "op": "delete",
+      "path": [
+        "classify",
+        {
+          "fallback": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "route": "rebuild",
+  "system": [
+    "../../registry/src/tokens.css",
+    "theme.css"
+  ],
+  "screens": [
+    {
+      "id": "home",
+      "source": "before.html",
+      "output": "after.html",
+      "purpose": "Introduce the product and ask for the first step",
+      "parts": [],
+      "status": "checked",
+      "notes": "proposed: hero-headline-lockup for the words, content-matched-grid rows for the three claims, one filled action\napproved by the builder: sample approval recorded for this worked example\nchecked: 0 findings, 0 drift"
+    },
+    {
+      "id": "pricing",
+      "source": null,
+      "output": "pricing.html",
+      "purpose": "Compare the plans without inventing prices",
+      "parts": [],
+      "status": "checked",
+      "notes": "The original nav links Pricing to the same page, so there is no source; built from the same components as home.\nproposed: the same hero and rows as home, prices left out until the owner sends them\napproved by the builder: sample approval recorded for this worked example\nchecked: 0 findings, 0 drift"
+    }
+  ]
+}

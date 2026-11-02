@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion sample</title>
+<style>
+body { margin: 0; padding: 24px 16px; background: #ffffff; color: #1d1d1f; font-family: Georgia, serif; font-size: 16px; line-height: 1.6; }
+.card { padding: 16px; border: 1px solid #d9d9d6; transition: all 250ms ease-out; }
+.pop { display: inline-block; padding: 8px 12px; border: 1px solid #d9d9d6; animation: pop 400ms ease-out infinite alternate; }
+@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+.slow-start { display: inline-block; padding: 8px 12px; border: 1px solid #d9d9d6; transition: transform 220ms ease-in; }
+.grow { width: 160px; padding: 8px; border: 1px solid #d9d9d6; transition: width 200ms ease-out; }
+.more { display: inline-flex; align-items: center; min-height: 44px; color: #1d1d1f; transition: color 600ms ease-out; }
+</style>
+</head>
+<body>
+  <div class="card">Weekly summary</div>
+  <p><span class="pop">Saved</span></p>
+  <p><span class="slow-start">Draft restored</span></p>
+  <div class="grow">Filters</div>
+  <p><a class="more" href="#more">See every report</a></p>
+</body>
+</html>

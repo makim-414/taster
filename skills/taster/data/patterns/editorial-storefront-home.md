@@ -5,7 +5,7 @@ category: commerce
 uses: [sell-a-product]
 surfaces: [commerce]
 replaces: [LAY-04]
-components: [blocks/card, blocks/button]
+components: [blocks/card, blocks/button, commerce/product-card]
 inspiration: []
 status: stable
 ---
@@ -36,6 +36,10 @@ The tone is light: a paper-white `--bg`, one text color, one accent used for the
 - Make category entries large enough to read as places to go: at least 40 percent of the viewport width on desktop.
 - Show a real price with currency and tax rule. If it varies by option, say "from".
 - Let the best-seller rail scroll with snap points and show the start of the next card so the reader knows it moves.
+- With one to five products, set the product section as one card rail with a narrow detail column under it, about 640px wide and aligned left. A full-width two-column spread spreads a small range too thin.
+- Switch an ingredient or material section to an editorial layout (one item per row, image and text on alternating sides, numbered, hairlines between) only when every item has its own image. When some are missing, keep the even card grid: a mix makes the items with photos look more important than the rest.
+- Say each fact once. When the card shows the price, the detail under it does not repeat it. When the hero line carries the benefit, the product block does not repeat it as a highlight line.
+- If the hero component can hold several slides and you give it one image, make it drop the autoplay, the dots and the pause button. One image must not look like a slider.
 
 ## Don't
 
@@ -45,6 +49,7 @@ The tone is light: a paper-white `--bg`, one text color, one accent used for the
 - Do not add a countdown, a popup coupon or a spinning badge.
 - Do not put a testimonial strip of invented names (CMP-08). Use real reviews on product pages.
 - Do not fill space with an aurora blob behind products (BG-01).
+- Do not keep a legal or safety notice inside an optional section such as the story, texture or ingredient block. Give it its own slot that renders whether or not those sections exist, or removing one section silently removes the notice.
 
 ## Swap recipe
 

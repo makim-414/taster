@@ -1,0 +1,20 @@
+{
+  "tokens": {
+    "--radius": "16px",
+    "--r-sm": "calc(var(--radius) * 0.5)",
+    "--r-md": "calc(var(--radius) * 0.75)",
+    "--r-card": "var(--radius)",
+    "--sp-2": "8px",
+    "--sp-3": "12px",
+    "--sp-4": "16px",
+    "--sp-6": "24px",
+    "--bg": "#fafaf7",
+    "--surface": "#ffffff",
+    "--text": "#1d1d1b",
+    "--text-muted": "#5c5c57",
+    "--border": "#e2e1da",
+    "--brand": "#b42318",
+    "--on-brand": "#ffffff",
+    "--font": "'Fixture Sans', Georgia, serif"
+  }
+}

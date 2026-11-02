@@ -1,0 +1,17 @@
+{
+  "expect": "DEFAULTS",
+  "why": "The default setting must satisfy every constraint.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "axes",
+        {
+          "id": "type-expression"
+        },
+        "default"
+      ],
+      "value": 1
+    }
+  ]
+}

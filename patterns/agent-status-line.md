@@ -5,7 +5,7 @@ category: chat-ai
 uses: [show-progress, ask-the-assistant]
 surfaces: [ai-chat]
 replaces: [AC-07]
-components: [blocks/skeleton]
+components: [blocks/skeleton, chat/agent-status]
 inspiration: [https://21st.dev/@anark17r/components/ai-thiking-orb-and-input]
 status: stable
 ---

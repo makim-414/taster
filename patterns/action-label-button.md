@@ -1,7 +1,7 @@
 ---
 id: action-label-button
 name: Specific action label
-category: button
+category: copy
 uses: [start-an-action]
 surfaces: [landing, app]
 replaces: [CPY-01, KO-09]

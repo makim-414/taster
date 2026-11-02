@@ -5,7 +5,7 @@ category: commerce
 uses: [sell-a-product]
 surfaces: [commerce]
 replaces: []
-components: [blocks/accordion]
+components: [blocks/accordion, commerce/product-gallery, commerce/buy-box]
 inspiration: [https://21st.dev/@hedevelope/components/estimated-arrival]
 status: stable
 ---
@@ -31,21 +31,29 @@ The delivery estimate is a small row ("Arrives Thu 6 to Mon 10") that opens into
 
 ## Do
 
+- Set the detail like print: price in three steps (struck original, discount, selling price), the story in one left column up to 640px, an alternating image and text layout only when every item has an image (otherwise a card grid), ingredients as numbered rows or a bordered grid, a centered title on a hairline, and footnotes. Leave claims and numbers as empty slots until a source fills them, and test that no number appears without one.
 - Put the price and the buy button inside the first viewport on a 700px tall screen. The sticky column makes that hold while images scroll.
 - Make option selectors real controls: a radio group for size and color with visible labels, disabled and sold-out states that say why.
 - Use `blocks/accordion` for the long lists. It is a Radix accordion, so keyboard and `aria-expanded` come for free.
 - Show an honest rating: the count next to the stars, and the distribution in the reviews block.
 - Put shipping cost and return terms near the button, in text, not hidden in a modal.
 - Keep the image gallery fast: the main image at the correct `sizes`, thumbnails lazy.
+- Keep required notices (regulatory text, allergens, cosmetic or supplement disclaimers) in a fixed slot of the page, not inside a section the shop can turn off.
+- Make the pack in every image match the real product: color, label text and printed values such as a registered SPF. Check generated or retouched images by eye, because a text check cannot read artwork. When the product color changes, change every sentence that names it, in every language.
+- Keep a proof slot for clinical or test results empty and hidden until there is a sourced number to put in it.
+- Build the buy column as one quiet panel: hairline dividers, a quantity stepper, and shipping and returns in a closed accordion under the button.
 
 ## Don't
 
+- Don't use generated pictures on the product surface (gallery, options). They drift from the real color, lace or print; keep them for a staged banner with a disclosure next to it, not only in the footer. Color chips come from the product's real named palette, never a made-up swatch set. Check generated images by eye: they can print text you did not ask for, such as a sun protection rating.
 - Do not use a triple number strip of "98 percent say it works" statistics without a source (CMP-06).
 - Do not set the benefits as three icon cards (LAY-02). Write them as a list the reader can scan.
 - Do not use a rounded-square icon tile above every benefit (CMP-03).
 - Do not show a testimonial carousel with invented names (CMP-08). Reviews must come from buyers.
 - Do not trap the page in a sticky bottom bar and a sticky top bar and a chat bubble at once.
 - Do not use a countdown timer or a fake "7 people are looking at this".
+- Do not repeat the same price, descriptor or delivery line twice in the first viewport. Each fact has one place.
+- Do not use treatment words for a cosmetic or food product (heals, cures, regenerates, detoxifies). Describe what the buyer sees and feels.
 
 ## Swap recipe
 

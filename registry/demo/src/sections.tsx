@@ -6,6 +6,7 @@ import {
   AppShell,
   Avatar, AvatarFallback,
   Badge,
+  BracketLabel,
   BarChart,
   Button,
   Calendar,
@@ -66,6 +67,7 @@ import {
   LightBeams,
   ThinkingOrb, ORB_RECIPES,
 } from '../../src'
+import { AppSections } from './sections-app'
 import { ONLY } from './stage'
 
 
@@ -160,6 +162,7 @@ function SelectMenuDemo() {
     </div>
   )
 }
+import { ContentSections, ContentFooters } from './sections-content'
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   if (ONLY) return ONLY === id ? <section data-registry-id={id} className="min-w-0"><div className="min-w-0">{children}</div></section> : null
@@ -393,6 +396,7 @@ const STEPS: ShowcaseStep[] = [
 export function Sections() {
   return (
     <>
+      <ContentSections />
       <Section id="blocks/accordion" title="Accordion"><AccordionDemo /></Section>
 
       <Section id="blocks/alert" title="Alert">
@@ -427,6 +431,22 @@ export function Sections() {
           <Badge variant="info">In progress</Badge>
           <Badge variant="neutral" withDot={false}>Archived</Badge>
         </div>
+      </Section>
+
+      <Section id="blocks/bracket-label" title="Bracket label">
+        <ul className="max-w-xl divide-y divide-border rounded-lg border border-border bg-bg-elev">
+          {[
+            ['northwind.example', 'Press'],
+            ['tailspin.example', 'Store'],
+            ['contoso.example', 'Own site'],
+            ['fabrikam.example', null],
+          ].map(([site, kind]) => (
+            <li key={site as string} className="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-4 py-3">
+              <span className="text-sm text-text">{site}</span>
+              {kind ? <BracketLabel>{kind}</BracketLabel> : <BracketLabel unknown>Unsorted</BracketLabel>}
+            </li>
+          ))}
+        </ul>
       </Section>
 
       <Section id="blocks/bar" title="Bar chart">
@@ -943,6 +963,8 @@ export function Sections() {
       </Section>
 
 
+      <AppSections />
+      <ContentFooters />
     </>
   )
 }
