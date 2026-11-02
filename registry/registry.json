@@ -110,6 +110,7 @@
         "error-state",
         "flat-solid-button",
         "in-hero-form-flow",
+        "language-playground",
         "lead-capture-form",
         "neutral-cta-band",
         "onboarding-wizard",
@@ -262,6 +263,7 @@
       "patterns": [
         "collapsible-sidebar",
         "dropdown-menu",
+        "language-playground",
         "site-header"
       ],
       "deps": [
@@ -424,6 +426,7 @@
       "category": "tabs-segmented",
       "patterns": [
         "app-bars",
+        "language-playground",
         "segmented-control",
         "step-workflow-section",
         "tabbed-product-showcase"
