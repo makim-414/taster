@@ -34,9 +34,10 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
           aria-label={label}
           className="h-2 w-full overflow-hidden rounded-full border border-border-soft bg-bg-elev"
         >
+          {/* A full-width fill slid left by transform, so the bar moves without relaying out (MOT-05) */}
           <div
-            className="h-full rounded-full bg-accent transition-[width]"
-            style={{ width: `${pct}%` }}
+            className="h-full w-full rounded-full bg-accent transition-transform duration-dropdown ease-out"
+            style={{ transform: `translateX(-${100 - pct}%)` }}
           />
         </div>
       </div>

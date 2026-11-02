@@ -203,7 +203,7 @@ cannot carry poster type, deep shadows need a restrained palette). `taxonomy/axe
 setting. Read [taxonomy/SCHEMA.md](taxonomy/SCHEMA.md).
 
 <!-- taxonomy:start -->
-120 patterns, 74 rules, 143 components, 33 categories in 8 families, 40 uses, 8 surfaces, 8 weighting axes, 10 constraints.
+122 patterns, 80 rules, 144 components, 33 categories in 8 families, 40 uses, 8 surfaces, 8 weighting axes, 10 constraints.
 
 | Family | Categories | Patterns |
 |---|---|---|
@@ -211,10 +211,10 @@ setting. Read [taxonomy/SCHEMA.md](taxonomy/SCHEMA.md).
 | Navigation | Navigation header; Footer; Sidebar; Command palette and shortcuts; Tabs, segmented control and disclosure | 9 |
 | Foundations | Layout and shell; Card and list; Typography; Copy and voice; Icon and mark; Theme and tokens | 31 |
 | Actions and inputs | Button; Form and input | 9 |
-| Feedback and overlays | Badge and label; Toast and alert; Empty and error state; Loader and skeleton; Overlay: dialog, drawer, popover and menu | 12 |
+| Feedback and overlays | Badge and label; Toast and alert; Empty and error state; Loader and skeleton; Overlay: dialog, drawer, popover and menu | 13 |
 | Data display | Chart and KPI; Table and data grid; Timeline, stepper and calendar; Map | 16 |
 | Media, commerce and AI | Media and gallery; Commerce; Chat and AI | 12 |
-| Motion and effects | Motion effect and particles; 3D scene | 7 |
+| Motion and effects | Motion effect and particles; 3D scene | 8 |
 <!-- taxonomy:end -->
 
 ## Repository

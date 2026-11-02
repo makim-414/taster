@@ -5,7 +5,7 @@ globs: **/*.tsx,**/*.jsx,**/*.vue,**/*.svelte,**/*.html,**/*.css
 
 # Taster: UI rules against the generated look
 
-When you build or change a user interface, avoid every pattern below. They are the 74 rules of
+When you build or change a user interface, avoid every pattern below. They are the 80 rules of
 Taster (https://github.com/makim-414/taster), each one a habit that makes a screen read as AI generated. Each line says what to avoid and
 what to do instead. Use the project's design tokens for color, spacing, radius and type, never raw values.
 
@@ -77,6 +77,7 @@ what to do instead. Use the project's design tokens for color, spacing, radius a
 - KO-11 Korean body text that is too small. Avoid: Korean captions and body copy set below 13px. Instead: 14px or more for Korean captions and 16px or more for body text.
 - RSP-04 Text overlapping text. Avoid: Two pieces of text drawn on top of each other. Instead: Take the element out of absolute positioning or give it its own row at narrow widths; check line-height and negative margins.
 - RSP-06 Touch target under 44px. Avoid: On a phone or tablet width, a button, field or control under 44px high (an icon-only one under 44 by 44px), or a plain text link under 24px high. Instead: Make controls 44px on touch screens and shrink them only for a wide screen without a coarse pointer, for example @media (min-width: 1024px) and (not (pointer: coarse)). Do not key the small size on pointer: fine, which a headless browser does not report.
+- MOT-07 No reduced motion version. Avoid: The page moves things (animations, transform transitions) but has no prefers-reduced-motion rule. Instead: Add @media (prefers-reduced-motion: reduce) that turns position and scale changes off and keeps opacity and color fades.
 
 ## Low severity
 
@@ -91,6 +92,11 @@ what to do instead. Use the project's design tokens for color, spacing, radius a
 - MOT-01 The same entrance animation on every block. Avoid: Every block fades in from below as you scroll, or bounces with an overshooting ease. Instead: Motion only for changes of state.
 - KO-09 English button labels on a Korean page. Avoid: The body is Korean but buttons still say 'Get started' or 'Learn more'. Instead: Korean button labels that name the action.
 - RSP-05 Part of the page scrolls sideways. Avoid: A box inside the page hides content behind a sideways scroll at this width. Instead: Wrap the content, switch a wide table to stacked rows at narrow widths, or mark an intended scroll row with data-taster-allow="scroll" and show that more content follows.
+- MOT-02 Transition on every property. Avoid: An element transitions `all` properties instead of naming the ones that should move. Instead: Name the properties: transition-property: opacity, transform (or color, background-color for a hover).
+- MOT-03 Entrance that starts from nothing. Avoid: An element animates in from scale(0). Instead: Start entrances at about 0.95 scale with opacity 0 and an 8px offset (--enter-scale, --enter-offset), and fade the rest of the way.
+- MOT-04 Slow start on interface motion. Avoid: A transition or animation under a second uses an ease-in curve, so the first frame, the one people watch, is the slowest. Instead: Use ease-out for things that enter or exit and ease-in-out for things that move from A to B on screen (--ease-out, --ease-in-out).
+- MOT-05 Layout properties animated. Avoid: A transition on width, height, top, left, margin or padding. Instead: Animate transform and opacity. For an accordion, animate grid-template-rows from 0fr to 1fr or let it open without motion.
+- MOT-06 Slow controls. Avoid: A button, link or field whose transition lasts longer than 300ms. Instead: Press feedback about 160ms, tooltips about 125ms, dropdowns about 200ms; keep 400ms for modals and drawers (--dur-press, --dur-tooltip, --dur-dropdown, --dur-modal).
 
 ## Check the result
 
