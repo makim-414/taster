@@ -37,7 +37,16 @@ const system = await designSystem({ brand: before });
 const violations = validateAxes(system.axes);
 if (violations.length) fail(`the system's axes are not balanced: ${violations.map((v) => v.message).join('; ')}`);
 if (readFileSync(file('theme.css'), 'utf8') !== system.css) fail('examples/rebuild/theme.css is not what design_system gives for before.html (regenerate: node engine/cli.mjs --system examples/rebuild/before.html --out examples/rebuild)');
-if (readFileSync(file('taster.system.json'), 'utf8') !== `${JSON.stringify(system, null, 2)}\n`) fail('examples/rebuild/taster.system.json drifted from design_system for before.html');
+// The evidence strings quote raw measurements (a 17px gap, a 26px card padding) that move by a pixel with the
+// platform's fallback fonts; the steps, tokens, css and notes they lead to do not. Everything else must match exactly.
+const stable = (s) => JSON.parse(JSON.stringify(s), (k, v) => ((k === 'evidence' || k === 'from') && typeof v === 'string' ? undefined : v));
+const differs = (a, b, at = '') => {
+  if (JSON.stringify(a) === JSON.stringify(b)) return [];
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return [at || '(root)'];
+  return [...new Set([...Object.keys(a), ...Object.keys(b)])].flatMap((k) => differs(a[k], b[k], `${at}.${k}`));
+};
+const drift = differs(stable(JSON.parse(readFileSync(file('taster.system.json'), 'utf8'))), stable(system));
+if (drift.length) fail(`examples/rebuild/taster.system.json drifted from design_system for before.html at ${drift.slice(0, 12).join(', ')}`);
 if (!/<link rel="stylesheet" href="theme\.css">/.test(readFileSync(after, 'utf8'))) fail('after.html does not load theme.css');
 
 // Screen by screen: the second screen, consistency across both against the system, and the plan.
