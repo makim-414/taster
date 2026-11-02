@@ -15,4 +15,4 @@ a { color: var(--brand); }
 .badge { justify-self: start; padding: var(--sp-1) var(--sp-2); border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg); color: var(--text-muted); font-size: 12px; }
 section { display: grid; gap: var(--sp-4); }
 form { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
-input { padding: var(--sp-2) var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--text); font: inherit; }
+input { padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--text); font: inherit; }
