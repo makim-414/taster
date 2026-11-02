@@ -2325,5 +2325,33 @@
       "blocks/bracket-label"
     ],
     "summary": "A row's kind written as [ Press ] beside its name instead of a pill: brackets for the eye only, held to the word, on every row, fainter when unknown."
+  },
+  {
+    "id": "state-change-motion",
+    "name": "Motion for changes of state",
+    "category": "motion-particle",
+    "uses": [
+      "notify-the-user",
+      "confirm-an-action"
+    ],
+    "surfaces": [
+      "landing",
+      "dashboard",
+      "app",
+      "commerce",
+      "editorial",
+      "auth-onboarding",
+      "ai-chat"
+    ],
+    "replaces": [
+      "MOT-02",
+      "MOT-03",
+      "MOT-04",
+      "MOT-05",
+      "MOT-06",
+      "MOT-07"
+    ],
+    "components": [],
+    "summary": "Interface motion that is quick, physical and optional: named properties, entrances from 0.95 not scale(0), ease-out, durations by frequency and a reduced motion version."
   }
 ]
