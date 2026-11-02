@@ -90,3 +90,75 @@ export function getComponent(id) {
     ...(registry.tokens || []).map(fence),
   ].join('\n');
 }
+
+// ---- Browsing with pictures: the gallery on the web, the stills in registry/previews ----
+const REGISTRY_ROOT = join(ROOT, 'registry');
+export const WEB_URL = (process.env.TASTER_WEB_URL || 'https://taster-six.vercel.app').replace(/\/$/, '');
+export const stagePath = () => join(REGISTRY_ROOT, 'stage', 'index.html');
+export const previewPath = (id, theme = 'dark') => join(REGISTRY_ROOT, 'previews', `${id.replace(/\//g, '-')}.${theme}.jpg`);
+
+const lookQuery = ({ theme, brand } = {}) => {
+  const q = [];
+  if (brand) q.push(`brand=${String(brand).replace('#', '')}`);
+  if (theme) q.push(`theme=${theme}`);
+  return q;
+};
+export const componentUrl = (id, look) => {
+  const q = lookQuery(look);
+  return `${WEB_URL}/components/${id}${q.length ? `?${q.join('&')}` : ''}`;
+};
+export const boardUrl = (ids, look) => `${WEB_URL}/board?${[`ids=${ids.join(',')}`, ...lookQuery(look)].join('&')}`;
+
+function words(text) {
+  return String(text || '').toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+}
+
+/** Components that fit a request, best first. Filters combine with AND; the query ranks what is left. */
+export function browseComponents({ query, category, family, use, surface, ids, limit = 6 } = {}) {
+  const tax = loadTaxonomy();
+  const patterns = loadPatterns();
+  const categoryName = new Map(tax.categories.map((c) => [c.id, c.name]));
+  if (family && !tax.families.some((f) => f.id === family)) throw new Error(`Unknown family ${family}. Known: ${tax.families.map((f) => f.id).join(', ')}`);
+  const familyCategories = family ? tax.families.find((f) => f.id === family).categories : null;
+  let list = loadRegistry().components.map((c) => {
+    const own = patterns.filter((p) => (p.components || []).includes(c.id)).sort((a, b) => Number(b.category === c.category) - Number(a.category === c.category));
+    return {
+      id: c.id,
+      category: c.category,
+      categoryName: categoryName.get(c.category) || c.category,
+      summary: own[0]?.summary || '',
+      patterns: own.map((p) => p.id),
+      uses: [...new Set(own.flatMap((p) => p.uses || []))],
+      surfaces: [...new Set(own.flatMap((p) => p.surfaces || []))],
+      fixes: [...new Set(own.flatMap((p) => p.replaces || []))],
+      deps: c.deps || [],
+      license: c.license || null,
+    };
+  });
+  if (ids?.length) {
+    const unknown = ids.filter((id) => !list.some((c) => c.id === id));
+    if (unknown.length) throw new Error(`Unknown component: ${unknown.join(', ')}. Use browse_components with a query to find one.`);
+    return ids.map((id) => list.find((c) => c.id === id));
+  }
+  if (category) list = list.filter((c) => c.category === category);
+  if (familyCategories) list = list.filter((c) => familyCategories.includes(c.category));
+  if (use) list = list.filter((c) => c.uses.includes(use));
+  if (surface) list = list.filter((c) => c.surfaces.includes(surface));
+  const asked = words(query);
+  if (asked.length) {
+    const scored = list.map((c) => {
+      const inId = words(c.id);
+      const inTags = words([c.category, c.categoryName, ...c.patterns, ...c.uses, ...c.surfaces].join(' '));
+      const inText = words(c.summary);
+      let score = 0;
+      for (const w of asked) {
+        if (inId.includes(w)) score += 6;
+        if (inTags.includes(w)) score += 3;
+        if (inText.includes(w)) score += 1;
+      }
+      return { c, score };
+    }).filter((x) => x.score > 0);
+    list = scored.sort((a, b) => b.score - a.score || a.c.id.localeCompare(b.c.id)).map((x) => x.c);
+  }
+  return list.slice(0, limit);
+}

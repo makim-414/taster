@@ -1730,6 +1730,9 @@
       return o;
     }
     function hiddenFromReader(el) {
+      // A closed <details> keeps layout boxes for its content, but nobody sees them.
+      var fold = el.closest && el.closest('details:not([open])');
+      if (fold && !el.closest('summary')) return true;
       return opacityOf(el) < 0.1 || !!el.closest('[aria-hidden="true"],[inert]');
     }
     // Fixed and sticky layers (headers, cookie banners, chat buttons) cover content on purpose.

@@ -15,6 +15,11 @@ It ships three things the agent uses together:
 - **A registry of components.** Token based React components you copy into your app. No package to install, no
   brand to undo.
 
+**[Browse the components](https://taster-six.vercel.app/components).** Every one runs live: click it, recolor it with your
+brand or read the brand from your site, and put a few side by side.
+
+![The gallery: components running live in the brand color the visitor picked](docs/gallery.jpg)
+
 ## What it does
 
 Every session starts with one question: **is this a site that already exists, or are we building a new one?**
@@ -75,6 +80,14 @@ node engine/cli.mjs add blocks/button blocks/citations --dir src/components/tast
 Copies each component with every file it imports and the token files; no shadcn or other CLI involved. Add
 `--from https://taster-six.vercel.app` to read the hosted copy instead of a clone. See `registry/README.md`.
 
+### Choose by eye with your agent
+
+Your agent does not have to pick the look alone. Ask it for a hero or a pricing section and the `browse_components` tool
+answers with pictures, a live link for each, and a board link that puts them side by side. `preview_component` shows one
+wearing your brand. On the board, press the pick button and paste the sentence it writes back to the agent.
+
+![The board: two candidates running live side by side, one picked](docs/board.jpg)
+
 ### Rules for agents without MCP
 
 `exports/` holds the rules as instruction files for AGENTS.md readers, Claude Code, Cursor, Windsurf, Cline,
@@ -117,9 +130,9 @@ claude mcp add --transport http taster https://taster-six.vercel.app/api/mcp
 ```
 
 In Cursor, `.cursor/mcp.json`: `{ "mcpServers": { "taster": { "url": "https://taster-six.vercel.app/api/mcp" } } }`.
-claude.ai and ChatGPT take the same URL as a custom connector. The hosted server has every tool except the two
-that read local files (`extract_content`, `brand_theme`); `diagnose` takes public http(s) URLs only and is rate
-limited per client. For local files and the full tool set, use the plugin above.
+claude.ai and ChatGPT take the same URL as a custom connector. The hosted server leaves out `extract_content`; `diagnose` and
+`brand_theme` take public http(s) URLs only and are rate limited per client, and `preview_component` answers with a
+still and a live link instead of a render. For local files and the full tool set, use the plugin above.
 
 ### Use from an editor (ACP)
 

@@ -66,6 +66,7 @@ import {
   LightBeams,
   ThinkingOrb, ORB_RECIPES,
 } from '../../src'
+import { ONLY } from './stage'
 
 
 // A neutral geometric mark for the glass reveal demo. Not a real brand.
@@ -97,6 +98,19 @@ function poster(i: number, title: string): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600"><rect width="400" height="600" fill="${bg}"/><circle cx="${120 + i * 40}" cy="${220 + (i % 2) * 60}" r="${90 + i * 12}" fill="none" stroke="#d4d4d8" stroke-width="2"/><rect x="40" y="470" width="${160 + i * 20}" height="6" fill="#d4d4d8"/><text x="40" y="440" font-family="sans-serif" font-size="34" font-weight="600" fill="#f4f4f5">${title}</text></svg>`
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
 }
+// Abstract landscapes drawn as SVG, for the heroes that need a picture and no words on it.
+function scene(i: number): string {
+  const skies = [['#8fa3b8', '#d9d4c7'], ['#2b3442', '#7d6f6a'], ['#c9a98c', '#efe2cf'], ['#51606e', '#aeb6b5'], ['#6d7f73', '#d7d3bd']]
+  const [top, low] = skies[i % skies.length]
+  const ridge = (y: number, amp: number, phase: number) => {
+    const points = Array.from({ length: 13 }, (_, k) => `${k * 100},${Math.round(y + Math.sin(k * 1.3 + phase + i) * amp + Math.sin(k * 0.47 + i * 2) * amp * 0.6)}`)
+    return `M0,750 L${points.join(' L')} L1200,750 Z`
+  }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${low}"/></linearGradient></defs><rect width="1200" height="750" fill="url(#s)"/><path d="${ridge(400, 50, 0)}" fill="#000" fill-opacity=".18"/><path d="${ridge(500, 60, 2)}" fill="#000" fill-opacity=".28"/><path d="${ridge(610, 45, 4)}" fill="#000" fill-opacity=".42"/></svg>`
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
+}
+const SCENES = [0, 1, 2, 3, 4].map(scene)
+
 const COVERS: CoverflowItem[] = ['Field notes', 'Ten rules', 'Before and after', 'Two widths', 'The swap'].map((t, i) => ({
   id: `c${i}`,
   title: t,
@@ -148,6 +162,7 @@ function SelectMenuDemo() {
 }
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+  if (ONLY) return ONLY === id ? <section data-registry-id={id} className="min-w-0"><div className="min-w-0">{children}</div></section> : null
   return (
     <section data-registry-id={id} className="mb-12 min-w-0">
       <div className="mb-4 flex items-baseline gap-3">
@@ -863,7 +878,7 @@ export function Sections() {
         <CurvedStreamHero
           title="Every frame, brought into focus."
           description="One row of your own work, flat in the middle and bending toward the viewer at the edges."
-          images={COVERS.map((c) => ({ src: c.image, alt: '' }))}
+          images={SCENES.map((src) => ({ src, alt: '' }))}
         />
       </Section>
 
@@ -872,7 +887,7 @@ export function Sections() {
         <BannerHero
           fullHeight={false}
           style={{ minHeight: 520 }}
-          image={{ src: COVERS[1].image, alt: '' }}
+          image={{ src: SCENES[1], alt: '' }}
           notice="New: the spring catalog is open"
           title="A full picture, and one clear sentence."
           description="The photograph carries the page. The scrim comes from the surface token, so the words stay readable."
