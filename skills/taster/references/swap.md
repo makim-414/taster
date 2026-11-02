@@ -26,6 +26,11 @@ own code, and prove it with a second detector run.
 5. Re run detect.js at both widths. The finding must be gone. If a new finding appears, you introduced it; fix it
    before moving on.
 
+6. Lint the files you touched (`taster lint <files>`, or `node engine/lint.mjs <files>`). It reads the source form of
+   the same rules (tinted pills, transition-all, hard-coded colors, pixel one-offs) without a browser, so a swap that
+   reintroduced one shows up even where the page did not render it. Leave a `taster-allow <reason>` only where the
+   user asked for the exception.
+
 ## Report
 
 Before and after captures side by side, the list of rules cleared, and anything left with a reason (for example
