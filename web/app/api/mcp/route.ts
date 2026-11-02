@@ -8,12 +8,13 @@ import { pathToFileURL } from 'node:url';
 import { BlockedError, bareHost, parseTarget, resolvePublic } from '../../../lib/net-guard.ts';
 import { clientIp, takeToken, withGate } from '../../../lib/limits.ts';
 import { PageLoadError, runDiagnosis, trimReport } from '../../../lib/diagnose.ts';
+import { runBrand } from '../../../lib/brand.ts';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 90;
 
-type Remote = { diagnose: (url: string) => Promise<{ report: unknown; shots?: Record<string, string> }> };
+type Remote = { diagnose: (url: string) => Promise<{ report: unknown; shots?: Record<string, string> }>; brand: (url: string) => Promise<unknown> };
 type Http = { handleMcpRequest: (request: Request, options: { remote: Remote }) => Promise<Response> };
 
 // Loaded at run time from the repository, like engine/diagnose.mjs in lib/diagnose.ts, so the server keeps
@@ -35,6 +36,26 @@ function loadHttp(): Promise<Http> {
 function remoteFor(request: Request): Remote {
   const ip = clientIp(request.headers);
   return {
+    async brand(url: string) {
+      let target: URL;
+      try {
+        target = parseTarget(String(url ?? ''));
+        await resolvePublic(bareHost(target));
+      } catch (err) {
+        if (err instanceof BlockedError) throw new Error(`${err.code}: ${err.message}`);
+        throw err;
+      }
+      const token = takeToken(ip);
+      if (!token.ok) throw new Error(`rate-limit: try again in ${Math.ceil(token.retryAfter / 60)} min`);
+      try {
+        const result = await withGate(() => runBrand(target.href));
+        if (!result) throw new Error('busy: too many requests right now, try again in 20 s');
+        return result;
+      } catch (err) {
+        if (err instanceof PageLoadError) throw new Error(`load: ${err.message}`);
+        throw err;
+      }
+    },
     async diagnose(url: string) {
       let target: URL;
       try {

@@ -5,6 +5,7 @@ import '../../src/tokens.css'
 import '../../src/themes/light.css'
 import '../../src/base.css'
 import { Sections } from './sections'
+import { ONLY, startStage } from './stage'
 
 function App() {
   const [light, setLight] = React.useState(false)
@@ -36,4 +37,14 @@ function App() {
   )
 }
 
-createRoot(document.getElementById('root') as HTMLElement).render(<App />)
+function Stage() {
+  // The frame is centered so short components sit in the middle of a preview. Tall ones start at the top.
+  return (
+    <main id="stage" className="flex min-h-screen w-full flex-col justify-center px-4 py-6 sm:px-6">
+      <Sections />
+    </main>
+  )
+}
+
+if (ONLY) startStage()
+createRoot(document.getElementById('root') as HTMLElement).render(ONLY ? <Stage /> : <App />)

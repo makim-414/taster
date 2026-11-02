@@ -45,6 +45,7 @@ Prefer its tools; they run the same detector in a real browser for you.
 - `brand_theme { target }`: the site's brand absorbed into token overrides and a ready `:root` block, with a note per choice.
 - `extract_content { target }`: the page's content in reading order (sections, actions, images, nav, footer, brand color and fonts), for Rebuild.
 - `suggest_swaps { ruleIds }`: the fix patterns and registry components for each rule found.
+- `browse_components { query, category, surface, use, ids, limit, theme, brand }` and `preview_component { id, width, tokens, theme, brand }`: pictures and live links, so the user chooses by eye. See [references/choose.md](references/choose.md).
 - `get_pattern { id }` and `get_component { id }`: the swap recipe and copyable code with its tokens.
 - `list_patterns { surface, use, category, family, rule }` and `taxonomy`: for Build.
 - `list_rules`, `explain_rule { id }`.
@@ -80,6 +81,12 @@ action still present. Flag unsourced numbers and testimonials to the user instea
 ## Build
 
 Follow [references/build.md](references/build.md). Choose the surface, list the uses the screen must serve in order, pick one pattern per use from the taxonomy, then compose. Run Diagnose on your own result before you show it.
+
+## Choosing components
+
+Do not pick the look alone. Before you write or swap in anything the visitor will see, follow
+[references/choose.md](references/choose.md): call `browse_components`, show the pictures and the live links, ask which
+number, try the shortlist in their brand with `preview_component`, and write code only after they choose.
 
 ## Icons
 

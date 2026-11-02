@@ -24,12 +24,22 @@ const nextConfig = {
       '../taxonomy/**',
       '../registry/registry.json',
       '../registry/src/**',
+      '../registry/previews/**',
       '../skills/taster/references/start.md',
       './node_modules/playwright-core/**',
       './node_modules/@sparticuz/chromium/**',
     ],
     // Keys are globs over route paths, so the brackets of [...slug] would read as a character class.
     '/r/**': ['../engine/add.mjs', '../registry/registry.json', '../registry/src/**', '../registry/THIRD_PARTY_NOTICES.md'],
+    '/api/brand': [
+      '../engine/*.mjs',
+      '../engine/*.js',
+      '../engine/package.json',
+      '../rules/detect.js',
+      '../rules/rules.json',
+      './node_modules/playwright-core/**',
+      './node_modules/@sparticuz/chromium/**',
+    ],
     '/api/diagnose': [
       '../engine/*.mjs',
       '../engine/*.js',
@@ -61,6 +71,11 @@ const nextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Frame-Options', value: 'DENY' },
         ],
+      },
+      {
+        // The gallery runs each component in a frame on this same site. Later rules win, so this one must stay last.
+        source: '/stage/:file*',
+        headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }],
       },
     ];
   },

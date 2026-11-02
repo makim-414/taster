@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, PATTERN_SECTIONS, readJson, loadPatterns, bundleFiles, parseFrontmatter } from './lib.mjs';
+import { previewFile, stageHash } from '../registry/stage-hash.mjs';
 
 const errors = [];
 const err = (m) => errors.push(m);
@@ -40,6 +41,16 @@ const compIds = new Set(registry.map((c) => c.id));
 for (const c of registry) {
   if (!fs.existsSync(path.join(ROOT, 'registry', c.file))) err(`registry ${c.id} file missing: ${c.file}`);
   if (!catIds.has(c.category)) err(`registry ${c.id} unknown category ${c.category}`);
+}
+
+// The stage page and preview pictures the gallery and the MCP tools show
+const REBUILD = 'run: npm --prefix registry run build-stage';
+if (!fs.existsSync(path.join(ROOT, 'registry/stage/index.html'))) err(`registry/stage/index.html missing, ${REBUILD}`);
+else if (readJson('registry/stage/meta.json').sourceHash !== stageHash()) err(`registry/stage is older than the components, ${REBUILD}`);
+for (const c of registry) {
+  for (const theme of ['dark', 'light']) {
+    if (!fs.existsSync(path.join(ROOT, 'registry/previews', previewFile(c.id, theme)))) err(`registry ${c.id} has no ${theme} preview, ${REBUILD}`);
+  }
 }
 
 // Patterns

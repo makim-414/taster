@@ -1,6 +1,6 @@
 // Copies the detector fixtures into public/fixtures so the deployed site can diagnose a known
 // slop page and a known clean page at a public address. The files stay generated, not committed.
-import { copyFileSync, mkdirSync } from 'node:fs';
+import { copyFileSync, cpSync, mkdirSync } from 'node:fs';
 
 const from = new URL('../../rules/fixtures/', import.meta.url);
 const to = new URL('../public/fixtures/', import.meta.url);
@@ -15,3 +15,9 @@ const pub = new URL('../public/taster/', import.meta.url);
 mkdirSync(pub, { recursive: true });
 for (const name of ['overlay.js', 'detect.js', 'rules.js']) copyFileSync(new URL(name, ext), new URL(name, pub));
 console.log('overlay copied to public/taster');
+
+// The gallery's live stage and preview pictures. registry/ holds them for the MCP tools too. Generated, not committed.
+const reg = new URL('../../registry/', import.meta.url);
+cpSync(new URL('stage/index.html', reg), new URL('../public/stage/index.html', import.meta.url));
+cpSync(new URL('previews/', reg), new URL('../public/previews/', import.meta.url), { recursive: true });
+console.log('stage and previews copied to public');
