@@ -114,4 +114,13 @@ npm --prefix engine test             # CLI, MCP, ACP and extract
 node engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop, rebuild is clean and keeps the content
 ```
 
-To add a measured rule: write the check in `rules/detect.js` (`flag('XX-00', el, evidence)`), set its `detect.level` to `deterministic` in `rules/rules.json`, make a fixture in `rules/fixtures/` hit it and add the id to `rules/fixtures/expected.json`. The clean fixture must stay at zero.
+To add a measured rule: write the check in `rules/detect.js` (`flag('XX-00', el, evidence)`), set its `detect.level` to `deterministic` in `rules/rules.json`, make a fixture in `rules/fixtures/` hit it and add the id to `rules/fixtures/expected-engine.json`. The clean fixture must stay at zero.
+
+Before trusting a new check, run it on the code from before your fix and watch it fail (a negative control): a check that passes on both versions measures nothing. Known findings you decide to keep go in a baseline with a reason (`taster lint --baseline`), and the count may only go down.
+
+### Headless Chrome traps
+
+- A real browser window will not shrink below about 500px. Set the viewport (`newPage({ viewport })`) instead of resizing a window, or narrow layouts are never measured.
+- CSS transitions and animations may still be running when you measure. Wait for them, or measure after `document.getAnimations()` has settled; the detector already skips text that is still fading in.
+- A light page can be turned dark by the browser's automatic dark mode. Pin `color-scheme` on the page (or in the launch flags) before judging colors.
+- A local server that checks the Host header can refuse the headless request; send the host it expects or serve on localhost.

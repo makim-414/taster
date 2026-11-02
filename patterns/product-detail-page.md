@@ -31,6 +31,7 @@ The delivery estimate is a small row ("Arrives Thu 6 to Mon 10") that opens into
 
 ## Do
 
+- Set the detail like print: price in three steps (struck original, discount, selling price), the story in one left column up to 640px, an alternating image and text layout only when every item has an image (otherwise a card grid), ingredients as numbered rows or a bordered grid, a centered title on a hairline, and footnotes. Leave claims and numbers as empty slots until a source fills them, and test that no number appears without one.
 - Put the price and the buy button inside the first viewport on a 700px tall screen. The sticky column makes that hold while images scroll.
 - Make option selectors real controls: a radio group for size and color with visible labels, disabled and sold-out states that say why.
 - Use `blocks/accordion` for the long lists. It is a Radix accordion, so keyboard and `aria-expanded` come for free.
@@ -44,6 +45,7 @@ The delivery estimate is a small row ("Arrives Thu 6 to Mon 10") that opens into
 
 ## Don't
 
+- Don't use generated pictures on the product surface (gallery, options). They drift from the real color, lace or print; keep them for a staged banner with a disclosure next to it, not only in the footer. Color chips come from the product's real named palette, never a made-up swatch set. Check generated images by eye: they can print text you did not ask for, such as a sun protection rating.
 - Do not use a triple number strip of "98 percent say it works" statistics without a source (CMP-06).
 - Do not set the benefits as three icon cards (LAY-02). Write them as a list the reader can scan.
 - Do not use a rounded-square icon tile above every benefit (CMP-03).

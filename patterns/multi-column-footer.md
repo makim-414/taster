@@ -26,6 +26,7 @@ For a site with two or three pages, use the slim legal footer instead.
 
 ## Do
 
+- Required notices live in the footer's fixed legal row, not inside a column that can be removed; a test should fail if the row goes missing.
 - Use real column counts. Three columns with five links each beats five columns with two links each.
 - Keep headings and links in normal case. Footers are where all caps with letter spacing piles up the fastest, and they are read on small screens.
 - Make the contact email a real `mailto:` link and reply to it.

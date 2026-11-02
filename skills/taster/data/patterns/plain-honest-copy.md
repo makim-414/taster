@@ -34,6 +34,8 @@ It also covers punctuation. Long dashes are the most recognizable mark of genera
 
 ## Don't
 
+- Don't explain the interface on the interface: "Click here to", "the number above the bar is", "press the button to" and version tags belong in an (i) that opens on request, not in the screen's copy.
+- Don't attach a cause to a number unless it was measured ("up 12% because of the redesign"). Say what moved and by how much; keep explanations for a write-up that shows its evidence.
 - Do not join clauses with long dashes (AC-02). Use a comma, colon or period.
 - Do not write "Build faster, ship smarter" or "not just X, but Y" (CPY-01). They have the rhythm of a claim and no content.
 - Do not open with "Welcome to the future of" or "Experience the power of".
