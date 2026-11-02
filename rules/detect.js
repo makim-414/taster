@@ -1936,13 +1936,23 @@
       }
       return false;
     }
+    // A fade in progress lowers the contrast for a moment; judge the text once it has arrived.
+    var animMemo = new Map();
+    function stillAnimating(el) {
+      if (!el || el === document.documentElement) return false;
+      if (animMemo.has(el)) return animMemo.get(el);
+      var own = typeof el.getAnimations === 'function' && el.getAnimations().some(function (an) { return an.playState === 'running'; });
+      var v = own || stillAnimating(el.parentElement);
+      animMemo.set(el, v);
+      return v;
+    }
     R['COL-08'] = function () {
       var checked = new Set();
       TN.forEach(function (o) {
         var el = o.el;
         if (checked.has(el)) return;
         checked.add(el);
-        if (hiddenFromReader(el) || el.closest(':disabled,[aria-disabled="true"]')) return;
+        if (hiddenFromReader(el) || el.closest(':disabled,[aria-disabled="true"]') || stillAnimating(el)) return;
         var it = M.get(el);
         var rng = document.createRange();
         rng.selectNodeContents(o.node);
@@ -2008,10 +2018,13 @@
           if (/scale(3d)?\(\s*0(\.0+)?\s*(,\s*0(\.0+)?\s*)*\)/.test(tf) || /scale[XY]\(\s*0\s*\)/.test(tf)) fromNothing[r.name] = tf;
         });
       });
-      I.forEach(function (it) {
-        String(it.cs.animationName || '').split(',').forEach(function (n) {
+      if (!Object.keys(fromNothing).length) return;
+      // Every element, not only the visible ones: at the moment of the scan the element may be at scale(0) and have no size.
+      Array.prototype.forEach.call(document.body.getElementsByTagName('*'), function (el) {
+        var cs = getComputedStyle(el);
+        String(cs.animationName || '').split(',').forEach(function (n) {
           n = n.trim();
-          if (n && fromNothing[n] && durMs(it.cs.animationDuration) > 0) add('MOT-03', it.el, { animation: n, from: fromNothing[n] });
+          if (n && fromNothing[n] && durMs(cs.animationDuration) > 0) add('MOT-03', el, { animation: n, from: fromNothing[n] });
         });
       });
     };
