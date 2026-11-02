@@ -49,5 +49,14 @@
   "clean-editor.html": [],
   "slop-editor.html": [
     "AC-09"
-  ]
+  ],
+  "slop-motion.html": [
+    "MOT-02",
+    "MOT-03",
+    "MOT-04",
+    "MOT-05",
+    "MOT-06",
+    "MOT-07"
+  ],
+  "clean-motion.html": []
 }

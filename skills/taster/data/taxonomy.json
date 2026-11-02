@@ -3843,6 +3843,45 @@
       ],
       "axis": "motion"
     },
+    "MOT-02": {
+      "categories": [
+        "motion-particle"
+      ],
+      "axis": null
+    },
+    "MOT-03": {
+      "categories": [
+        "motion-particle",
+        "modal-drawer"
+      ],
+      "axis": null
+    },
+    "MOT-04": {
+      "categories": [
+        "motion-particle"
+      ],
+      "axis": null
+    },
+    "MOT-05": {
+      "categories": [
+        "motion-particle",
+        "tabs-segmented"
+      ],
+      "axis": null
+    },
+    "MOT-06": {
+      "categories": [
+        "button",
+        "form-input"
+      ],
+      "axis": null
+    },
+    "MOT-07": {
+      "categories": [
+        "motion-particle"
+      ],
+      "axis": null
+    },
     "CPY-01": {
       "categories": [
         "copy"

@@ -205,7 +205,7 @@ export function WorkflowSection({
                 const on = active === i; const Icon = tab.icon;
                 return (
                   <button key={tab.key} type="button" onClick={() => setActive(i)} aria-current={on ? "step" : undefined}
-                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", minHeight: 44, borderRadius: 12, textAlign: "left", cursor: "pointer", transition: "all .25s",
+                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", minHeight: 44, borderRadius: 12, textAlign: "left", cursor: "pointer", transition: "background-color .2s, border-color .2s, color .2s",
                       background: on ? "rgba(255,255,255,.1)" : "transparent", border: `1px solid ${on ? "rgba(255,255,255,.22)" : "transparent"}` }}>
                     <Icon style={{ width: 20, height: 20, flexShrink: 0, color: on ? "#fff" : "rgba(255,255,255,.55)" }} />
                     <span style={{ fontSize: 14, fontWeight: 500, color: on ? "#fff" : "rgba(255,255,255,.85)", display: "flex", alignItems: "center" }}>

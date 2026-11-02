@@ -1747,6 +1747,17 @@
       "deps": [],
       "license": "MIT",
       "credit": "Written for this registry; idea from the PremiumHero background on 21st.dev, license not confirmed (no code taken)"
+    },
+    {
+      "id": "blocks/bracket-label",
+      "file": "src/blocks/bracket-label.tsx",
+      "category": "badge-label",
+      "patterns": [
+        "bracket-category-label"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
     }
   ]
 }

@@ -1,5 +1,5 @@
 name: Taster
-description: Check pages for the generated UI look (74 rules, measured in a real browser) and report findings on the pull request.
+description: Check pages for the generated UI look (80 rules, measured in a real browser) and report findings on the pull request.
 author: makim-414
 branding:
   icon: eye
