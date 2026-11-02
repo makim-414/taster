@@ -1,0 +1,15 @@
+{
+  "expect": "RULEMAP",
+  "why": "A rule a constraint prevents must be mapped to one of that constraint axes.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "ruleMap",
+        "MOT-01",
+        "axis"
+      ],
+      "value": "stroke"
+    }
+  ]
+}

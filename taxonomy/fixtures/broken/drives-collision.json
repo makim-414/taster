@@ -1,0 +1,17 @@
+{
+  "expect": "DRIVES",
+  "why": "Two axes may not drive the same CSS custom property.",
+  "patch": [
+    {
+      "op": "push",
+      "path": [
+        "axes",
+        {
+          "id": "density"
+        },
+        "drives"
+      ],
+      "value": "--radius"
+    }
+  ]
+}

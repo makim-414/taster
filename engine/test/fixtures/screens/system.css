@@ -1,0 +1,29 @@
+/* The design system for the consistency fixtures: every value the screens may use. */
+:root {
+  --radius: 10px;
+  --r-sm: calc(var(--radius) * 0.6);
+  --r-md: calc(var(--radius) * 0.8);
+  --r-card: var(--radius);
+  --r-pill: 999px;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --text: #1d1d1b;
+  --text-muted: #5c5c57;
+  --border: #e2e1da;
+  --brand: #1f4f8a;
+  --on-brand: #ffffff;
+  --font: 'Fixture Sans', Georgia, serif;
+  --sh-card: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --dur-press: 160ms;
+}
+
+/* Left out by the parser: only top level :root blocks are the system. */
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-press: 1ms; }
+}

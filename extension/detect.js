@@ -519,8 +519,14 @@
       });
     };
 
+    // Fields and code editors hold what the visitor types or the code they read: not interface text the page set.
+    // Covers form fields, contenteditable regions, role=textbox, and the containers common editor libraries draw
+    // (CodeMirror 5 and 6, Monaco, Ace), whose gutters and lines sit outside the contenteditable area.
+    var EDITOR_SEL = 'textarea,input,[contenteditable],[role="textbox"],' +
+      '[class^="cm-"],[class*=" cm-"],[class*="CodeMirror"],[class*="monaco"],[class^="ace_"],[class*=" ace_"]';
+
     R['AC-03'] = function () {
-      var skipSel = 'textarea,input,[contenteditable],[data-user-content],.comment,.comments';
+      var skipSel = EDITOR_SEL + ',[data-user-content],.comment,.comments';
       TN.forEach(function (t) {
         if (t.el.closest(skipSel)) return;
         var s = t.text.replace(/[\u00A9\u00AE\u2122]/g, '');
@@ -632,6 +638,7 @@
         var t = ownText(it.el);
         if (!t || t.length > 80 || !/[\p{L}\p{N}]/u.test(t)) return;
         if (it.el.closest('code,pre,kbd,samp,var,tt')) return;
+        if (it.el.closest(EDITOR_SEL)) return;
         var f = resolved(it);
         if (isMonoFont(f)) add('AC-09', it.el, { font: f, fontSizePx: px(it.cs.fontSize), chars: t.length });
       });

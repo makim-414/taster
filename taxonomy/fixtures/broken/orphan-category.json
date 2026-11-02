@@ -1,0 +1,21 @@
+{
+  "expect": "ORPHAN",
+  "why": "A category that no family lists is outside the partition.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "families",
+        {
+          "id": "data"
+        },
+        "categories"
+      ],
+      "value": [
+        "chart-kpi",
+        "table",
+        "timeline-stepper"
+      ]
+    }
+  ]
+}

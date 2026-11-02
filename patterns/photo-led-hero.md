@@ -5,7 +5,7 @@ category: hero
 uses: [introduce-the-product]
 surfaces: [landing, commerce, editorial]
 replaces: [AC-19, BG-01, COL-03, LAY-01]
-components: [blocks/button, blocks/banner-hero]
+components: [blocks/button, marketing/photo-hero, blocks/banner-hero]
 inspiration: [https://21st.dev/@felipemenezes098/components/hero-04, https://21st.dev/@ravikatiyar162/components/modern-hero-section]
 status: draft
 ---

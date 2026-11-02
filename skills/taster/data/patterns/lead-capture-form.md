@@ -5,7 +5,7 @@ category: form-input
 uses: [capture-contact]
 surfaces: [landing]
 replaces: [AC-12, CMP-10]
-components: [blocks/input, blocks/button]
+components: [blocks/input, blocks/button, blocks/field]
 inspiration: []
 status: stable
 ---

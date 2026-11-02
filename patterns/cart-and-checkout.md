@@ -5,7 +5,7 @@ category: commerce
 uses: [sell-a-product]
 surfaces: [commerce]
 replaces: []
-components: []
+components: [commerce/buy-box, commerce/cart]
 inspiration: []
 status: draft
 ---

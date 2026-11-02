@@ -10,7 +10,11 @@ Taster 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 읽
   배지, 카드 왼쪽의 두꺼운 색 띠, 이모지 불릿, 똑같은 아이콘 카드 세 장, 단어 중간에서 끊기는 한글 줄바꿈
   같은 것들입니다. 대부분은 `rules/detect.js` 가 실제 브라우저에서 잽니다.
 - **패턴 분류 체계.** 방문자가 하려는 일(숫자 하나 보기, 요금제 비교, 믿을 근거 확인, 상태 표시)과 화면 종류
-  (랜딩, 대시보드, 앱, 쇼핑, 읽을거리, 로그인, AI 대화)로 정리한 재사용 디자인 답안입니다. 규칙마다 그것을
+  (랜딩, 대시보드, 앱, 쇼핑, 읽을거리, 로그인, AI 대화)로 정리한 재사용 디자인 답안입니다. 화면의 모든 부품은
+  기계로 판정하는 결정 키를 거쳐 33개 분류 중 정확히 하나에 들어가고, 분류마다 정의, 포함, 제외(그리고 제외한 것이
+  가는 곳), 예시가 있습니다. 밀도, 대비, 둥글기, 타입 표현, 색 절제, 깊이, 모션, 선 굵기의 여덟 가중치 축이 브랜드의
+  톤을 토큰으로 옮기고, 축 값은 정해진 단계에만 놓이며, 디자인 원칙을 식으로 적은 제약이 균형을 지킵니다(빽빽한
+  화면에 포스터 같은 글자는 올 수 없음 등). 자세한 내용은 `taxonomy/SCHEMA.md` 에 있습니다. 규칙마다 그것을
   고치는 패턴이 연결돼 있습니다.
 - **컴포넌트 모음.** 토큰으로 만든 React 컴포넌트입니다. 설치할 패키지 없이 필요한 파일만 복사해 씁니다.
 
@@ -44,6 +48,22 @@ Taster 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 읽
 `examples/icon-slots/` 에는 아이콘 자리(조작, 설명용, 식별 마크, 데이터 표식, 아이콘 없음)마다 변형 5개씩, `taxonomy.json` 에
 적힌 25개가 그대로 있습니다. `node engine/scripts/check-icon-slots-example.mjs` 가 분류 체계와 맞는지, 두 폭 모두 0건인지
 확인합니다.
+## 디자인 시스템
+
+화면을 짓기 전에 브랜드와 만드는 사람의 의도를 먼저 하나의 디자인 시스템으로 만듭니다. 브랜드 사이트와 마음에 드는
+톤의 페이지 한두 개를 넣으면 실제 브라우저에서 잽니다(모서리 둥글기, 간격과 버튼 높이, 글자 대비, 글자 크기 비율,
+색상 수, 그림자, 움직임, 테두리). 여덟 축을 각각 이름 있는 단계에 놓고, 제약으로 적은 디자인 원칙에 맞춰 균형을
+잡으므로 애매한 중간값이 생기지 않습니다. 축 하나를 움직이면 나머지는 꼭 필요한 만큼만 따라 움직이고, 어떤 원칙
+때문에 움직였는지 그대로 알려 줍니다. 결과는 `taster.system.json` 과 `theme.css` 입니다. 축이 정하는 모든 토큰과
+브랜드가 들어 있고, 글자 대비는 WCAG AA 이상입니다. 모든 화면과 부품이 이 파일을 불러 씁니다.
+
+```bash
+node engine/cli.mjs --system https://your-site.example --ref ./a-page-you-like.html --out system
+node engine/cli.mjs --tune system/taster.system.json roundness=1
+```
+
+MCP 도구: `design_system`, `tune_system`, `system_for_category`. 측정값이 단계로, 단계가 토큰으로 바뀌는 방식은
+`skills/taster/references/system.md` 에 있습니다.
 
 ## 설치
 
@@ -104,8 +124,8 @@ claude mcp add --transport http taster https://taster-six.vercel.app/api/mcp
 ```
 
 Cursor 는 `.cursor/mcp.json` 에 `{ "mcpServers": { "taster": { "url": "https://taster-six.vercel.app/api/mcp" } } }`.
-claude.ai 와 ChatGPT 는 같은 주소를 사용자 지정 커넥터로 넣습니다. 원격 서버에는 로컬 파일을 읽는 두 도구
-(`extract_content`, `brand_theme`)를 뺀 모든 도구가 있고, `diagnose` 는 공개 http(s) 주소만 받으며 사용자마다 횟수
+claude.ai 와 ChatGPT 는 같은 주소를 사용자 지정 커넥터로 넣습니다. 원격 서버에는 로컬 파일을 읽는 도구
+(`extract_content`, `brand_theme`, 디자인 시스템 도구, 화면 단위 도구)를 뺀 모든 도구가 있고, `diagnose` 는 공개 http(s) 주소만 받으며 사용자마다 횟수
 제한이 있습니다. 로컬 파일과 전체 도구는 위의 플러그인으로 쓰세요.
 
 ### 에디터에서 쓰기 (ACP)

@@ -5,7 +5,7 @@ category: card
 uses: [label-a-state]
 surfaces: [dashboard, app]
 replaces: [AC-10]
-components: [blocks/alert, blocks/badge]
+components: [blocks/alert, blocks/badge, blocks/status-list]
 inspiration: []
 status: stable
 ---

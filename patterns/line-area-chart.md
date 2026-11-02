@@ -5,7 +5,7 @@ category: chart-kpi
 uses: [show-a-trend]
 surfaces: [dashboard]
 replaces: [AC-13, COL-01]
-components: [blocks/line, blocks/trend, blocks/spark]
+components: [blocks/line, blocks/trend, blocks/spark, blocks/sparkline-table]
 inspiration: []
 status: stable
 ---
