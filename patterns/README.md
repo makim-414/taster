@@ -144,6 +144,7 @@ Status, alerts, waiting, empty results and layers above the page.
 
 ### Badge and label
 
+- [Bracket category label](bracket-category-label.md) fixes AC-04, AC-05
 - [Data honesty label](data-honesty-label.md) fixes CMP-06, CMP-08, CPY-02
 - [Filter chip](filter-chip.md) fixes AC-05
 - [Status label](status-label.md) fixes AC-04, AC-05, AC-07, AC-08
@@ -239,6 +240,7 @@ Backgrounds, particles and 3D that set a mood.
 - [Count-up number](count-up-number.md) fixes MOT-01
 - [Marquee band](marquee-band.md)
 - [Scroll reveal wrapper](scroll-reveal-wrapper.md) fixes MOT-01
+- [Motion for changes of state](state-change-motion.md) fixes MOT-02, MOT-03, MOT-04, MOT-05, MOT-06, MOT-07
 
 ### 3D scene
 

@@ -14,7 +14,7 @@ status: stable
 
 Anywhere a thing has a state a person needs to scan: rows in a table, cards in a list, a header on a detail page. Orders (paid, shipped), jobs (queued, running, failed), documents (draft, published), connections (healthy, down).
 
-If the label is a category or a tag rather than a state, use plain text or the filter chip. If the number matters more than the state, show the number.
+If the label is a category or a kind rather than a state, use the bracket category label (`[ Press ]`), or the filter chip when people click it to narrow a list. If the number matters more than the state, show the number.
 
 ## Anatomy
 

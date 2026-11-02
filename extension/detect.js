@@ -1936,13 +1936,23 @@
       }
       return false;
     }
+    // A fade in progress lowers the contrast for a moment; judge the text once it has arrived.
+    var animMemo = new Map();
+    function stillAnimating(el) {
+      if (!el || el === document.documentElement) return false;
+      if (animMemo.has(el)) return animMemo.get(el);
+      var own = typeof el.getAnimations === 'function' && el.getAnimations().some(function (an) { return an.playState === 'running'; });
+      var v = own || stillAnimating(el.parentElement);
+      animMemo.set(el, v);
+      return v;
+    }
     R['COL-08'] = function () {
       var checked = new Set();
       TN.forEach(function (o) {
         var el = o.el;
         if (checked.has(el)) return;
         checked.add(el);
-        if (hiddenFromReader(el) || el.closest(':disabled,[aria-disabled="true"]')) return;
+        if (hiddenFromReader(el) || el.closest(':disabled,[aria-disabled="true"]') || stillAnimating(el)) return;
         var it = M.get(el);
         var rng = document.createRange();
         rng.selectNodeContents(o.node);
@@ -1972,13 +1982,115 @@
       });
     };
 
+    // ------------------------------------------------ motion contract (MOT-02 to MOT-07)
+    // Read from computed styles: what a transition animates, how long, on which curve, and whether the page
+    // offers a reduced motion version. Durations come back as lists ("0.2s, 0s"), so the longest one counts.
+    function durMs(v) {
+      return String(v || '').split(',').reduce(function (mx, s) {
+        s = s.trim();
+        var n = parseFloat(s);
+        if (isNaN(n)) return mx;
+        return Math.max(mx, /ms$/.test(s) ? n : n * 1000);
+      }, 0);
+    }
+    // Pairs each transitioned property with its duration (the lists repeat when they are shorter).
+    function transitions(it) {
+      var props = String(it.cs.transitionProperty || '').split(',').map(function (s) { return s.trim(); });
+      var durs = String(it.cs.transitionDuration || '').split(',').map(function (s) { return durMs(s); });
+      return props.map(function (p, i) { return { prop: p, ms: durs[i % durs.length] || 0 }; }).filter(function (t) { return t.ms > 0; });
+    }
+    var MOTION_UI_SEL = 'a[href],button,[role="button"],input,select,textarea,summary,[role="tab"],[role="menuitem"],[role="option"],[role="switch"]';
+
+    R['MOT-02'] = function () {
+      I.forEach(function (it) {
+        var t = transitions(it).filter(function (x) { return x.prop === 'all'; });
+        if (t.length) add('MOT-02', it.el, { transitionProperty: 'all', durationMs: t[0].ms });
+      });
+    };
+
+    R['MOT-03'] = function () {
+      var fromNothing = {};
+      scanSheets(function (r) {
+        if (r.type !== 7 || !r.cssRules) return; // CSSKeyframesRule
+        Array.prototype.forEach.call(r.cssRules, function (k) {
+          if (!/^(from|0%)/.test(String(k.keyText).trim())) return;
+          var tf = (k.style && k.style.transform) || '';
+          if (/scale(3d)?\(\s*0(\.0+)?\s*(,\s*0(\.0+)?\s*)*\)/.test(tf) || /scale[XY]\(\s*0\s*\)/.test(tf)) fromNothing[r.name] = tf;
+        });
+      });
+      if (!Object.keys(fromNothing).length) return;
+      // Every element, not only the visible ones: at the moment of the scan the element may be at scale(0) and have no size.
+      Array.prototype.forEach.call(document.body.getElementsByTagName('*'), function (el) {
+        var cs = getComputedStyle(el);
+        String(cs.animationName || '').split(',').forEach(function (n) {
+          n = n.trim();
+          if (n && fromNothing[n] && durMs(cs.animationDuration) > 0) add('MOT-03', el, { animation: n, from: fromNothing[n] });
+        });
+      });
+    };
+
+    // An ease-in family curve starts slow and has no fast shoulder at the end: both control points sit below the diagonal.
+    function easeIn(tf) {
+      if (/(^|,\s*)ease-in(\s*,|$)/.test(tf)) return true;
+      var re = /cubic-bezier\(([^)]*)\)/g, m;
+      while ((m = re.exec(tf))) {
+        var p = m[1].split(',').map(parseFloat);
+        if (p[1] < p[0] - 0.05 && p[3] <= p[2] && p[3] >= 0.95) return true;
+      }
+      return false;
+    }
+    R['MOT-04'] = function () {
+      I.forEach(function (it) {
+        var t = transitions(it);
+        var anim = String(it.cs.animationName || 'none') !== 'none' ? durMs(it.cs.animationDuration) : 0;
+        if (t.length && t.some(function (x) { return x.ms <= 1000; }) && easeIn(String(it.cs.transitionTimingFunction))) {
+          add('MOT-04', it.el, { timing: String(it.cs.transitionTimingFunction).slice(0, 60), via: 'transition' });
+        } else if (anim > 0 && anim <= 1000 && easeIn(String(it.cs.animationTimingFunction))) {
+          add('MOT-04', it.el, { timing: String(it.cs.animationTimingFunction).slice(0, 60), via: 'animation' });
+        }
+      });
+    };
+
+    var LAYOUT_PROP = /^(width|height|min-width|min-height|max-width|max-height|top|right|bottom|left|inset|margin|margin-(top|right|bottom|left)|padding|padding-(top|right|bottom|left))$/;
+    R['MOT-05'] = function () {
+      I.forEach(function (it) {
+        var t = transitions(it).filter(function (x) { return LAYOUT_PROP.test(x.prop); });
+        if (t.length) add('MOT-05', it.el, { properties: t.map(function (x) { return x.prop; }).join(', '), durationMs: t[0].ms });
+      });
+    };
+
+    R['MOT-06'] = function () {
+      I.forEach(function (it) {
+        // Controls only: a card or a panel that happens to be clickable moves as layout, not as press feedback.
+        if (!it.el.matches(MOTION_UI_SEL) || it.r.h > 120) return;
+        var slow = transitions(it).filter(function (x) { return x.ms > 300; });
+        if (slow.length) add('MOT-06', it.el, { durationMs: Math.max.apply(null, slow.map(function (x) { return x.ms; })), properties: slow.map(function (x) { return x.prop; }).join(', ') });
+      });
+    };
+
+    R['MOT-07'] = function () {
+      var reduced = false;
+      var blocked = scanSheets(function (r) {
+        var cond = (r.media && r.media.mediaText) || r.conditionText || '';
+        if (/prefers-reduced-motion/.test(cond)) reduced = true;
+      });
+      if (reduced || blocked) return; // a stylesheet we cannot read may hold the reduced motion rules
+      var moving = I.filter(function (it) {
+        var a = String(it.cs.animationName || 'none') !== 'none' && durMs(it.cs.animationDuration) > 0;
+        var t = transitions(it).some(function (x) { return /^(transform|translate|scale|rotate|all)$/.test(x.prop) && x.ms >= 200; });
+        return a || t;
+      });
+      // A hover color fade is not motion; flag the page only when something moves, and only a few elements.
+      if (moving.length) moving.slice(0, 5).forEach(function (it) { add('MOT-07', it.el, { movingElements: moving.length, reducedMotionRule: false }); });
+    };
+
     // ------------------------------------------------ execute in a fixed order
     var ORDER = [
       'AC-01', 'AC-02', 'AC-03', 'AC-04', 'AC-05', 'AC-06', 'AC-07', 'AC-08', 'AC-09', 'AC-10', 'AC-11', 'AC-12',
       'AC-13', 'AC-14', 'AC-15', 'AC-16', 'AC-17', 'COL-01', 'COL-02', 'COL-03', 'COL-04', 'COL-06', 'COL-07',
       'COL-05', 'TYP-01', 'TYP-02', 'TYP-03', 'TYP-04', 'TYP-05', 'LAY-01', 'LAY-02', 'LAY-03', 'LAY-04', 'LAY-05',
       'LAY-06', 'CMP-01', 'CMP-02', 'CMP-03', 'CMP-04', 'CMP-05', 'CMP-06', 'CMP-07', 'CMP-09', 'CMP-10', 'CMP-11',
-      'BG-01', 'ICO-01', 'ICO-02', 'ICO-03', 'ICO-04', 'MOT-01', 'CPY-01', 'KO-01', 'KO-02', 'KO-03', 'KO-04', 'KO-05', 'KO-06', 'KO-07',
+      'BG-01', 'ICO-01', 'ICO-02', 'ICO-03', 'ICO-04', 'MOT-01', 'MOT-02', 'MOT-03', 'MOT-04', 'MOT-05', 'MOT-06', 'MOT-07', 'CPY-01', 'KO-01', 'KO-02', 'KO-03', 'KO-04', 'KO-05', 'KO-06', 'KO-07',
       'KO-08', 'KO-09', 'KO-10', 'KO-11',
       'RSP-01', 'RSP-02', 'RSP-03', 'RSP-04', 'RSP-05', 'RSP-06', 'COL-08', 'CPY-02'
     ];

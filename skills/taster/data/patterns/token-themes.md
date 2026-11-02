@@ -22,6 +22,7 @@ It prevents four common failures: a single dark mode with no light option, a nea
 - Layer 2, roles: `--bg`, `--bg-elev`, `--bg-sunken`, `--border`, `--text`, `--text-muted`, `--text-subtle`, `--accent`, `--success`, `--warning`, `--danger`.
 - Layer 3, component tokens: only when a component needs its own knob, such as `--sidebar` or `--card-radius`.
 - Brand slot: one variable, `--brand`, defaults to near white (dark) or ink (light). A theme sets this and, if data uses color, the `--chart-*` ramp. Nothing else.
+- Where the brand color goes (through `--accent`): every emphasis slot, and only those. The primary action fill, the active tab, segment or nav item, the selected row marker, a checked checkbox, radio or switch, the focus ring, a progress or meter fill, link text, the one number a screen is about, and at most one filled surface per screen (a hero block or a call to action band). Together they stay under about a tenth of the screen.
 - Modes: dark is the `:root` default with a `.theme-dark` class, light is `:root[data-theme="light"]` and a `.theme-light` class. Both define every role. `color-scheme` is set to match.
 - Switch: a toggle that writes `data-theme` on `<html>` and stores the choice. First visit follows `prefers-color-scheme`. When the mode is a large part of the service, use `appearance-picker` on the settings page instead.
 
@@ -31,6 +32,7 @@ It prevents four common failures: a single dark mode with no light option, a nea
 - Keep the dark neutral at chroma 0. A hue of 240 at chroma 0.005 already reads as a blue or teal cast across a whole page, and a 5% white card lifts the page more than it looks; 3% is enough.
 - Check the smallest text token (`--text-subtle`) at 4.5:1 (rule COL-08) on the surface it sits on that is closest in lightness (`--muted`, `--secondary`), not only on `--bg`.
 - Keep accents flat. Emphasis is a contrast step or a single brand fill, not a glow.
+- Use the brand in all of its slots, not only on the button. A brand color that shows up in one place reads as a leftover, and an active tab in gray next to a brand button reads as two systems.
 - Make light surfaces opaque. A 5% white card disappears on a white page.
 - Tune semantic colors per mode; the same green is too bright on white.
 - Test both modes on every screen, including charts and focus rings.
@@ -42,6 +44,8 @@ It prevents four common failures: a single dark mode with no light option, a nea
 - Do not default to a cream background with a terracotta accent and a serif because it feels "designed" (COL-02).
 - Do not answer a ban on purple by moving to emerald with the same glow and gradients (COL-05). Change the structure, not the hue.
 - Do not give every box the same large radius and the same shadow (CMP-04). Radius and shadow are tokens that scale.
+- Do not let the brand color excuse a banned shape. A tinted pill, a thick left bar, a glow or gradient text is still slop in the brand hue (AC-04, AC-06, COL-03).
+- Do not fill more than one surface per screen with the brand, and do not give data its own second accent: the brand marks emphasis, the `--chart-*` ramp carries data.
 
 ## Swap recipe
 
