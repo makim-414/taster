@@ -189,6 +189,7 @@
       },
       "fix": "Plain text in the body color, or a neutral outline. If state matters, put it in words next to the value.",
       "fix_patterns": [
+        "bracket-category-label",
         "plan-cards",
         "segmented-control",
         "status-label",
@@ -222,6 +223,7 @@
       },
       "fix": "Plain text, or a neutral hairline border with square or slightly rounded corners.",
       "fix_patterns": [
+        "bracket-category-label",
         "filter-chip",
         "segmented-control",
         "status-label"
