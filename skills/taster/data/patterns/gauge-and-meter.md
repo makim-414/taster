@@ -26,6 +26,7 @@ One value against a known scale: quota used, score out of 100, storage, complete
 
 ## Do
 
+- Keep one scale for one kind of ratio across the product: the same track length, thickness and 0 to 100% range, so two meters on different screens can be compared by eye.
 - Print the number. A bar without a figure is decoration.
 - Show the limit as a tick and a number, so people know how close they are.
 - Switch to `--danger` text for the figure only when the value crosses a hard limit, and say what happens next.
