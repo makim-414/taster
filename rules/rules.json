@@ -2894,6 +2894,199 @@
       "severity": "high",
       "korean": false,
       "refs": []
+    },
+    {
+      "id": "MOT-02",
+      "name": "Transition on every property",
+      "what": "An element transitions `all` properties instead of naming the ones that should move.",
+      "why": "transition: all animates whatever happens to change, layout included, so a hover or a theme switch can slide boxes around. Generated utility classes reach for it by default.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Computed transition-property is `all` with a duration above 0.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "transition_property": "all"
+        }
+      },
+      "fix": "Name the properties: transition-property: opacity, transform (or color, background-color for a hover).",
+      "fix_patterns": [
+        "state-change-motion"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Apple WWDC 2018, Designing Fluid Interfaces",
+          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
+        },
+        {
+          "label": "MDN, prefers-reduced-motion",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+        }
+      ]
+    },
+    {
+      "id": "MOT-03",
+      "name": "Entrance that starts from nothing",
+      "what": "An element animates in from scale(0).",
+      "why": "Real objects do not grow out of a point. A popover or a toast that starts at scale(0) flashes through every size; starting near full size reads as arriving.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "An element whose running CSS animation uses keyframes that start (from or 0%) at scale(0), scale3d(0, 0, 0) or scaleX/Y(0).",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "from_scale": 0
+        }
+      },
+      "fix": "Start entrances at about 0.95 scale with opacity 0 and an 8px offset (--enter-scale, --enter-offset), and fade the rest of the way.",
+      "fix_patterns": [
+        "state-change-motion"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Apple WWDC 2018, Designing Fluid Interfaces",
+          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
+        },
+        {
+          "label": "MDN, prefers-reduced-motion",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+        }
+      ]
+    },
+    {
+      "id": "MOT-04",
+      "name": "Slow start on interface motion",
+      "what": "A transition or animation under a second uses an ease-in curve, so the first frame, the one people watch, is the slowest.",
+      "why": "Interface motion answers an action. A curve that starts slow makes the answer feel late; ease-out responds at once and settles.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Timing function `ease-in`, or a cubic-bezier whose control points both sit below the diagonal (slow start, no fast end), on a transition or an animation of 1 second or less. ease-in-out and linear are not reported.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "curve": "ease-in family",
+          "duration_max_ms": 1000
+        }
+      },
+      "fix": "Use ease-out for things that enter or exit and ease-in-out for things that move from A to B on screen (--ease-out, --ease-in-out).",
+      "fix_patterns": [
+        "state-change-motion"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Apple WWDC 2018, Designing Fluid Interfaces",
+          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
+        },
+        {
+          "label": "MDN, prefers-reduced-motion",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+        }
+      ]
+    },
+    {
+      "id": "MOT-05",
+      "name": "Layout properties animated",
+      "what": "A transition on width, height, top, left, margin or padding.",
+      "why": "Animating layout makes the browser lay out the page on every frame, which stutters on phones, and it moves the neighbours too. Transform and opacity animate without either.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "A transition with a duration above 0 on width, height, their min and max, top, right, bottom, left, inset, margin or padding. An accordion that animates its height on purpose is a known exception; treat findings as candidates.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "properties": "width height top left margin padding"
+        }
+      },
+      "fix": "Animate transform and opacity. For an accordion, animate grid-template-rows from 0fr to 1fr or let it open without motion.",
+      "fix_patterns": [
+        "state-change-motion"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Apple WWDC 2018, Designing Fluid Interfaces",
+          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
+        },
+        {
+          "label": "MDN, prefers-reduced-motion",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+        }
+      ]
+    },
+    {
+      "id": "MOT-06",
+      "name": "Slow controls",
+      "what": "A button, link or field whose transition lasts longer than 300ms.",
+      "why": "The more often something is used, the shorter its motion should be. A hover or press that takes half a second makes the whole product feel heavy.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Links, buttons, fields, tabs, menu items and switches up to 120px tall with a transition duration above 300ms. Taller clickable cards and panels are skipped: their motion is layout, not press feedback.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "duration_max_ms": 300
+        }
+      },
+      "fix": "Press feedback about 160ms, tooltips about 125ms, dropdowns about 200ms; keep 400ms for modals and drawers (--dur-press, --dur-tooltip, --dur-dropdown, --dur-modal).",
+      "fix_patterns": [
+        "state-change-motion"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Apple WWDC 2018, Designing Fluid Interfaces",
+          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
+        },
+        {
+          "label": "MDN, prefers-reduced-motion",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+        }
+      ]
+    },
+    {
+      "id": "MOT-07",
+      "name": "No reduced motion version",
+      "what": "The page moves things (animations, transform transitions) but has no prefers-reduced-motion rule.",
+      "why": "People who get dizzy from motion turn it down in their system settings. A page that ignores the setting keeps sliding and zooming for them.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "At least one element runs a CSS animation or a transform transition of 200ms or more, and no stylesheet the page can read has a prefers-reduced-motion media rule. Skipped when a stylesheet cannot be read; a script that checks the setting itself is not visible, so treat findings as candidates.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "media": "prefers-reduced-motion"
+        }
+      },
+      "fix": "Add @media (prefers-reduced-motion: reduce) that turns position and scale changes off and keeps opacity and color fades.",
+      "fix_patterns": [
+        "state-change-motion"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": [
+        {
+          "label": "Apple WWDC 2018, Designing Fluid Interfaces",
+          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
+        },
+        {
+          "label": "MDN, prefers-reduced-motion",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+        }
+      ]
     }
   ]
 }
