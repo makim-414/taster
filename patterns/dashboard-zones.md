@@ -3,7 +3,7 @@ id: dashboard-zones
 name: Dashboard zones
 category: layout-shell
 uses: [organize-the-page, show-one-number]
-surfaces: [dashboard]
+surfaces: [dashboard, app]
 replaces: [AC-14, COL-06, LAY-05]
 components: [blocks/card, blocks/kpi]
 inspiration: []
@@ -15,6 +15,8 @@ status: stable
 Use it for the home view of any analytics or monitoring screen. A dashboard answers three questions in order: how are we doing (a few numbers), what changed (trend charts), and where to look (a table or list). Lay it out in zones that follow that order, with one tone and one panel header style across them.
 
 It replaces the bento grid of mixed-size rounded boxes in a different color each, where nothing tells the reader where to start.
+
+An operations console, where people run a process every day rather than read numbers, follows the same zones but leads with what to press: the work waiting for a person first, then the state of the process, then the records. The Do and Don't items about actions below apply to it.
 
 ## Anatomy
 
@@ -32,6 +34,12 @@ It replaces the bento grid of mixed-size rounded boxes in a different color each
 - Color charts with lightness steps of one hue (`--chart-1` to `--chart-6`) and use the accent for the single series that matters.
 - Keep panel heights aligned in each row. Different heights read as accidents.
 - Show an honest empty value (a middle dot) rather than a zero when data is missing.
+- Before you add any element, answer who presses it and when. If there is no answer, leave it out: explanation panels, principle notes, hand-kept ledgers, and settings that change nothing.
+- Keep a process in a few large steps. Do not number sub-steps 1-1 to 1-7 on the screen.
+- Let a person confirm a value once (a plan, a topic, a target) and carry it into every later step instead of asking again.
+- Prefill candidates on a schedule, for example once a week, so people pick from a ready list instead of searching.
+- For a list of accounts, workspaces or channels, give each item a toggle and keep that item's settings inside it, like an admin page.
+- Show the overview as real captures of what the process produces, marking where each input ends up, instead of an animated simulation.
 
 ## Don't
 
@@ -40,6 +48,9 @@ It replaces the bento grid of mixed-size rounded boxes in a different color each
 - Do not repeat flat gray bordered boxes in dozens of sizes without hierarchy (AC-14). Merge related stats into one panel.
 - Do not mix chart styles and palettes between panels.
 - Do not put more than five KPI tiles in the first row.
+- Do not show a setting that does not change what happens.
+- Do not add a block of guidance text with nothing to press.
+- Do not automate an outward action that cannot be undone or can get an account suspended, such as posting or sending. Prepare it (text, files, which targets) and leave the final paste or send to a person.
 
 ## Swap recipe
 
