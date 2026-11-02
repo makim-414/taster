@@ -2304,5 +2304,26 @@
       "blocks/curved-stream-hero"
     ],
     "summary": "A short headline above one endless row of real pictures that flatten in the middle and bend toward the viewer at the edges, with a visible pause."
+  },
+  {
+    "id": "bracket-category-label",
+    "name": "Bracket category label",
+    "category": "badge-label",
+    "uses": [
+      "label-a-state",
+      "browse-records"
+    ],
+    "surfaces": [
+      "dashboard",
+      "app"
+    ],
+    "replaces": [
+      "AC-04",
+      "AC-05"
+    ],
+    "components": [
+      "blocks/bracket-label"
+    ],
+    "summary": "A row's kind written as [ Press ] beside its name instead of a pill: brackets for the eye only, held to the word, on every row, fainter when unknown."
   }
 ]

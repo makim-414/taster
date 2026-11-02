@@ -29,6 +29,8 @@ Comparing the same measure across categories: sales by channel, share of answers
 - Write the takeaway as the chart title: "Email drives 42% of signups", not "Signups by channel".
 - Sort by value unless the categories have a natural order (months, age bands).
 - Highlight one bar. If everything is highlighted nothing is.
+- Use the brand color only when the chart compares yours with others (your share against competitors). When every bar is yours (your pages, your products), there is nothing to set apart; keep them all on the ramp.
+- Draw the same ratio the same way on every screen: the same bar thickness, the same 0 to 100% scale and the same fill, so 40% on one screen looks like 40% on the next.
 - Make bars at least 24px thick on a touch screen, and show values on tap.
 - Add `role="img"` and a text summary or a data table for screen readers.
 
