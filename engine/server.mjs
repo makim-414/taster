@@ -206,7 +206,7 @@ export function createServer({ remote } = {}) {
         category: z.string().optional().describe('taxonomy category id, such as hero'),
         family: z.string().optional().describe('taxonomy family id, such as page-sections'),
         use: z.string().optional().describe('what the visitor is doing, a taxonomy use id'),
-        surface: z.string().optional().describe('landing, dashboard, app, commerce, editorial, auth-onboarding or ai-chat'),
+        surface: z.string().optional().describe('landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat or developer-docs'),
         ids: z.array(z.string()).max(8).optional().describe('exact component ids, to show a chosen few again'),
         limit: z.number().int().min(1).max(8).optional().describe('how many, default 6'),
         ...lookInput,
