@@ -8,6 +8,10 @@ Write down, before any code: the product in one sentence, who the screen is for,
 `data/taxonomy.json` surfaces), and the real content you have (names, numbers with sources, images the user owns).
 If content is missing, ask for it or leave a clearly marked gap. Never invent numbers or testimonials.
 
+Then the brand ([brand.md](brand.md)): their color, typeface and logo file, absorbed with `brand_theme` from any page
+they already have, or the Taster defaults if they have none. Save the theme as `theme.css` and load it after the
+tokens.
+
 ## 2. List the uses in order
 
 Read the `uses` in the taxonomy and pick the ones this screen must serve, in reading order. A landing page is
@@ -18,6 +22,9 @@ A dashboard is usually: show one number, show a trend, compare items, act on a r
 
 From `data/patterns/INDEX.json`, filter by surface and use. Prefer patterns with `status: stable` and with
 registry components. Read each pattern's "Do" and "Don't" before you write the section.
+
+Any block the visitor will see is the user's call, not yours: follow [choose.md](choose.md) and let them pick by eye
+before you write it.
 
 ## 4. Compose
 

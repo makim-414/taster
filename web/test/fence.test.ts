@@ -10,6 +10,7 @@ import type { AddressInfo } from 'node:net';
 
 import { fencePage, launchBrowser, type Budget } from '../lib/browser.ts';
 import { loadEngine, runDiagnosis } from '../lib/diagnose.ts';
+import { runBrand } from '../lib/brand.ts';
 
 const FIXTURES = path.resolve(import.meta.dirname, '../../rules/fixtures');
 
@@ -128,8 +129,6 @@ test('engine through the fence: slop.html is hit, clean.html has zero findings',
   }
 });
 
-
-
 test('out of time with one width measured: that width is the answer', async (t) => {
   // The first load answers at once; every later one stalls, so the second width is still loading
   // when the deadline comes.
@@ -156,4 +155,14 @@ test('out of time with one width measured: that width is the answer', async (t) 
     for (const s of sockets) s.destroy();
     server.close();
   }
+});
+
+test('brand through the fence: tokens come from the page, and private addresses stay blocked', async (t) => {
+  const srv = await serveOn8080();
+  if (!srv) return t.skip('port 8080 is busy');
+  t.after(() => srv.close());
+  const result = await runBrand(`${srv.base}/fixtures/slop.html`, { allowLoopback: true });
+  assert.ok(result.tokens['--success'] && result.tokens['--danger']);
+  assert.ok(result.notes.length >= 3);
+  await assert.rejects(runBrand(`${srv.base}/to-private`, { allowLoopback: true }));
 });

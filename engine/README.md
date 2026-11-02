@@ -1,6 +1,6 @@
 # engine
 
-Runs the slop detector (`rules/detect.js`) in a real Chromium at 1440 and 390 wide, writes an annotated capture per width, and serves the same thing to agents over MCP.
+Runs the slop detector (`rules/detect.js`) in a real Chromium at 1440 and 390 wide, writes an annotated capture per width, and serves the same thing to agents over MCP and to editors over ACP.
 
 `rules/detect.js` has no dependencies. Any browser tool can load it into a page and call `window.tasterDetect({ highlight: true })`, as `skills/taster/references/diagnose.md` describes. This folder is the ready-made runner for when you have Node.
 
@@ -18,6 +18,7 @@ node engine/cli.mjs https://example.com --out out    # report.json, annotated-14
 node engine/cli.mjs ./page.html --json --widths 1440 # one width, JSON to stdout
 node engine/cli.mjs https://example.com --widths responsive  # 360 to 1440 in nine steps, for the RSP rules
 node engine/cli.mjs https://example.com --extract    # content JSON for a rebuild (content.json with --out)
+node engine/cli.mjs https://example.com --brand      # brand theme CSS and notes (theme.css with --out, JSON with --json)
 node engine/cli.mjs --rules                          # every rule, how it is checked, severity
 node engine/cli.mjs --explain KO-01                  # what, why, how it is found, fix
 ```
@@ -28,7 +29,7 @@ Exit code is 0 with no findings, 1 with findings, 2 on error. The report groups 
 
 Prompt: `start` (the opening question: does the site already exist, or are we building a new one?).
 
-Tools: `diagnose` (report plus one capture per width), `extract_content` (the page's content in reading order, for a rebuild), `list_rules`, `explain_rule`, and the swap tools `suggest_swaps`, `list_patterns`, `get_pattern`, `get_component`, `taxonomy`.
+Tools: `browse_components` (numbered candidates as pictures, a live link each and one board link), `preview_component` (one component rendered in a brand, as a picture), `diagnose` (report plus one capture per width), `brand_theme` (the site's brand color, typeface and logo as token overrides, with success and failure colors fitted to them), `extract_content` (the page's content in reading order, for a rebuild), `list_rules`, `explain_rule`, and the swap tools `suggest_swaps`, `list_patterns`, `get_pattern`, `get_component`, `taxonomy`.
 
 Claude Code:
 
@@ -44,12 +45,55 @@ command = "node"
 args = ["/path/to/taster/engine/mcp.mjs"]
 ```
 
+## Hosted MCP (HTTP)
+
+`server.mjs` builds the MCP server; `mcp.mjs` serves it on stdio and `http.mjs` answers one Streamable HTTP request
+statelessly (`handleMcpRequest(request, { remote })`), so it runs on serverless functions. Hosted mode takes
+`remote.diagnose(url)` from the host instead of opening a local browser and leaves out `extract_content` and
+`brand_theme`. `web/app/api/mcp/route.ts` mounts it at `/api/mcp`, with diagnose going through the same fence as
+`/api/diagnose` (public http(s) only, request budget, per-IP window, one browser at a time).
+
+## ACP agent
+
+`acp.mjs` serves the same engine to editors over the [Agent Client Protocol](https://agentclientprotocol.com)
+(JSON-RPC on stdio, protocol version 1, `@agentclientprotocol/sdk`). There is no model inside, so it answers slash
+commands, which it advertises with `available_commands_update` after `session/new`:
+
+- `/start`: the opening question, read from `skills/taster/references/start.md`.
+- `/diagnose <url or file>`: one `tool_call` for the browser run (the annotated captures as its locations), then the
+  findings as text. A relative path is read from the session's `cwd`.
+- `/extract <url>`, `/brand <url>`: content JSON, or the theme CSS and notes.
+- `/explain <rule id>`, `/rules`, `/help`.
+
+Plain text gets a short help reply. `session/cancel` ends the turn with `stopReason: "cancelled"`; a browser run already
+started finishes in the background and its result is dropped.
+
+Zed, in `settings.json`:
+
+```json
+{
+  "agent_servers": {
+    "Taster": { "type": "custom", "command": "node", "args": ["/path/to/taster/engine/start.mjs", "acp"], "env": {} }
+  }
+}
+```
+
+`start.mjs acp` installs the dependencies on first start (the MCP launcher does the same with no argument), then
+serves `acp.mjs`. JetBrains IDEs, in `~/.jetbrains/acp.json`: the same `agent_servers` entry without `type`, with the
+full path of `node` in `command`. With the engine linked or installed globally, `taster-acp` is the same agent.
+
+Try it by hand:
+
+```bash
+printf '%s\n' '{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":1}}' | node engine/acp.mjs
+```
+
 ## Checks
 
 ```bash
 node rules/test-detect.mjs           # fixtures: exact rule sets on slop pages, zero on the clean page at both widths
 node engine/scripts/check-rules.mjs  # rules.json schema, and detect.js checks exactly the measured rules
-npm --prefix engine test             # CLI, MCP and extract
+npm --prefix engine test             # CLI, MCP, ACP and extract
 node engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop, rebuild is clean and keeps the content
 ```
 

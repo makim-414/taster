@@ -9,6 +9,7 @@ Marketing page blocks: the parts a landing page is made of.
 ### Hero
 
 - [Asymmetric product hero](asymmetric-product-hero.md) fixes AC-17, CMP-06, CMP-07, LAY-01
+- [Curved image stream hero](curved-image-stream-hero.md) fixes BG-01, LAY-02
 - [Hero headline lockup](hero-headline-lockup.md) fixes AC-01, CMP-01, TYP-04, TYP-05
 - [In-hero form flow](in-hero-form-flow.md) fixes AC-12, CMP-10
 - [Photo-led hero](photo-led-hero.md) fixes AC-19, BG-01, COL-03, LAY-01
@@ -128,6 +129,7 @@ Buttons and every way a person types, picks or submits something.
 
 ### Form and input
 
+- [Appearance picker](appearance-picker.md) fixes CMP-11
 - [Checkbox and switch](checkbox-and-switch.md)
 - [Lead capture form](lead-capture-form.md) fixes AC-12, CMP-10
 - [Search and filter bar](search-and-filter-bar.md)
@@ -220,6 +222,7 @@ Galleries, storefront pages and assistant interfaces.
 
 - [Agent chat thread and composer](agent-chat-thread.md)
 - [Agent status line](agent-status-line.md) fixes AC-07
+- [Agent thinking orb](agent-thinking-orb.md) fixes AC-07
 - [Ask-human step](ask-human-step.md)
 - [Sourced answer block](sourced-answer-block.md) fixes CMP-06, CPY-01
 - [Tool call disclosure](tool-call-disclosure.md)
@@ -231,6 +234,7 @@ Backgrounds, particles and 3D that set a mood.
 ### Motion and particles
 
 - [Ambient background](ambient-background.md) fixes BG-01, COL-01, COL-03
+- [Brand wire form](brand-wire-form.md) fixes BG-01, COL-01, COL-03
 - [Count-up number](count-up-number.md) fixes MOT-01
 - [Marquee band](marquee-band.md)
 - [Scroll reveal wrapper](scroll-reveal-wrapper.md) fixes MOT-01

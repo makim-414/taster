@@ -41,5 +41,9 @@
     "ICO-02"
   ],
   "clean-icons.html": [],
-  "clean-render.html": []
+  "clean-render.html": [],
+  "clean-status.html": [],
+  "slop-status.html": [
+    "AC-08"
+  ]
 }

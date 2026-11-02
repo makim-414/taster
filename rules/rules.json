@@ -287,6 +287,7 @@
       "fix": "Neutral text with a neutral spinner.",
       "fix_patterns": [
         "agent-status-line",
+        "agent-thinking-orb",
         "live-step-list",
         "progress-and-spinner",
         "quiet-empty-state",
@@ -303,7 +304,7 @@
       "why": "A stock dashboard ornament. Color alone carries the meaning, which also fails color-blind readers. Seen again and again in our own work.",
       "detect": {
         "level": "deterministic",
-        "signal": "Element 4 to 12px square with fully rounded corners, an opaque chromatic background, no text, followed by text. A running animation or a colored box-shadow raises the weight.",
+        "signal": "Element 4 to 12px square with fully rounded corners, an opaque chromatic background, no text, followed by text. Not flagged when the dot is flat and still and its color is the page's own success or failure token (--success, --danger, --destructive, --error, --delta-up, --delta-down, --positive, --negative on :root). A running animation or a colored box-shadow is always flagged and raises the weight.",
         "selectors": [
           "span",
           "i",
@@ -318,7 +319,7 @@
           "text_follows": true
         }
       },
-      "fix": "Say the state in words. If a mark is needed, use the text color, not a hue.",
+      "fix": "Say the state in words. If a mark is needed, use the text color, or the brand's own success or failure token for a real outcome, flat and still.",
       "fix_patterns": [
         "gauge-and-meter",
         "plan-comparison-table",
@@ -751,6 +752,7 @@
       "fix": "Pick one brand color and use it flat. If a gradient is needed, keep it within one hue and low contrast.",
       "fix_patterns": [
         "ambient-background",
+        "brand-wire-form",
         "editorial-paper-sheet",
         "flat-solid-button",
         "kpi-stat-tile",
@@ -874,6 +876,7 @@
       "fix": "If a dark theme is needed, separate surfaces with gray steps and keep the accent flat.",
       "fix_patterns": [
         "ambient-background",
+        "brand-wire-form",
         "photo-led-hero",
         "plain-section-surface",
         "token-themes"
@@ -1394,6 +1397,7 @@
         "audience-entry-split",
         "connection-diagram",
         "content-matched-grid",
+        "curved-image-stream-hero",
         "focus-card-carousel",
         "icon-placement",
         "media-tile-card",
@@ -2075,6 +2079,7 @@
       },
       "fix": "Define both modes in tokens.",
       "fix_patterns": [
+        "appearance-picker",
         "token-themes"
       ],
       "severity": "low",
@@ -2109,6 +2114,8 @@
       "fix": "Show the product, a real photo, or nothing. A flat background is a valid choice.",
       "fix_patterns": [
         "ambient-background",
+        "brand-wire-form",
+        "curved-image-stream-hero",
         "photo-led-hero",
         "plain-section-surface",
         "scroll-driven-product-hero",

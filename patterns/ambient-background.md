@@ -5,7 +5,7 @@ category: motion-particle
 uses: [set-the-mood]
 surfaces: [landing, auth-onboarding]
 replaces: [BG-01, COL-01, COL-03]
-components: []
+components: [motion/mesh-drift, motion/light-beams]
 inspiration: [https://blog.maximeheckel.co/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/]
 status: stable
 ---
@@ -24,7 +24,9 @@ A point field: a few hundred to a few thousand points drawn on a `<canvas>`, dri
 
 A line field: thin lines displaced by noise, drawn in `--border` color on a calm surface, moving only a few pixels.
 
-Both sit in an absolutely positioned layer with `pointer-events: none`, `aria-hidden="true"`, and a solid `--bg` behind them. Foreground text is above at full contrast. A static first frame is drawn before anything animates.
+Light beams: soft slanted shafts rising slowly, in `motion/light-beams`. They read `--brand` and suit a dark surface with a short headline. Keep them faint, since a strong beam turns into the neon look this pattern avoids (COL-03).
+
+All of them sit in an absolutely positioned layer with `pointer-events: none`, `aria-hidden="true"`, and a solid `--bg` behind them. Foreground text is above at full contrast. A static first frame is drawn before anything animates.
 
 ## Do
 

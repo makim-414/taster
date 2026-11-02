@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "description": "Runs rules/detect.js in a real browser at two widths, writes annotated captures, and serves it to agents over MCP.",
+  "description": "Runs rules/detect.js in a real browser at two widths, writes annotated captures, and serves it to agents over MCP and to editors over ACP.",
   "bin": {
     "taster-diagnose": "cli.mjs",
-    "taster-mcp": "mcp.mjs"
+    "taster-mcp": "mcp.mjs",
+    "taster-acp": "acp.mjs"
   },
   "engines": {
     "node": ">=20"
@@ -16,6 +17,7 @@
     "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
+    "@agentclientprotocol/sdk": "2.1.0",
     "@modelcontextprotocol/sdk": "1.32.2",
     "playwright": "1.64.1",
     "zod": "4.6.7"
