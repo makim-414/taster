@@ -31,6 +31,7 @@ For a single-purpose tool with one screen, skip the sidebar and use a plain top 
 - Group items under small muted headings when you have more than seven.
 - Make the sidebar its own scroll container so long nav does not push the footer away.
 - Test the drawer with keyboard only: open, tab through, Escape to close, focus returns to the menu button.
+- Show a count next to a nav item only for work waiting for a person (items to review, drafts to approve), not for totals.
 
 ## Don't
 
