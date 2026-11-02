@@ -4,7 +4,7 @@ name: Scroll reveal wrapper
 category: motion-particle
 uses: [set-the-mood]
 surfaces: [landing]
-replaces: [MOT-01]
+replaces: [MOT-01, MOT-09]
 components: []
 inspiration: []
 status: stable
@@ -38,6 +38,7 @@ Both are inert until JavaScript marks the document, so content is visible withou
 
 ## Don't
 
+- Don't let content wait at opacity 0 for a scroll event (MOT-09). Render it visible, add the entrance as an enhancement, and show everything after a short timeout if the observer never fires.
 - Do not fade up every section, every card and every paragraph (MOT-01).
 - Do not use a spring that overshoots, or `cubic-bezier` values above 1. The block should stop where it stops.
 - Do not animate things above the fold on load. The first screen should be there when the page is.

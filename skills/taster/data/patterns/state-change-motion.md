@@ -4,7 +4,7 @@ name: Motion for changes of state
 category: motion-particle
 uses: [notify-the-user, confirm-an-action]
 surfaces: [landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat]
-replaces: [MOT-02, MOT-03, MOT-04, MOT-05, MOT-06, MOT-07]
+replaces: [MOT-02, MOT-03, MOT-04, MOT-05, MOT-06, MOT-07, MOT-08]
 components: []
 inspiration: []
 status: stable
@@ -31,6 +31,7 @@ Every transition and animation in an interface: a press, a hover, a menu opening
 
 ## Don't
 
+- Don't move an element on :hover outside `@media (hover: hover) and (pointer: fine)` (MOT-08). On touch the hover sticks after a tap; on a desktop the card slides away from the pointer about to click it.
 - Don't write `transition: all` (MOT-02). It animates layout and theme changes you did not mean to animate.
 - Don't start an entrance from `scale(0)` (MOT-03).
 - Don't use ease-in on interface motion (MOT-04): the first frame, the one people watch, is the slowest.

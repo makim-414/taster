@@ -4,7 +4,7 @@ name: Korean line breaking and alignment
 category: typography
 uses: [read-long-text]
 surfaces: [landing, editorial]
-replaces: [KO-01, KO-10]
+replaces: [KO-01, KO-10, KO-13]
 components: []
 inspiration: []
 status: stable
@@ -27,6 +27,7 @@ Also use it to stop justified Korean text. Hangul has spaces between phrases, no
 
 ## Do
 
+- Never leave a single syllable alone on the last line of a Korean heading (KO-13): text-wrap: balance with keep-all, a width in em rather than ch, or a rewrite.
 - Put the rules in the base stylesheet once, not per component.
 - Check the narrowest layout (360px). `keep-all` makes lines ragged when a word is long, which is correct, but a container narrower than 12em can overflow, so keep `overflow-wrap: anywhere`.
 - Insert `<wbr>` or `&nbsp;` for names, numbers with units and short phrases that must stay together ("3개월", "월 9,900원").
