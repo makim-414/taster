@@ -101,6 +101,18 @@ node engine/cli.mjs https://example.com --brand      # the site's brand as a tok
 
 It uses Playwright's Chromium if installed, otherwise your Google Chrome.
 
+### Lint the source
+
+The same rules in their source form, for review and CI, no browser needed:
+
+```bash
+npx @makim-414/taster lint src                                   # tinted pills, transition-all, hard-coded colors ...
+npx @makim-414/taster lint src --baseline taster-baseline.json --write-baseline   # adopt on an old codebase
+npx @makim-414/taster lint src --baseline taster-baseline.json  # then counts may only go down
+```
+
+A line passes with a comment `taster-allow <reason>`; an allow without a reason is reported.
+
 ### Add components to your app
 
 ```bash
