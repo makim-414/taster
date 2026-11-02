@@ -26,6 +26,7 @@ Something changes over time and the reader wants shape, not exact values: traffi
 
 ## Do
 
+- Compare like with like. Average only what was measured for the whole period; draw days measured under a different setup as hollow gray points on a dashed line, mark the day the measurement changed with a labeled vertical rule, and leave a fully empty day without a point or a "no data" label rather than filling it with another value.
 - Start the Y axis at zero for volumes and at a sensible floor for rates, and say so.
 - Mark one event on the line (a launch, an outage) with a small tick and a caption.
 - Keep the same time range across charts on one screen.

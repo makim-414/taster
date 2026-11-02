@@ -27,6 +27,7 @@ Layers from back to front: photo, scrim (a linear gradient from transparent at 4
 
 ## Do
 
+- When copy overlaps a product label, give the copy an opaque band in the page color instead of a gradient, and tune the scrim to the photo's lightness (stronger on a dark product, lighter on a pale one). A 100vh slot keeps the subject with `object-position: 50% 0`.
 - Use real photographs from a real shoot or from the client's own archive. Keep file size under 300 KB at 1600px wide with `srcset` and an explicit `width` and `height`.
 - Brief the photographer, or the generator, with a real reference photo. Ask for film grain, slightly lowered saturation and a slightly darker exposure.
 - Test contrast of the headline on the scrim at its lightest point. Aim for 4.5:1.
