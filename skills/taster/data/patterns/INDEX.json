@@ -2304,5 +2304,33 @@
       "blocks/curved-stream-hero"
     ],
     "summary": "A short headline above one endless row of real pictures that flatten in the middle and bend toward the viewer at the edges, with a visible pause."
+  },
+  {
+    "id": "state-change-motion",
+    "name": "Motion for changes of state",
+    "category": "motion-particle",
+    "uses": [
+      "notify-the-user",
+      "confirm-an-action"
+    ],
+    "surfaces": [
+      "landing",
+      "dashboard",
+      "app",
+      "commerce",
+      "editorial",
+      "auth-onboarding",
+      "ai-chat"
+    ],
+    "replaces": [
+      "MOT-02",
+      "MOT-03",
+      "MOT-04",
+      "MOT-05",
+      "MOT-06",
+      "MOT-07"
+    ],
+    "components": [],
+    "summary": "Interface motion that is quick, physical and optional: named properties, entrances from 0.95 not scale(0), ease-out, durations by frequency and a reduced motion version."
   }
 ]
