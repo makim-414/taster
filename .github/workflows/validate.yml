@@ -36,6 +36,8 @@ jobs:
         run: npm --prefix engine test
       - name: Rebuild example stays clean and keeps its content
         run: node engine/scripts/check-rebuild-example.mjs
+      - name: Icon slot variations match the taxonomy and stay clean
+        run: node engine/scripts/check-icon-slots-example.mjs
   web:
     runs-on: ubuntu-latest
     steps:
