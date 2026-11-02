@@ -90,6 +90,12 @@ Your agent does not have to pick the look alone. Ask it for a hero or a pricing 
 answers with pictures, a live link for each, and a board link that puts them side by side. `preview_component` shows one
 wearing your brand. On the board, press the pick button and paste the sentence it writes back to the agent.
 
+Before the parts, the `pick_tone` tool places the look on a tone map: commerce to brand personality, minimal to
+expressive, and an optional genre (geek and developer first). It answers with the nearest real sites, opened on request
+and never stored, the eight axes and tokens of that spot, and Taster parts wearing them. The references set the
+direction; the parts show what Taster builds. [taster-six.vercel.app/tone](https://taster-six.vercel.app/tone) is the
+same map to drag by hand.
+
 ![The board: two candidates running live side by side, one picked](docs/board.jpg)
 
 ### Rules for agents without MCP
@@ -135,8 +141,9 @@ claude mcp add --transport http taster https://taster-six.vercel.app/api/mcp
 
 In Cursor, `.cursor/mcp.json`: `{ "mcpServers": { "taster": { "url": "https://taster-six.vercel.app/api/mcp" } } }`.
 claude.ai and ChatGPT take the same URL as a custom connector. The hosted server leaves out `extract_content`; `diagnose` and
-`brand_theme` take public http(s) URLs only and are rate limited per client, and `preview_component` answers with a
-still and a live link instead of a render. For local files and the full tool set, use the plugin above.
+`brand_theme` take public http(s) URLs only and are rate limited per client, `preview_component` answers with a
+still and a live link instead of a render, and `pick_tone` opens the references through the same fence and links to the
+live parts instead of rendering them. For local files and the full tool set, use the plugin above.
 
 ### Use from an editor (ACP)
 
