@@ -4,7 +4,7 @@ name: Plain and specific copy
 category: typography
 uses: [introduce-the-product]
 surfaces: [landing, app]
-replaces: [AC-02, CPY-01]
+replaces: [AC-02, CPY-01, CPY-03]
 components: []
 inspiration: []
 status: stable
@@ -34,6 +34,7 @@ It also covers punctuation. Long dashes are the most recognizable mark of genera
 
 ## Don't
 
+- Don't show identifiers as words (CPY-03): NO_ANSWER, created_at or userName on screen means the interface is showing its plumbing. Write the state in words and keep the code for support.
 - Do not join clauses with long dashes (AC-02). Use a comma, colon or period.
 - Do not write "Build faster, ship smarter" or "not just X, but Y" (CPY-01). They have the rhythm of a claim and no content.
 - Do not open with "Welcome to the future of" or "Experience the power of".

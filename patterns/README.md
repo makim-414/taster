@@ -87,7 +87,7 @@ Layout, type, icons, tokens and the base surfaces everything sits on.
 - [Language playground in the site shell](language-playground.md)
 - [Plain section surface](plain-section-surface.md) fixes BG-01, CMP-05, COL-03
 - [Product-first section order](product-first-section-order.md) fixes LAY-04
-- [Readable at every width](readable-at-every-width.md) fixes RSP-01, RSP-02, RSP-03, RSP-04, RSP-05
+- [Readable at every width](readable-at-every-width.md) fixes RSP-01, RSP-02, RSP-03, RSP-04, RSP-05, RSP-07
 - [Spacing and dividers](spacing-and-dividers.md) fixes CMP-02, LAY-06
 - [Token themes](token-themes.md) fixes CMP-04, CMP-11, COL-02, COL-03, COL-05, COL-08
 
@@ -95,7 +95,7 @@ Layout, type, icons, tokens and the base surfaces everything sits on.
 
 - [Hairline card](hairline-card.md) fixes AC-14, CMP-04, CMP-05, COL-07
 - [List item row](list-item-row.md) fixes CMP-02
-- [Media tile card](media-tile-card.md) fixes AC-17, LAY-02
+- [Media tile card](media-tile-card.md) fixes AC-17, CMP-12, LAY-02
 - [Single surface section](single-surface-section.md) fixes CMP-02
 - [Spotlight border card](spotlight-border-card.md) fixes COL-07
 - [Status without side bar](status-without-side-bar.md) fixes AC-10
@@ -103,12 +103,12 @@ Layout, type, icons, tokens and the base surfaces everything sits on.
 ### Typography
 
 - [Animated text](animated-text.md) fixes COL-04, MOT-01, TYP-03
-- [Korean line breaking and alignment](korean-line-breaking.md) fixes KO-01, KO-10
+- [Korean line breaking and alignment](korean-line-breaking.md) fixes KO-01, KO-10, KO-13
 - [Korean-first copy](korean-natural-copy.md) fixes CPY-01, KO-07, KO-09
-- [Korean type setup](korean-type-setup.md) fixes KO-02, KO-03, KO-04, KO-05, KO-06, KO-08, KO-11
-- [Long-form prose](long-form-prose.md) fixes KO-03, KO-11
+- [Korean type setup](korean-type-setup.md) fixes KO-02, KO-03, KO-04, KO-05, KO-06, KO-08, KO-11, KO-12
+- [Long-form prose](long-form-prose.md) fixes KO-03, KO-11, LAY-07
 - [Plain headline and eyebrow](plain-headline-and-eyebrow.md) fixes AC-01, COL-04, TYP-03, TYP-05
-- [Plain and specific copy](plain-honest-copy.md) fixes AC-02, CPY-01
+- [Plain and specific copy](plain-honest-copy.md) fixes AC-02, CPY-01, CPY-03
 - [Tabular number text](tabular-number-text.md) fixes AC-09
 - [Type system](type-system.md) fixes AC-15, TYP-01, TYP-02, TYP-04
 
@@ -117,7 +117,7 @@ Layout, type, icons, tokens and the base surfaces everything sits on.
 - [Avatar with fallback](avatar-with-fallback.md)
 - [Icon placement map](icon-placement.md) fixes ICO-01, ICO-02, ICO-03, ICO-04, CMP-03, LAY-02
 - [Line icon set](line-icon-set.md) fixes AC-03, AC-11, CMP-03, ICO-01, ICO-02, ICO-03
-- [Original logo assets](original-logo-assets.md) fixes AC-18
+- [Original logo assets](original-logo-assets.md) fixes AC-18, CMP-12
 
 ## Actions and inputs
 
@@ -155,7 +155,7 @@ Status, alerts, waiting, empty results and layers above the page.
 
 ### Empty and error state
 
-- [Error and locked state](error-state.md)
+- [Error and locked state](error-state.md) fixes CPY-03
 - [Quiet empty state](quiet-empty-state.md) fixes AC-07, AC-11, CPY-02
 
 ### Loader and skeleton
@@ -218,7 +218,7 @@ Galleries, storefront pages and assistant interfaces.
 
 - [Cart and checkout](cart-and-checkout.md)
 - [Editorial storefront home](editorial-storefront-home.md) fixes LAY-04
-- [Product detail page](product-detail-page.md)
+- [Product detail page](product-detail-page.md) fixes LAY-07
 
 ### Chat and AI
 
@@ -239,8 +239,8 @@ Backgrounds, particles and 3D that set a mood.
 - [Brand wire form](brand-wire-form.md) fixes BG-01, COL-01, COL-03
 - [Count-up number](count-up-number.md) fixes MOT-01
 - [Marquee band](marquee-band.md)
-- [Scroll reveal wrapper](scroll-reveal-wrapper.md) fixes MOT-01
-- [Motion for changes of state](state-change-motion.md) fixes MOT-02, MOT-03, MOT-04, MOT-05, MOT-06, MOT-07
+- [Scroll reveal wrapper](scroll-reveal-wrapper.md) fixes MOT-01, MOT-09
+- [Motion for changes of state](state-change-motion.md) fixes MOT-02, MOT-03, MOT-04, MOT-05, MOT-06, MOT-07, MOT-08
 
 ### 3D scene
 

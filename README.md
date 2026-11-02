@@ -182,7 +182,7 @@ without the AI look", or "Build a pricing page for this product without generic 
 ## Taxonomy at a glance
 
 <!-- taxonomy:start -->
-119 patterns, 80 rules, 65 components, 40 uses, 8 surfaces.
+119 patterns, 88 rules, 65 components, 40 uses, 8 surfaces.
 
 | Family | Categories | Patterns |
 |---|---|---|

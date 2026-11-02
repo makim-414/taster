@@ -4,7 +4,7 @@ name: Long-form prose
 category: typography
 uses: [read-long-text]
 surfaces: [editorial, developer-docs]
-replaces: [KO-03, KO-11]
+replaces: [KO-03, KO-11, LAY-07]
 components: []
 inspiration: []
 status: stable
@@ -35,6 +35,7 @@ Pair it with korean-type-setup when the text is Korean, since the numbers below 
 
 ## Don't
 
+- Don't ship a long page as one tall image of text (LAY-07). It cannot be searched, translated, zoomed or read aloud; set the words as text and keep images for photos.
 - Do not set Korean body text with a Latin line height of 1.2 to 1.4 (KO-03). Use 1.6 to 1.8.
 - Do not set Korean body or captions at 12px or smaller (KO-11). 15 to 16px for body, 13px minimum for captions.
 - Do not mark a quote with a 4px colored border on the left.

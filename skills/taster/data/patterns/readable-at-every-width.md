@@ -4,7 +4,7 @@ name: Readable at every width
 category: layout-shell
 uses: [organize-the-page, read-long-text]
 surfaces: [landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat, developer-docs]
-replaces: [RSP-01, RSP-02, RSP-03, RSP-04, RSP-05]
+replaces: [RSP-01, RSP-02, RSP-03, RSP-04, RSP-05, RSP-07]
 components: []
 inspiration: []
 status: stable
@@ -33,6 +33,7 @@ Every screen, before it ships. Generated layouts are usually checked at one phon
 
 ## Don't
 
+- Don't let a layer from a neighbouring block sit over a control at some width (RSP-07). The button looks fine and swallows no clicks; check the center of every control is the control.
 - Don't key layout on the window width when the component sits next to a sidebar.
 - Don't fix a sideways scroll with `overflow-x: hidden` on body. It hides the broken element and cuts its content.
 - Don't put an ellipsis on a short name or a button label. If eight characters do not fit, the box is wrong.
