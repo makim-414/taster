@@ -37,12 +37,13 @@ test('the tone catalog holds places, links and words, never a picture', () => {
     }
   };
   walk(catalog, 'catalog');
-  assert.ok(catalog.refs.filter((r) => r.genres.includes('geek')).length >= 4, 'the first genre needs references');
+  for (const g of catalog.genres) assert.ok(catalog.refs.filter((r) => r.genres.includes(g.id)).length >= 4, `${g.id} needs four references`);
+  assert.ok(catalog.genres.some((g) => g.id === 'geek'), 'the first genre is geek and developer');
   assert.equal(catalog.quadrants.length, 4);
 });
 
 test('every spot sets all eight axes on their snap steps, and readability never drops', () => {
-  for (const x of GRID) for (const y of GRID) for (const genre of [undefined, 'geek']) {
+  for (const x of GRID) for (const y of GRID) for (const genre of [undefined, ...catalog.genres.map((g) => g.id)]) {
     const axes = toneAxes({ x, y }, genre);
     for (const a of TONE_AXES) assert.ok(a.steps.includes(axes[a.id]), `${a.id} ${axes[a.id]} at ${x},${y}`);
     for (const theme of ['dark', 'light']) {
@@ -73,12 +74,15 @@ test('the map reads the way its labels say', () => {
   assert.deepEqual([at(0, 1).roundness, at(0, 1).motion, at(0, 1)['color-restraint']], [0.75, 1, 0.5]);
   assert.deepEqual([at(1, 0).roundness, at(1, 0).motion, at(1, 0).elevation], [0, 0, 0]);
   assert.equal(at(1, 1)['type-expression'], 1);
-  // The geek genre is denser, sharper and more lined than the same spot without it.
+  // The geek genre is denser, sharper and more lined than the same spot without it; utility is never rounder; every
+  // genre changes something at the center of the map.
   for (const x of GRID) for (const y of GRID) {
     const plain = at(x, y);
     const geek = at(x, y, 'geek');
     assert.ok(geek.density >= plain.density && geek.roundness <= plain.roundness && geek.stroke >= plain.stroke, `geek at ${x},${y}`);
+    assert.ok(at(x, y, 'utility').roundness <= plain.roundness && at(x, y, 'illustration').roundness >= plain.roundness, `utility and illustration at ${x},${y}`);
   }
+  for (const g of catalog.genres) assert.notDeepEqual(at(0.5, 0.5, g.id), at(0.5, 0.5), `${g.id} changes nothing`);
 });
 
 test('color comes from the brand, a stand in only when the spot asks for color', () => {

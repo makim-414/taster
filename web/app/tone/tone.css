@@ -7,7 +7,9 @@
 }
 .tone-map, .tone-refs, .tone-parts { min-width: 0; }
 .tone-map h2, .tone-refs h2, .tone-parts h2 { margin: 0; font-size: var(--t-title); font-weight: var(--w-semi); }
-.tone-map-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.tone-genres { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-3) 0 var(--sp-2); }
+.tone-genre-note { margin: 0 0 var(--sp-2); }
+.tone-genre-note b { color: var(--text); font-weight: var(--w-semi); }
 
 .pad-row { display: flex; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-1) var(--sp-1); font-size: var(--t-sm); color: var(--text-muted); }
 .pad {
