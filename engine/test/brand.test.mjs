@@ -15,7 +15,7 @@ test('a brand with a solid color and a chosen typeface is kept', () => {
   assert.match(t.tokens['--font'], /^'Fraunces', 'Source Sans 3', 'IBM Plex Sans KR'/);
   assert.equal(t.tokens['--delta-up'], t.tokens['--success']);
   assert.ok(t.notes.some((n) => /Use the file as is/.test(n)));
-  assert.match(t.css, /^\/\* Brand theme[\s\S]*:root \{[\s\S]*--brand: #2563eb;/);
+  assert.match(t.css, /^\/\* Brand theme[\s\S]*:root, :root\[data-theme\], \.theme-dark, \.theme-light \{[\s\S]*--brand: #2563eb;/);
 });
 
 test('usual AI faces and stock fonts are replaced, and the note says how to keep them', () => {

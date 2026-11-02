@@ -5,3 +5,5 @@ next-env.d.ts
 shots/
 public/fixtures/
 public/taster/
+public/stage/
+public/previews/

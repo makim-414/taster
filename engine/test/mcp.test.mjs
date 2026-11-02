@@ -13,7 +13,7 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [server] }));
   try {
     const { tools } = await client.listTools();
-    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,suggest_swaps,taxonomy');
+    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,browse_components,diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,preview_component,suggest_swaps,taxonomy');
 
     // The opening question comes from the skill's start guide, so the prompt and the skill say the same thing.
     const { prompts } = await client.listPrompts();
@@ -32,8 +32,36 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
     const theme = await client.callTool({ name: 'brand_theme', arguments: { target: fixture } });
     assert.ok(!theme.isError, theme.content[0].text);
     const t = JSON.parse(theme.content[0].text);
-    assert.match(t.css, /:root \{/);
+    assert.match(t.css, /:root, :root\[data-theme\], \.theme-dark, \.theme-light \{/);
     assert.ok(t.tokens['--success'] && t.tokens['--danger'] && t.notes.length >= 3);
+
+    // Choosing by eye: numbered candidates, one picture each, a live link each, and one board link for all of them.
+    const browsed = await client.callTool({ name: 'browse_components', arguments: { query: 'hero', limit: 3, theme: 'light', brand: '#e4002b' } });
+    assert.ok(!browsed.isError, browsed.content[0].text);
+    const pictures = browsed.content.filter((c) => c.type === 'image');
+    assert.equal(pictures.length, 3);
+    assert.ok(pictures.every((c) => c.mimeType === 'image/jpeg' && Buffer.from(c.data, 'base64').length > 2000));
+    const words = browsed.content.filter((c) => c.type === 'text').map((c) => c.text).join('\n');
+    assert.match(words, /\/board\?ids=[^\s]+&brand=e4002b&theme=light/);
+    assert.match(words, /1\. blocks\/[\w-]*hero/);
+    assert.match(words, /\/components\/blocks\/[\w-]*hero\?brand=e4002b&theme=light/);
+    assert.match(words, /Do not write code until they choose/);
+    const dark = await client.callTool({ name: 'browse_components', arguments: { ids: ['blocks/button'], theme: 'dark' } });
+    const light = await client.callTool({ name: 'browse_components', arguments: { ids: ['blocks/button'], theme: 'light' } });
+    assert.notEqual(dark.content.find((c) => c.type === 'image').data, light.content.find((c) => c.type === 'image').data);
+    assert.ok((await client.callTool({ name: 'browse_components', arguments: { ids: ['blocks/nope'] } })).isError);
+    assert.match((await client.callTool({ name: 'browse_components', arguments: { query: 'zzzqqq' } })).content[0].text, /No component matches/);
+
+    // The picture changes with the brand: the same component renders differently for each look.
+    const preview = (args) => client.callTool({ name: 'preview_component', arguments: { id: 'blocks/button', theme: 'light', width: 600, ...args } });
+    const plain = await preview({});
+    const red = await preview({ brand: '#e4002b' });
+    assert.ok(!plain.isError && !red.isError, (plain.isError ? plain : red).content[0].text);
+    assert.notEqual(plain.content.find((c) => c.type === 'image').data, red.content.find((c) => c.type === 'image').data);
+    assert.match(red.content[0].text, /\/components\/blocks\/button\?brand=e4002b&theme=light/);
+    const fromTheme = await preview({ tokens: { '--brand': '#0a7f3f', '--accent-fg': '#ffffff' } });
+    assert.notEqual(fromTheme.content.find((c) => c.type === 'image').data, plain.content.find((c) => c.type === 'image').data);
+    assert.ok((await client.callTool({ name: 'preview_component', arguments: { id: 'blocks/nope' } })).isError);
 
     const listed = JSON.parse((await client.callTool({ name: 'list_rules', arguments: {} })).content[0].text);
     assert.equal(listed.length, RULES.length);
