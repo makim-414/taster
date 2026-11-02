@@ -25,6 +25,7 @@ A fixed, short list of stages that something moves through: a record in a pipeli
 
 ## Do
 
+- Color the stages with one hue stepped by lightness, the same steps the funnel and the progress fill use, so position reads the same everywhere.
 - Give every stage a name that a screen reader reads: `aria-label="Review, current, step 3 of 5"`.
 - Keep the same order and same count across every row of a table, so columns line up.
 - Show the result of the whole row in one word next to the dots when it matters ("Blocked").

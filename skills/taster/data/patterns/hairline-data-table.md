@@ -27,6 +27,7 @@ A list of records with a few columns that people scan and compare: orders, repor
 
 ## Do
 
+- Decide table versus stacked cards by the width the content box actually has, not the window: beside a sidebar a 768px window leaves about 460px. Use a container query (`@container`) and wrap names between words instead of cutting them.
 - Right-align numeric columns and show units in the header ("Amount, USD"), not in every cell.
 - Truncate long text with an ellipsis and a full value on hover or in a detail view.
 - Keep 5 to 8 columns. Move the rest to a detail panel.
