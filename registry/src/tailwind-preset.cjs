@@ -42,6 +42,10 @@ module.exports = {
         'sidebar-border': 'var(--sidebar-border)',
         'delta-up': 'var(--delta-up)',
         'delta-down': 'var(--delta-down)',
+        scrim: 'var(--scrim)',
+        'on-scrim': 'var(--on-scrim)',
+        'on-scrim-muted': 'var(--on-scrim-muted)',
+        'on-scrim-ink': 'var(--on-scrim-ink)',
         chart: {
           1: 'var(--chart-1)',
           2: 'var(--chart-2)',
@@ -60,19 +64,21 @@ module.exports = {
         // The stock text-sm (14px) stays untouched. text-xs and the small token sizes read the --t-* variables,
         // so a Korean page (lang="ko") gets 13px from tokens.css without a rebuild.
         xs: ['var(--t-sm)', { lineHeight: '1rem' }],
-        display: ['36px', { lineHeight: '1.1' }],
-        h1: ['30px', { lineHeight: '1.1' }],
-        h2: ['24px', { lineHeight: '1.3' }],
-        title: ['16px', { lineHeight: '1.3' }],
-        body: ['14px', { lineHeight: '1.5' }],
+        display: ['var(--t-display, 36px)', { lineHeight: '1.1' }],
+        h1: ['var(--t-h1, 30px)', { lineHeight: '1.1' }],
+        h2: ['var(--t-h2, 24px)', { lineHeight: '1.3' }],
+        title: ['var(--t-title, 16px)', { lineHeight: '1.3' }],
+        body: ['var(--t-body, 14px)', { lineHeight: '1.5' }],
         label: ['var(--t-sm)', { lineHeight: '1.5' }],
         caption: ['var(--t-xs)', { lineHeight: '1.5' }],
         micro: ['var(--t-micro)', { lineHeight: '1.5' }],
       },
-      fontWeight: { reg: '400', med: '500', semi: '600' },
+      fontWeight: { reg: '400', med: 'var(--w-med, 500)', semi: 'var(--w-semi, 600)' },
+      // Spacing and type read the tokens, so the design system's density and type-expression axes reshape every
+      // component. The fallbacks are the default steps from tokens.css.
       spacing: {
-        1: '4px', 2: '8px', 3: '12px', 4: '16px',
-        5: '20px', 6: '24px', 8: '32px', 12: '48px', 16: '64px',
+        1: 'var(--sp-1, 4px)', 2: 'var(--sp-2, 8px)', 3: 'var(--sp-3, 12px)', 4: 'var(--sp-4, 16px)',
+        5: 'var(--sp-5, 20px)', 6: 'var(--sp-6, 24px)', 8: 'var(--sp-8, 32px)', 12: 'var(--sp-12, 48px)', 16: 'var(--sp-16, 64px)',
       },
       borderRadius: {
         sm: 'calc(var(--radius) * 0.6)',

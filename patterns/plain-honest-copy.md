@@ -1,7 +1,7 @@
 ---
 id: plain-honest-copy
 name: Plain and specific copy
-category: typography
+category: copy
 uses: [introduce-the-product]
 surfaces: [landing, app]
 replaces: [AC-02, CPY-01]

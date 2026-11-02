@@ -5,7 +5,7 @@ category: form-input
 uses: [enter-data]
 surfaces: [app, auth-onboarding]
 replaces: [AC-06, AC-09, AC-14, RSP-06]
-components: [blocks/input, blocks/sensitive-input]
+components: [blocks/input, blocks/sensitive-input, blocks/settings-section, blocks/field, blocks/textarea, blocks/slider, blocks/file-dropzone, blocks/tag-input]
 inspiration: [https://ui.shadcn.com/docs/components/input]
 status: stable
 ---

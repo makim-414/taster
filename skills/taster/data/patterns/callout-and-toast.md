@@ -5,7 +5,7 @@ category: toast-alert
 uses: [notify-the-user]
 surfaces: [app, dashboard]
 replaces: [AC-06, AC-10, COL-06]
-components: [blocks/alert]
+components: [blocks/alert, blocks/toast, blocks/banner, blocks/notification-list]
 inspiration: [https://ui.shadcn.com/docs/components/alert]
 status: stable
 ---

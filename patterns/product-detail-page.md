@@ -5,7 +5,7 @@ category: commerce
 uses: [sell-a-product]
 surfaces: [commerce]
 replaces: []
-components: [blocks/accordion]
+components: [blocks/accordion, commerce/product-gallery, commerce/buy-box]
 inspiration: [https://21st.dev/@hedevelope/components/estimated-arrival]
 status: stable
 ---

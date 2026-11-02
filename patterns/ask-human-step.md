@@ -5,7 +5,7 @@ category: chat-ai
 uses: [confirm-an-action, ask-the-assistant]
 surfaces: [ai-chat]
 replaces: []
-components: [blocks/button]
+components: [blocks/button, chat/approval-step]
 inspiration: []
 status: stable
 ---

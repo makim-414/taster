@@ -1,0 +1,19 @@
+{
+  "expect": "DANGLING",
+  "why": "An exclusion must name a real category where the excluded thing goes instead.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "categories",
+        {
+          "id": "hero"
+        },
+        "excludes",
+        0,
+        "goes_to"
+      ],
+      "value": "carousel"
+    }
+  ]
+}

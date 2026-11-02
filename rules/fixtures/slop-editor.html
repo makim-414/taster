@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A monospace label outside the editors</title>
+<style>
+  /* Text inside a code editor is code the visitor types or reads as code, so monospace is right there. Each editor
+     below is drawn the way a common editor library draws it: CodeMirror 6 (cm- classes, a contenteditable content
+     area with role=textbox), CodeMirror 5, Monaco, Ace, and a plain role=textbox field. AC-09 must not flag any of them, but the label after them is interface text in monospace and is flagged. */
+  body { margin: 0; padding: 48px; font-family: "IBM Plex Sans", system-ui, sans-serif; color: #1a1a1a; background: #fbfaf8; font-size: 16px; line-height: 1.6; }
+  h1 { font-size: 28px; margin: 0 0 24px; }
+  p { max-width: 60ch; }
+  .editor { margin: 0 0 24px; border: 1px solid #d9d6d0; background: #ffffff; padding: 8px 12px; font-family: Menlo, Consolas, "DejaVu Sans Mono", monospace; font-size: 14px; line-height: 1.5; }
+  .monaco-editor { padding: 16px 12px; }
+  .ace_editor { padding: 4px 12px 24px; }
+  .row { display: flex; gap: 12px; }
+  .label { font-family: Menlo, Consolas, "DejaVu Sans Mono", monospace; font-size: 13px; color: #5b5b5b; }
+  .gutter { color: #5b5b5b; min-width: 24px; text-align: right; }
+</style>
+</head>
+<body>
+  <h1>Try the language</h1>
+  <p>Pick an example, edit it, and run it. Each editor below holds code, so it stays in a fixed-width face.</p>
+
+  <div class="cm-editor editor">
+    <div class="cm-scroller row">
+      <div class="cm-gutters gutter"><div class="cm-gutterElement">1</div><div class="cm-gutterElement">2</div></div>
+      <div class="cm-content" contenteditable="true" role="textbox" aria-multiline="true">
+        <div class="cm-line">let total = add(40, 2)</div>
+        <div class="cm-line">print(total)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="CodeMirror editor">
+    <div class="CodeMirror-code">
+      <pre class="CodeMirror-line-like"><span>fn main() returns 42</span></pre>
+      <div class="CodeMirror-linenumber">3</div>
+      <div class="CodeMirror-line">return main()</div>
+    </div>
+  </div>
+
+  <div class="monaco-editor editor">
+    <div class="view-lines"><div class="view-line"><span>const answer = 42</span></div></div>
+    <div class="line-numbers">7</div>
+  </div>
+
+  <div class="ace_editor editor">
+    <div class="ace_gutter-cell">9</div>
+    <div class="ace_line">answer + 1</div>
+  </div>
+
+  <div class="editor" role="textbox" aria-multiline="true" aria-label="Query">select name from users</div>
+  <p><span class="label">Example result</span></p>
+</body>
+</html>

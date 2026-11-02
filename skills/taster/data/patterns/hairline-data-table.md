@@ -5,7 +5,7 @@ category: table
 uses: [browse-records]
 surfaces: [dashboard, app]
 replaces: [AC-01, AC-09, AC-14, CMP-02]
-components: [blocks/table]
+components: [blocks/table, blocks/selectable-table, blocks/sparkline-table]
 inspiration: []
 status: stable
 ---

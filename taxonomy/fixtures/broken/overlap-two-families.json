@@ -1,0 +1,17 @@
+{
+  "expect": "OVERLAP",
+  "why": "A category listed in two families breaks the partition.",
+  "patch": [
+    {
+      "op": "push",
+      "path": [
+        "families",
+        {
+          "id": "data"
+        },
+        "categories"
+      ],
+      "value": "card"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ category: media-gallery
 uses: [compare-versions]
 surfaces: [app, landing, editorial]
 replaces: []
-components: []
+components: [media/before-after]
 inspiration: []
 status: stable
 ---

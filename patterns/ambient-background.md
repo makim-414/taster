@@ -5,7 +5,7 @@ category: motion-particle
 uses: [set-the-mood]
 surfaces: [landing, auth-onboarding]
 replaces: [BG-01, COL-01, COL-03]
-components: [motion/mesh-drift, motion/light-beams]
+components: [motion/mesh-drift, motion/point-field, motion/light-beams]
 inspiration: [https://blog.maximeheckel.co/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/]
 status: stable
 ---

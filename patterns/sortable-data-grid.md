@@ -5,7 +5,7 @@ category: table
 uses: [browse-records, filter-and-search]
 surfaces: [dashboard, app]
 replaces: [AC-08, AC-09]
-components: [blocks/datagrid]
+components: [blocks/datagrid, blocks/selectable-table]
 inspiration: [https://ui.shadcn.com/docs/components/data-table, https://tanstack.com/table]
 status: stable
 ---

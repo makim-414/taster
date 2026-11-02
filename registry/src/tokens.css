@@ -150,6 +150,11 @@
 
   /* Scrim behind modals and drawers */
   --scrim: oklch(0 0 0 / 55%);
+  /* Text set on a photo under a dark scrim (photo hero, lightbox). The scrim stays dark in every theme,
+     so this stays light in every theme too. */
+  --on-scrim: oklch(0.985 0 0);
+  --on-scrim-muted: oklch(0.985 0 0 / 80%);
+  --on-scrim-ink: oklch(0.205 0 0);     /* text on a light button placed over the scrim */
 
   /* Motion. Enter and exit use ease-out, moves inside the screen use ease-in-out,
      UI stays under 300ms. ease-in is not used for UI because the first frame,

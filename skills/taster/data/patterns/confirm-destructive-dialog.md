@@ -5,7 +5,7 @@ category: modal-drawer
 uses: [confirm-an-action]
 surfaces: [app]
 replaces: [CPY-01]
-components: [blocks/dialog, blocks/alert]
+components: [blocks/dialog, blocks/alert, blocks/confirm-dialog]
 inspiration: [https://www.radix-ui.com/primitives/docs/components/alert-dialog]
 status: stable
 ---

@@ -5,7 +5,7 @@ category: command-palette
 uses: [jump-anywhere, explain-on-demand]
 surfaces: [app, dashboard]
 replaces: []
-components: [blocks/command-palette, blocks/shortcuts-cheatsheet, blocks/use-hotkeys]
+components: [blocks/command-palette, blocks/shortcuts-cheatsheet, blocks/use-hotkeys, blocks/kbd]
 inspiration: [https://cmdk.paco.me]
 status: stable
 ---

@@ -1,0 +1,17 @@
+{
+  "expect": "UNKNOWN",
+  "why": "A decision step may only read features from the vocabulary.",
+  "patch": [
+    {
+      "op": "push",
+      "path": [
+        "classify",
+        {
+          "category": "3d"
+        },
+        "all"
+      ],
+      "value": "is_glossy"
+    }
+  ]
+}

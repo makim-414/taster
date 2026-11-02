@@ -5,7 +5,7 @@ category: footer
 uses: [navigate-the-site]
 surfaces: [landing, commerce]
 replaces: [AC-01, CMP-10]
-components: []
+components: [marketing/site-footer]
 inspiration: []
 status: stable
 ---
