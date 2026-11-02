@@ -12,6 +12,34 @@ const nextConfig = {
   serverExternalPackages: ['playwright-core', '@sparticuz/chromium'],
   // engine/diagnose.mjs is imported at run time (not bundled), so the engine files it reads are listed by hand.
   outputFileTracingIncludes: {
+    // engine/http.mjs and engine/server.mjs are also imported at run time; they read the catalog files below.
+    '/api/mcp': [
+      '../engine/*.mjs',
+      '../engine/*.js',
+      '../engine/package.json',
+      '../engine/node_modules/**',
+      '../rules/detect.js',
+      '../rules/rules.json',
+      '../patterns/**',
+      '../taxonomy/**',
+      '../registry/registry.json',
+      '../registry/src/**',
+      '../registry/previews/**',
+      '../skills/taster/references/start.md',
+      './node_modules/playwright-core/**',
+      './node_modules/@sparticuz/chromium/**',
+    ],
+    // Keys are globs over route paths, so the brackets of [...slug] would read as a character class.
+    '/r/**': ['../engine/add.mjs', '../registry/registry.json', '../registry/src/**', '../registry/THIRD_PARTY_NOTICES.md'],
+    '/api/brand': [
+      '../engine/*.mjs',
+      '../engine/*.js',
+      '../engine/package.json',
+      '../rules/detect.js',
+      '../rules/rules.json',
+      './node_modules/playwright-core/**',
+      './node_modules/@sparticuz/chromium/**',
+    ],
     '/api/diagnose': [
       '../engine/*.mjs',
       '../engine/*.js',
@@ -28,12 +56,26 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // The bookmarklet loads these from any site.
+        source: '/taster/:file*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+          { key: 'Cache-Control', value: 'public, max-age=300' },
+        ],
+      },
+      {
         source: '/(.*)',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Frame-Options', value: 'DENY' },
         ],
+      },
+      {
+        // The gallery runs each component in a frame on this same site. Later rules win, so this one must stay last.
+        source: '/stage/:file*',
+        headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }],
       },
     ];
   },

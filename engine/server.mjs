@@ -1,0 +1,510 @@
+// The Taster MCP server, shared by the stdio entry (mcp.mjs) and the hosted HTTP endpoint (http.mjs).
+// Prompt: start (the opening question). Diagnose tools: diagnose, list_rules, explain_rule.
+// Brand tool: brand_theme. System tools: design_system, tune_system, system_for_category. Rebuild tool: extract_content.
+// Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
+// Choosing tools: browse_components and preview_component answer with pictures and links to the live gallery.
+// Screen by screen tools: check_consistency, plan_screens, plan_next, plan_update.
+// Hosted mode has no local files and opens pages only through the host's fenced browser, so it swaps the local
+// diagnose for `remote.diagnose` (public http(s) URLs only), brand_theme for `remote.brand` when the host gives one,
+// leaves out extract_content, the system tools and the screen by screen tools (they open pages in a local browser
+// and read or write files), and answers preview_component with the still and the live link instead of a render.
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { z } from 'zod';
+import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, launch, viewportFor } from './diagnose.mjs';
+import { brandTheme } from './brand.mjs';
+import { boardUrl, browseComponents, componentUrl, getComponent, getPattern, listPatterns, loadTaxonomy, previewPath, stagePath, suggestSwaps } from './catalog.mjs';
+import { checkConsistency, formatConsistencyText } from './consistency.mjs';
+import { applyStep, checkScreen, nextStep, planFromExtract, planPath, planRelative, readPlan, writePlan } from './plan.mjs';
+import * as sys from './system.mjs';
+
+const json = (value) => ({ type: 'text', text: JSON.stringify(value, null, 2) });
+const START_GUIDE = fileURLToPath(new URL('../skills/taster/references/start.md', import.meta.url));
+
+/**
+ * Build a Taster MCP server.
+ * @param {{ remote?: { diagnose: (url: string) => Promise<{ report: unknown, shots?: Record<string, string> }>, brand?: (url: string) => Promise<unknown> } }} [options]
+ *   remote: hosted mode; diagnose (and brand, when given) go through these functions instead of a local browser.
+ */
+export function createServer({ remote } = {}) {
+  const server = new McpServer({ name: 'taster', version: '0.1.0' });
+
+  // The opening question every session starts with. The text lives in the skill so both say the same thing.
+  server.registerPrompt(
+    'start',
+    {
+      title: 'Start Taster',
+      description: 'Ask whether the site already exists or is being built new, then take the matching route (diagnose and swap, diagnose and rebuild, or build).',
+      argsSchema: { request: z.string().optional().describe('what the user asked for, if anything') },
+    },
+    ({ request }) => ({
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: `${readFileSync(START_GUIDE, 'utf8')}\n---\n${request ? `The user said: ${request}\n\n` : ''}Follow the guide above. Your first reply is the opening question, unless the user's words already answer it.`,
+          },
+        },
+      ],
+    }),
+  );
+
+  if (remote?.brand) {
+    server.registerTool(
+      'brand_theme',
+      {
+        title: "Absorb a site's brand",
+        description:
+          "Open a public http(s) URL, read its brand (the solid color on its own buttons and links, its typeface, light or dark) and return token overrides: tokens, css to save as theme.css after the tokens, and notes. Pass tokens to preview_component or the brand color to browse_components to see components in this brand.",
+        inputSchema: { target: z.string().describe('public http(s) URL') },
+        annotations: { readOnlyHint: true, openWorldHint: true },
+      },
+      async ({ target }) => {
+        try {
+          return { content: [json(await remote.brand(target))] };
+        } catch (err) {
+          return { isError: true, content: [{ type: 'text', text: `brand_theme failed: ${err.message}` }] };
+        }
+      },
+    );
+  }
+
+  if (remote) {
+    server.registerTool(
+      'diagnose',
+      {
+        title: 'Diagnose a page',
+        description:
+          'Open a public http(s) URL in a real browser at 1440 and 390 wide, run the taster detector, and return every finding grouped by rule with selector, evidence, severity, fix and fix patterns, plus one capture per width. Hosted: local files and private network addresses are refused, and calls are rate limited per client.',
+        inputSchema: { target: z.string().describe('public http(s) URL') },
+        annotations: { readOnlyHint: true, openWorldHint: true },
+      },
+      async ({ target }) => {
+        try {
+          const { report, shots } = await remote.diagnose(target);
+          const content = [json(report)];
+          for (const [width, dataUrl] of Object.entries(shots || {})) {
+            const m = /^data:(image\/[a-z]+);base64,(.+)$/.exec(String(dataUrl));
+            if (m) content.push({ type: 'image', mimeType: m[1], data: m[2] }, { type: 'text', text: `capture at ${width} wide` });
+          }
+          return { content };
+        } catch (err) {
+          return { isError: true, content: [{ type: 'text', text: `diagnose failed: ${err.message}` }] };
+        }
+      },
+    );
+  } else {
+    server.registerTool(
+      'diagnose',
+      {
+        title: 'Diagnose a page',
+        description:
+          'Open a URL or a local HTML file in a real browser at 1440 and 390 wide, run the taster detector, and return every finding grouped by rule with selector, page rect, evidence, severity, fix and fix patterns. Also returns one capture per width with each finding outlined and labeled by rule id, and the list of manual rules to judge by eye.',
+        inputSchema: {
+          target: z.string().describe('http(s) URL, file:// URL, or path to a local HTML file'),
+          widths: z.array(z.number().int().min(320).max(3840)).max(9).optional().describe(`viewport widths, default [1440, 390]; for a responsive check pass [${RESPONSIVE_WIDTHS.join(', ')}]`),
+          screenshots: z.boolean().optional().describe('return the annotated captures, default true'),
+        },
+      },
+      async ({ target, widths, screenshots = true }) => {
+        const dir = screenshots ? mkdtempSync(join(tmpdir(), 'taster-')) : null;
+        try {
+          const viewports = widths ? widths.map(viewportFor) : VIEWPORTS;
+          const report = await diagnose(target, { viewports, outDir: dir });
+          const content = [json({ ...report, screenshots: undefined })];
+          for (const file of report.screenshots) content.push({ type: 'image', mimeType: 'image/png', data: readFileSync(file).toString('base64') });
+          return { content };
+        } catch (err) {
+          return { isError: true, content: [{ type: 'text', text: `diagnose failed: ${err.message}` }] };
+        } finally {
+          if (dir) rmSync(dir, { recursive: true, force: true });
+        }
+      },
+    );
+
+    server.registerTool(
+      'extract_content',
+      {
+        title: 'Read a page for a rebuild',
+        description:
+          "Open a URL or a local HTML file in a real browser and return its content in reading order: sections (each h1 or h2 with its text, subheadings, lists, actions with their targets, images, quotes and forms), nav and footer links, and the brand (name or logo, the most used solid action color, heading and body fonts, dark or light). Emoji are stripped. Use it to rebuild a page the user has no source for, then compare the rebuild's content with this one.",
+        inputSchema: { target: z.string().describe('http(s) URL, file:// URL, or path to a local HTML file') },
+        annotations: { readOnlyHint: true, openWorldHint: true },
+      },
+      async ({ target }) => {
+        try {
+          return { content: [json(await extract(target))] };
+        } catch (err) {
+          return { isError: true, content: [{ type: 'text', text: `extract_content failed: ${err.message}` }] };
+        }
+      },
+    );
+
+    server.registerTool(
+      'brand_theme',
+      {
+        title: "Absorb a site's brand",
+        description:
+          "Open a URL or a local HTML file, read its brand (the solid color on its own buttons and links, its typeface, its logo, light or dark) and return token overrides fitted to it: --brand and the text color on it, --font (kept when it was a real choice, replaced when it is a stock or usual AI default), and success and failure colors moved away from the brand hue. Returns the tokens, a ready :root CSS block to load after registry/src/tokens.css, and notes that say why each choice was made. Use it after diagnosing an existing site and before swapping or rebuilding.",
+        inputSchema: { target: z.string().describe('http(s) URL, file:// URL, or path to a local HTML file') },
+        annotations: { readOnlyHint: true, openWorldHint: true },
+      },
+      async ({ target }) => {
+        try {
+          return { content: [json(brandTheme(await extract(target)))] };
+        } catch (err) {
+          return { isError: true, content: [{ type: 'text', text: `brand_theme failed: ${err.message}` }] };
+        }
+      },
+    );
+  }
+
+  server.registerTool(
+    'list_rules',
+    {
+      title: 'List rules',
+      description: 'Every slop rule with id, name, severity and how it is checked (deterministic rules are measured, manual rules are judged by eye).',
+      inputSchema: {},
+    },
+    async () => ({ content: [json(RULES.map((r) => ({ id: r.id, name: r.name, severity: r.severity, level: r.detect.level })))] }),
+  );
+
+  server.registerTool(
+    'explain_rule',
+    {
+      title: 'Explain a rule',
+      description: 'What a rule flags, why it reads as generated, how it is checked, the fix and the fix patterns.',
+      inputSchema: { id: z.string().describe('rule id such as AC-01') },
+    },
+    async ({ id }) => {
+      const rule = explainRule(id);
+      if (!rule) return { isError: true, content: [{ type: 'text', text: `Unknown rule: ${id}` }] };
+      return { content: [json(rule)] };
+    },
+  );
+
+  const guard = (fn) => async (args) => {
+    try {
+      return await fn(args || {});
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err.message }] };
+    }
+  };
+  const readOnly = { readOnlyHint: true, idempotentHint: true };
+
+  const lookInput = {
+    theme: z.enum(['dark', 'light']).optional().describe('default dark'),
+    brand: z.string().regex(/^#?[0-9a-fA-F]{6}$/).optional().describe('brand color as hex, for the live links (and the render in preview_component)'),
+  };
+
+  server.registerTool(
+    'browse_components',
+    {
+      title: 'Browse components with pictures',
+      description:
+        'Show components as pictures so the user can choose by eye. Returns numbered candidates, each with a still, what it is for, and a live page the user can click and recolor, plus one board link that puts them side by side with a pick button. Show every picture and both links, ask which number, and wait for the answer before writing code. Then call get_component on the choice. Filters combine with AND and the query ranks what is left.',
+      inputSchema: {
+        query: z.string().optional().describe('what the user wants, such as "hero with photo" or "pricing"'),
+        category: z.string().optional().describe('taxonomy category id, such as hero'),
+        family: z.string().optional().describe('taxonomy family id, such as page-sections'),
+        use: z.string().optional().describe('what the visitor is doing, a taxonomy use id'),
+        surface: z.string().optional().describe('landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat or developer-docs'),
+        ids: z.array(z.string()).max(8).optional().describe('exact component ids, to show a chosen few again'),
+        limit: z.number().int().min(1).max(8).optional().describe('how many, default 6'),
+        ...lookInput,
+      },
+      annotations: readOnly,
+    },
+    guard(async ({ theme = 'dark', brand, limit = 6, ...filters }) => {
+      const found = browseComponents({ ...filters, limit });
+      if (!found.length) return { content: [{ type: 'text', text: 'No component matches. Try a wider query, or call taxonomy to see the categories.' }] };
+      const look = { theme, brand };
+      const content = [{ type: 'text', text: `${found.length} candidates. Board with all of them, live, with a pick button: ${boardUrl(found.map((c) => c.id), look)}` }];
+      found.forEach((c, i) => {
+        content.push({
+          type: 'text',
+          text: `${i + 1}. ${c.id} (${c.categoryName})${c.summary ? `: ${c.summary}` : ''}\nFixes: ${c.fixes.join(', ') || 'none listed'}. Packages: ${c.deps.join(', ') || 'none'}. License: ${c.license || 'not stated'}.\nLive: ${componentUrl(c.id, look)}`,
+        });
+        content.push({ type: 'image', mimeType: 'image/jpeg', data: readFileSync(previewPath(c.id, theme)).toString('base64') });
+      });
+      content.push({ type: 'text', text: 'Ask the user which number they like, or what is off about all of them. For the brand on one, call preview_component. Do not write code until they choose.' });
+      return { content };
+    }),
+  );
+
+  server.registerTool(
+    'preview_component',
+    {
+      title: 'Preview a component in a brand',
+      description: remote
+        ? 'A still of one component and a live page that opens in the given brand color and theme, where the user can click it and change the color. For a render in the brand as a picture, use the local server.'
+        : 'Render one component in a real browser wearing a brand (brand color, or the tokens from brand_theme) and return it as a picture, plus a live page the user can click and recolor. Use it to show the shortlist in their brand before writing code.',
+      inputSchema: {
+        id: z.string().describe('registry component id, such as blocks/button'),
+        width: z.number().int().min(320).max(1600).optional().describe('frame width, default 900; use 390 to see the phone layout'),
+        tokens: z.record(z.string(), z.string()).optional().describe('token overrides, for example the tokens from brand_theme'),
+        ...lookInput,
+      },
+      annotations: { readOnlyHint: true },
+    },
+    guard(async ({ id, width = 900, tokens, theme = 'dark', brand }) => {
+      const [item] = browseComponents({ ids: [id] });
+      const hex = brand ? `#${brand.replace('#', '')}` : tokens?.['--brand'];
+      const live = componentUrl(item.id, { theme, brand: hex });
+      if (remote) {
+        return {
+          content: [
+            { type: 'text', text: `${item.id}. The still shows the default look. Live in the brand: ${live}` },
+            { type: 'image', mimeType: 'image/jpeg', data: readFileSync(previewPath(item.id, theme)).toString('base64') },
+          ],
+        };
+      }
+      if (!existsSync(stagePath())) throw new Error('registry/stage/index.html is missing. Run: npm --prefix registry run build-stage');
+      const all = { ...(tokens || {}), ...(hex ? { '--brand': hex } : {}) };
+      const browser = await launch();
+      try {
+        const page = await browser.newPage({ viewport: { width, height: Math.round(width * 0.625) }, deviceScaleFactor: 1.5 });
+        const look = encodeURIComponent(JSON.stringify({ theme, tokens: all }));
+        await page.goto(`${pathToFileURL(stagePath()).href}?only=${encodeURIComponent(item.id)}&look=${look}`);
+        await page.waitForSelector(`[data-registry-id="${item.id}"]`, { timeout: 15000 });
+        await page.waitForTimeout(1400);
+        const shot = await page.screenshot({ type: 'jpeg', quality: 80 });
+        return {
+          content: [
+            { type: 'text', text: `${item.id} at ${width} wide, ${theme}${hex ? `, brand ${hex}` : ''}. Live, to click and recolor: ${live}` },
+            { type: 'image', mimeType: 'image/jpeg', data: shot.toString('base64') },
+          ],
+        };
+      } finally {
+        await browser.close();
+      }
+    }),
+  );
+
+  server.registerTool(
+    'suggest_swaps',
+    {
+      title: 'Suggest replacements',
+      description: 'For rule ids found by diagnose, return the patterns that fix each rule and the registry components for each pattern. Next, call get_pattern for the swap recipe and get_component for code.',
+      inputSchema: { ruleIds: z.array(z.string()).min(1).describe('rule ids such as AC-01, CMP-04') },
+      annotations: readOnly,
+    },
+    guard(async ({ ruleIds }) => ({ content: [json(suggestSwaps(ruleIds))] })),
+  );
+
+  server.registerTool(
+    'list_patterns',
+    {
+      title: 'List patterns',
+      description: 'Pattern stubs (id, name, category, uses, surfaces, replaces, components, summary). Filters combine with AND. Use this to build a screen from scratch: pick a surface, then one pattern per use.',
+      inputSchema: {
+        family: z.string().optional(),
+        category: z.string().optional(),
+        use: z.string().optional(),
+        surface: z.string().optional(),
+        rule: z.string().optional().describe('only patterns that fix this rule id'),
+      },
+      annotations: readOnly,
+    },
+    guard(async (filters) => ({ content: [json(listPatterns(filters))] })),
+  );
+
+  server.registerTool(
+    'get_pattern',
+    {
+      title: 'Get a pattern',
+      description: 'Full Markdown of one pattern: when to use, anatomy, do, don\'t, swap recipe with before and after code, tokens.',
+      inputSchema: { id: z.string().describe('pattern id, kebab-case') },
+      annotations: readOnly,
+    },
+    guard(async ({ id }) => ({ content: [{ type: 'text', text: getPattern(id) }] })),
+  );
+
+  server.registerTool(
+    'get_component',
+    {
+      title: 'Get a component',
+      description: 'Source of a registry component (for example blocks/badge) with the shared helpers and token files it needs, ready to copy into an app.',
+      inputSchema: { id: z.string().describe('registry component id') },
+      annotations: readOnly,
+    },
+    guard(async ({ id }) => ({ content: [{ type: 'text', text: getComponent(id) }] })),
+  );
+
+  server.registerTool(
+    'taxonomy',
+    {
+      title: 'Taxonomy',
+      description: 'The strict taxonomy: families and categories (each with definition, includes, excludes and examples), the classify decision key over a boolean feature vocabulary, uses, surfaces, the weighting axes with the tokens each drives, snap steps, per-category relevance, design constraints, the rule map and gaps, plus the icon slot map (iconography). See taxonomy/SCHEMA.md.',
+      inputSchema: {},
+      annotations: readOnly,
+    },
+    guard(async () => ({ content: [json(loadTaxonomy())] })),
+  );
+
+  // Local only: these open pages in a local browser and read or write taster.system.json, theme.css and taster.plan.json.
+  if (!remote) {
+    // Design system tools (engine/system.mjs): brand and references in, balanced axes and every token out.
+    const systemArg = z.union([z.string(), z.record(z.string(), z.any())]).describe('path to a taster.system.json, or the system object itself');
+    const load = (s) => (typeof s === 'string' ? sys.readSystem(s) : s);
+    const run = (name, fn) => async (args) => {
+      try {
+        return { content: [json(await fn(args || {}))] };
+      } catch (err) {
+        return { isError: true, content: [{ type: 'text', text: `${name} failed: ${err.message}` }] };
+      }
+    };
+    server.registerTool(
+      'design_system',
+      {
+        title: 'Make the design system',
+        description:
+          "Turn the brand's identity and the tone of references into one balanced design system before any screen is built. Reads the brand site (color, typeface, logo, light or dark) and measures each page in a real browser for the eight axes (radii, spacing and control heights, text contrast, type scale, hues, shadows, motion, borders). Axes come from builder intent first, then the references, then the brand site, then the taxonomy default; balance keeps every design constraint. Returns axes with step names, axisNotes saying where each came from and what balance moved (quoting the principle), every token the axes drive plus the brand tokens, and a theme.css block. With out, writes taster.system.json and theme.css there.",
+        inputSchema: {
+          brand: z.string().optional().describe('the brand site: URL or local HTML file'),
+          references: z.array(z.string()).max(6).optional().describe('pages whose tone the builder likes'),
+          axes: z.record(z.string(), z.number()).optional().describe('builder intent, e.g. { "density": 0.75 }; values on the taxonomy snap steps'),
+          surface: z.string().optional().describe('surface id from the taxonomy, recorded for the screens'),
+          scheme: z.enum(['dark', 'light']).optional(),
+          out: z.string().optional().describe('directory to write taster.system.json and theme.css'),
+        },
+        annotations: { openWorldHint: true },
+      },
+      run('design_system', async ({ brand, references = [], axes, surface, scheme, out }) => {
+        const system = await sys.designSystem({ brand: brand || null, references, intent: { axes, surface, scheme } });
+        return out ? { files: sys.writeSystem(out, system), system } : system;
+      }),
+    );
+    server.registerTool(
+      'tune_system',
+      {
+        title: 'Move a weight',
+        description:
+          'The exchange with the builder: move one or more axes of a design system. The moved axes stay where the builder put them, the others move the least needed to keep every constraint, and the result says which moved and why (the constraint principle). Tokens and theme.css are regenerated. Given a path, the files are rewritten in place.',
+        inputSchema: { system: systemArg, axes: z.record(z.string(), z.number()).describe('e.g. { "roundness": 1 }') },
+      },
+      run('tune_system', async ({ system, axes }) => {
+        const next = sys.tuneSystem(load(system), axes);
+        const summary = next.tuned[next.tuned.length - 1].summary;
+        if (typeof system === 'string' && existsSync(system)) return { summary, files: sys.writeSystem(dirname(system), next), system: next };
+        return { summary, system: next };
+      }),
+    );
+    server.registerTool(
+      'system_for_category',
+      {
+        title: 'Tokens that matter for a part',
+        description: "For one taxonomy category, the axes ordered by relevance with this system's step and the tokens each drives, so the builder of that part knows which values matter most. Parts read these through the alias tokens only.",
+        inputSchema: { system: systemArg, category: z.string().describe('category id, e.g. table, hero, button') },
+        annotations: readOnly,
+      },
+      run('system_for_category', async ({ system, category }) => sys.systemForCategory(load(system), category)),
+    );
+
+    // ---- screen by screen: one screen or one part at a time, approved by the builder, checked before the next ----
+    const filesArg = z.union([z.string(), z.array(z.string()).min(1)]).optional();
+
+    server.registerTool(
+      'check_consistency',
+      {
+        title: 'Check screens against each other and the system',
+        description:
+          'Render each screen (URL or local HTML file) at 1440 and 390 wide and read the computed values of every button, input, card, h1 to h3, body text, link and badge: radius, typeface, size, weight, line height, padding, gap, text, fill and border colors, shadow, transition duration. Returns drift (the same component drawn differently on two screens, with selectors and screen ids) and, when a system is given (theme CSS with :root tokens, or { tokens } JSON; a list loads in order), every value that is not one of its tokens with the nearest token. A system may declare the logo wordmark\'s own face (identity.logoFont in taster.system.json, or logoFont here): inside the site\'s logo or home link in the header and footer that face is listed under exempt instead of off-system, for font-family only. ok is true only with zero findings.',
+        inputSchema: {
+          screens: z.array(z.string()).min(1).describe('URLs or HTML file paths, in the order the screens were built'),
+          system: filesArg.describe('theme CSS or { tokens } JSON path, or a list such as [tokens.css, theme.css]'),
+          widths: z.array(z.number().int().min(320).max(3840)).max(9).optional(),
+          logoFont: z.string().optional().describe("the logo wordmark's own face; exempt inside the logo only, overrides the system's identity.logoFont"),
+        },
+        annotations: { readOnlyHint: true, openWorldHint: true },
+      },
+      guard(async ({ screens, system, widths, logoFont }) => {
+        const report = await checkConsistency(screens, { system: system ?? null, identity: logoFont ?? null, widths });
+        return { content: [json(report), { type: 'text', text: formatConsistencyText(report) }] };
+      }),
+    );
+
+    server.registerTool(
+      'plan_screens',
+      {
+        title: 'Plan the screens',
+        description:
+          'Read the start page and list the screens to work through: the page itself, then every same-site page its nav links to. Each screen gets a draft purpose, optional parts (byPart splits a read page into its sections) and status planned. With out, writes taster.plan.json there. Then call plan_next and follow it: one screen or part at a time, proposed to the builder, built only after their OK, checked before the next.',
+        inputSchema: {
+          target: z.string().describe('the start page: URL or local HTML file'),
+          route: z.enum(['swap', 'rebuild', 'build']).optional().describe('default rebuild'),
+          system: filesArg.describe('the design system file(s) every screen is checked against'),
+          byPart: z.boolean().optional(),
+          out: z.string().optional().describe('folder to write taster.plan.json into'),
+        },
+        annotations: { openWorldHint: true },
+      },
+      guard(async ({ target, route = 'rebuild', system, byPart = false, out }) => {
+        const sys = system == null ? null : (Array.isArray(system) ? system : [system]).map((f) => (out ? planRelative(out, f) : f));
+        const plan = planFromExtract(await extract(target), { route, system: sys && sys.length === 1 ? sys[0] : sys, byPart, baseDir: out || null });
+        const file = out ? writePlan(out, plan) : null;
+        return { content: [json({ file, plan, next: nextStep(plan) })] };
+      }),
+    );
+
+    server.registerTool(
+      'plan_next',
+      {
+        title: 'The next step',
+        description: 'Read taster.plan.json and return exactly one next action: propose a screen or part, wait for the builder, build it, check it, or done. Never build before the builder approved; never start the next screen before this one is checked.',
+        inputSchema: { plan: z.string().describe('path to taster.plan.json or its folder') },
+        annotations: readOnly,
+      },
+      guard(async ({ plan }) => ({ content: [json(nextStep(readPlan(plan)))] })),
+    );
+
+    server.registerTool(
+      'plan_update',
+      {
+        title: 'Record a step',
+        description:
+          'Move the screen (or part) in progress one step and save the plan: propose (planned to proposed; may set purpose and parts), revise (the builder asked for changes, back to planned), approve (needs note with the builder\'s own words), build (approved to built; output is the built file or URL), check (built to checked), accept (records a named exception the builder approved on the screen: rule is a detector rule id such as AC-03, or drift:<role>:<property> / off-system:<role>:<property>; needs reason, and by with the builder\'s own words). A check without counts runs diagnose on the output and check_consistency against the checked screens and the system itself, and refuses unless every remaining finding is an accepted exception (with none accepted, unless both are zero). Accepted exceptions stay in the plan and in every next step. Out of order steps are refused with the reason.',
+        inputSchema: {
+          plan: z.string().describe('path to taster.plan.json or its folder'),
+          event: z.object({
+            type: z.enum(['propose', 'revise', 'approve', 'build', 'check', 'accept']),
+            screen: z.string(),
+            part: z.string().optional(),
+            note: z.string().optional(),
+            purpose: z.string().optional(),
+            parts: z.array(z.union([z.string(), z.object({ id: z.string().optional(), purpose: z.string() })])).optional(),
+            output: z.string().optional(),
+            findings: z.number().int().min(0).optional(),
+            drift: z.number().int().min(0).optional(),
+            remaining: z.array(z.string()).optional().describe('check with counts: the findings left, named as accept names them'),
+            rule: z.string().optional().describe('accept: AC-03, drift:<role>:<property> or off-system:<role>:<property>'),
+            reason: z.string().optional().describe('accept: why it cannot be fixed here, for example it needs a markup change'),
+            by: z.string().optional().describe("accept: the builder's own words approving the exception"),
+          }),
+        },
+      },
+      guard(async ({ plan: path, event }) => {
+        const file = planPath(path);
+        const plan = readPlan(file);
+        let check = null;
+        if (event.type === 'check' && (event.findings === undefined || event.drift === undefined)) {
+          check = await checkScreen(plan, event.screen, { baseDir: dirname(file) });
+          if ((check.findings || check.drift) && check.unaccepted.length) {
+            const refused = `Not clean: ${check.findings} detector findings, ${check.drift} consistency findings. Not accepted: ${check.unaccepted.join(', ')}. Fix them and check again; when one needs a change outside the builder's control, ask the builder and record { type: "accept", screen, rule, reason, by: "<their words>" }.`;
+            return { isError: true, content: [json({ refused, check })] };
+          }
+          event = { ...event, findings: check.findings, drift: check.drift, remaining: check.remaining };
+        }
+        const next = applyStep(plan, event);
+        writePlan(file, next);
+        return { content: [json({ file, next: nextStep(next), plan: next, check })] };
+      }),
+    );
+  }
+
+  return server;
+}

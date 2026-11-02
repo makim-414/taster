@@ -62,7 +62,8 @@
     ],
     "components": [
       "blocks/button",
-      "marketing/photo-hero"
+      "marketing/photo-hero",
+      "blocks/banner-hero"
     ],
     "summary": "Real photography carries the hero: a full-bleed photo with a gentle bottom scrim, or a serif headline over two or three overlapping photos. Film grain and slightly muted tone replace the glossy AI photo look."
   },
@@ -333,7 +334,8 @@
       "COL-07"
     ],
     "components": [
-      "blocks/card"
+      "blocks/card",
+      "blocks/spotlight-card"
     ],
     "summary": "On hover a soft light follows the pointer along the card border only, instead of a colored glow shadow around the whole card."
   },
@@ -358,6 +360,9 @@
     "components": [
       "blocks/card",
       "blocks/badge",
+      "blocks/glass-folder",
+      "blocks/side-folder",
+      "blocks/orbit-illustration",
       "marketing/case-study-card",
       "commerce/product-card"
     ],
@@ -379,6 +384,7 @@
     ],
     "components": [
       "blocks/card",
+      "blocks/session-list",
       "blocks/description-list",
       "blocks/item-list"
     ],
@@ -394,7 +400,8 @@
     "surfaces": [
       "landing",
       "commerce",
-      "editorial"
+      "editorial",
+      "developer-docs"
     ],
     "replaces": [
       "AC-01",
@@ -405,6 +412,7 @@
     "components": [
       "blocks/dropdown",
       "blocks/button",
+      "blocks/liquid-nav",
       "marketing/site-header",
       "marketing/breadcrumb"
     ],
@@ -552,6 +560,7 @@
       "blocks/badge",
       "blocks/button",
       "blocks/toggle",
+      "marketing/pricing-cards",
       "marketing/plan-rows"
     ],
     "summary": "One card per real plan with aligned slots for name, price, billing note and features. A monthly or yearly toggle updates every price. Recommended is a text label and a stronger border, not a scaled center card."
@@ -694,7 +703,8 @@
       "TYP-04"
     ],
     "components": [
-      "blocks/accordion"
+      "blocks/accordion",
+      "marketing/reveal-faq"
     ],
     "summary": "Section title on the left, accordion on the right, answers that fade in, and an optional image that appears beside the list for the open item."
   },
@@ -841,7 +851,8 @@
       "commerce",
       "editorial",
       "auth-onboarding",
-      "ai-chat"
+      "ai-chat",
+      "developer-docs"
     ],
     "replaces": [
       "ICO-01",
@@ -958,7 +969,9 @@
     "replaces": [
       "AC-09"
     ],
-    "components": [],
+    "components": [
+      "motion/digit-swap"
+    ],
     "summary": "UI text uses the body typeface with tabular-nums for aligned figures, instead of a monospaced font for labels."
   },
   {
@@ -994,7 +1007,12 @@
       "MOT-01",
       "TYP-03"
     ],
-    "components": [],
+    "components": [
+      "motion/text-reveal",
+      "motion/typewriter",
+      "motion/gooey-text",
+      "motion/text-scramble"
+    ],
     "summary": "Use text motion once and with purpose: words firm up as the reader scrolls, one headline word cycles, a tagline types out. Never a different effect on every heading."
   },
   {
@@ -1005,7 +1023,8 @@
       "read-long-text"
     ],
     "surfaces": [
-      "editorial"
+      "editorial",
+      "developer-docs"
     ],
     "replaces": [
       "KO-03",
@@ -1149,7 +1168,8 @@
       "show-one-number"
     ],
     "surfaces": [
-      "dashboard"
+      "dashboard",
+      "app"
     ],
     "replaces": [
       "AC-14",
@@ -1221,7 +1241,8 @@
     ],
     "components": [
       "blocks/toggle",
-      "blocks/theme-scope"
+      "blocks/theme-scope",
+      "blocks/appearance-picker"
     ],
     "summary": "Raw values, roles and component tokens in three layers with one brand variable on top, and both light and dark defined as token sets with a switch. Dark steps by gray levels, not neon glow."
   },
@@ -1261,6 +1282,7 @@
     "components": [
       "blocks/app-shell",
       "blocks/dropdown",
+      "blocks/tree-view",
       "blocks/sidebar-nav"
     ],
     "summary": "Grouped menu with a collapsed icon rail and a drawer on mobile, a workspace switcher on top, one indicator that slides between links. The active item uses a surface tone, not a colored bar or glowing dot."
@@ -1373,7 +1395,8 @@
     "components": [
       "marketing/workflow-section",
       "blocks/tabs",
-      "blocks/accordion"
+      "blocks/accordion",
+      "marketing/step-showcase"
     ],
     "summary": "Number steps only when order matters. A workflow is shown as tabs or a vertical accordion, the body in neutral tones, with one always-visible assistant dock below."
   },
@@ -1702,6 +1725,7 @@
     ],
     "components": [
       "blocks/input",
+      "blocks/sensitive-input",
       "blocks/settings-section",
       "blocks/field",
       "blocks/textarea",
@@ -1727,6 +1751,7 @@
       "blocks/combobox",
       "blocks/datepicker",
       "blocks/calendar",
+      "blocks/select-menu",
       "blocks/tag-input"
     ],
     "summary": "A searchable select with option descriptions and grouped headers, apply-on-confirm for multi select, and a date picker that opens a calendar popover."
@@ -2008,7 +2033,9 @@
     "replaces": [
       "MOT-01"
     ],
-    "components": [],
+    "components": [
+      "motion/glass-logo-reveal"
+    ],
     "summary": "A logo drawn line by line once on first visit and then faded out, never on every route."
   },
   {
@@ -2064,6 +2091,7 @@
     ],
     "components": [
       "blocks/card",
+      "blocks/coverflow-carousel",
       "media/snap-carousel"
     ],
     "summary": "Cards rotate along an arc or one is enlarged in the center while neighbors recede, with side buttons."
@@ -2153,6 +2181,7 @@
     "components": [
       "blocks/input",
       "blocks/button",
+      "blocks/citations",
       "chat/chat-thread",
       "chat/message-composer"
     ],
@@ -2176,7 +2205,8 @@
     ],
     "components": [
       "blocks/card",
-      "blocks/kpi"
+      "blocks/kpi",
+      "blocks/citations"
     ],
     "summary": "A conclusion sentence first, then a table, chart or widget with headline number, then evidence, a confidence note, source chips and an as-of date."
   },
@@ -2253,7 +2283,9 @@
       "COL-03"
     ],
     "components": [
-      "motion/point-field"
+      "motion/mesh-drift",
+      "motion/point-field",
+      "motion/light-beams"
     ],
     "summary": "A GPU or canvas point cloud in neutral tones that forms shapes slowly, or thin noise-driven lines on a calm surface, replacing purple orbs and aurora blobs."
   },
@@ -2269,7 +2301,9 @@
       "landing"
     ],
     "replaces": [],
-    "components": [],
+    "components": [
+      "motion/marquee"
+    ],
     "summary": "A seamless horizontal loop that pauses on hover, for logos or tickers."
   },
   {
@@ -2305,7 +2339,9 @@
       "MOT-01"
     ],
     "components": [
-      "blocks/kpi"
+      "blocks/kpi",
+      "motion/number-ticker",
+      "motion/digit-swap"
     ],
     "summary": "A figure rolls to its value once when it enters the view, reserves its final width and gives assistive tech the end value only."
   },
@@ -2346,7 +2382,8 @@
       "commerce",
       "editorial",
       "auth-onboarding",
-      "ai-chat"
+      "ai-chat",
+      "developer-docs"
     ],
     "replaces": [
       "RSP-01",
@@ -2380,5 +2417,107 @@
       "blocks/master-detail"
     ],
     "summary": "A list pane beside a detail pane split by one hairline; below the md breakpoint one pane at a time with a Back button and focus moved to the detail heading."
+  },
+  {
+    "id": "language-playground",
+    "name": "Language playground in the site shell",
+    "category": "layout-shell",
+    "uses": [
+      "start-an-action",
+      "organize-the-page",
+      "navigate-the-site"
+    ],
+    "surfaces": [
+      "developer-docs"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/button",
+      "blocks/dropdown",
+      "blocks/tabs"
+    ],
+    "summary": "Keep the landing header, page column and light page on the playground of a language or developer tool site; make only the code card dark, let the code fill it and open the output under the code on the first Run."
+  },
+  {
+    "id": "agent-thinking-orb",
+    "name": "Agent thinking orb",
+    "category": "chat-ai",
+    "uses": [
+      "show-progress",
+      "ask-the-assistant"
+    ],
+    "surfaces": [
+      "ai-chat"
+    ],
+    "replaces": [
+      "AC-07"
+    ],
+    "components": [
+      "motion/thinking-orb"
+    ],
+    "summary": "A dotted orb whose state matches what the agent is doing, made your own with a recipe of plain data, with the step named in words beside it."
+  },
+  {
+    "id": "appearance-picker",
+    "name": "Appearance picker",
+    "category": "form-input",
+    "uses": [
+      "set-the-visual-foundation",
+      "switch-views"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-11"
+    ],
+    "components": [
+      "blocks/appearance-picker"
+    ],
+    "summary": "Three radio cards for light, dark and system on the settings page, each showing a small screen drawn with the real tokens, for services where the mode matters."
+  },
+  {
+    "id": "brand-wire-form",
+    "name": "Brand wire form",
+    "category": "motion-particle",
+    "uses": [
+      "set-the-mood"
+    ],
+    "surfaces": [
+      "landing",
+      "auth-onboarding"
+    ],
+    "replaces": [
+      "BG-01",
+      "COL-01",
+      "COL-03"
+    ],
+    "components": [
+      "motion/wireframe-form"
+    ],
+    "summary": "One thin line figure turning slowly behind a short hero, in the brand color, built from the brand name or extruded from the brand's own mark."
+  },
+  {
+    "id": "curved-image-stream-hero",
+    "name": "Curved image stream hero",
+    "category": "hero",
+    "uses": [
+      "introduce-the-product",
+      "browse-media"
+    ],
+    "surfaces": [
+      "landing",
+      "commerce",
+      "editorial"
+    ],
+    "replaces": [
+      "BG-01",
+      "LAY-02"
+    ],
+    "components": [
+      "blocks/curved-stream-hero"
+    ],
+    "summary": "A short headline above one endless row of real pictures that flatten in the middle and bend toward the viewer at the edges, with a visible pause."
   }
 ]

@@ -9,6 +9,7 @@ Full-width bands that make up a marketing or editorial page, each answering one 
 ### Hero
 
 - [Asymmetric product hero](asymmetric-product-hero.md) fixes AC-17, CMP-06, CMP-07, LAY-01
+- [Curved image stream hero](curved-image-stream-hero.md) fixes BG-01, LAY-02
 - [Hero headline lockup](hero-headline-lockup.md) fixes AC-01, CMP-01, TYP-04, TYP-05
 - [In-hero form flow](in-hero-form-flow.md) fixes AC-12, CMP-10
 - [Photo-led hero](photo-led-hero.md) fixes AC-19, BG-01, COL-03, LAY-01
@@ -85,6 +86,7 @@ The shared materials every other part is built from: page frame, item containers
 - [Auth split frame](auth-split-frame.md) fixes LAY-01
 - [Dashboard zones](dashboard-zones.md) fixes AC-14, COL-06, LAY-05
 - [Editorial paper sheet](editorial-paper-sheet.md) fixes CMP-04, COL-01
+- [Language playground in the site shell](language-playground.md)
 - [Master detail split](master-detail-split.md) fixes CMP-02, RSP-01
 - [Plain section surface](plain-section-surface.md) fixes BG-01, CMP-05, COL-03
 - [Product-first section order](product-first-section-order.md) fixes LAY-04
@@ -137,6 +139,7 @@ Controls a person presses to act, or uses to enter and pick values.
 
 ### Form and input
 
+- [Appearance picker](appearance-picker.md) fixes CMP-11
 - [Checkbox and switch](checkbox-and-switch.md)
 - [Filter chip](filter-chip.md) fixes AC-05
 - [Lead capture form](lead-capture-form.md) fixes AC-12, CMP-10
@@ -228,6 +231,7 @@ Parts whose content model belongs to one domain: media to look at, goods to buy,
 
 - [Agent chat thread and composer](agent-chat-thread.md)
 - [Agent status line](agent-status-line.md) fixes AC-07
+- [Agent thinking orb](agent-thinking-orb.md) fixes AC-07
 - [Ask-human step](ask-human-step.md)
 - [Sourced answer block](sourced-answer-block.md) fixes CMP-06, CPY-01
 - [Tool call disclosure](tool-call-disclosure.md)
@@ -240,6 +244,7 @@ Effects that add movement or depth to content that is complete without them, and
 
 - [Ambient background](ambient-background.md) fixes BG-01, COL-01, COL-03
 - [Animated text](animated-text.md) fixes COL-04, MOT-01, TYP-03
+- [Brand wire form](brand-wire-form.md) fixes BG-01, COL-01, COL-03
 - [Count-up number](count-up-number.md) fixes MOT-01
 - [Marquee band](marquee-band.md)
 - [Scroll reveal wrapper](scroll-reveal-wrapper.md) fixes MOT-01

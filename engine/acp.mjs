@@ -114,8 +114,13 @@ export function createAgent() {
         promptCapabilities: { image: false, audio: false, embeddedContext: false },
       },
       agentInfo: { name: 'taster', title: 'Taster', version: VERSION },
-      authMethods: [],
+      // No account: the only setup is a browser for page checks. Clients that support terminal setup can run it
+      // before first use (`taster acp --setup`); nothing ever requires it, and authenticate is a no-op.
+      authMethods: [
+        { id: 'setup', name: 'Set up the browser', description: 'Checks for Chrome or Chromium and downloads Chromium once if neither works.', type: 'terminal', args: ['acp', '--setup'], env: {} },
+      ],
     }))
+    .onRequest(methods.agent.authenticate, () => ({}))
     .onRequest(methods.agent.session.new, ({ params, client }) => {
       const sessionId = randomUUID();
       sessions.set(sessionId, { cwd: params.cwd, turn: null });
@@ -231,8 +236,10 @@ const isMain = (() => {
     return false;
   }
 })();
-if (isMain) {
+// Serve on this process's stdio until the editor closes it. start.mjs calls this after its first-run install.
+export function serve() {
   const stream = ndJsonStream(Writable.toWeb(process.stdout), Readable.toWeb(process.stdin));
   const connection = createAgent().connect(stream);
   connection.closed.then(() => process.exit(0));
 }
+if (isMain) serve();

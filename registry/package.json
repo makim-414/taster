@@ -7,7 +7,8 @@
   "description": "Portable React and TypeScript components with neutral design tokens. Copy a file into your app, import tokens first.",
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "build-demo": "node demo/build.mjs"
+    "build-demo": "node demo/build.mjs",
+    "build-stage": "node build-stage.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.1",
@@ -23,7 +24,8 @@
     "react": "^18.3.1",
     "react-day-picker": "^9.4.0",
     "react-dom": "^18.3.1",
-    "recharts": "^2.13.0"
+    "recharts": "^2.13.0",
+    "thinking-orbs": "0.3.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.5",

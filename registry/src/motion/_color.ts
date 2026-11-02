@@ -1,6 +1,6 @@
 // Turns any CSS color (a token such as var(--bg), oklch(), hex, rgb()) into an sRGB triple 0..1.
 // WebGL components need numbers, while the registry only hands out CSS variables. No dependency.
-// Copy this file with motion/glass-logo-reveal, motion/mesh-drift and blocks/liquid-nav.
+// Copy this file with motion/glass-logo-reveal, motion/mesh-drift, motion/wireframe-form, motion/light-beams and blocks/liquid-nav.
 
 export type Rgb = [number, number, number]
 
