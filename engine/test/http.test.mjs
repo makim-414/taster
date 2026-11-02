@@ -28,7 +28,7 @@ test('hosted MCP answers initialize, lists only the hosted tools and runs them',
 
   const { tools } = await rpc('tools/list', {}, fake);
   const names = tools.map((t) => t.name).sort();
-  assert.deepEqual(names, ['browse_components', 'diagnose', 'explain_rule', 'get_component', 'get_pattern', 'list_patterns', 'list_rules', 'preview_component', 'suggest_swaps', 'taxonomy']);
+  assert.deepEqual(names, ['browse_components', 'diagnose', 'explain_rule', 'get_component', 'get_pattern', 'list_patterns', 'list_rules', 'pick_tone', 'preview_component', 'suggest_swaps', 'taxonomy']);
   assert.ok(!names.includes('extract_content') && !names.includes('brand_theme'), 'local-file tools stay out of hosted mode');
 
   // Hosted, a preview is the still plus the live link, since there is no render without a local browser.
@@ -47,6 +47,30 @@ test('hosted MCP answers initialize, lists only the hosted tools and runs them',
 
   const prompts = await rpc('prompts/list', {}, fake);
   assert.ok(prompts.prompts.some((p) => p.name === 'start'));
+});
+
+test('hosted pick_tone shows the pictures the host could take, a link for the rest, and the live parts link', async () => {
+  const asked = [];
+  const remote = {
+    ...fake,
+    async tone(ids) {
+      asked.push(ids);
+      return { [ids[0]]: { status: 'ok', image: 'data:image/jpeg;base64,AAAA' }, [ids[1]]: { status: 'blocked' } };
+    },
+  };
+  const out = await rpc('tools/call', { name: 'pick_tone', arguments: { x: 0.9, y: 0.1, genre: 'geek' } }, remote);
+  assert.ok(!out.isError, out.content[0].text);
+  assert.equal(asked[0].length, 4);
+  assert.equal(out.content.filter((c) => c.type === 'image').length, 1);
+  const text = out.content.filter((c) => c.type === 'text').map((c) => c.text).join('\n');
+  assert.match(text, /bot check or a block page/);
+  assert.match(text, /The parts wearing these tokens, live: https:\/\/[^\s]+\/tone\?x=0\.9&y=0\.1&genre=geek/);
+
+  // A host without a capture function still answers, with links only.
+  const plain = await rpc('tools/call', { name: 'pick_tone', arguments: { like: 'govuk' } }, fake);
+  assert.ok(!plain.isError);
+  assert.equal(plain.content.filter((c) => c.type === 'image').length, 0);
+  assert.match(plain.content[1].text, /^1\. GOV\.UK/);
 });
 
 test('a diagnose failure comes back as a tool error, not a crash', async () => {
