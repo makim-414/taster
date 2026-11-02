@@ -20,6 +20,7 @@ const HELP = `Usage
   node engine/cli.mjs add <component-id>... [--dir <dir>] [--from <url>] [--overwrite]
   node engine/cli.mjs add --list
   node engine/cli.mjs export <agents|claude|cursor|windsurf|cline|copilot|gemini|all> [--dir <project>]
+  node engine/cli.mjs lint [paths...] [--json] [--baseline <file>] [--write-baseline] [--selftest]
 
 Options
   --out <dir>       write report.json and annotated-<width>.png into <dir>
@@ -41,6 +42,11 @@ Options
 add copies registry components into your app with every helper they import and the token files, no shadcn
 needed. --dir defaults to src/components/taster. --from reads a hosted copy (https://taster-six.vercel.app)
 instead of this repository. Files you changed are left alone unless --overwrite.
+
+lint reads source files (tsx, jsx, vue, svelte, html, css, md) for the code form of the rules: tinted and outlined
+pills, thick left bars, caps with wide tracking, long dashes, emoji, transition-all, ease-in, hard-coded colors,
+pixel one-offs, stock palette classes and Tailwind screens that drop the defaults. --baseline makes it a ratchet:
+counts per file and check may only go down. A line passes with a comment taster-allow <reason>.
 
 Exit codes: 0 no findings, 1 findings, 2 error`;
 
@@ -98,6 +104,7 @@ async function exportRules(argv) {
 async function main() {
   if (process.argv[2] === 'add') return add(process.argv.slice(3));
   if (process.argv[2] === 'export') return exportRules(process.argv.slice(3));
+  if (process.argv[2] === 'lint') return (await import('./lint.mjs')).lintCommand(process.argv.slice(3));
   // Design system: brand and references in, balanced axes and every token out (engine/system.mjs).
   // --system is also the system file flag of --consistency and --plan, so only those two keep it.
   const own = ['--consistency', '--plan'].some((f) => process.argv.includes(f));
