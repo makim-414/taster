@@ -47,3 +47,11 @@ follow its `shows`; `examples/icon-slots/index.html` in the repository renders a
 ## 5. Check before you show
 
 Run Diagnose on the result at 1440 and 390, ICO rules included. Show the user the screen together with the clean detector report.
+
+Done means all of these, and zero overflow is the floor, not the proof:
+
+- no hard-coded colors (`taster lint` on the files you wrote), no slop findings, pageerror 0
+- three levels of hierarchy or fewer in any block
+- `--widths responsive` (360 to 1440) with no overflow, and the 768, 820 and 1024 captures opened and looked at
+
+Then walk the state matrix before you call a screen finished. Every screen: default, loading, empty, local error, pending change, detail, and the navigation at desktop, tablet and phone width, each reachable by an address such as `?state=empty` so it can be reproduced. The states that go missing most: the moment an agent asks the person something, a goal not met, waiting to start, cancelled, and just confirmed. Give step images an `aria-label` ("Question 2 of 2").
