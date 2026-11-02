@@ -3,7 +3,7 @@ id: site-header
 name: Site header
 category: nav-header
 uses: [navigate-the-site]
-surfaces: [landing, commerce, editorial]
+surfaces: [landing, commerce, editorial, developer-docs]
 replaces: [AC-01, CMP-05, ICO-01, LAY-06]
 components: [blocks/dropdown, blocks/button, blocks/liquid-nav]
 inspiration: []

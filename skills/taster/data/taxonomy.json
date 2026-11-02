@@ -476,6 +476,10 @@
     {
       "id": "ai-chat",
       "name": "AI chat and agent"
+    },
+    {
+      "id": "developer-docs",
+      "name": "Language and developer tool site"
     }
   ],
   "iconography": {

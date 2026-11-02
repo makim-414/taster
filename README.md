@@ -166,13 +166,13 @@ without the AI look", or "Build a pricing page for this product without generic 
 ## Taxonomy at a glance
 
 <!-- taxonomy:start -->
-116 patterns, 74 rules, 64 components, 40 uses, 7 surfaces.
+117 patterns, 74 rules, 64 components, 40 uses, 8 surfaces.
 
 | Family | Categories | Patterns |
 |---|---|---|
 | Page sections | Hero, Feature section, Pricing, Call to action, Testimonial and proof, FAQ | 24 |
 | Navigation | Navigation header, Footer, Sidebar, Command palette, Tabs and segmented control | 7 |
-| Foundations | Layout and shell, Card, Typography, Icon and mark | 28 |
+| Foundations | Layout and shell, Card, Typography, Icon and mark | 29 |
 | Actions and inputs | Button, Form and input | 9 |
 | Feedback and overlays | Badge and label, Toast and alert, Empty and error state, Loader and skeleton, Modal, drawer and menu | 13 |
 | Data display | Chart and KPI, Table, Timeline and stepper, Map | 17 |
