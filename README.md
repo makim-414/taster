@@ -170,7 +170,7 @@ without the AI look", or "Build a pricing page for this product without generic 
 ## Taxonomy at a glance
 
 <!-- taxonomy:start -->
-118 patterns, 74 rules, 65 components, 40 uses, 8 surfaces.
+119 patterns, 80 rules, 65 components, 40 uses, 8 surfaces.
 
 | Family | Categories | Patterns |
 |---|---|---|
@@ -181,7 +181,7 @@ without the AI look", or "Build a pricing page for this product without generic 
 | Feedback and overlays | Badge and label, Toast and alert, Empty and error state, Loader and skeleton, Modal, drawer and menu | 14 |
 | Data display | Chart and KPI, Table, Timeline and stepper, Map | 17 |
 | Media, commerce and AI | Media and gallery, Commerce, Chat and AI | 12 |
-| Motion and effects | Motion and particles, 3D scene | 6 |
+| Motion and effects | Motion and particles, 3D scene | 7 |
 <!-- taxonomy:end -->
 
 ## Repository

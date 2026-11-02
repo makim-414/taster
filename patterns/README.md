@@ -240,6 +240,7 @@ Backgrounds, particles and 3D that set a mood.
 - [Count-up number](count-up-number.md) fixes MOT-01
 - [Marquee band](marquee-band.md)
 - [Scroll reveal wrapper](scroll-reveal-wrapper.md) fixes MOT-01
+- [Motion for changes of state](state-change-motion.md) fixes MOT-02, MOT-03, MOT-04, MOT-05, MOT-06, MOT-07
 
 ### 3D scene
 
