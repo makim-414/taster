@@ -84,6 +84,7 @@ Layout, type, icons, tokens and the base surfaces everything sits on.
 - [Auth split frame](auth-split-frame.md) fixes LAY-01
 - [Dashboard zones](dashboard-zones.md) fixes AC-14, COL-06, LAY-05
 - [Editorial paper sheet](editorial-paper-sheet.md) fixes CMP-04, COL-01
+- [Language playground in the site shell](language-playground.md)
 - [Plain section surface](plain-section-surface.md) fixes BG-01, CMP-05, COL-03
 - [Product-first section order](product-first-section-order.md) fixes LAY-04
 - [Readable at every width](readable-at-every-width.md) fixes RSP-01, RSP-02, RSP-03, RSP-04, RSP-05
