@@ -11,8 +11,10 @@ import type { AddressInfo } from 'node:net';
 import { fencePage, launchBrowser, type Budget } from '../lib/browser.ts';
 import { loadEngine, runDiagnosis } from '../lib/diagnose.ts';
 import { runBrand } from '../lib/brand.ts';
+import { allKept, captureShots } from '../lib/tone-shot.ts';
 
 const FIXTURES = path.resolve(import.meta.dirname, '../../rules/fixtures');
+const TONE_FIXTURES = path.resolve(import.meta.dirname, '../../engine/test/fixtures');
 
 
 function serve(): Promise<{ base: string; close: () => void }> {
@@ -24,6 +26,14 @@ function serve(): Promise<{ base: string; close: () => void }> {
     if (url.pathname === '/hop') return res.writeHead(302, { location: '/fixtures/clean.html' }).end();
     if (url.pathname === '/subresource-private') {
       return res.writeHead(200, { 'content-type': 'text/html' }).end('<!doctype html><html lang="en"><body><img src="http://169.254.169.254/x.png"><p>hi</p></body></html>');
+    }
+    if (url.pathname.startsWith('/tone-fixtures/')) {
+      try {
+        const body = await readFile(path.join(TONE_FIXTURES, path.basename(url.pathname)));
+        return res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }).end(body);
+      } catch {
+        return res.writeHead(404).end();
+      }
     }
     if (url.pathname.startsWith('/fixtures/')) {
       try {
@@ -130,4 +140,20 @@ test('brand through the fence: tokens come from the page, and private addresses 
   assert.ok(result.tokens['--success'] && result.tokens['--danger']);
   assert.ok(result.notes.length >= 3);
   await assert.rejects(runBrand(`${srv.base}/to-private`, { allowLoopback: true }));
+});
+
+test('tone shots through the fence: a picture of a page, none of a check page, private addresses fail, kept pictures skip the browser', async (t) => {
+  const srv = await serveOn8080();
+  if (!srv) return t.skip('port 8080 is busy');
+  t.after(() => srv.close());
+  const page = { id: 'page', url: `${srv.base}/tone-fixtures/tone-consent.html` };
+  const shots = await captureShots([page, { id: 'check', url: `${srv.base}/tone-fixtures/tone-blocked.html` }, { id: 'private', url: `${srv.base}/to-private` }], { allowLoopback: true, settleMs: 100 });
+  assert.equal(shots.page.status, 'ok');
+  assert.ok(shots.page.status === 'ok' && shots.page.image.startsWith('data:image/jpeg;base64,'), 'missing the picture');
+  assert.equal(shots.check.status, 'blocked');
+  assert.equal(shots.private.status, 'failed');
+  assert.ok(allKept([page]), 'the picture is kept in memory');
+  assert.ok(!allKept([{ id: 'private', url: `${srv.base}/to-private` }]), 'a failure is not kept');
+  const again = await captureShots([{ id: 'same', url: page.url }], { allowLoopback: true, deadlineMs: 1 });
+  assert.deepEqual(again.same, shots.page);
 });

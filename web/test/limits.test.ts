@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { clientIp, takeToken, withGate } from '../lib/limits.ts';
+import { clientIp, takeShotToken, takeToken, withGate } from '../lib/limits.ts';
 
 test('one IP gets six diagnoses per ten minutes, then waits', () => {
   const t0 = 1_000_000;
@@ -10,6 +10,13 @@ test('one IP gets six diagnoses per ten minutes, then waits', () => {
   assert.ok(seventh.retryAfter > 0);
   assert.equal(takeToken('203.0.113.8', t0 + 10).ok, true);
   assert.equal(takeToken('203.0.113.7', t0 + 10 * 60 * 1000 + 1).ok, true);
+});
+
+test('reference screens have their own window of twenty calls', () => {
+  const t0 = 2_000_000;
+  for (let i = 0; i < 20; i++) assert.equal(takeShotToken('203.0.113.9', t0 + i).ok, true);
+  assert.equal(takeShotToken('203.0.113.9', t0 + 30).ok, false);
+  assert.equal(takeToken('203.0.113.9', t0 + 30).ok, true, 'a diagnosis is not charged for screens');
 });
 
 test('client IP comes from the platform headers', () => {

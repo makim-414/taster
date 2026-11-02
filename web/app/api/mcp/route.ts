@@ -1,20 +1,28 @@
 // Hosted Taster MCP (Streamable HTTP, stateless). Agents add https://taster-six.vercel.app/api/mcp as a remote
 // MCP server and get the same tools as the local one, minus the two that read local files. The engine's
-// http.mjs builds the server; this route only supplies diagnose, which goes through the same fence as
-// /api/diagnose: public http(s) URLs, the request budget in lib/browser.ts, a per-IP window and one browser at a time.
+// http.mjs builds the server; this route only supplies diagnose, brand and the tone references' first screens, which go
+// through the same fence as /api/diagnose: public http(s) URLs, the request budget in lib/browser.ts, a per-IP window
+// and one browser at a time.
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { BlockedError, bareHost, parseTarget, resolvePublic } from '../../../lib/net-guard.ts';
-import { clientIp, takeToken, withGate } from '../../../lib/limits.ts';
+import { clientIp, takeShotToken, takeToken, withGate } from '../../../lib/limits.ts';
 import { PageLoadError, runDiagnosis, trimReport } from '../../../lib/diagnose.ts';
 import { runBrand } from '../../../lib/brand.ts';
+import { allKept, captureShots, type Shot } from '../../../lib/tone-shot.ts';
+import catalog from '../../../../taxonomy/tone-refs.json';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 90;
 
-type Remote = { diagnose: (url: string) => Promise<{ report: unknown; shots?: Record<string, string> }>; brand: (url: string) => Promise<unknown> };
+type Remote = {
+  diagnose: (url: string) => Promise<{ report: unknown; shots?: Record<string, string> }>;
+  brand: (url: string) => Promise<unknown>;
+  tone: (ids: string[]) => Promise<Record<string, Shot>>;
+};
+const TONE_URLS = new Map(catalog.refs.map((r) => [r.id, r.url]));
 type Http = { handleMcpRequest: (request: Request, options: { remote: Remote }) => Promise<Response> };
 
 // Loaded at run time from the repository, like engine/diagnose.mjs in lib/diagnose.ts, so the server keeps
@@ -55,6 +63,13 @@ function remoteFor(request: Request): Remote {
         if (err instanceof PageLoadError) throw new Error(`load: ${err.message}`);
         throw err;
       }
+    },
+    // Reference first screens for pick_tone: catalog ids only, the same fence, window and gate as the tone page.
+    async tone(ids: string[]) {
+      const targets = ids.filter((id) => TONE_URLS.has(id)).slice(0, 6).map((id) => ({ id, url: TONE_URLS.get(id)! }));
+      if (!allKept(targets) && !takeShotToken(ip).ok) return Object.fromEntries(targets.map((t) => [t.id, { status: 'busy' } as Shot]));
+      const shots = allKept(targets) ? await captureShots(targets) : await withGate(() => captureShots(targets));
+      return shots || Object.fromEntries(targets.map((t) => [t.id, { status: 'busy' } as Shot]));
     },
     async diagnose(url: string) {
       let target: URL;
