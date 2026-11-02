@@ -33,7 +33,7 @@ Exit code is 0 with no findings, 1 with findings, 2 on error. The report groups 
 
 Prompt: `start` (the opening question: does the site already exist, or are we building a new one?).
 
-Tools: `diagnose` (report plus one capture per width), `brand_theme` (the site's brand color, typeface and logo as token overrides, with success and failure colors fitted to them), `extract_content` (the page's content in reading order, for a rebuild), `design_system`, `tune_system` and `system_for_category` (the design system, see `skills/taster/references/system.md`), `list_rules`, `explain_rule`, and the swap tools `suggest_swaps`, `list_patterns`, `get_pattern`, `get_component`, `taxonomy`.
+Tools: `browse_components` (numbered candidates as pictures, a live link each and one board link), `preview_component` (one component rendered in a brand, as a picture), `diagnose` (report plus one capture per width), `brand_theme` (the site's brand color, typeface and logo as token overrides, with success and failure colors fitted to them), `extract_content` (the page's content in reading order, for a rebuild), `design_system`, `tune_system` and `system_for_category` (the design system, see `skills/taster/references/system.md`), `list_rules`, `explain_rule`, and the swap tools `suggest_swaps`, `list_patterns`, `get_pattern`, `get_component`, `taxonomy`.
 
 Screen by screen (`skills/taster/references/screens.md`): `check_consistency` (render every screen at 1440 and 390 and report the same component drawn differently on two screens, and every radius, spacing step, typeface, color, shadow or duration that is not one of the system's tokens; the logo face a system declares as `identity.logoFont` is listed apart as exempt, inside the logo only), `plan_screens` (the start page and its same-site nav pages as `taster.plan.json`), `plan_next` (exactly one next step) and `plan_update` (records propose, revise, approve, build, check and accept; refuses a build before the builder's approval and a new screen before the last one is checked, runs the check itself, and passes it only when every finding left is an exception the builder accepted, with the reason and their words on record).
 
@@ -50,6 +50,15 @@ Codex, in `~/.codex/config.toml`:
 command = "node"
 args = ["/path/to/taster/engine/mcp.mjs"]
 ```
+
+## Hosted MCP (HTTP)
+
+`server.mjs` builds the MCP server; `mcp.mjs` serves it on stdio and `http.mjs` answers one Streamable HTTP request
+statelessly (`handleMcpRequest(request, { remote })`), so it runs on serverless functions. Hosted mode takes
+`remote.diagnose(url)` from the host instead of opening a local browser and leaves out `extract_content`,
+`brand_theme` (unless the host gives `remote.brand`), the design system tools and the screen by screen tools, which
+open pages in a local browser and read or write files. `web/app/api/mcp/route.ts` mounts it at `/api/mcp`, with diagnose going through the same fence as
+`/api/diagnose` (public http(s) only, request budget, per-IP window, one browser at a time).
 
 ## ACP agent
 
@@ -71,13 +80,14 @@ Zed, in `settings.json`:
 ```json
 {
   "agent_servers": {
-    "Taster": { "type": "custom", "command": "node", "args": ["/path/to/taster/engine/acp.mjs"], "env": {} }
+    "Taster": { "type": "custom", "command": "node", "args": ["/path/to/taster/engine/start.mjs", "acp"], "env": {} }
   }
 }
 ```
 
-JetBrains IDEs, in `~/.jetbrains/acp.json`: the same `agent_servers` entry without `type`. With the engine linked or
-installed globally, `taster-acp` is the same command.
+`start.mjs acp` installs the dependencies on first start (the MCP launcher does the same with no argument), then
+serves `acp.mjs`. JetBrains IDEs, in `~/.jetbrains/acp.json`: the same `agent_servers` entry without `type`, with the
+full path of `node` in `command`. With the engine linked or installed globally, `taster-acp` is the same agent.
 
 Try it by hand:
 

@@ -46,9 +46,11 @@ import {
   UnderlineTabs,
   Wizard,
 } from '../../src'
+import { ONLY } from './stage'
 
 // Demo sections for the app side components. Same wrapper as sections.tsx: one data-registry-id per entry.
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+  if (ONLY) return ONLY === id ? <section data-registry-id={id} className="min-w-0"><div className="min-w-0">{children}</div></section> : null
   return (
     <section data-registry-id={id} className="mb-12 min-w-0">
       <div className="mb-4 flex items-baseline gap-3">

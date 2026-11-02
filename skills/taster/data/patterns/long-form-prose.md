@@ -3,7 +3,7 @@ id: long-form-prose
 name: Long-form prose
 category: typography
 uses: [read-long-text]
-surfaces: [editorial]
+surfaces: [editorial, developer-docs]
 replaces: [KO-03, KO-11]
 components: [content/prose, content/article, content/footnotes, content/code-block]
 inspiration: []

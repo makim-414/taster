@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, PATTERN_SECTIONS, readJson, loadPatterns, bundleFiles, parseFrontmatter } from './lib.mjs';
 import { runAll as runTaxonomyChecks } from './check-taxonomy.mjs';
+import { previewFile, stageHash } from '../registry/stage-hash.mjs';
 
 const errors = [];
 const err = (m) => errors.push(m);
@@ -46,6 +47,16 @@ for (const c of registry) {
   if (!catIds.has(c.category)) err(`registry ${c.id} unknown category ${c.category}`);
 }
 
+// The stage page and preview pictures the gallery and the MCP tools show
+const REBUILD = 'run: npm --prefix registry run build-stage';
+if (!fs.existsSync(path.join(ROOT, 'registry/stage/index.html'))) err(`registry/stage/index.html missing, ${REBUILD}`);
+else if (readJson('registry/stage/meta.json').sourceHash !== stageHash()) err(`registry/stage is older than the components, ${REBUILD}`);
+for (const c of registry) {
+  for (const theme of ['dark', 'light']) {
+    if (!fs.existsSync(path.join(ROOT, 'registry/previews', previewFile(c.id, theme)))) err(`registry ${c.id} has no ${theme} preview, ${REBUILD}`);
+  }
+}
+
 // Patterns
 const index = readJson('patterns/INDEX.json');
 const files = loadPatterns();
@@ -85,6 +96,14 @@ for (const p of files) {
       for (const r of s.rules || []) if (!ruleIds.has(r)) err(`icon slot ${s.id} unknown rule ${r}`);
       for (const pid of s.patterns || []) if (!fileIds.has(pid)) err(`icon slot ${s.id} unknown pattern ${pid}`);
       if (s.id !== 'no-icon' && !(s.patterns || []).length) err(`icon slot ${s.id} needs at least one pattern`);
+      // Five worked variations per slot, rendered in examples/icon-slots/ (checked there by engine/scripts/check-icon-slots-example.mjs).
+      const vars = s.variations || [];
+      if (vars.length !== 5) err(`icon slot ${s.id} needs 5 variations, has ${vars.length}`);
+      for (const v of vars) {
+        if (!kebab.test(v.id || '')) err(`icon slot ${s.id} variation id not kebab-case: ${v.id}`);
+        for (const k of ['name', 'use_when', 'shows']) if (!v[k]) err(`icon slot ${s.id} variation ${v.id} missing ${k}`);
+      }
+      if (new Set(vars.map((v) => v.id)).size !== vars.length) err(`icon slot ${s.id} has duplicate variation ids`);
     }
   }
 }
@@ -144,6 +163,56 @@ const emoji = /\p{Extended_Pictographic}/u;
     if (emoji.test(t)) err(`emoji in ${path.relative(ROOT, p)}`);
   }
 })(ROOT);
+
+// exports/ must match what build-docs would write from the current rules.json.
+{
+  const { renderAll } = await import('../engine/exports.mjs');
+  for (const [rel, content] of Object.entries(renderAll())) {
+    const file = path.join(ROOT, rel);
+    if (!fs.existsSync(file)) err(`${rel} missing (run node scripts/build-docs.mjs)`);
+    else if (fs.readFileSync(file, 'utf8') !== content) err(`${rel} is stale (run node scripts/build-docs.mjs)`);
+  }
+}
+
+// extension/ carries a copy of the detector and generated rule names; both must match the sources.
+{
+  const { extensionRules } = await import('./lib.mjs');
+  const same = (rel, content) => fs.existsSync(path.join(ROOT, rel)) && fs.readFileSync(path.join(ROOT, rel), 'utf8') === content;
+  if (!same('extension/detect.js', fs.readFileSync(path.join(ROOT, 'rules/detect.js'), 'utf8'))) err('extension/detect.js is stale (run node scripts/build-docs.mjs)');
+  if (!same('extension/rules.js', extensionRules(readJson('rules/rules.json').rules))) err('extension/rules.js is stale (run node scripts/build-docs.mjs)');
+}
+
+// Orb recipes: each one is complete, uses only known keys and in-range values, and the generated module is current.
+{
+  const { orbRecipesModule } = await import('./lib.mjs');
+  const recipes = readJson('registry/recipes/orbs.json');
+  const src = fs.readFileSync(path.join(ROOT, 'registry/src/motion/_orb-recipe.ts'), 'utf8');
+  const states = src.match(/ORB_STATES = \[(.*?)\]/)[1].match(/'([a-z]+)'/g).map((x) => x.slice(1, -1));
+  const seen = new Set();
+  for (const r of recipes) {
+    const at = `orb recipe ${r.id}`;
+    if (!/^[a-z0-9-]+$/.test(r.id || '')) err(`${at}: id must be kebab-case`);
+    if (seen.has(r.id)) err(`${at}: duplicate id`);
+    seen.add(r.id);
+    for (const k of ['name', 'by', 'note']) if (!r[k]) err(`${at}: needs ${k}`);
+    if (!states.includes(r.state)) err(`${at}: unknown state ${r.state}`);
+    const known = new Set(['id', 'name', 'by', 'note', 'state', 'speed', 'dots', 'dotSize', 'tint', 'opts']);
+    for (const k of Object.keys(r)) if (!known.has(k)) err(`${at}: unknown key ${k}`);
+    if (r.speed !== undefined && !(r.speed >= 0.1 && r.speed <= 3)) err(`${at}: speed out of range`);
+    if (r.dots !== undefined && !(r.dots >= 0.2 && r.dots <= 3)) err(`${at}: dots out of range`);
+    if (r.dotSize !== undefined && !(r.dotSize >= 0.4 && r.dotSize <= 2.5)) err(`${at}: dotSize out of range`);
+    if (r.tint !== undefined && !/^(ink|brand|#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6})$/.test(r.tint)) err(`${at}: bad tint`);
+    const block = src.slice(src.indexOf(`  ${r.state}: [`));
+    const knobs = block.slice(0, block.indexOf('],') + 1);
+    for (const [k, v] of Object.entries(r.opts || {})) {
+      const m = knobs.match(new RegExp(`key: '${k}'.*?min: (-?[\\d.]+), max: (-?[\\d.]+)`));
+      if (!m) err(`${at}: ${r.state} has no knob ${k}`);
+      else if (v < Number(m[1]) || v > Number(m[2])) err(`${at}: ${k} out of range`);
+    }
+  }
+  const mod = path.join(ROOT, 'registry/src/motion/orb-recipes.ts');
+  if (!fs.existsSync(mod) || fs.readFileSync(mod, 'utf8') !== orbRecipesModule(recipes)) err('registry/src/motion/orb-recipes.ts is stale (run node scripts/build-docs.mjs)');
+}
 
 if (errors.length) {
   console.log(errors.slice(0, 80).join('\n'));

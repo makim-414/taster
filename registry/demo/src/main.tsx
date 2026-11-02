@@ -5,12 +5,19 @@ import '../../src/tokens.css'
 import '../../src/themes/light.css'
 import '../../src/base.css'
 import { Sections } from './sections'
+import { ONLY, startStage } from './stage'
 
 function App() {
   const [light, setLight] = React.useState(false)
+  // The attribute is the one source: the appearance picker in the demo writes it too.
   React.useEffect(() => {
-    document.documentElement.dataset.theme = light ? 'light' : 'dark'
-  }, [light])
+    const root = document.documentElement
+    const read = () => setLight(root.dataset.theme === 'light')
+    read()
+    const observer = new MutationObserver(read)
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
+  }, [])
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <header className="mb-10 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
@@ -21,7 +28,7 @@ function App() {
           </p>
         </div>
         <label className="flex min-h-11 items-center gap-2 text-sm text-text-muted desk:min-h-0">
-          <input type="checkbox" checked={light} onChange={(e) => setLight(e.target.checked)} />
+          <input type="checkbox" checked={light} onChange={(e) => { document.documentElement.dataset.theme = e.target.checked ? 'light' : 'dark' }} />
           Light theme
         </label>
       </header>
@@ -30,4 +37,14 @@ function App() {
   )
 }
 
-createRoot(document.getElementById('root') as HTMLElement).render(<App />)
+function Stage() {
+  // The frame is centered so short components sit in the middle of a preview. Tall ones start at the top.
+  return (
+    <main id="stage" className="flex min-h-screen w-full flex-col justify-center px-4 py-6 sm:px-6">
+      <Sections />
+    </main>
+  )
+}
+
+if (ONLY) startStage()
+createRoot(document.getElementById('root') as HTMLElement).render(ONLY ? <Stage /> : <App />)

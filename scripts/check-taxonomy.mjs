@@ -20,7 +20,8 @@ const EPS = 1e-9;
 
 export function loadContext() {
   const tokens = fs.readFileSync(path.join(ROOT, 'registry/src/tokens.css'), 'utf8');
-  const rootBlock = tokens.match(/:root\s*\{([\s\S]*?)\n\}/);
+  // The first top-level block whose selector list names :root (it is `:root, .theme-dark` since the theme scopes).
+  const rootBlock = tokens.match(/^:root(?:\s*,[^{]*)?\{([\s\S]*?)\n\}/m);
   return {
     schema: readJson('taxonomy/taxonomy.schema.json'),
     patterns: loadPatterns().map((p) => p.data).filter(Boolean),

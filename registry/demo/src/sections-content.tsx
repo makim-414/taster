@@ -48,11 +48,13 @@ import {
   type GlobeMarker,
 } from '../../src'
 import { plate } from './placeholder'
+import { ONLY } from './stage'
 
 // Demo sections for the page section, content, media, commerce, chat, motion and scene components.
 // Sample content is generic: no brand names, no invented big numbers, placeholders say what they stand for.
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+  if (ONLY) return ONLY === id ? <section data-registry-id={id} className="min-w-0"><div className="min-w-0">{children}</div></section> : null
   return (
     <section data-registry-id={id} className="mb-16 min-w-0">
       <div className="mb-4 flex items-baseline gap-3">

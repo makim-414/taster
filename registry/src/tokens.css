@@ -10,7 +10,8 @@
    --chart-* ramp if you want color data) in your own stylesheet. Nothing else needs
    to change, because the components only read the alias layer.
    ============================================================ */
-:root {
+:root,
+.theme-dark {
   /* shadcn/ui style base tokens */
   --background: oklch(0.12 0 0);
   --foreground: oklch(0.985 0 0);

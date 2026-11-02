@@ -31,6 +31,9 @@ A dashboard is usually: show one number, show a trend, compare items, act on a r
 From `data/patterns/INDEX.json`, filter by surface and use. Prefer patterns with `status: stable` and with
 registry components. Read each pattern's "Do" and "Don't" before you write the section.
 
+Any block the visitor will see is the user's call, not yours: follow [choose.md](choose.md) and let them pick by eye
+before you write it.
+
 ## 4. Compose
 
 - Tokens first (`registry/src/tokens.css`, then the system's `theme.css`), then layout, then components, then copy.
@@ -47,6 +50,9 @@ slot's `test`. Keep the icon only when the test passes; otherwise use the slot's
 set at one stroke weight and the three sizes (the registry `icons/icon` component and its tokens), sit on the first
 line of their label, and are `aria-hidden` unless they are the only content of a control. Logos and partner marks are
 the original files, never redrawn. Most feature cards end up with no icon.
+
+Each slot lists five `variations` with `use_when` and `shows`. Pick the one whose `use_when` matches the spot and
+follow its `shows`; `examples/icon-slots/index.html` in the repository renders all 25.
 
 ## 5. Check before you show
 

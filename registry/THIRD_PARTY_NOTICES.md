@@ -479,6 +479,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+## thinking-orbs
+
+Source: https://github.com/Jakubantalik/Libraries.dev (https://libraries.dev/orbs), by Jakub Antalik
+License: MIT (package LICENSE).
+
+Used for: `motion/thinking-orb` imports the package as a dependency; its code is not copied here. Taster adds the recipe format, token tint and token theme around it.
+
+```text
+MIT License
+
+Copyright (c) 2026 Jakub Antalik
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
 ## Design references with no code taken
 
 - `marketing/reveal-faq` follows the layout and the letter reveal of "text-reveal-faqs" by Ruixen
@@ -490,3 +521,6 @@ SOFTWARE.
 - `blocks/tree-view`: a 21st.dev tree view picked by the owner (shipped without its useTree, model and CSS files). Source and license could not be traced; the state hook, keyboard model and rows were written new, following the WAI-ARIA tree pattern.
 - `blocks/toggle` dashed checkbox: a 21st.dev checkbox with a dashed unchecked border. Only the dashed border idea was used.
 - `blocks/session-list`, `blocks/sensitive-input`, `blocks/orbit-illustration`: 21st.dev components picked by the owner (a session list, a cfui sensitive input shipped without its CSS, an "Enrichment Orbit" card picture). Their sources and licenses could not be confirmed, so each was written new for this registry; only the idea and, for the sensitive input, the compound part names were kept.
+- `blocks/spotlight-card`: "Spotlight Card" by jahed (EaseMize UI) on 21st.dev, picked by the owner. The listing says "License: unknown", so no code was taken; it was written new from `patterns/spotlight-border-card.md`, keeping only the idea of one light reaching neighboring cards.
+- `blocks/appearance-picker`: "Theme Toggle" on 21st.dev, picked by the owner, which comes from Campsite's ThemePicker (https://github.com/campsite/campsite). Campsite is CC BY-NC 4.0, so no code or SVG was taken; it was written new from `patterns/appearance-picker.md`
+- `blocks/curved-stream-hero`, `blocks/banner-hero`, `motion/wireframe-form`, `motion/light-beams`: "Tilted Grid Hero" by ruixen.ui, "Responsive Hero Banner" by sensewood8, "Wireframe Forms" by mengto and the background of "PremiumHero" on 21st.dev, picked by the owner. Their licenses could not be confirmed, so these were written new from the previews and from the idea; no code was taken

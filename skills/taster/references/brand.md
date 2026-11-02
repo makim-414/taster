@@ -29,7 +29,8 @@ the page the same way `extract_content` does and returns:
 - `source.fonts.logo`: the face the logo wordmark is set in, read apart from heading and body. It never becomes
   `--font`; the design system keeps it as `identity.logoFont`, and the consistency check lists that face inside the
   logo as exempt instead of off the system ([screens.md](screens.md)).
-- `css`: a `:root` block with only the identity. The system's `theme.css` carries the same values plus the tokens
+- `css`: a block for `:root`, `:root[data-theme]`, `.theme-dark` and `.theme-light` with only the identity, so the
+  brand also reaches a light theme and nested scopes. The system's `theme.css` carries the same values plus the tokens
   of the axes; load that one after `registry/src/tokens.css`.
 - `notes`: one line per choice, with the reason. Show them to the user.
 
@@ -49,6 +50,8 @@ from that. If they have nothing, keep the Taster defaults and say so.
   face.
 - Rebuild and Build: every component reads the alias tokens, so loading the system's `theme.css` after `tokens.css`
   is enough. Do not type brand values into components.
+- Showing it: pass the brand color or the tokens to `preview_component` and `browse_components`, so the user chooses components already wearing their brand.
+- Backgrounds: `motion/wireframe-form` and `motion/light-beams` read `--brand`, so they change with the theme. For a wire form that belongs to this brand, pass the brand name as `seed` with `form="generated"`, or the path of the original mark as `mark`. It stays a background: the logo itself is still the original file.
 - Status: a dot or a mark for a real outcome uses `--success` or `--danger`, flat and still. The detector (AC-08)
   passes a dot in exactly these page colors and still flags a dot in any other hue, or one that glows or pulses.
   States that are not outcomes (queued, processing, draft) stay neutral and say the state in words.

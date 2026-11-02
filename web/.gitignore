@@ -4,3 +4,6 @@ next-env.d.ts
 .vercel
 shots/
 public/fixtures/
+public/taster/
+public/stage/
+public/previews/
