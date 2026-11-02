@@ -144,6 +144,7 @@ Status, alerts, waiting, empty results and layers above the page.
 
 ### Badge and label
 
+- [Bracket category label](bracket-category-label.md) fixes AC-04, AC-05
 - [Data honesty label](data-honesty-label.md) fixes CMP-06, CMP-08, CPY-02
 - [Filter chip](filter-chip.md) fixes AC-05
 - [Status label](status-label.md) fixes AC-04, AC-05, AC-07, AC-08

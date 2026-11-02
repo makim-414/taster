@@ -34,7 +34,7 @@ Use the contained segmented control for a view or mode switch inside a page. Use
 
 ## Don't
 
-- Don't color the active pill (purple, blue, gradient). The hue says "brand", not "selected".
+- Don't color the active pill with a hue the product does not own (a stock purple or blue, a gradient), and never one hue per option. The active segment is one of the brand slots in token-themes: `--accent` when the theme sets a brand, a contrast step when it does not.
 - Don't animate a glowing indicator behind the active option.
 - Don't use a segmented control for navigation that changes the route and the page title. That is tabs or a sidebar.
 - Don't put icons and labels and counts in each segment. One of the three.
