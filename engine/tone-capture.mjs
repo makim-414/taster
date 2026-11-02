@@ -49,7 +49,12 @@ export async function readFirstScreen(page, url, { settleMs = 2500, timeoutMs = 
   }
   const code = response?.status() ?? 0;
   await page.waitForTimeout(settleMs);
-  const rejected = await pressReject(page);
+  // Consent tools often load after the page; through the server's fence they can be later still. Look twice more.
+  let rejected = await pressReject(page);
+  for (let i = 0; !rejected && i < 2; i++) {
+    await page.waitForTimeout(800);
+    rejected = await pressReject(page);
+  }
   await page.addStyleTag({ content: HIDE_CSS }).catch(() => {});
   await page.waitForTimeout(rejected ? 600 : 200);
   const title = (await page.title().catch(() => '')).slice(0, 120);
