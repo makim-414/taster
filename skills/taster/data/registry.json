@@ -86,6 +86,17 @@
       "credit": null
     },
     {
+      "id": "blocks/bracket-label",
+      "file": "src/blocks/bracket-label.tsx",
+      "category": "badge-label",
+      "patterns": [
+        "bracket-category-label"
+      ],
+      "deps": [],
+      "license": "MIT",
+      "credit": null
+    },
+    {
       "id": "blocks/bar",
       "file": "src/blocks/bar.tsx",
       "category": "chart-kpi",
