@@ -28,10 +28,16 @@ const CORNERS = {
   'creative-studio': { density: 0.3, contrast: 1, roundness: 0.1, 'type-expression': 1, 'color-restraint': 0.5, elevation: 0.1, motion: 1, stroke: 0.5 },
 };
 
-// A genre moves a few axes the same way wherever the spot is. Geek and developer sites are denser, sharper, flatter
-// and more lined than their spot alone says.
+// A genre moves a few axes the same way wherever the spot is, after what its sites share (tone-refs.json genres).
+// Geek and developer sites are denser, sharper, flatter and more lined than their spot alone says; editorial ones
+// airier, squarer and louder in type; and so on. Monospace body text is not one of them: Taster flags it (AC-09).
 const GENRE_NUDGE = {
   geek: { density: 0.35, contrast: 0.25, roundness: -0.25, elevation: -0.25, stroke: 0.25 },
+  editorial: { density: -0.25, roundness: -0.25, 'type-expression': 0.25, 'color-restraint': 0.25, elevation: -0.25 },
+  illustration: { roundness: 0.35, 'color-restraint': -0.25, motion: 0.25 },
+  'product-photo': { 'type-expression': 0.25, 'color-restraint': 0.25, elevation: -0.25, stroke: -0.25 },
+  'product-screen': { 'type-expression': -0.25, 'color-restraint': 0.25, elevation: 0.25 },
+  utility: { density: 0.5, roundness: -0.5, 'type-expression': -0.25, 'color-restraint': 0.25, elevation: -0.25, motion: -0.25, stroke: 0.25 },
 };
 
 // The brand color the parts wear when the visitor has not given one and the spot calls for color. Only a stand in.

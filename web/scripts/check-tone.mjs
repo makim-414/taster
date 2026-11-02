@@ -90,7 +90,8 @@ try {
     ok(await waitFor(async () => (await cardNames(page))[0] === 'GOV.UK'), `${name}: a press on a dot lands on that site`);
 
     // The genre narrows the references.
-    await page.click('.seg-item:has-text("긱·개발자")');
+    ok((await page.locator('.tone-genres button').count()) === catalog.genres.length + 1, `${name}: every genre can be picked`);
+    await page.click('.tone-genres button:has-text("긱·개발자")');
     ok(await waitFor(async () => (await cardNames(page)).every((n) => geek.has(n))), `${name}: the genre keeps its own references (${(await cardNames(page)).join(', ')})`);
     ok(await waitFor(async () => new URL(page.url()).searchParams.get('genre') === 'geek'), `${name}: the address keeps the genre`);
 

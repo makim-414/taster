@@ -7,7 +7,7 @@ export type Bilingual = { en: string; ko: string };
 export type Praise = { on: 'x' | 'reddit' | 'hackernews'; url: string; date: string; caveat?: Bilingual };
 export type ToneRef = { id: string; name: string; url: string; x: number; y: number; genres: string[]; note: Bilingual; praise: Praise | null };
 export type Quadrant = { id: string; x: number[]; y: number[]; name: string; ko: string };
-export type Genre = { id: string; name: string; ko: string; summary: string };
+export type Genre = { id: string; name: string; ko: string; summary: string; summaryKo: string };
 export type ToneCatalog = {
   about: string;
   checked: string;

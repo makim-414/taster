@@ -77,6 +77,7 @@ function RefCard({ r, number, shot, onRetry }: { r: ToneRef; number: number; sho
       <div className="ref-text">
         <h3><span className="ref-number">{number}</span> {r.name}</h3>
         <p className="ref-note">{r.note.ko}</p>
+        {r.genres.length > 0 && <p className="ref-caveat">결: {r.genres.map((g) => catalog.genres.find((x) => x.id === g)?.ko).join(', ')}</p>}
         <p className="ref-links">
           <a href={r.url} target="_blank" rel="noopener noreferrer">{hostOf(r.url)} 열기</a>
           {p && <a href={p.url} target="_blank" rel="noopener noreferrer">{PRAISE_ON[p.on]} 칭찬 글, {p.date}</a>}
@@ -219,7 +220,8 @@ export function Tone() {
   };
 
   const where = `브랜드 개성 ${pct(spot.x)}, 화려 ${pct(spot.y)}, ${quadrant.ko} 쪽`;
-  const genreName = catalog.genres.find((g) => g.id === genre)?.ko;
+  const genreInfo = catalog.genres.find((g) => g.id === genre);
+  const genreName = genreInfo?.ko;
   const demo = !brand && toneTokens['--brand'] === DEMO_BRAND;
   const message = `Taster 톤 지도에서 ${where}${genreName ? `, 결 ${genreName}` : ''} 를 골랐어. 가까운 레퍼런스는 ${near.map((r) => r.name).join(', ')}. 축은 ${steps.map((s) => `${s.ko} ${s.stepKo}`).join(', ')}. 이 톤으로 진행해 줘.${href ? ` ${href}` : ''}`;
 
@@ -241,15 +243,14 @@ export function Tone() {
 
         <div className="tone-grid">
           <section className="tone-map" aria-labelledby="map-title">
-            <div className="tone-map-head">
-              <h2 id="map-title">톤 지도</h2>
-              <div className="seg" role="group" aria-label="결">
-                <button type="button" className="seg-item" aria-pressed={!genre} onClick={() => setGenre('')}>전체</button>
-                {catalog.genres.map((g) => (
-                  <button key={g.id} type="button" className="seg-item" aria-pressed={genre === g.id} onClick={() => setGenre(g.id)}>{g.ko}</button>
-                ))}
-              </div>
+            <h2 id="map-title">톤 지도</h2>
+            <div className="tone-genres" role="group" aria-label="결">
+              <button type="button" className="chip" aria-pressed={!genre} onClick={() => setGenre('')}>모든 결</button>
+              {catalog.genres.map((g) => (
+                <button key={g.id} type="button" className="chip" aria-pressed={genre === g.id} onClick={() => setGenre(g.id)}>{g.ko}</button>
+              ))}
             </div>
+            {genreInfo && <p className="tone-hint tone-genre-note"><b>{genreInfo.ko}</b> {genreInfo.summaryKo} 레퍼런스는 이 결 안에서만 고르고, 토큰도 이 결 쪽으로 조금 옮깁니다.</p>}
             <div className="pad-row" aria-hidden="true"><span>출시·프로모션</span><span>크리에이티브 스튜디오</span></div>
             <div
               ref={pad}

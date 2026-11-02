@@ -7,7 +7,8 @@ options and do the work; they decide.
 
 When the look is still open (a new build, or a rebuild the owner wants to move away from), settle the tone before the
 parts. Ask in one line where it should sit: more commercial or more brand personality, calmer or louder, and whether a
-genre fits (geek and developer). Then call `pick_tone` with that spot (`x` from commerce 0 to brand personality 1, `y`
+genre fits (geek and developer, editorial and serif, illustration and play, product photo hero, product screen hero,
+utility and density). Then call `pick_tone` with that spot (`x` from commerce 0 to brand personality 1, `y`
 from minimal 0 to expressive 1, `genre`), or with `like` set to a reference they named.
 
 - Show every reference picture with its number, name and praise link, the parts picture, and the tone page link. Say
@@ -43,7 +44,7 @@ Every link goes to the live gallery, where the component really runs:
 
 - `/components` lists everything with filters, and lets them try a color or read the brand from a site address.
 - `/components/<id>` runs one component to click on, at desktop, tablet and phone width, with the install line and code.
-- `/tone?x=0.8&y=0.18&genre=geek` is the tone map: a pad to drag, the nearest real sites with their first screens, and
+- `/tone?x=0.8&y=0.18&genre=geek` is the tone map: a pad to drag, a genre to narrow it, the nearest real sites with their first screens, and
   three Taster parts running in that spot's tokens, with a sentence to paste back.
 - `/board?ids=a,b,c&brand=hex&theme=light` puts candidates side by side. They press a pick button and get a sentence to
   paste back to you, such as "2번 blocks/card 를 골랐어". Treat that as their answer, and act on it.
