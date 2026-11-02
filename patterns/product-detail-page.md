@@ -37,6 +37,10 @@ The delivery estimate is a small row ("Arrives Thu 6 to Mon 10") that opens into
 - Show an honest rating: the count next to the stars, and the distribution in the reviews block.
 - Put shipping cost and return terms near the button, in text, not hidden in a modal.
 - Keep the image gallery fast: the main image at the correct `sizes`, thumbnails lazy.
+- Keep required notices (regulatory text, allergens, cosmetic or supplement disclaimers) in a fixed slot of the page, not inside a section the shop can turn off.
+- Make the pack in every image match the real product: color, label text and printed values such as a registered SPF. Check generated or retouched images by eye, because a text check cannot read artwork. When the product color changes, change every sentence that names it, in every language.
+- Keep a proof slot for clinical or test results empty and hidden until there is a sourced number to put in it.
+- Build the buy column as one quiet panel: hairline dividers, a quantity stepper, and shipping and returns in a closed accordion under the button.
 
 ## Don't
 
@@ -46,6 +50,8 @@ The delivery estimate is a small row ("Arrives Thu 6 to Mon 10") that opens into
 - Do not show a testimonial carousel with invented names (CMP-08). Reviews must come from buyers.
 - Do not trap the page in a sticky bottom bar and a sticky top bar and a chat bubble at once.
 - Do not use a countdown timer or a fake "7 people are looking at this".
+- Do not repeat the same price, descriptor or delivery line twice in the first viewport. Each fact has one place.
+- Do not use treatment words for a cosmetic or food product (heals, cures, regenerates, detoxifies). Describe what the buyer sees and feels.
 
 ## Swap recipe
 
