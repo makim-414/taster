@@ -35,6 +35,7 @@ Write the Korean from the product fact up, as if no English version existed. The
 
 ## Don't
 
+- Don't write usage instructions into the screen ("~를 누르면", "막대 위 숫자는"). If a control needs explaining, the control is unclear; fix the label or put the note behind an (i).
 - Do not leave "Get started" and "Learn more" on a Korean page (KO-09).
 - Do not ship literal renderings such as "미래를 경험하세요" or "새로운 차원의 경험" (KO-07).
 - Do not write "빠르게 만들고 똑똑하게 출시하세요" style parallel slogans (CPY-01).

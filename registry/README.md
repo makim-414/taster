@@ -66,6 +66,10 @@ node test-render.mjs  # headless render gate, prints RENDER OK
 The demo page renders every registry entry in a `data-registry-id` wrapper. The render test
 fails on any page error, any console error, or any registry id without a rendered element.
 
+### Bringing in a component from elsewhere
+
+Do not install it; redraw it with the tokens. Record each one in a three column table (component, source and author, what we changed) and in `THIRD_PARTY_NOTICES.md` with its own license, checked per component. Replace motion libraries with CSS keyframes, make every control 44px on touch screens, never color a remove action red by default, keep only the structure of a tinted pill (not the tint), and leave out borders with a light running around them (COL-07, BG-01).
+
 ## What is not here yet
 
 Text effects, visual effects and particle components are left out of this first cut. A short
