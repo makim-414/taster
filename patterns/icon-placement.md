@@ -3,7 +3,7 @@ id: icon-placement
 name: Icon placement map
 category: icon
 uses: [set-the-visual-foundation, explain-features, navigate-the-app, navigate-the-site]
-surfaces: [landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat]
+surfaces: [landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat, developer-docs]
 replaces: [ICO-01, ICO-02, ICO-03, ICO-04, CMP-03, LAY-02]
 components: [icons/icon]
 inspiration: []
