@@ -9,7 +9,7 @@
 // source use SRC- ids. A line is skipped when it, or the line above, holds `taster-allow <reason>`; an allow
 // without a reason is reported itself. --baseline turns the run into a ratchet: counts per file and check may
 // only go down, so an old codebase can adopt it without fixing everything first.
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { basename, extname, join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
@@ -199,15 +199,18 @@ function parentKey(text, at) {
 const SKIP_DIRS = new Set(['node_modules', '.git', 'dist', 'build', 'out', '.next', '.nuxt', '.svelte-kit', '.turbo', '.vercel', 'coverage', 'vendor', '.cache']);
 const ALLOW = /taster-allow\b(.*)/;
 
-function walk(path, files = []) {
-  const st = statSync(path);
+// A path named on the command line is followed even when it is a link; links met while walking are skipped, so a
+// link back up the tree (a/loop -> ..) cannot loop and a linked file elsewhere is not read as part of this tree.
+function walk(path, files = [], named = true) {
+  const st = named ? statSync(path) : lstatSync(path);
+  if (st.isSymbolicLink()) return files;
   if (st.isFile()) {
     if (ALL.includes(extname(path)) && !/\.min\./.test(path)) files.push(path);
     return files;
   }
   for (const name of readdirSync(path).sort()) {
     if (SKIP_DIRS.has(name) || name.startsWith('.')) continue;
-    walk(join(path, name), files);
+    walk(join(path, name), files, false);
   }
   return files;
 }
