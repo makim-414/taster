@@ -195,7 +195,7 @@ function Report({ result, sectionRef }: { result: Result; sectionRef: React.RefO
                   {r.findings.map((f) => (
                     <li key={`${f.width}-${f.selector}`}>
                       <code>{f.selector}</code>
-                      {typeof f.evidence === 'string' ? <span className="hit-evidence">{f.evidence}</span> : null}
+                      {typeof f.evidence === 'string' ? <code className="hit-evidence">{f.evidence}</code> : null}
                     </li>
                   ))}
                 </ul>

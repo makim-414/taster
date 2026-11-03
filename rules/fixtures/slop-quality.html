@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>품질 규칙 예시</title>
+<style>
+body { margin: 0; padding: 16px; background: #ffffff; color: #1d1d1f; font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; font-size: 16px; line-height: 1.7; word-break: keep-all; }
+.card { display: block; padding: 16px; border: 1px solid #d9d9d6; }
+.card:hover { transform: translateY(-4px); }
+.cover-wrap { position: relative; height: 48px; }
+.cover-wrap button { min-height: 44px; padding: 0 16px; }
+.cover-wrap .ghost { position: absolute; inset: 0; background: #ffffff; opacity: 0.6; }
+.logo { display: block; width: 120px; height: 120px; }
+.big { font-size: 40px; line-height: 0.9; margin: 16px 0; font-weight: 600; }
+.orphan { font-size: 28px; line-height: 1.4; margin: 16px 0; font-weight: 600; }
+.reveal { opacity: 0; transform: translateY(24px); }
+.longshot { display: block; width: min(100%, 640px); height: auto; }
+</style>
+</head>
+<body>
+  <div class="reveal">이 문단은 스크롤하기 전까지 보이지 않습니다. 첫 화면에 있는데도 투명합니다.</div>
+  <a class="card" href="#plan">요금제 보기</a>
+  <div class="cover-wrap"><button type="button">저장</button><div class="ghost"></div></div>
+  <img class="logo" alt="로고" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAIAAAB7QOjdAAAADklEQVR4nGM4ceIIEAEAEFsEqZwW27YAAAAASUVORK5CYII=">
+  <h1 class="big">두 줄로 나뉜 큰 한글 제목은<br>받침이 닿습니다</h1>
+  <h2 class="orphan">새로운 방식으로 일하는<br>법</h2>
+  <p>상태: NO_ANSWER_CODE</p>
+  <section><h3>상세 정보</h3>
+  <img class="longshot" alt="상세 설명" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAKCAIAAAD6sKMdAAAAD0lEQVR4nGM4ceIIAxEYANH/F0mkIOLxAAAAAElFTkSuQmCC">
+  </section>
+</body>
+</html>
