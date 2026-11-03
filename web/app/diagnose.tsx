@@ -99,16 +99,19 @@ export function Diagnose({ initialUrl, ruleCount }: { initialUrl: string; ruleCo
         <Report result={state.result} sectionRef={resultRef} />
       ) : (
         <section className="sample" aria-labelledby="sample-title">
-          <h2 id="sample-title">AI 가 그대로 만든 판과 실제 사이트</h2>
-          <p className="sample-lede">같은 첫 화면입니다. 왼쪽은 AI 가 그대로 만든 판에 걸린 규칙 이름을 붙인 것, 오른쪽은 사람이 다듬은 실제 사이트입니다. 가운데 선을 좌우로 끌어 보세요.</p>
+          {/* web/scripts/compare/render.mjs draws both pictures from examples/rebuild, a made-up product. */}
+          <h2 id="sample-title">Taster 의 재구성 예시</h2>
+          <p className="sample-lede">
+            저장소의 examples/rebuild 에 있는 가상의 서비스 Acme Ledger 입니다. 왼쪽은 AI 가 자주 남기는 흔적을 모아 만든 예시 페이지를 Taster 로 잰 화면으로, 빨간 테두리가 규칙에 걸린 곳입니다. 오른쪽은 Taster 가 같은 내용을 규칙대로 다시 지은 판입니다. 가운데 선을 좌우로 끌어 보세요.
+          </p>
           <CompareReveal
-            label="AI 가 그대로 만든 판과 실제 사이트 비교"
-            before={{ src: '/compare/before.jpg', alt: 'AI 가 그대로 만든 서비스 첫 화면. 이모지, 대문자 넓은 자간, 그라디언트 글자, 엠대시, 빛 번짐 버튼, 틴트 알약 배지, 유리 카드에 빨간 이름표' }}
-            after={{ src: '/compare/after.jpg', alt: '사람이 다듬은 같은 서비스의 실제 첫 화면. 흰 글자 제목과 흰 버튼 하나, 입자 구 배경' }}
+            label="Taster 재구성 예시의 고치기 전과 다시 지은 판 비교"
+            before={{ src: '/compare/before.jpg', alt: 'Acme Ledger 예시 페이지의 첫 화면. 보라 그라디언트 바탕, 이모지가 든 알약 공지, 대문자 넓은 자간 머리말, 그라디언트 글자와 이탤릭 세리프 한 단어가 섞인 제목, 엠대시 문장, 빛 번짐 버튼, 이모지 타일 카드 세 장과 틴트 알약 배지. 걸린 요소마다 빨간 테두리' }}
+            after={{ src: '/compare/after.jpg', alt: '같은 내용을 다시 지은 첫 화면. 어두운 바탕에 왼쪽 정렬 제목과 설명, 버튼 하나와 글자 링크, 아이콘 카드 대신 선으로 나눈 기능 목록' }}
           />
           <div className="sample-captions">
-            <p>AI 가 그대로 만든 판</p>
-            <p>실제 사이트</p>
+            <p>고치기 전, before.html</p>
+            <p>다시 지은 판, after.html</p>
           </div>
         </section>
       )}
