@@ -8,7 +8,7 @@ import { useStyleOnce } from '../motion/_motion'
 // ten seconds, and a Stop button that is always in reach. For long runs, `steps` shows the earlier steps
 // above the line, dimmed and still, newest at the bottom.
 // role="status" announces step changes, not every tick of the clock. Under reduced motion the spinner
-// turns slowly instead of fast.
+// stands still, as blocks/spinner does, and the step text carries the state.
 // Follows patterns/agent-status-line: no orange glowing pill (AC-07), no pulsing colored dot (AC-08), no
 // gradient orb (COL-01, BG-01), no invented steps (CPY-01). The text shimmer that pattern mentions is left
 // out on purpose: a gradient on glyphs reads as gradient text (COL-04).
@@ -28,7 +28,7 @@ export interface AgentStatusProps extends React.HTMLAttributes<HTMLDivElement> {
 const CSS =
   '@keyframes dsg-spin{to{transform:rotate(360deg)}}' +
   '.dsg-spin{animation:dsg-spin 800ms linear infinite}' +
-  '@media (prefers-reduced-motion: reduce){.dsg-spin{animation-duration:2400ms}}'
+  '@media (prefers-reduced-motion: reduce){.dsg-spin{animation:none}}'
 
 const KEEP = 'break-keep [overflow-wrap:break-word]'
 

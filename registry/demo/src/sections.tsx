@@ -93,14 +93,8 @@ function DigitSwapDemo() {
   )
 }
 
-// Abstract posters drawn as SVG so the demo ships no images and no real artwork.
-function poster(i: number, title: string): string {
-  const shades = ['#1c1c1e', '#2a2a2d', '#3a3a3e', '#4b4b50', '#5e5e63']
-  const bg = shades[i % shades.length]
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600"><rect width="400" height="600" fill="${bg}"/><circle cx="${120 + i * 40}" cy="${220 + (i % 2) * 60}" r="${90 + i * 12}" fill="none" stroke="#d4d4d8" stroke-width="2"/><rect x="40" y="470" width="${160 + i * 20}" height="6" fill="#d4d4d8"/><text x="40" y="440" font-family="sans-serif" font-size="34" font-weight="600" fill="#f4f4f5">${title}</text></svg>`
-  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
-}
-// Abstract landscapes drawn as SVG, for the heroes that need a picture and no words on it.
+// Abstract landscapes drawn as SVG, for the heroes and covers that need a picture and no words on it. A title
+// drawn into a picture is text a screen reader and a translator cannot reach, so titles stay in the markup.
 function scene(i: number): string {
   const skies = [['#8fa3b8', '#d9d4c7'], ['#2b3442', '#7d6f6a'], ['#c9a98c', '#efe2cf'], ['#51606e', '#aeb6b5'], ['#6d7f73', '#d7d3bd']]
   const [top, low] = skies[i % skies.length]
@@ -117,7 +111,7 @@ const COVERS: CoverflowItem[] = ['Field notes', 'Ten rules', 'Before and after',
   id: `c${i}`,
   title: t,
   subtitle: `Issue ${String(i + 1).padStart(2, '0')}, 2026`,
-  image: poster(i, t),
+  image: scene(i),
   description: 'A sample cover drawn for the demo.',
 }))
 
@@ -226,12 +220,17 @@ function CommandDemo() {
   const [open, setOpen] = React.useState(false)
   const [last, setLast] = React.useState('nothing yet')
   useHotkeys({ 'mod+k': () => setOpen(true) })
+  // Running a command closes the palette, and focus goes back to whatever opened it.
+  const pick = (label: string) => () => {
+    setLast(label)
+    setOpen(false)
+  }
   const items: CommandItem[] = [
-    { id: 'go-reports', kind: 'Go to', label: 'Reports', hint: 'g r', run: () => setLast('Reports') },
-    { id: 'go-audience', kind: 'Go to', label: 'Audience', hint: 'g a', run: () => setLast('Audience') },
-    { id: 'new-report', kind: 'Action', label: 'Create report', run: () => setLast('Create report') },
-    { id: 'export', kind: 'Action', label: 'Export as CSV', run: () => setLast('Export as CSV') },
-    { id: 'library', kind: 'Go to', label: '라이브러리', hint: 'g l', run: () => setLast('라이브러리') },
+    { id: 'go-reports', kind: 'Go to', label: 'Reports', hint: 'g r', run: pick('Reports') },
+    { id: 'go-audience', kind: 'Go to', label: 'Audience', hint: 'g a', run: pick('Audience') },
+    { id: 'new-report', kind: 'Action', label: 'Create report', run: pick('Create report') },
+    { id: 'export', kind: 'Action', label: 'Export as CSV', run: pick('Export as CSV') },
+    { id: 'library', kind: 'Go to', label: '라이브러리', hint: 'g l', run: pick('라이브러리') },
   ]
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -244,9 +243,11 @@ function CommandDemo() {
 
 function ShortcutsDemo() {
   const [open, setOpen] = React.useState(false)
+  useHotkeys({ '?': () => setOpen(true) }, !open)
   return (
-    <div>
+    <div className="flex flex-wrap items-center gap-3">
       <Button variant="outline" onClick={() => setOpen(true)}>Show shortcuts</Button>
+      <span className="text-sm text-text-muted">or press ?</span>
       {open && (
         <ShortcutsCheatsheet
           onClose={() => setOpen(false)}
@@ -257,6 +258,59 @@ function ShortcutsDemo() {
         />
       )}
     </div>
+  )
+}
+
+function InputDemo() {
+  const id = React.useId()
+  return (
+    <div className="max-w-sm space-y-4">
+      <div className="space-y-1.5">
+        <label htmlFor={`${id}-search`} className="text-xs font-medium text-text-muted">Search</label>
+        <Input id={`${id}-search`} placeholder="Type a query" />
+      </div>
+      <div className="space-y-1.5">
+        <label htmlFor={`${id}-name`} className="text-xs font-medium text-text-muted">Campaign name</label>
+        <Input id={`${id}-name`} defaultValue="Summer promotion" />
+      </div>
+      <div className="space-y-1.5">
+        <label htmlFor={`${id}-range`} className="text-xs font-medium text-text-muted">Range</label>
+        <Select id={`${id}-range`} defaultValue="30d">
+          <option value="7d">Last 7 days</option>
+          <option value="30d">Last 30 days</option>
+          <option value="90d">Last 90 days</option>
+        </Select>
+      </div>
+      <div className="space-y-1.5">
+        <label htmlFor={`${id}-locked`} className="text-xs font-medium text-text-subtle">Locked field</label>
+        <Input id={`${id}-locked`} disabled defaultValue="Read only" />
+      </div>
+    </div>
+  )
+}
+
+function PopoverDemo() {
+  const id = React.useId()
+  return (
+    <Popover>
+      <PopoverTrigger asChild><Button variant="outline">Size settings</Button></PopoverTrigger>
+      <PopoverContent align="start" aria-labelledby={`${id}-title`}>
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <div id={`${id}-title`} className="text-sm font-medium text-text">Dimensions</div>
+            <div className="text-caption text-text-subtle">4px grid tokens</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor={`${id}-width`} className="w-16 text-label text-text-muted">Width</label>
+            <Input id={`${id}-width`} defaultValue="320" className="h-8" />
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor={`${id}-height`} className="w-16 text-label text-text-muted">Height</label>
+            <Input id={`${id}-height`} defaultValue="180" className="h-8" />
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -452,7 +506,7 @@ export function Sections() {
       <Section id="blocks/bar" title="Bar chart">
         <div className="max-w-xl rounded-lg border border-border bg-bg-elev p-4">
           <div className="mb-3 text-xs text-text-subtle">Weekly throughput</div>
-          <BarChart data={BAR_DATA} />
+          <BarChart data={BAR_DATA} label="Weekly throughput" />
         </div>
       </Section>
 
@@ -562,30 +616,7 @@ export function Sections() {
         </div>
       </Section>
 
-      <Section id="blocks/input" title="Input and select">
-        <div className="max-w-sm space-y-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-text-muted">Search</label>
-            <Input placeholder="Type a query" />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-text-muted">Campaign name</label>
-            <Input defaultValue="Summer promotion" />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-text-muted">Range</label>
-            <Select defaultValue="30d">
-              <option value="7d">Last 7 days</option>
-              <option value="30d">Last 30 days</option>
-              <option value="90d">Last 90 days</option>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-text-subtle">Locked field</label>
-            <Input disabled defaultValue="Read only" />
-          </div>
-        </div>
-      </Section>
+      <Section id="blocks/input" title="Input and select"><InputDemo /></Section>
 
       <Section id="blocks/kpi" title="Stat / KPI">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -599,33 +630,13 @@ export function Sections() {
         <div className="max-w-xl"><AreaChart data={LINE_DATA} height={140} /></div>
       </Section>
 
-      <Section id="blocks/popover" title="Popover">
-        <Popover>
-          <PopoverTrigger asChild><Button variant="outline">Size settings</Button></PopoverTrigger>
-          <PopoverContent align="start">
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <div className="text-sm font-medium text-text">Dimensions</div>
-                <div className="text-caption text-text-subtle">4px grid tokens</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="w-16 text-label text-text-muted">Width</label>
-                <Input defaultValue="320" className="h-8" />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="w-16 text-label text-text-muted">Height</label>
-                <Input defaultValue="180" className="h-8" />
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-      </Section>
+      <Section id="blocks/popover" title="Popover"><PopoverDemo /></Section>
 
       <Section id="blocks/progress" title="Progress">
         <div className="max-w-sm space-y-5">
-          <Progress value={28} />
-          <Progress value={64} />
-          <Progress value={92} />
+          <Progress value={28} aria-label="Indexing" />
+          <Progress value={64} aria-label="Rendering" />
+          <Progress value={92} aria-label="Publishing" />
           <Progress value={72} label="Upload" />
         </div>
       </Section>
@@ -677,7 +688,7 @@ export function Sections() {
                 <div className="text-[11px] text-text-subtle">{s.label}</div>
                 <div className="text-title font-semibold tabular-nums text-text">{s.value}</div>
               </div>
-              <Sparkline dir={s.dir} data={s.data} />
+              <Sparkline dir={s.dir} data={s.data} label={`${s.label} trend`} />
             </div>
           ))}
         </div>
@@ -790,7 +801,10 @@ export function Sections() {
       </Section>
 
       <Section id="motion/text-scramble" title="Text scramble">
-        <TextScramble text="Hover or focus to replay" className="text-h2 font-semibold text-text" />
+        {/* The text sits in a link, so a keyboard user replays it by tabbing to the link. */}
+        <a href="#text-scramble" className="inline-block rounded-sm text-text no-underline outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <TextScramble text="Hover or focus to replay" className="text-h2 font-semibold" />
+        </a>
       </Section>
 
       <Section id="motion/typewriter" title="Typewriter">

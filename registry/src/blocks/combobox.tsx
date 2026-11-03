@@ -18,6 +18,8 @@ export interface ComboboxProps {
   placeholder?: string
   searchPlaceholder?: string
   emptyText?: string
+  /** Name of the popup and its search field for screen readers. */
+  dialogLabel?: string
   className?: string
 }
 
@@ -43,6 +45,7 @@ export function Combobox({
   placeholder = 'Select...',
   searchPlaceholder = 'Search...',
   emptyText = 'No results',
+  dialogLabel = 'Choose an option',
   className,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
@@ -72,9 +75,10 @@ export function Combobox({
         <PopoverPrimitive.Content
           align="start"
           sideOffset={6}
+          aria-label={dialogLabel}
           className="z-50 w-56 overflow-hidden rounded-lg border border-border bg-bg-popover shadow-xl outline-none"
         >
-          <Command className="w-full">
+          <Command label={dialogLabel} className="w-full">
             <div className="border-b border-border-soft px-3">
               <Command.Input
                 placeholder={searchPlaceholder}

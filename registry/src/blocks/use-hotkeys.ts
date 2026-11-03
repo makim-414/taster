@@ -4,7 +4,8 @@ import * as React from 'react'
 
 // Keyboard hooks, React only, no dependency.
 // useHotkeys: mod+k (works while typing), two-key chords like 'g q', single keys (ignored while typing).
-// useFocusTrap: cycles Tab inside a modal. useListNavigation: j/k and arrow keys over a list.
+// useFocusTrap: moves focus into a modal, cycles Tab inside it and returns focus on close.
+// useListNavigation: j/k and arrow keys over a list.
 
 export type HotkeyHandler = (e: KeyboardEvent) => void
 
@@ -84,17 +85,25 @@ export function useFocusTrap(ref: React.RefObject<HTMLElement | null>, active = 
 
     const selector =
       'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])'
+    const focusables = () =>
+      Array.from(node.querySelectorAll<HTMLElement>(selector)).filter((el) => el.offsetParent !== null)
+
+    // Move focus in on open and hand it back on close. Leave autoFocus off the fields inside: it runs before this
+    // effect, so the element to return to would already be lost.
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    if (!node.contains(document.activeElement)) (focusables()[0] ?? node).focus()
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return
-      const items = Array.from(node.querySelectorAll<HTMLElement>(selector)).filter(
-        (el) => el.offsetParent !== null,
-      )
-      if (items.length === 0) return
+      const items = focusables()
+      if (items.length === 0) {
+        e.preventDefault()
+        return
+      }
       const first = items[0]
       const last = items[items.length - 1]
       const activeEl = document.activeElement
-      if (e.shiftKey && activeEl === first) {
+      if (e.shiftKey && (activeEl === first || activeEl === node)) {
         e.preventDefault()
         last.focus()
       } else if (!e.shiftKey && activeEl === last) {
@@ -104,7 +113,10 @@ export function useFocusTrap(ref: React.RefObject<HTMLElement | null>, active = 
     }
 
     node.addEventListener('keydown', onKey, true)
-    return () => node.removeEventListener('keydown', onKey, true)
+    return () => {
+      node.removeEventListener('keydown', onKey, true)
+      if (opener && opener !== node && !node.contains(opener) && opener.isConnected) opener.focus()
+    }
   }, [ref, active])
 }
 
