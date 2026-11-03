@@ -7,12 +7,14 @@ import { safeHref, youtubeId } from './_url'
 // front card opens a preview dialog (an image, or a YouTube trailer that loads only on demand).
 // Source: "Glassy Coverflow Carousel" by troyjlorents-gh on 21st.dev
 // (https://21st.dev/@troyjlorents-gh/components/glassy-coverflow-carousel), whose coverflow
-// geometry is adapted from educalvolpz/coverflow-carousel on 21st.dev.
+// geometry is adapted from "Coverflow Carousel" by Edu Calvo (educalvolpz) on 21st.dev
+// (https://21st.dev/@educalvolpz/components/coverflow-carousel).
 // Changes: colors map to the registry tokens instead of --color-*, lucide icons are the registry
 // icon set, the radial glow behind the stage and the brand header are gone (BG-01, COL-07), the
 // position reads "3 of 5" instead of "03 / 05" (LAY-03), the turn angle is a prop, and the root is a section with a min height instead of a full viewport.
 // Upstream license: MIT as stated on the 21st.dev listing (no LICENSE file published),
-// Copyright (c) troyjlorents-gh. Full text in THIRD_PARTY_NOTICES.md.
+// Copyright (c) troyjlorents-gh. The coverflow geometry: MIT as stated on its 21st.dev listing,
+// Copyright (c) Edu Calvo. Full text in THIRD_PARTY_NOTICES.md.
 //
 // patterns/focus-card-carousel.md is the quiet default (flat track, about 8 degrees at most). Use the
 // coverflow when the items are posters or covers and browsing them is the point, not to hold copy.
