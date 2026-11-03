@@ -1,6 +1,8 @@
 // Validates schemas, cross links, the skill bundle and text hygiene. Prints VALIDATE OK on success.
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import * as meta from './check-meta.mjs';
 import { ROOT, PATTERN_SECTIONS, readJson, loadPatterns, bundleFiles, parseFrontmatter } from './lib.mjs';
 import { runAll as runTaxonomyChecks } from './check-taxonomy.mjs';
 import { previewFile, stageHash } from '../registry/stage-hash.mjs';
@@ -126,6 +128,33 @@ const cx = readJson('.codex-plugin/plugin.json');
 if (mk.plugins[0].version !== cx.version) err('plugin versions differ between .claude-plugin and .codex-plugin');
 for (const s of mk.plugins[0].skills) if (!fs.existsSync(path.join(ROOT, s, 'SKILL.md'))) err(`marketplace skill path missing ${s}`);
 
+// Package and plugin metadata (scripts/check-meta.mjs): the descriptions and every count stated in prose, versions,
+// dependencies and Node versions, and the files npm would publish.
+const counts = meta.metaCounts({ rules, patterns: files, components: registry });
+{
+  const json = Object.fromEntries([...new Set([...meta.DESCRIPTIONS.map((d) => d.file), 'engine/package.json'])].map((f) => [f, readJson(f)]));
+  for (const d of meta.DESCRIPTIONS) {
+    const text = d.text(counts);
+    if (meta.getAt(json[d.file], d.at) !== text) err(`${d.file} ${d.at.join('.')} is stale (run node scripts/build-docs.mjs)`);
+    if (d.max && text.length > d.max) err(`${d.file} ${d.at.join('.')} has ${text.length} characters, the limit is ${d.max}`);
+  }
+  for (const f of meta.COUNTED_FILES) for (const e of meta.countErrors(f, fs.readFileSync(path.join(ROOT, f), 'utf8'), counts)) err(e);
+  const sources = Object.fromEntries(['engine/server.mjs', 'engine/acp.mjs', 'engine/sarif.mjs'].map((f) => [f, fs.readFileSync(path.join(ROOT, f), 'utf8')]));
+  for (const e of meta.versionErrors(json, sources)) err(e);
+  for (const e of meta.packageErrors(json['package.json'], json['engine/package.json'], fs.readFileSync(path.join(ROOT, '.nvmrc'), 'utf8'), readJson('engine/package-lock.json'))) err(e);
+  const pack = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: ROOT, encoding: 'utf8', shell: process.platform === 'win32' });
+  let packed = null;
+  try {
+    packed = JSON.parse(pack.stdout)[0].files.map((f) => f.path);
+  } catch {
+    err(`npm pack --dry-run failed: ${(pack.stderr || pack.error?.message || '').trim().split('\n').pop()}`);
+  }
+  if (packed) for (const e of meta.packErrors(packed, json['package.json'])) err(e);
+}
+
+// Credits: a component built after a 21st.dev listing keeps that link in one of its patterns' inspiration.
+for (const e of meta.creditErrors(registry, Object.fromEntries(files.filter((p) => p.data).map((p) => [p.data.id, p.data])))) err(e);
+
 // The registry's own default type must pass the repo's own font rules: not a stock default (AC-15), not one of the
 // usual substitutes (TYP-02), and a Hangul family in the stack (KO-02).
 {
@@ -149,9 +178,12 @@ for (const s of mk.plugins[0].skills) if (!fs.existsSync(path.join(ROOT, s, 'SKI
   }
 }
 
-// Text hygiene: long dashes and emoji are banned in this repo.
+// Text hygiene: long dashes and emoji are banned in this repo. The same walk checks links to patterns and collects
+// the Markdown pages for the npx check.
 const dash = new RegExp('[' + String.fromCharCode(0x2014, 0x2013) + ']');
 const emoji = /\p{Extended_Pictographic}/u;
+const patternIds = new Set(index.map((s) => s.id));
+const docs = {};
 (function walk(d) {
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
     if (['.git', 'node_modules', 'dist', 'shots', '.next'].includes(e.name)) continue;
@@ -159,10 +191,15 @@ const emoji = /\p{Extended_Pictographic}/u;
     if (e.isDirectory()) { walk(p); continue; }
     if (!/\.(md|json|tsx?|jsx?|mjs|css|html|ya?ml)$/.test(e.name)) continue;
     const t = fs.readFileSync(p, 'utf8');
-    if (dash.test(t)) err(`dash character in ${path.relative(ROOT, p)}`);
-    if (emoji.test(t)) err(`emoji in ${path.relative(ROOT, p)}`);
+    const rel = path.relative(ROOT, p).split(path.sep).join('/');
+    if (dash.test(t)) err(`dash character in ${rel}`);
+    if (emoji.test(t)) err(`emoji in ${rel}`);
+    for (const e of meta.patternLinkErrors(rel, t, patternIds)) err(e);
+    // RELEASE.md says how to publish, CHANGELOG.md what was; the other pages say what to run today.
+    if (rel.endsWith('.md') && !['RELEASE.md', 'CHANGELOG.md'].includes(rel)) docs[rel] = t;
   }
 })(ROOT);
+for (const e of meta.npxErrors(readJson('package.json'), docs)) err(e);
 
 // exports/ must match what build-docs would write from the current rules.json.
 {
