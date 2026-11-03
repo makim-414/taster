@@ -10,6 +10,8 @@ export interface DatePickerProps {
   value?: Date
   onValueChange?: (date: Date | undefined) => void
   placeholder?: string
+  /** Name of the calendar popup for screen readers. */
+  dialogLabel?: string
   className?: string
 }
 
@@ -26,7 +28,7 @@ function fmt(d: Date) {
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
-export function DatePicker({ value, onValueChange, placeholder = 'Pick a date', className }: DatePickerProps) {
+export function DatePicker({ value, onValueChange, placeholder = 'Pick a date', dialogLabel = 'Choose a date', className }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   const [internal, setInternal] = React.useState<Date | undefined>(undefined)
   const current = value ?? internal
@@ -52,6 +54,7 @@ export function DatePicker({ value, onValueChange, placeholder = 'Pick a date', 
         <PopoverPrimitive.Content
           align="start"
           sideOffset={6}
+          aria-label={dialogLabel}
           className="z-50 rounded-lg border border-border bg-bg-popover p-3 shadow-xl outline-none"
         >
           <Calendar mode="single" selected={current} onSelect={set} />

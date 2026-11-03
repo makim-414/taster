@@ -42,7 +42,8 @@ function Answer({ text, reveal }: { text: string; reveal: 'fade' | 'letters' }) 
   let n = 0
   const words = text.split(' ')
   return (
-    <p className="m-0 pb-4 text-body text-text-muted" aria-label={text}>
+    <p className="m-0 pb-4 text-body text-text-muted">
+      <span className="sr-only">{text}</span>
       {words.map((word, w) => (
         <span key={w} className="inline-block whitespace-pre" aria-hidden>
           {[...word].map((ch) => (

@@ -39,10 +39,11 @@ function App() {
 
 function Stage() {
   // The frame is centered so short components sit in the middle of a preview. Tall ones start at the top.
+  // A div and not main: components such as AppShell bring their own main landmark.
   return (
-    <main id="stage" className="flex min-h-screen w-full flex-col justify-center px-4 py-6 sm:px-6">
+    <div id="stage" className="flex min-h-screen w-full flex-col justify-center px-4 py-6 sm:px-6">
       <Sections />
-    </main>
+    </div>
   )
 }
 
