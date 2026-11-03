@@ -56,7 +56,7 @@
   --sidebar: oklch(0.10 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.985 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary-foreground: oklch(0.205 0 0);   /* ink on the white primary, not white on white */
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
@@ -103,6 +103,8 @@
   --t-sm: 12px;
   --t-xs: 11px;
   --t-micro: 10px;
+  /* Text typed into a field. 16px or more, because iOS Safari zooms the whole page into a field set smaller. */
+  --t-input: 16px;
   --w-reg: 400;
   --w-med: 500;
   --w-semi: 600;
@@ -155,6 +157,11 @@
   --on-scrim: oklch(0.985 0 0);
   --on-scrim-muted: oklch(0.985 0 0 / 80%);
   --on-scrim-ink: oklch(0.205 0 0);     /* text on a light button placed over the scrim */
+  /* Ink for a surface that keeps its own tone in every theme: milk or smoked glass, a light or dark object.
+     Pick by the surface, never by the page: the page text color flips with the theme and the surface does not.
+     The themes leave these two alone. */
+  --ink-on-light: oklch(0.205 0 0);
+  --ink-on-dark: oklch(0.985 0 0);
 
   /* Motion. Enter and exit use ease-out, moves inside the screen use ease-in-out,
      UI stays under 300ms. ease-in is not used for UI because the first frame,
