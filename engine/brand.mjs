@@ -1,6 +1,7 @@
 // Brand intake: turn what extract.js read from a site (logo, solid action color, fonts, light or dark) into token
 // overrides, so a swap or a rebuild keeps the owner's brand instead of the repo's neutral defaults.
-// Deterministic: the same content gives the same theme. Every choice it makes is written into `notes`.
+// Deterministic: the same content gives the same theme. Every choice it makes is written into `notes`. The notes never
+// quote the page: a value read from it is named by its field in `source` (source.logo.text), which carries it as data.
 import { readFileSync } from 'node:fs';
 
 const DETECT = readFileSync(new URL('../rules/detect.js', import.meta.url), 'utf8');
@@ -67,9 +68,20 @@ function semanticHue(base, brandHue, away) {
   return { hue: h, moved: true };
 }
 
+// A face name read from a page is written into the theme's CSS, so only a plain name passes: letters, digits, spaces,
+// dot, underscore and hyphen, up to 64 characters. A quote, a backslash or a brace could end the string or the rule.
+const FAMILY = /^[\p{L}\p{N} ._-]{1,64}$/u;
 function cleanFamily(f) {
-  return String(f || '').replace(/["']/g, '').trim();
+  const name = String(f || '').trim();
+  return FAMILY.test(name) ? name : '';
 }
+// One family in a font stack, as one CSS string. cleanFamily lets no quote or backslash through; escaping them here
+// keeps the stack a list of plain strings whatever reaches it.
+const quoted = (name) => `'${String(name).replace(/[\\']/g, (c) => `\\${c}`)}'`;
+// Every declaration is name: value; inside the one rule. A value that could close it or open another (a brace, a
+// semicolon, an angle bracket, a backslash escape) is left out instead of written.
+const TOKEN_NAME = /^--[\w-]+$/;
+const TOKEN_VALUE = /^[^{};<>\\]*$/;
 
 export function brandTheme(content) {
   const notes = [];
@@ -94,21 +106,28 @@ export function brandTheme(content) {
   // 2. Typeface: carry the site's face when it was a choice, not a stock or usual AI default.
   const heading = cleanFamily(brand.fonts?.heading);
   const body = cleanFamily(brand.fonts?.body);
+  const refused = ['heading', 'body'].filter((k) => String(brand.fonts?.[k] || '').trim() && !cleanFamily(brand.fonts[k])).map((k) => `source.fonts.${k}`);
+  if (refused.length) {
+    const one = refused.length === 1;
+    notes.push(`The face ${one ? 'name' : 'names'} in ${refused.join(' and ')} ${one ? 'is not a plain font name' : 'are not plain font names'} (letters, digits, spaces, dot, underscore, hyphen), so ${one ? 'it is' : 'they are'} not written into the CSS.`);
+  }
   const pick = heading || body;
   const lower = pick.toLowerCase();
+  // Stock and usual AI faces are names from Taster's own lists, so their notes can say them.
   if (!pick || DEFAULT_FONTS.has(lower)) {
     tokens['--font'] = TASTER_FONT;
-    notes.push(`The site falls back to a stock font${pick ? ` (${pick})` : ''}, which is not a brand choice. Using the Taster default, IBM Plex.`);
+    notes.push(!pick && refused.length ? 'Using the Taster default, IBM Plex.' : `The site falls back to a stock font${pick ? ` (${pick})` : ''}, which is not a brand choice. Using the Taster default, IBM Plex.`);
   } else if (FAVORITE_FONTS.has(lower) || lower === 'inter') {
     tokens['--font'] = TASTER_FONT;
     notes.push(`The site uses ${pick}, one of the faces generated pages default to (TYP-01, TYP-02). Using IBM Plex instead. If ${pick} is part of the brand on purpose, set --font back to it and accept the finding.`);
   } else {
-    const stack = [`'${pick}'`];
-    if (body && body !== pick && !DEFAULT_FONTS.has(body.toLowerCase())) stack.push(`'${body}'`);
+    const withBody = body && body !== pick && !DEFAULT_FONTS.has(body.toLowerCase());
+    const stack = [quoted(pick)];
+    if (withBody) stack.push(quoted(body));
     if (!stack.some((f) => KOREAN_FONT_RE.test(f))) stack.push(HANGUL_FALLBACK);
     stack.push('-apple-system', 'system-ui', 'sans-serif');
     tokens['--font'] = stack.join(', ');
-    notes.push(`Keeping the site's typeface ${pick}${body && body !== pick ? ` with ${body} for body text` : ''}. Load it the way the site does.`);
+    notes.push(`Keeping the site's own typeface (source.fonts.${heading ? 'heading' : 'body'})${withBody ? ' with source.fonts.body for body text' : ''}, first in --font. Load it the way the site does.`);
   }
   if (/^ko/i.test(content?.lang || '') && !KOREAN_FONT_RE.test(tokens['--font'])) tokens['--font'] += `, ${HANGUL_FALLBACK}`;
 
@@ -125,10 +144,15 @@ export function brandTheme(content) {
   if (brandHue != null) notes.push(`Hue gap to the brand: success ${Math.round(hueGap(success.hue, brandHue))} degrees, failure ${Math.round(hueGap(danger.hue, brandHue))} degrees.`);
 
   // 4. Logo: never redrawn.
-  if (brand.logo?.kind === 'image') notes.push(`Logo is an image (${brand.logo.src}). Use the file as is; do not redraw it or set it in a font.`);
-  else if (brand.logo?.kind === 'text') notes.push(`Logo is set as text ("${brand.logo.text}"). Ask the owner for the logo file before shipping; do not invent a mark.`);
+  if (brand.logo?.kind === 'image') notes.push('Logo is an image (source.logo.src). Use the file as is; do not redraw it or set it in a font.');
+  else if (brand.logo?.kind === 'text') notes.push('Logo is set as text (source.logo.text). Ask the owner for the logo file before shipping; do not invent a mark.');
   else notes.push('No logo found. Ask the owner for the logo file.');
 
+  for (const [k, v] of Object.entries(tokens)) {
+    if (TOKEN_NAME.test(k) && TOKEN_VALUE.test(String(v))) continue;
+    delete tokens[k];
+    notes.push(`${TOKEN_NAME.test(k) ? k : 'A token'} was left out: its value cannot be written into CSS safely.`);
+  }
   const css = [
     '/* Brand theme generated by Taster from the original site. Load after registry/src/tokens.css. */',
     // Past :root alone: the light theme sets --brand on :root[data-theme="light"], which would beat a plain :root.
