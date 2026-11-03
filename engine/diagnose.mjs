@@ -4,6 +4,9 @@ import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
+import { NotDiagnosedError, classifyLoad } from './blocked.mjs';
+
+export { NotDiagnosedError } from './blocked.mjs';
 
 const ROOT = new URL('../', import.meta.url);
 export const DETECT_SOURCE = readFileSync(new URL('rules/detect.js', ROOT), 'utf8');
@@ -75,6 +78,17 @@ export function explainRule(id) {
   return RULE_BY_ID.get(String(id).toUpperCase()) || null;
 }
 
+// Opens url in page and waits until the layout is there. Returns what classifyLoad (engine/blocked.mjs) made of
+// the page that came back: its HTTP status, the URL after redirects, and whether it is the site at all.
+async function open(page, url, timeout) {
+  const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+  // Heavy pages (video, WebGL) can take minutes to fire load; the layout we measure is there long before.
+  await page.waitForLoadState('load', { timeout: LOAD_WAIT }).catch(() => {});
+  await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
+  await page.evaluate(() => document.fonts && document.fonts.ready);
+  return classifyLoad({ status: response ? response.status() : null, headers: response ? response.headers() : {}, requestedUrl: url, finalUrl: page.url(), page });
+}
+
 // The top `height` px of the page as JPEG at `file`, in 2000px tiles (file, file-2, ...) when one image would pass
 // MAX_SHOT_BYTES. Returns the files written, top first.
 async function capture(page, file, width, height) {
@@ -91,18 +105,17 @@ async function capture(page, file, width, height) {
   return files;
 }
 
-// One page load at one viewport. Returns the raw detect.js report.
+// One page load at one viewport. Returns the raw detect.js report with `load` (classifyLoad's verdict) added.
+// A page that is not the site (a bot check, an error or sign-in page) is not measured: no findings, no capture.
 // bypassCSP: many large sites forbid inline scripts, which would block the injected detector.
 export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50 } = {}) {
   const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true });
   try {
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
-    // Heavy pages (video, WebGL) can take minutes to fire load; the layout we measure is there long before.
-    await page.waitForLoadState('load', { timeout: LOAD_WAIT }).catch(() => {});
-    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
-    await page.evaluate(() => document.fonts && document.fonts.ready);
+    const load = await open(page, url, timeout);
+    if (!load.diagnosed) return { url: load.finalUrl, viewport, page: { width: viewport.width, height: 0 }, counts: {}, findings: [], load };
     await page.addScriptTag({ content: DETECT_SOURCE });
     const report = await page.evaluate((o) => window.tasterDetect(o), { highlight: highlight || !!screenshot, maxPerRule });
+    report.load = load;
     if (screenshot) {
       // Wide overflow is shown up to half a screen past the viewport, the way the web capture does.
       const width = Math.min(Math.max(report.page.width, viewport.width), Math.round(viewport.width * 1.5));
@@ -123,6 +136,8 @@ export async function diagnose(target, { viewports = VIEWPORTS, outDir = null, t
     for (const viewport of viewports) {
       const screenshot = outDir ? join(outDir, `annotated-${viewport.width}.jpg`) : null;
       runs.push(await detectOnce(browser, url, viewport, { screenshot, timeout, maxPerRule }));
+      // A block or error page is not loaded again at the next width.
+      if (!runs.at(-1).load.diagnosed) break;
     }
     return summarize(url, runs);
   } finally {
@@ -130,9 +145,31 @@ export async function diagnose(target, { viewports = VIEWPORTS, outDir = null, t
   }
 }
 
-// Groups findings by rule across widths, most severe and most frequent first.
+const sameUrl = (a, b) => {
+  try {
+    return new URL(a).href === new URL(b).href;
+  } catch {
+    return a === b;
+  }
+};
+
+// Groups findings by rule across widths, most severe and most frequent first. When a width got a page that is not
+// the site, the report says so (diagnosed: false, notDiagnosed) and carries no findings at all.
 export function summarize(url, runs) {
-  const ids = [...new Set(runs.flatMap((run) => Object.keys(run.counts)))];
+  const loads = runs.map((run) => run.load || { diagnosed: true, status: null, finalUrl: run.url || url });
+  const failed = loads.find((l) => !l.diagnosed);
+  const counted = failed ? [] : runs;
+  const finalUrl = loads[0]?.finalUrl || url;
+  const load = {
+    finalUrl,
+    redirected: !sameUrl(finalUrl, url),
+    status: loads[0]?.status ?? null,
+    diagnosed: !failed,
+    ...(failed && { notDiagnosed: { reason: failed.reason, status: failed.status, title: failed.title, finalUrl: failed.finalUrl, message: failed.message } }),
+    // Sites that send phones elsewhere (an m. host) land on different pages per width.
+    ...(new Set(loads.map((l) => l.finalUrl)).size > 1 && { finalUrls: Object.fromEntries(runs.map((run, i) => [run.viewport.width, loads[i].finalUrl])) }),
+  };
+  const ids = [...new Set(counted.flatMap((run) => Object.keys(run.counts)))];
   const rules = ids
     .map((id) => {
       const rule = RULE_BY_ID.get(id);
@@ -140,27 +177,29 @@ export function summarize(url, runs) {
         ruleId: id,
         name: rule.name,
         severity: rule.severity,
-        counts: Object.fromEntries(runs.map((run) => [run.viewport.width, run.counts[id] || 0])),
+        counts: Object.fromEntries(counted.map((run) => [run.viewport.width, run.counts[id] || 0])),
         fix: rule.fix,
         fix_patterns: rule.fix_patterns,
-        findings: runs.flatMap((run) => run.findings.filter((f) => f.ruleId === id).map((f) => ({ width: run.viewport.width, ...f }))),
+        findings: counted.flatMap((run) => run.findings.filter((f) => f.ruleId === id).map((f) => ({ width: run.viewport.width, ...f }))),
       };
     })
     .sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity] || Math.max(...Object.values(b.counts)) - Math.max(...Object.values(a.counts)) || a.ruleId.localeCompare(b.ruleId));
   return {
     url,
+    ...load,
     widths: runs.map((run) => run.viewport.width),
     measured: RULES.filter((r) => r.detect.level !== 'manual').length,
     rulesHit: rules.length,
     findings: rules.reduce((n, r) => n + Math.max(...Object.values(r.counts)), 0),
     rules,
     judgeByEye: RULES.filter((r) => r.detect.level === 'manual').map((r) => r.id),
-    screenshots: runs.flatMap((run) => run.screenshots || [run.screenshot]).filter(Boolean),
+    screenshots: counted.flatMap((run) => run.screenshots || [run.screenshot]).filter(Boolean),
   };
 }
 
 export function formatText(report) {
-  const out = [report.url, `${report.rulesHit} of ${report.measured} measured rules hit at ${report.widths.join(' and ')} wide`];
+  if (report.diagnosed === false) return report.notDiagnosed.message;
+  const out = [report.redirected ? `${report.url} (redirected to ${report.finalUrl})` : report.url, `${report.rulesHit} of ${report.measured} measured rules hit at ${report.widths.join(' and ')} wide`];
   for (const r of report.rules) {
     const counts = report.widths.map((w) => `${r.counts[w]} at ${w}`).join(', ');
     out.push('', `${r.ruleId}  ${r.name}  [${r.severity}]  ${counts}`);
@@ -182,16 +221,14 @@ export function formatText(report) {
 
 // The page's content (words, links, images, brand color and fonts, nav, footer) in reading order, read at
 // desktop width. This is what a rebuild keeps; diagnose() says what it drops.
+// Throws NotDiagnosedError when the page is a bot check, an error or a sign-in page, not the site.
 export async function extract(target, { timeout = 30000, viewport = VIEWPORTS[0] } = {}) {
   const url = toUrl(target);
   const browser = await launch();
   try {
     const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true });
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
-    // Heavy pages (video, WebGL) can take minutes to fire load; the layout we measure is there long before.
-    await page.waitForLoadState('load', { timeout: LOAD_WAIT }).catch(() => {});
-    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
-    await page.evaluate(() => document.fonts && document.fonts.ready);
+    const load = await open(page, url, timeout);
+    if (!load.diagnosed) throw new NotDiagnosedError(load);
     await page.addScriptTag({ content: EXTRACT_SOURCE });
     return await page.evaluate(() => window.tasterExtract());
   } finally {

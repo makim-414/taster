@@ -7,7 +7,7 @@ import type { Browser, BrowserContext, BrowserContextOptions, Page } from 'playw
 import { closeBrowser, fencePage, launchBrowser, tmpFree, type Budget } from './browser.ts';
 
 type Viewport = { width: number; height: number };
-type RawRun = { viewport: Viewport; page: { width: number; height: number }; counts: Record<string, number>; findings: unknown[]; screenshot?: string };
+type RawRun = { viewport: Viewport; page: { width: number; height: number }; counts: Record<string, number>; findings: unknown[]; screenshot?: string; load?: { diagnosed: boolean } };
 export type RuleHit = {
   ruleId: string;
   name: string;
@@ -17,7 +17,7 @@ export type RuleHit = {
   fix_patterns: string[];
   findings: { width: number; selector: string; text?: string; evidence?: unknown }[];
 };
-export type Summary = { url: string; widths: number[]; measured: number; rulesHit: number; findings: number; rules: RuleHit[]; judgeByEye: string[] };
+export type Summary = { url: string; status?: number | null; diagnosed?: boolean; widths: number[]; measured: number; rulesHit: number; findings: number; rules: RuleHit[]; judgeByEye: string[] };
 type Engine = {
   VIEWPORTS: Viewport[];
   detectOnce: (browser: unknown, url: string, viewport: Viewport, opts: Record<string, unknown>) => Promise<RawRun>;
@@ -120,8 +120,12 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
           if (budget.blocked) throw new PageLoadError(budget.blocked);
           throw new PageLoadError(`페이지를 열지 못했습니다. (${String((err as Error).message || err).split('\n')[0].slice(0, 120)})`);
         }
+        if (runs[runs.length - 1].load?.diagnosed === false) break;
       }
-      return engine.summarize(url, runs);
+      const summary = engine.summarize(url, runs);
+      // A bot check, an error or a sign-in page came back instead of the site: no result for that site at all.
+      if (summary.diagnosed === false) throw new PageLoadError(`사이트가 아니라 차단·오류 화면${summary.status ? `(HTTP ${summary.status})` : ''}을 받았습니다. 우회하지 않으므로 진단하지 않았습니다.`);
+      return summary;
     })();
     const report = await Promise.race([work, deadline]);
     return { report, shots, requests: budget.requests };
