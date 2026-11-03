@@ -22,6 +22,9 @@ const HELP = `Usage
   node engine/cli.mjs export <agents|claude|cursor|windsurf|cline|copilot|gemini|all> [--dir <project>]
   node engine/cli.mjs lint [paths...] [--json] [--baseline <file>] [--write-baseline] [--selftest]
 
+A target is an http(s) URL, localhost:<port> (opened as http), a bare domain (opened as https), or a local .html,
+.htm, .xhtml or .svg file. Other local files are refused, and a missing file is never guessed into a web address.
+
 Options
   --out <dir>       write report.json and annotated-<width>.png into <dir>
   --json            print the report as JSON
@@ -47,6 +50,9 @@ lint reads source files (tsx, jsx, vue, svelte, html, css, md) for the code form
 pills, thick left bars, caps with wide tracking, long dashes, emoji, transition-all, ease-in, hard-coded colors,
 pixel one-offs, stock palette classes and Tailwind screens that drop the defaults. --baseline makes it a ratchet:
 counts per file and check may only go down. A line passes with a comment taster-allow <reason>.
+
+Environment
+  TASTER_ROOT=<dir>     open local files only inside <dir>
 
 Exit codes: 0 no findings, 1 findings, 2 error`;
 
