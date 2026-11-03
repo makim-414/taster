@@ -138,5 +138,9 @@
     "CPY-03"
   ],
   "clean-quality.html": [],
+  "clean-type.html": [],
+  "slop-type.html": [
+    "TYP-05"
+  ],
   "gap-col08-backdrop.html": []
 }

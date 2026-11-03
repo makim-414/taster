@@ -155,6 +155,13 @@ for (const [key, o] of Object.entries(engineOut)) {
   console.log(`${key}: expected ${want.length}, found ${want.length - missing.length}, total findings ${o.result.findings.length}`);
 }
 
+// TYP-05 skips wordmarks (clean-type.html) and reports a heading once, even when each word is its own span.
+for (const w of [1440, 390]) {
+  const typ = engineOut[`slop-type.html@${w}`].result.findings.filter((x) => x.ruleId === 'TYP-05').map((x) => x.selector).sort();
+  const want = ['#t-pct', '#t-split', '#t-story'];
+  check(JSON.stringify(typ) === JSON.stringify(want), `slop-type.html at ${w}: TYP-05 on ${typ.join(' ') || 'nothing'}, want ${want.join(' ')}`);
+}
+
 // Known gaps: these fixtures record what a rule cannot measure yet. When the rule starts to fire, the gap is closed:
 // move the fixture's id into expected-engine.json as a positive one.
 for (const [f, id] of Object.entries({ 'gap-col08-backdrop.html': 'COL-08' })) {
