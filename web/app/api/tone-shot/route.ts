@@ -2,7 +2,7 @@
 // this route never opens an address a visitor typed. Pictures go back in the response; they are never written to disk, kept in server memory up to 30 minutes.
 import { NextResponse } from 'next/server';
 import catalog from '../../../../taxonomy/tone-refs.json';
-import { clientIp, takeShotCeiling, takeShotToken, withGate } from '../../../lib/limits.ts';
+import { NEED_MS, clientIp, gateBudget, takeShotCeiling, takeShotToken, withGate } from '../../../lib/limits.ts';
 import { allKept, captureShots } from '../../../lib/tone-shot.ts';
 
 export const runtime = 'nodejs';
@@ -16,6 +16,7 @@ function fail(status: number, code: string, message: string) {
 }
 
 export async function POST(request: Request) {
+  const started = Date.now();
   // A JSON content type forces a CORS preflight from other origins, which this route never answers.
   if (!(request.headers.get('content-type') || '').startsWith('application/json')) return fail(415, 'content-type', '요청 형식이 맞지 않습니다.');
   let body: { ids?: unknown };
@@ -33,7 +34,8 @@ export async function POST(request: Request) {
     if (!takeShotCeiling()) return fail(503, 'busy', '지금 화면을 여는 요청이 많습니다. 1분 뒤에 다시 해 주세요.');
   }
   try {
-    const shots = allKept(targets) ? await captureShots(targets) : await withGate(() => captureShots(targets));
+    // The wait for the browser and the capture share the time limit: the capture gets what the wait left.
+    const shots = allKept(targets) ? await captureShots(targets) : await withGate((leftMs) => captureShots(targets, { deadlineMs: leftMs }), { budgetMs: gateBudget(maxDuration, started), needMs: NEED_MS.shots });
     if (!shots) return fail(503, 'busy', '지금 요청이 몰려 있습니다. 조금 뒤에 다시 해 주세요.');
     return NextResponse.json({ shots }, { headers: { 'cache-control': 'no-store' } });
   } catch (err) {
