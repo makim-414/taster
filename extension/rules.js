@@ -319,5 +319,37 @@ window.__tasterRules = {
  "MOT-07": {
   "name": "No reduced motion version",
   "severity": "medium"
+ },
+ "MOT-08": {
+  "name": "Hover that moves the element on every device",
+  "severity": "low"
+ },
+ "RSP-07": {
+  "name": "Control covered by another element",
+  "severity": "high"
+ },
+ "CMP-12": {
+  "name": "Stretched image",
+  "severity": "medium"
+ },
+ "KO-12": {
+  "name": "Tight line height on a large Korean heading",
+  "severity": "medium"
+ },
+ "LAY-07": {
+  "name": "Long content as one image",
+  "severity": "medium"
+ },
+ "MOT-09": {
+  "name": "Content left hidden",
+  "severity": "high"
+ },
+ "KO-13": {
+  "name": "A single syllable alone on a Korean heading's last line",
+  "severity": "low"
+ },
+ "CPY-03": {
+  "name": "Machine codes on screen",
+  "severity": "low"
  }
 };

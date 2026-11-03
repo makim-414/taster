@@ -58,5 +58,16 @@
     "MOT-06",
     "MOT-07"
   ],
-  "clean-motion.html": []
+  "clean-motion.html": [],
+  "slop-quality.html": [
+    "MOT-08",
+    "RSP-07",
+    "CMP-12",
+    "KO-12",
+    "LAY-07",
+    "MOT-09",
+    "KO-13",
+    "CPY-03"
+  ],
+  "clean-quality.html": []
 }

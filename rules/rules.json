@@ -3103,6 +3103,199 @@
           "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
         }
       ]
+    },
+    {
+      "id": "MOT-08",
+      "name": "Hover that moves the element on every device",
+      "what": "A :hover rule lifts or slides the element (transform, top, margin) without an @media (hover: hover) guard.",
+      "why": "On a touch screen the hover sticks after a tap, so the card stays lifted. On a desktop the card slides away from the pointer that is about to click it. Generated cards lift on hover by default.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "A stylesheet rule whose selector has :hover and that sets transform, translate, scale, top, bottom or a vertical margin, with no enclosing @media (hover: hover) or (pointer: fine). Reported on the elements the selector matches.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "guard": "@media (hover: hover)"
+        }
+      },
+      "fix": "Put hover movement inside @media (hover: hover) and (pointer: fine), or change the border or background instead of moving the element.",
+      "fix_patterns": [
+        "state-change-motion"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": [
+        {
+          "label": "MDN, the hover media feature",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/hover"
+        }
+      ]
+    },
+    {
+      "id": "RSP-07",
+      "name": "Control covered by another element",
+      "what": "A visible button, link or field whose center is under another element, so a click lands on the wrong thing.",
+      "why": "A layer from a neighbouring block sat over a button on a narrow layout and swallowed every click; the button looked fine. Seen in our own work.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "For each control in the viewport, document.elementFromPoint at its center returns an element that is not the control, inside it, its label, a dialog, or a fixed or sticky layer.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "probe": "elementFromPoint at the center"
+        }
+      },
+      "fix": "Find the covering element (its selector is in the evidence) and take it out of the flow at this width, lower its z-index, or give it pointer-events: none if it is decoration.",
+      "fix_patterns": [
+        "readable-at-every-width"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "CMP-12",
+      "name": "Stretched image",
+      "what": "A raster image drawn at a different aspect ratio than its file, with object-fit left at its default.",
+      "why": "A logo stretched sideways by a flex container is the quickest way to look unfinished. The default align-items: stretch does it without anyone choosing it.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "An <img> (not SVG) whose drawn content box differs from its file's aspect ratio by more than 3% or 2px while object-fit is fill.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "tolerance": 0.03
+        }
+      },
+      "fix": "Set one dimension and let the other be auto, or use object-fit: cover (photos) or contain (logos). In a flex column add align-self: flex-start or align-items: flex-start.",
+      "fix_patterns": [
+        "media-tile-card",
+        "original-logo-assets"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "KO-12",
+      "name": "Tight line height on a large Korean heading",
+      "what": "A Korean heading above 28px that wraps to two or more lines with a line height under about 1.05.",
+      "why": "Hangul final consonants sit low; with a Latin display line height the lines touch or clip. Fixed in our own work by raising 0.9 to above 1.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element with mostly Hangul text, font size above 28px, two or more rendered lines and line-height divided by font-size under 1.05. KO-03 covers body text up to 28px.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "font_size_min_px": 28,
+          "line_height_min": 1.05
+        }
+      },
+      "fix": "Use 1.2 to 1.35 for Korean display headings; keep the tight Latin value only for Latin headlines.",
+      "fix_patterns": [
+        "korean-type-setup"
+      ],
+      "severity": "medium",
+      "korean": true,
+      "refs": []
+    },
+    {
+      "id": "LAY-07",
+      "name": "Long content as one image",
+      "what": "A content image several screens tall with almost no text around it: the page is a picture of text.",
+      "why": "A product page drawn as one long image cannot be searched, translated, zoomed, read aloud or edited, and it loads slowly on a phone.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "An <img> at least three viewports tall and 40% of the viewport wide whose surrounding block has under one character of text per 40px of the image's height.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "screens_min": 3
+        }
+      },
+      "fix": "Set the headings, copy and numbers as text and keep images for photos. Split a long design into sections with real text between the pictures.",
+      "fix_patterns": [
+        "long-form-prose",
+        "product-detail-page"
+      ],
+      "severity": "medium",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "MOT-09",
+      "name": "Content left hidden",
+      "what": "Text or images in the first screen still at opacity 0 and shifted after the page has settled: a scroll reveal that never fired.",
+      "why": "A reveal that waits for a scroll event hides the content from people who do not scroll, from crawlers and from screenshots. Seen on rebuilt sites where the first section never appeared.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "An element in the first viewport with 40 or more characters of text or an image, opacity 0, and a transform or a reveal class or data-aos attribute, outside dialogs, menus, tooltips and fixed layers, after load.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "opacity_max": 0.05
+        }
+      },
+      "fix": "Render content visible by default and add the entrance as an enhancement, with a timeout that shows everything if the observer never fires.",
+      "fix_patterns": [
+        "scroll-reveal-wrapper"
+      ],
+      "severity": "high",
+      "korean": false,
+      "refs": []
+    },
+    {
+      "id": "KO-13",
+      "name": "A single syllable alone on a Korean heading's last line",
+      "what": "A wrapped Korean heading whose last line holds one syllable.",
+      "why": "A heading that ends in a stray syllable reads as broken. A common cause is a max-width in ch, which is measured on the Latin zero and is the wrong width for Hangul.",
+      "detect": {
+        "level": "deterministic",
+        "signal": "Element with mostly Hangul text, a heading tag or 22px and up, two or more lines, and exactly one non-space character on its last rendered line. A whole short word on the last line is not reported.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "last_line_chars": 1
+        }
+      },
+      "fix": "Use text-wrap: balance with word-break: keep-all, set the width in em rather than ch, or rewrite the heading.",
+      "fix_patterns": [
+        "korean-line-breaking"
+      ],
+      "severity": "low",
+      "korean": true,
+      "refs": []
+    },
+    {
+      "id": "CPY-03",
+      "name": "Machine codes on screen",
+      "what": "Status codes, snake_case keys or camelCase field names shown to the reader as words.",
+      "why": "An identifier on screen tells the reader the interface is showing its plumbing. Seen in our own dashboards when a status code leaked into a label.",
+      "detect": {
+        "level": "heuristic",
+        "signal": "Visible text outside code, pre, kbd, samp and monospace elements with a SCREAMING_SNAKE token (NO_ANSWER), a snake_case token (created_at) or a camelCase token (userName). Reported as candidates; product names are not judged.",
+        "selectors": [
+          "*"
+        ],
+        "css": {
+          "tokens": "SNAKE_CASE snake_case camelCase"
+        }
+      },
+      "fix": "Write the state as words (\"No answer yet\"), keep the code in a data attribute or a details panel for support.",
+      "fix_patterns": [
+        "error-state",
+        "plain-honest-copy"
+      ],
+      "severity": "low",
+      "korean": false,
+      "refs": []
     }
   ]
 }
