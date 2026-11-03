@@ -412,6 +412,9 @@ code {
 .colophon p {
   margin: 0;
 }
+.colophon p + p {
+  margin-top: var(--sp-3);
+}
 a {
   color: var(--text);
   text-underline-offset: 3px;
