@@ -35,11 +35,22 @@ for (const r of doc.rules) {
   if (keys !== 'detect,fix,fix_patterns,id,korean,name,refs,severity,what,why') err(`${at}: unexpected keys ${keys}`);
 }
 
-// detect.js registers one checker per rule as R['AC-01'] = function () { ... }.
-const checked = new Set([...detect.matchAll(/(?:flag\(|R\[)'([A-Z]{2,3}-\d{2})'/g)].map((m) => m[1]));
+// detect.js registers one checker per rule as R['AC-01'] = function () { ... } and runs them in the order of
+// var ORDER = [...]. A checker left out of ORDER never runs, so every measured rule must be in both, once.
+const registered = [...detect.matchAll(/R\['([A-Z]{2,3}-\d{2})'\]\s*=\s*function/g)].map((m) => m[1]);
+const orderList = detect.match(/var ORDER = \[([\s\S]*?)\];/);
+if (!orderList) err('detect.js: var ORDER = [...] not found');
+const order = orderList ? [...orderList[1].matchAll(/'([A-Z]{2,3}-\d{2})'/g)].map((m) => m[1]) : [];
+const twice = (list) => [...new Set(list.filter((id, i) => list.indexOf(id) !== i))];
+for (const id of twice(registered)) err(`${id}: registered twice in detect.js`);
+for (const id of twice(order)) err(`${id}: listed twice in ORDER in detect.js`);
 const measured = doc.rules.filter((r) => r.detect && r.detect.level !== 'manual').map((r) => r.id);
-for (const id of measured) if (!checked.has(id)) err(`${id}: measured in rules.json but not checked in detect.js`);
-for (const id of checked) if (!measured.includes(id)) err(`${id}: checked in detect.js but not measured in rules.json`);
+for (const id of measured) {
+  if (!registered.includes(id)) err(`${id}: measured in rules.json but not checked in detect.js`);
+  if (!order.includes(id)) err(`${id}: measured in rules.json but missing from ORDER in detect.js, so it never runs`);
+}
+for (const id of new Set(registered)) if (!measured.includes(id)) err(`${id}: checked in detect.js but not measured in rules.json`);
+for (const id of new Set(order)) if (!registered.includes(id)) err(`${id}: in ORDER but detect.js has no R['${id}'] checker`);
 
 if (errors.length) {
   for (const e of errors) console.log(`FAIL ${e}`);
