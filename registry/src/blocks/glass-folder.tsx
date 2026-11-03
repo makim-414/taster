@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { safeHref } from './_url'
 
 // Glass folder: a folder drawn as an object. A back panel holds generated artwork, the files sit in
 // the pocket, and a frosted front panel blurs whatever moves behind it. Hover leans the panel
@@ -7,9 +8,11 @@ import * as React from 'react'
 // shared canvas; pass `image` for your own picture.
 // Source: "Glassmorphism Folder Cards" by kedhareswer on 21st.dev
 // (https://21st.dev/@kedhareswer/components/glass-folder-cards).
-// Changes: label, meta and file name ink, the focus ring and the danger item use tokens (--text,
-// --accent-fg, --ring, --destructive), the font is inherited (no monospace labels, AC-09), the
-// overshooting spring is the --ease-out token (MOT-01), menu items are 44px tall, the sample names lost their dashes, and it is a named export.
+// Changes: label, meta and file name ink follow the glass, not the page (--ink-on-light on milk glass,
+// --ink-on-dark on smoked glass), the focus ring and the danger item use tokens (--ring, --destructive),
+// the glass colors are named per tone at the top of the stylesheet, file links pass safeHref, the font
+// is inherited (no monospace labels, AC-09), the overshooting spring is the --ease-out token (MOT-01),
+// menu items are 44px tall, the sample names lost their dashes, and it is a named export.
 // Upstream license: MIT as stated on the 21st.dev listing (no LICENSE file published),
 // Copyright (c) kedhareswer. Full text in THIRD_PARTY_NOTICES.md.
 //
@@ -45,7 +48,7 @@ export type FolderFile = {
   art?: ArtPreset | ArtRecipe
   /** …or an image of your own. Without either, the file is a sheet of paper. */
   image?: string
-  /** Rendered as a link when the folder is open. */
+  /** Rendered as a link when the folder is open: http, https or mailto, or a relative path. Any other scheme makes the file a button (blocks/_url.ts). */
   href?: string
 }
 
@@ -99,6 +102,7 @@ export const ART_PRESETS: Record<ArtPreset, ArtRecipe> = {
   // a long exposure: blush, oxblood and steel pulled across the frame
   aurora: {
     style: "streak",
+    // taster-allow artwork palette, painted into the canvas pixel by pixel, not a UI color
     colors: ["#f4efe9", "#e9c2b8", "#c2433f", "#2a1e2a", "#22395e", "#6f97c2", "#e5edf4"],
     scale: 0.7,
     warp: 1.4,
@@ -109,6 +113,7 @@ export const ART_PRESETS: Record<ArtPreset, ArtRecipe> = {
   // red ink folding through teal-black water
   ember: {
     style: "marble",
+    // taster-allow artwork palette, painted into the canvas pixel by pixel, not a UI color
     colors: ["#07090c", "#16252c", "#3d5f68", "#1a1416", "#a3201a", "#ef4a2b", "#ff8a5c"],
     scale: 0.62,
     warp: 3.2,
@@ -119,6 +124,7 @@ export const ART_PRESETS: Record<ArtPreset, ArtRecipe> = {
   // plum and rust, swirled
   dusk: {
     style: "marble",
+    // taster-allow artwork palette, painted into the canvas pixel by pixel, not a UI color
     colors: ["#120c18", "#3e2850", "#8f6c9c", "#2b1a24", "#b3502f", "#eab08a", "#fbe7d2"],
     scale: 0.75,
     warp: 3.6,
@@ -129,6 +135,7 @@ export const ART_PRESETS: Record<ArtPreset, ArtRecipe> = {
   // cold, pale, nearly white
   glacier: {
     style: "streak",
+    // taster-allow artwork palette, painted into the canvas pixel by pixel, not a UI color
     colors: ["#f7f8fa", "#d9e2ea", "#9fb4c7", "#e8edf2", "#bccbd8", "#ffffff"],
     scale: 0.7,
     warp: 1.6,
@@ -139,6 +146,7 @@ export const ART_PRESETS: Record<ArtPreset, ArtRecipe> = {
   // moss and brass
   verdant: {
     style: "marble",
+    // taster-allow artwork palette, painted into the canvas pixel by pixel, not a UI color
     colors: ["#070b08", "#173024", "#4f7a5a", "#141812", "#a7843a", "#e9cf87", "#fbf3d6"],
     scale: 0.7,
     warp: 3.4,
@@ -250,6 +258,7 @@ export type ArtJob = {
 export function createArtJob(width: number, height: number, recipe: ArtRecipe, seed: number): ArtJob {
   const w = Math.max(1, Math.round(width))
   const h = Math.max(1, Math.round(height))
+  // taster-allow artwork palette fallback for a recipe with fewer than two colors, painted into the canvas
   const colors = recipe.colors.length >= 2 ? recipe.colors : ["#111111", "#eeeeee"]
   const stops = colors.map((c, i) => ({ t: i / (colors.length - 1), c: hexToRgb(c) }))
   const scale = recipe.scale ?? 0.7
@@ -737,9 +746,9 @@ export function GlassFolder({
             <svg className="gf-rim gf-front-rim" viewBox={"0 0 " + W + " " + FRONT_H} aria-hidden="true">
               <defs>
                 <linearGradient id={"gf-rim-" + uid} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#fff" stopOpacity="0.95" />
-                  <stop offset="0.35" stopColor="#fff" stopOpacity="0.35" />
-                  <stop offset="1" stopColor="#fff" stopOpacity="0.12" />
+                  <stop offset="0" stopOpacity="0.95" />
+                  <stop offset="0.35" stopOpacity="0.35" />
+                  <stop offset="1" stopOpacity="0.12" />
                 </linearGradient>
               </defs>
               <path d={FRONT_PATH} stroke={"url(#gf-rim-" + uid + ")"} />
@@ -812,10 +821,11 @@ export function GlassFolder({
                 } as React.CSSProperties,
                 onAnimationEnd: id === dropped ? () => setDropped(null) : undefined,
               }
+              const href = safeHref(file.href)
               return (
                 <div key={id} role="listitem" className="gf-sheet-slot">
-                  {file.href ? (
-                    <a {...common} href={file.href} onClick={() => onFileSelect?.(file, start + v)}>
+                  {href ? (
+                    <a {...common} href={href} onClick={() => onFileSelect?.(file, start + v)}>
                       {inner}
                     </a>
                   ) : (
@@ -899,8 +909,43 @@ const GF_CSS = `
   --gf-spread: 0px;
   --gf-fan: 0deg;
   --gf-stack: 15px;
-  --gf-ink: var(--accent-fg, oklch(0.205 0 0));
+  /* Material. The folder is an object with its own glass, so these follow the tone prop and never the page
+     theme. Override any of them on the folder (the style prop works) to restyle it; data-tone="dark" swaps in smoked glass.
+     Ink is the one place a theme token comes in: --ink-on-light on milk glass and paper, --ink-on-dark on
+     smoked glass and pictures. The page text color would flip with the theme while the glass stays put. */
+  --gf-ink: var(--ink-on-light);
   --gf-ink-soft: color-mix(in oklab, var(--gf-ink) 64%, transparent);
+  --gf-paper-ink: var(--ink-on-light);
+  --gf-paper-ink-soft: color-mix(in oklab, var(--gf-paper-ink) 64%, transparent);
+  --gf-art-ink: var(--ink-on-dark);
+  --gf-art-ink-soft: color-mix(in oklab, var(--gf-art-ink) 72%, transparent);
+  --gf-danger: color-mix(in oklab, var(--destructive) 80%, var(--ink-on-light));
+  /* light that the glass catches: rims, sheen and glare, the same white in both tones */
+  --gf-rim: #fff;
+  --gf-glare: rgba(255, 255, 255, .5);
+  --gf-back-sheen: linear-gradient(180deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, 0) 22%), radial-gradient(120% 80% at 80% 0%, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 60%);
+  --gf-back-rim: rgba(255, 255, 255, .45);
+  /* milk glass */
+  --gf-shadow: rgba(16, 18, 24, .34);
+  --gf-back: linear-gradient(180deg, #f3f3f4 0%, #e3e3e6 100%);
+  --gf-tint: linear-gradient(180deg, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, .5) 42%, rgba(252, 252, 252, .93) 100%);
+  --gf-sheet: linear-gradient(180deg, #ffffff 0%, #f2f2f0 100%);
+  --gf-sheet-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 0 0 .5px rgba(0, 0, 0, .1), 0 10px 26px -8px rgba(10, 12, 20, .28);
+  --gf-sheet-lift: inset 0 1px 0 rgba(255, 255, 255, .9), 0 0 0 .5px rgba(0, 0, 0, .1), 0 22px 40px -12px rgba(10, 12, 20, .42);
+  --gf-art-sheet: #1a1a1d;
+  --gf-art-shade: linear-gradient(180deg, rgba(0, 0, 0, .42) 0%, rgba(0, 0, 0, 0) 34%);
+  --gf-art-edge: inset 0 0 0 1px rgba(255, 255, 255, .2);
+  --gf-line: rgba(24, 24, 27, .08);
+  --gf-line-head: rgba(24, 24, 27, .14);
+  --gf-add-ink: var(--ink-on-dark);
+  --gf-add: radial-gradient(120% 90% at 50% 0%, #3a3a3f 0%, #121214 55%, #050506 100%);
+  --gf-add-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), inset 0 -3px 8px rgba(0, 0, 0, .7), 0 0 0 1px rgba(0, 0, 0, .75), 0 14px 22px -8px rgba(0, 0, 0, .55), 0 3px 6px -2px rgba(0, 0, 0, .35);
+  --gf-more-ink: var(--ink-on-light);
+  --gf-more: linear-gradient(180deg, rgba(255, 255, 255, .92) 0%, rgba(226, 226, 230, .82) 100%);
+  --gf-more-shadow: inset 0 1px 0 #fff, inset 0 -2px 4px rgba(0, 0, 0, .06), 0 0 0 1px rgba(0, 0, 0, .16), 0 10px 18px -8px rgba(0, 0, 0, .3);
+  --gf-menu: rgba(252, 252, 253, .72);
+  --gf-menu-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 0 0 .5px rgba(0, 0, 0, .14), 0 24px 48px -16px rgba(10, 12, 20, .4);
+  --gf-menu-hover: rgba(24, 24, 27, .07);
   position: relative;
   display: inline-block;
   flex: none;
@@ -910,7 +955,32 @@ const GF_CSS = `
   -webkit-tap-highlight-color: transparent;
   isolation: isolate;
 }
-.gf-root[data-tone="dark"] { --gf-ink: var(--text); --gf-ink-soft: var(--text-muted); }
+/* smoked glass */
+.gf-root[data-tone="dark"] {
+  --gf-ink: var(--ink-on-dark);
+  --gf-ink-soft: color-mix(in oklab, var(--gf-ink) 72%, transparent);
+  --gf-paper-ink: var(--ink-on-dark);
+  --gf-paper-ink-soft: color-mix(in oklab, var(--gf-paper-ink) 72%, transparent);
+  --gf-danger: color-mix(in oklab, var(--destructive) 75%, var(--ink-on-dark));
+  --gf-back-rim: rgba(255, 255, 255, .16);
+  --gf-shadow: rgba(0, 0, 0, .62);
+  --gf-back: linear-gradient(180deg, #2a2a2e 0%, #121214 100%);
+  --gf-tint: linear-gradient(180deg, rgba(18, 18, 20, .18) 0%, rgba(14, 14, 16, .62) 46%, rgba(8, 8, 10, .94) 100%);
+  --gf-sheet: linear-gradient(180deg, #2c2c30 0%, #1c1c1f 100%);
+  --gf-sheet-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 0 0 .5px rgba(255, 255, 255, .08), 0 12px 28px -8px rgba(0, 0, 0, .7);
+  --gf-sheet-lift: inset 0 1px 0 rgba(255, 255, 255, .14), 0 0 0 .5px rgba(255, 255, 255, .08), 0 22px 40px -12px rgba(0, 0, 0, .8);
+  --gf-line: rgba(255, 255, 255, .08);
+  --gf-line-head: rgba(255, 255, 255, .16);
+  --gf-add-ink: var(--ink-on-light);
+  --gf-add: radial-gradient(120% 90% at 50% 0%, #ffffff 0%, #ececee 55%, #d2d2d6 100%);
+  --gf-add-shadow: inset 0 1px 0 #fff, inset 0 -3px 8px rgba(0, 0, 0, .14), 0 0 0 1px rgba(0, 0, 0, .4), 0 14px 22px -8px rgba(0, 0, 0, .7);
+  --gf-more-ink: var(--ink-on-dark);
+  --gf-more: linear-gradient(180deg, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, .06) 100%);
+  --gf-more-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 0 0 1px rgba(255, 255, 255, .1), 0 10px 18px -8px rgba(0, 0, 0, .6);
+  --gf-menu: rgba(30, 30, 34, .72);
+  --gf-menu-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 0 0 .5px rgba(255, 255, 255, .1), 0 24px 48px -16px rgba(0, 0, 0, .8);
+  --gf-menu-hover: rgba(255, 255, 255, .09);
+}
 .gf-root:hover, .gf-root:focus-within { --gf-hinge: -11deg; --gf-lift: -34px; --gf-spread: 8px; --gf-fan: 1.4deg; --gf-stack: 10px; }
 .gf-root[data-open] { --gf-hinge: -24deg; --gf-lift: -96px; --gf-spread: 40px; --gf-fan: 5deg; --gf-stack: 30px; }
 
@@ -936,20 +1006,18 @@ const GF_CSS = `
   bottom: -6px;
   height: 60px;
   border-radius: 40px;
-  background: rgba(16, 18, 24, .34);
+  background: var(--gf-shadow);
   filter: blur(22px);
   transform: translateX(calc(var(--gf-px) * -8px));
   transition: transform .9s var(--gf-ease), opacity .9s var(--gf-ease);
 }
-.gf-root[data-tone="dark"] .gf-shadow { background: rgba(0, 0, 0, .62); }
 
 .gf-back {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: linear-gradient(180deg, #f3f3f4 0%, #e3e3e6 100%);
+  background: var(--gf-back);
 }
-.gf-root[data-tone="dark"] .gf-back { background: linear-gradient(180deg, #2a2a2e 0%, #121214 100%); }
 .gf-art {
   position: absolute;
   left: -12px;
@@ -964,9 +1032,7 @@ canvas.gf-art[data-ready] { opacity: 1; filter: none; }
 .gf-back-sheen {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, 0) 22%),
-    radial-gradient(120% 80% at 80% 0%, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 60%);
+  background: var(--gf-back-sheen);
   pointer-events: none;
 }
 
@@ -980,8 +1046,7 @@ canvas.gf-art[data-ready] { opacity: 1; filter: none; }
   fill: none;
 }
 .gf-back-rim { width: 340px; height: 272px; }
-.gf-back-rim path { stroke: rgba(255, 255, 255, .45); stroke-width: 1; }
-.gf-root[data-tone="dark"] .gf-back-rim path { stroke: rgba(255, 255, 255, .16); }
+.gf-back-rim path { stroke: var(--gf-back-rim); stroke-width: 1; }
 
 /* ---- files ---------------------------------------------------------------- */
 .gf-files {
@@ -1005,11 +1070,8 @@ canvas.gf-art[data-ready] { opacity: 1; filter: none; }
   overflow: hidden;
   cursor: pointer;
   pointer-events: auto;
-  background: linear-gradient(180deg, #ffffff 0%, #f2f2f0 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .9),
-    0 0 0 .5px rgba(0, 0, 0, .1),
-    0 10px 26px -8px rgba(10, 12, 20, .28);
+  background: var(--gf-sheet);
+  box-shadow: var(--gf-sheet-shadow);
   transform-origin: 50% 100%;
   transform:
     translate(calc(var(--gf-jx) + var(--gf-slot) * var(--gf-spread)), calc(var(--gf-lift) + var(--gf-depth) * var(--gf-stack) * -1))
@@ -1020,14 +1082,13 @@ canvas.gf-art[data-ready] { opacity: 1; filter: none; }
     translate .9s var(--gf-ease),
     opacity .9s var(--gf-ease);
 }
-.gf-root[data-tone="dark"] .gf-sheet { background: linear-gradient(180deg, #2c2c30 0%, #1c1c1f 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 0 0 .5px rgba(255, 255, 255, .08), 0 12px 28px -8px rgba(0, 0, 0, .7); }
-.gf-sheet--art { background: #1a1a1d; }
+.gf-sheet--art { background: var(--gf-art-sheet); }
 .gf-root[data-open] .gf-sheet:hover,
 .gf-root[data-open] .gf-sheet:focus-visible {
   transform:
     translate(calc(var(--gf-jx) + var(--gf-slot) * var(--gf-spread)), calc(var(--gf-lift) + var(--gf-depth) * var(--gf-stack) * -1 - 18px))
     rotate(calc(var(--gf-slot) * var(--gf-fan) * .6));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 0 0 .5px rgba(0, 0, 0, .1), 0 22px 40px -12px rgba(10, 12, 20, .42);
+  box-shadow: var(--gf-sheet-lift);
   transition-delay: 0s;
 }
 .gf-sheet:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
@@ -1048,8 +1109,8 @@ canvas.gf-sheet-art[data-ready] { opacity: 1; filter: none; }
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(180deg, rgba(0, 0, 0, .42) 0%, rgba(0, 0, 0, 0) 34%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2);
+  background: var(--gf-art-shade);
+  box-shadow: var(--gf-art-edge);
   pointer-events: none;
 }
 .gf-sheet-head {
@@ -1070,17 +1131,17 @@ canvas.gf-sheet-art[data-ready] { opacity: 1; filter: none; }
   font-size: 12.5px;
   font-weight: 560;
   letter-spacing: -.005em;
-  color: var(--accent-fg, oklch(0.205 0 0));
+  color: var(--gf-paper-ink);
 }
 .gf-sheet-meta {
   flex: none;
   font-variant-numeric: tabular-nums;
   font-size: 10px;
   letter-spacing: .02em;
-  color: color-mix(in oklab, var(--accent-fg, oklch(0.205 0 0)) 64%, transparent);
+  color: var(--gf-paper-ink-soft);
 }
-.gf-root[data-tone="dark"] .gf-sheet-name, .gf-sheet--art .gf-sheet-name { color: var(--foreground, #fafafa); }
-.gf-root[data-tone="dark"] .gf-sheet-meta, .gf-sheet--art .gf-sheet-meta { color: color-mix(in oklab, var(--foreground, #fafafa) 72%, transparent); }
+.gf-sheet--art .gf-sheet-name { color: var(--gf-art-ink); }
+.gf-sheet--art .gf-sheet-meta { color: var(--gf-art-ink-soft); }
 .gf-lines {
   position: absolute;
   left: 14px;
@@ -1094,11 +1155,9 @@ canvas.gf-sheet-art[data-ready] { opacity: 1; filter: none; }
   display: block;
   height: 5px;
   border-radius: 3px;
-  background: rgba(24, 24, 27, .08);
+  background: var(--gf-line);
 }
-.gf-lines i:first-child { height: 9px; margin-bottom: 4px; background: rgba(24, 24, 27, .14); }
-.gf-root[data-tone="dark"] .gf-lines i { background: rgba(255, 255, 255, .08); }
-.gf-root[data-tone="dark"] .gf-lines i:first-child { background: rgba(255, 255, 255, .16); }
+.gf-lines i:first-child { height: 9px; margin-bottom: 4px; background: var(--gf-line-head); }
 
 .gf-sheet--drop { animation: gf-drop .85s var(--gf-ease) both; }
 @keyframes gf-drop {
@@ -1132,16 +1191,12 @@ canvas.gf-sheet-art[data-ready] { opacity: 1; filter: none; }
 .gf-tint {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, .5) 42%, rgba(252, 252, 252, .93) 100%);
-}
-.gf-root[data-tone="dark"] .gf-tint {
-  background: linear-gradient(180deg, rgba(18, 18, 20, .18) 0%, rgba(14, 14, 16, .62) 46%, rgba(8, 8, 10, .94) 100%);
+  background: var(--gf-tint);
 }
 .gf-spec {
   position: absolute;
   inset: 0;
-  background: radial-gradient(260px 200px at calc(50% + var(--gf-px) * 46%) calc(30% + var(--gf-py) * 40%), rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(260px 200px at calc(50% + var(--gf-px) * 46%) calc(30% + var(--gf-py) * 40%), var(--gf-glare), transparent 70%);
   mix-blend-mode: soft-light;
   opacity: .9;
   transition: background-position .6s var(--gf-ease);
@@ -1149,6 +1204,7 @@ canvas.gf-sheet-art[data-ready] { opacity: 1; filter: none; }
 }
 .gf-root[data-tone="dark"] .gf-spec { mix-blend-mode: screen; opacity: .16; }
 .gf-front-rim { width: 340px; height: 198px; }
+.gf-front-rim stop { stop-color: var(--gf-rim); }
 .gf-front-rim path { stroke-width: 2.4; transition: stroke-width .3s var(--gf-ease); }
 .gf-root[data-tone="dark"] .gf-front-rim { opacity: .55; }
 
@@ -1217,35 +1273,16 @@ canvas.gf-sheet-art[data-ready] { opacity: 1; filter: none; }
 .gf-key:active { transform: translateY(0) scale(.93); transition-duration: .12s; }
 .gf-key:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 .gf-key--add {
-  color: #fff;
-  background: radial-gradient(120% 90% at 50% 0%, #3a3a3f 0%, #121214 55%, #050506 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .22),
-    inset 0 -3px 8px rgba(0, 0, 0, .7),
-    0 0 0 1px rgba(0, 0, 0, .75),
-    0 14px 22px -8px rgba(0, 0, 0, .55),
-    0 3px 6px -2px rgba(0, 0, 0, .35);
-}
-.gf-root[data-tone="dark"] .gf-key--add {
-  color: #111113;
-  background: radial-gradient(120% 90% at 50% 0%, #ffffff 0%, #ececee 55%, #d2d2d6 100%);
-  box-shadow: inset 0 1px 0 #fff, inset 0 -3px 8px rgba(0, 0, 0, .14), 0 0 0 1px rgba(0, 0, 0, .4), 0 14px 22px -8px rgba(0, 0, 0, .7);
+  color: var(--gf-add-ink);
+  background: var(--gf-add);
+  box-shadow: var(--gf-add-shadow);
 }
 .gf-key--more {
-  color: #111113;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .92) 0%, rgba(226, 226, 230, .82) 100%);
+  color: var(--gf-more-ink);
+  background: var(--gf-more);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  box-shadow:
-    inset 0 1px 0 #fff,
-    inset 0 -2px 4px rgba(0, 0, 0, .06),
-    0 0 0 1px rgba(0, 0, 0, .16),
-    0 10px 18px -8px rgba(0, 0, 0, .3);
-}
-.gf-root[data-tone="dark"] .gf-key--more {
-  color: #f5f5f7;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, .06) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 0 0 1px rgba(255, 255, 255, .1), 0 10px 18px -8px rgba(0, 0, 0, .6);
+  box-shadow: var(--gf-more-shadow);
 }
 .gf-key--more[aria-expanded="true"] { transform: scale(.96); }
 .gf-glyph { display: block; max-width: none; fill: none; stroke: currentColor; stroke-linecap: round; }
@@ -1264,10 +1301,10 @@ canvas.gf-sheet-art[data-ready] { opacity: 1; filter: none; }
   border-radius: 16px;
   display: flex;
   flex-direction: column;
-  background: rgba(252, 252, 253, .72);
+  background: var(--gf-menu);
   -webkit-backdrop-filter: blur(24px) saturate(1.6);
   backdrop-filter: blur(24px) saturate(1.6);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 0 0 .5px rgba(0, 0, 0, .14), 0 24px 48px -16px rgba(10, 12, 20, .4);
+  box-shadow: var(--gf-menu-shadow);
   transform-origin: 100% 100%;
   opacity: 0;
   visibility: hidden;
@@ -1275,7 +1312,6 @@ canvas.gf-sheet-art[data-ready] { opacity: 1; filter: none; }
   transition: opacity .2s var(--gf-ease), transform .32s var(--gf-spring), visibility 0s .32s;
 }
 .gf-menu[data-open] { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
-.gf-root[data-tone="dark"] .gf-menu { background: rgba(30, 30, 34, .72); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 0 0 .5px rgba(255, 255, 255, .1), 0 24px 48px -16px rgba(0, 0, 0, .8); }
 .gf-menu-item {
   all: unset;
   box-sizing: border-box;
@@ -1286,14 +1322,11 @@ canvas.gf-sheet-art[data-ready] { opacity: 1; filter: none; }
   border-radius: 10px;
   font-size: 13.5px;
   font-weight: 450;
-  color: var(--accent-fg, oklch(0.205 0 0));
+  color: var(--gf-ink);
   cursor: pointer;
 }
-.gf-root[data-tone="dark"] .gf-menu-item { color: var(--text); }
-.gf-menu-item:hover, .gf-menu-item:focus-visible { background: rgba(24, 24, 27, .07); }
-.gf-root[data-tone="dark"] .gf-menu-item:hover, .gf-root[data-tone="dark"] .gf-menu-item:focus-visible { background: rgba(255, 255, 255, .09); }
-.gf-menu-item--danger { color: color-mix(in oklab, var(--destructive) 80%, black); }
-.gf-root[data-tone="dark"] .gf-menu-item--danger { color: var(--destructive); }
+.gf-menu-item:hover, .gf-menu-item:focus-visible { background: var(--gf-menu-hover); }
+.gf-menu-item--danger { color: var(--gf-danger); }
 
 /* ---- entrance: the folder assembles itself ---------------------------------- */
 .gf-root:not([data-entered]) .gf-back,
