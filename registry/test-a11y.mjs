@@ -4,7 +4,9 @@
 // progress bars carry their names. Part two drives demo/dist/index.html?only=<id> in Chrome: the command palette is a
 // combobox whose Enter runs the row shown as chosen, modal sheets take focus in and hand it back, focus rings show,
 // labels are connected, popups have names, the weekday row reads at 4.5:1 and the skeleton pulse stops under reduced
-// motion.
+// motion. In both themes: glass folder labels read at 4.5:1 on the glass behind them, the sidebar token pairs read,
+// the focus ring is opaque at 3:1 on every surface, and the workflow section follows the page. Under reduced motion
+// the workflow section's particle orb draws one frame and runs no animation loop.
 // Run: npm --prefix registry run build-demo, then node registry/test-a11y.mjs (same browser variables as test-render).
 import fs from 'node:fs'
 import os from 'node:os'
@@ -149,6 +151,51 @@ const nameOf = (page, selector) =>
     if (ids) return ids.split(/\s+/).map((id) => document.getElementById(id)?.textContent?.trim() || '').join(' ').trim()
     return (el.getAttribute('aria-label') || '').trim()
   }, selector)
+// Color helpers inside the page: any CSS color (a token, oklch, color-mix) is read back through a canvas pixel.
+const COLOR = `(() => {
+  window.__rgb = (color) => {
+    const c = document.createElement('canvas')
+    c.width = c.height = 1
+    const g = c.getContext('2d')
+    g.fillStyle = color
+    g.fillRect(0, 0, 1, 1)
+    return [...g.getImageData(0, 0, 1, 1).data]
+  }
+  window.__over = (fg, bg) => fg.slice(0, 3).map((v, i) => v * (fg[3] / 255) + bg[i] * (1 - fg[3] / 255)).concat(255)
+  window.__lum = ([r, g, b]) => [r, g, b].map((v) => (v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0)
+  window.__ratio = (a, b) => { const [h, l] = [window.__lum(a), window.__lum(b)].sort((x, y) => y - x); return (h + 0.05) / (l + 0.05) }
+})()`
+// Contrast of text against what is drawn behind it: the text is hidden, its box is captured, and its color is measured
+// against the median pixel. Glass, gradients and blur count as what they look like, which a computed background
+// color cannot tell (rule COL-08 has the same blind spot on a backdrop).
+async function inkOnPixels(page, selector) {
+  await page.evaluate(COLOR)
+  const found = []
+  for (const el of await page.$$(selector)) {
+    const box = await el.boundingBox()
+    if (!box || box.width < 2) continue
+    const text = (await el.innerText()).trim()
+    await el.evaluate((e) => { e.style.visibility = 'hidden' })
+    const png = (await page.screenshot({ clip: box })).toString('base64')
+    await el.evaluate((e) => { e.style.visibility = '' })
+    const ratio = await el.evaluate(async (e, png) => {
+      const img = await createImageBitmap(await (await fetch('data:image/png;base64,' + png)).blob())
+      const c = document.createElement('canvas')
+      c.width = img.width
+      c.height = img.height
+      const g = c.getContext('2d')
+      g.drawImage(img, 0, 0)
+      const d = g.getImageData(0, 0, c.width, c.height).data
+      const px = []
+      for (let i = 0; i < d.length; i += 4) px.push([d[i], d[i + 1], d[i + 2], 255])
+      px.sort((a, b) => window.__lum(a) - window.__lum(b))
+      const bg = px[Math.floor(px.length / 2)]
+      return window.__ratio(window.__over(window.__rgb(getComputedStyle(e).color), bg), bg)
+    }, png)
+    found.push({ text, ratio })
+  }
+  return found
+}
 
 try {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } })
@@ -305,6 +352,73 @@ try {
   })
   await ctx.close()
 
+  // Themes. Reduced motion here only so the glass and the labels are measured at rest, not halfway through a fade.
+  const still = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' })
+  for (const theme of ['dark', 'light']) {
+    // The glass keeps its tone in either theme, so its labels must too: milk glass with white ink was 1.03:1.
+    await step(`blocks/glass-folder ${theme}`, async () => {
+      const page = await open(still, 'blocks/glass-folder', theme)
+      await page.waitForFunction(() => [...document.querySelectorAll('canvas.gf-art')].every((c) => c.hasAttribute('data-ready')))
+      const labels = await inkOnPixels(page, '.gf-title, .gf-meta')
+      expect(labels.length >= 4, `glass-folder (${theme}): found ${labels.length} labels, expected the demo's four`)
+      for (const l of labels) expect(l.ratio >= 4.5, `glass-folder (${theme}): "${l.text}" reads at ${l.ratio.toFixed(2)}:1 on its glass, under 4.5:1`)
+      await page.close()
+    })
+
+    // Sidebar tokens: AppShell paints --sidebar, a stock shadcn sidebar reads all eight. Each ink reads on its surface.
+    await step(`sidebar tokens ${theme}`, async () => {
+      const page = await open(still, 'blocks/app-shell', theme)
+      await page.evaluate(COLOR)
+      const r = await page.evaluate(() => {
+        const css = (name) => window.__rgb(getComputedStyle(document.documentElement).getPropertyValue(name).trim())
+        const pairs = [
+          ['--sidebar-foreground', '--sidebar'],
+          ['--sidebar-primary-foreground', '--sidebar-primary'],
+          ['--sidebar-accent-foreground', '--sidebar-accent'],
+          ['--sidebar-ring', '--sidebar'],
+        ].map(([fg, bg]) => [fg, bg, window.__ratio(css(fg), css(bg))])
+        const aside = [...document.querySelectorAll('aside')].find((a) => a.offsetParent !== null)
+        return { pairs, aside: aside ? window.__lum(window.__rgb(getComputedStyle(aside).backgroundColor)) : null, page: window.__lum(css('--background')) }
+      })
+      for (const [fg, bg, ratio] of r.pairs) {
+        const min = fg === '--sidebar-ring' ? 3 : 4.5
+        expect(ratio >= min, `sidebar (${theme}): ${fg} on ${bg} is ${ratio.toFixed(2)}:1, under ${min}:1`)
+      }
+      expect(r.aside !== null && (r.aside > 0.5) === (r.page > 0.5), `app-shell (${theme}): the sidebar does not follow the page (sidebar ${r.aside}, page ${r.page})`)
+      await page.close()
+    })
+
+    // Focus ring: opaque, and 3:1 on every surface it can sit on (WCAG 1.4.11). A 30% ring was 1.91:1 on paper.
+    await step(`--ring ${theme}`, async () => {
+      const page = await open(still, 'blocks/button', theme)
+      await page.evaluate(COLOR)
+      const r = await page.evaluate(() => {
+        const css = (name) => window.__rgb(getComputedStyle(document.documentElement).getPropertyValue(name).trim())
+        const ring = css('--ring')
+        const page = css('--background')
+        const surfaces = { '--background': page, '--card': window.__over(css('--card'), page), '--muted': css('--muted'), '--secondary': css('--secondary') }
+        return { alpha: ring[3], ratios: Object.entries(surfaces).map(([name, bg]) => [name, window.__ratio(window.__over(ring, bg), bg)]) }
+      })
+      expect(r.alpha === 255, `--ring (${theme}) is translucent (alpha ${r.alpha}/255), so its contrast depends on the surface`)
+      for (const [name, ratio] of r.ratios) expect(ratio >= 3, `--ring (${theme}) on ${name} is ${ratio.toFixed(2)}:1, under 3:1`)
+      await page.close()
+    })
+  }
+  // The workflow section reads its colors from the theme, so a light page does not get a black slab.
+  await step('marketing/workflow-section light', async () => {
+    const page = await open(still, 'marketing/workflow-section', 'light')
+    await page.evaluate(COLOR)
+    const r = await page.evaluate(() => {
+      const section = document.querySelector('[data-registry-id="marketing/workflow-section"] section')
+      const bg = window.__rgb(getComputedStyle(section).backgroundColor)
+      return { bg: window.__lum(bg), heading: window.__ratio(window.__over(window.__rgb(getComputedStyle(section.querySelector('h2')).color), bg), bg) }
+    })
+    expect(r.bg > 0.5, `workflow-section (light): the section stays dark on a light page (luminance ${r.bg.toFixed(2)})`)
+    expect(r.heading >= 4.5, `workflow-section (light): the heading reads at ${r.heading.toFixed(2)}:1`)
+    await page.close()
+  })
+  await still.close()
+
   // Reduced motion: the skeleton stands still, and it does pulse without the setting, so the check can fail.
   for (const reducedMotion of ['reduce', 'no-preference']) await step(`blocks/skeleton ${reducedMotion}`, async () => {
     const rctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion })
@@ -312,6 +426,30 @@ try {
     const running = await page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length)
     if (reducedMotion === 'reduce') expect(running === 0, `skeleton: ${running} animations run under reduced motion`)
     else expect(running > 0, 'skeleton: no pulse without reduced motion, so the reduced motion check proves nothing')
+    await rctx.close()
+  })
+
+  // Reduced motion: the particle orb paints one frame and asks for no more. Animation frames are counted for 1.5s
+  // after load; without the setting the orb does loop, so the check can fail.
+  for (const reducedMotion of ['reduce', 'no-preference']) await step(`marketing/workflow-section ${reducedMotion}`, async () => {
+    const rctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion })
+    await rctx.addInitScript(() => {
+      const ask = window.requestAnimationFrame.bind(window)
+      window.__frames = 0
+      window.requestAnimationFrame = (cb) => (window.__frames++, ask(cb))
+    })
+    const page = await open(rctx, 'marketing/workflow-section')
+    await page.evaluate(() => { window.__frames = 0 })
+    await page.waitForTimeout(1500)
+    const frames = await page.evaluate(() => window.__frames)
+    const painted = await page.evaluate(() => [...document.querySelectorAll('[data-registry-id="marketing/workflow-section"] canvas')].some((c) => {
+      const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data
+      for (let i = 3; i < d.length; i += 4) if (d[i]) return true
+      return false
+    }))
+    expect(painted, `workflow-section (${reducedMotion}): the particle orb painted nothing`)
+    if (reducedMotion === 'reduce') expect(frames === 0, `workflow-section: ${frames} animation frames in 1.5s under reduced motion`)
+    else expect(frames > 0, 'workflow-section: no animation frames without reduced motion, so the reduced motion check proves nothing')
     await rctx.close()
   })
 } finally {
