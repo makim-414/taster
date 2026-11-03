@@ -59,7 +59,7 @@ export const CHECKS = [
     good: ['<span className="rounded-full border border-border text-text">New</span>'],
   },
   {
-    id: 'AC-06',
+    id: 'AC-10',
     re: /\bborder-l-(?:[2-9]|\d{2,}|\[)|border-left(?:-width)?\s*:\s*(?:[3-9]|\d{2,})px/,
     ext: [...CODE, ...STYLE],
     bad: ['<div className="border-l-4 border-emerald-500 pl-4">', '.callout { border-left: 4px solid #10b981; }'],
