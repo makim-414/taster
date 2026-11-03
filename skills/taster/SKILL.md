@@ -55,7 +55,7 @@ Prefer its tools; they run the same detector in a real browser for you.
 - `system_for_category { system, category }`: the axes that matter for one kind of part, with the tokens they drive.
 - `extract_content { target }`: the page's content in reading order (sections, actions, images, nav, footer, brand color and fonts), for Rebuild.
 - `suggest_swaps { ruleIds }`: the fix patterns and registry components for each rule found.
-- `pick_tone { x, y, like, genre, limit, shots, theme, brand }`: the tone map. The nearest real sites as pictures (opened on request, never stored, block pages left as links), the eight axes of that spot, its tokens and theme.css, and Taster parts wearing them. See [references/choose.md](references/choose.md).
+- `pick_tone { x, y, like, genre, limit, shots, theme, brand }`: the tone map. The nearest real sites as pictures (opened on request, never written to disk, kept in server memory up to 30 minutes; block pages and cookie banners without a reject button left as links), the eight axes of that spot, its tokens and theme.css, and Taster parts wearing them. See [references/choose.md](references/choose.md).
 - `browse_components { query, category, surface, use, ids, limit, theme, brand }` and `preview_component { id, width, tokens, theme, brand }`: pictures and live links, so the user chooses by eye. See [references/choose.md](references/choose.md).
 - `get_pattern { id }` and `get_component { id }`: the swap recipe and copyable code with its tokens.
 - `list_patterns { surface, use, category, family, rule }` and `taxonomy`: for Build.

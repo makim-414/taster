@@ -1,12 +1,12 @@
 // First screens of the tone references, opened through the fenced server browser (browser.ts): public addresses only,
 // a request budget per page, GET and HEAD only. engine/tone-capture.mjs does the page work, the same code the local
 // MCP server runs: reject buttons only, never accept, and no picture of a bot check or block page.
-// A picture lives in this instance's memory for half an hour and is never written anywhere, so a cold instance
-// simply opens the site again.
+// A picture is never written to disk and is kept in server memory up to 30 minutes, so a cold instance simply opens
+// the site again. A site with a cookie banner that offers no reject button comes back as `consent`, with no picture.
 import { readFirstScreen } from '../../engine/tone-capture.mjs';
 import { closeBrowser, fencePage, launchBrowser, type Budget } from './browser.ts';
 
-export type Shot = { status: 'ok'; image: string } | { status: 'blocked' | 'failed' | 'busy' };
+export type Shot = { status: 'ok'; image: string } | { status: 'blocked' | 'consent' | 'failed' | 'busy' };
 export type Target = { id: string; url: string };
 
 const KEEP_MS = 30 * 60 * 1000;
@@ -25,7 +25,7 @@ export function keptShot(url: string, now = Date.now()): Shot | null {
 
 function keep(url: string, shot: Shot) {
   // A failure may be the network or the deadline, so the next visitor tries again.
-  if (shot.status !== 'ok' && shot.status !== 'blocked') return;
+  if (shot.status === 'failed' || shot.status === 'busy') return;
   kept.delete(url);
   kept.set(url, { at: Date.now(), shot });
   while (kept.size > KEEP_MAX) kept.delete(kept.keys().next().value as string);
