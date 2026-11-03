@@ -13,8 +13,8 @@ import { safeHref, youtubeId } from './_url'
 // icon set, the radial glow behind the stage and the brand header are gone (BG-01, COL-07), the
 // position reads "3 of 5" instead of "03 / 05" (LAY-03), the turn angle is a prop, and the root is a section with a min height instead of a full viewport.
 // Upstream license: MIT as stated on the 21st.dev listing (no LICENSE file published),
-// Copyright (c) troyjlorents-gh. The coverflow geometry: MIT as stated on its 21st.dev listing,
-// Copyright (c) Edu Calvo. Full text in THIRD_PARTY_NOTICES.md.
+// Copyright (c) Troy Lorents (21st.dev @troyjlorents-gh). The coverflow geometry: MIT (SmoothUI,
+// https://github.com/educlopez/smoothui), Copyright (c) 2024 Eduardo Calvo. Full text in THIRD_PARTY_NOTICES.md.
 //
 // patterns/focus-card-carousel.md is the quiet default (flat track, about 8 degrees at most). Use the
 // coverflow when the items are posters or covers and browsing them is the point, not to hold copy.
