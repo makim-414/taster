@@ -34,7 +34,12 @@ export async function launch() {
   }
 }
 const SEVERITY_ORDER = { high: 0, medium: 1, low: 2 };
-const MAX_SHOT_HEIGHT = 8000;
+// Annotated captures are JPEG, cover the top 4000px of the page, and no file passes 4 MB, so an agent can take them
+// as images (an MCP stdio message is capped at 10 MB, an API image at 5 MB). A capture over the limit is taken again
+// as 2000px tiles, and a tile still over it at a lower quality.
+const MAX_SHOT_HEIGHT = 4000;
+const TILE_HEIGHT = 2000;
+export const MAX_SHOT_BYTES = 4 * 1024 * 1024;
 const LOAD_WAIT = 15000;
 // Local files are opened only as pages. Anything else (notes, keys, configs) is refused, even through a link.
 const LOCAL_PAGE = /\.(html?|xhtml|svg)$/i;
@@ -70,6 +75,22 @@ export function explainRule(id) {
   return RULE_BY_ID.get(String(id).toUpperCase()) || null;
 }
 
+// The top `height` px of the page as JPEG at `file`, in 2000px tiles (file, file-2, ...) when one image would pass
+// MAX_SHOT_BYTES. Returns the files written, top first.
+async function capture(page, file, width, height) {
+  const take = (path, y, h, quality) => page.screenshot({ path, type: 'jpeg', quality, fullPage: true, clip: { x: 0, y, width, height: h } });
+  if ((await take(file, 0, height, 70)).length <= MAX_SHOT_BYTES) return [file];
+  const files = [];
+  for (let y = 0; y < height; y += TILE_HEIGHT) {
+    const path = y ? file.replace(/(\.jpe?g)?$/i, `-${y / TILE_HEIGHT + 1}.jpg`) : file;
+    const h = Math.min(TILE_HEIGHT, height - y);
+    // A region no taller than a tile was just taken at 70.
+    for (const quality of h < height ? [70, 45, 25] : [45, 25]) if ((await take(path, y, h, quality)).length <= MAX_SHOT_BYTES) break;
+    files.push(path);
+  }
+  return files;
+}
+
 // One page load at one viewport. Returns the raw detect.js report.
 // bypassCSP: many large sites forbid inline scripts, which would block the injected detector.
 export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50 } = {}) {
@@ -83,9 +104,10 @@ export async function detectOnce(browser, url, viewport, { highlight = false, sc
     await page.addScriptTag({ content: DETECT_SOURCE });
     const report = await page.evaluate((o) => window.tasterDetect(o), { highlight: highlight || !!screenshot, maxPerRule });
     if (screenshot) {
-      const height = Math.min(report.page.height, MAX_SHOT_HEIGHT);
-      await page.screenshot({ path: screenshot, fullPage: true, clip: { x: 0, y: 0, width: Math.max(report.page.width, viewport.width), height } });
-      report.screenshot = screenshot;
+      // Wide overflow is shown up to half a screen past the viewport, the way the web capture does.
+      const width = Math.min(Math.max(report.page.width, viewport.width), Math.round(viewport.width * 1.5));
+      report.screenshots = await capture(page, screenshot, width, Math.min(report.page.height, MAX_SHOT_HEIGHT));
+      report.screenshot = report.screenshots[0];
     }
     return report;
   } finally {
@@ -99,7 +121,7 @@ export async function diagnose(target, { viewports = VIEWPORTS, outDir = null, t
   try {
     const runs = [];
     for (const viewport of viewports) {
-      const screenshot = outDir ? join(outDir, `annotated-${viewport.width}.png`) : null;
+      const screenshot = outDir ? join(outDir, `annotated-${viewport.width}.jpg`) : null;
       runs.push(await detectOnce(browser, url, viewport, { screenshot, timeout, maxPerRule }));
     }
     return summarize(url, runs);
@@ -133,7 +155,7 @@ export function summarize(url, runs) {
     findings: rules.reduce((n, r) => n + Math.max(...Object.values(r.counts)), 0),
     rules,
     judgeByEye: RULES.filter((r) => r.detect.level === 'manual').map((r) => r.id),
-    screenshots: runs.map((run) => run.screenshot).filter(Boolean),
+    screenshots: runs.flatMap((run) => run.screenshots || [run.screenshot]).filter(Boolean),
   };
 }
 

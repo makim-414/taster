@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { RULES, toUrl } from '../diagnose.mjs';
+import { MAX_SHOT_BYTES, RULES, toUrl } from '../diagnose.mjs';
 
 const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
 const fixture = (name) => fileURLToPath(new URL(`../../rules/fixtures/${name}`, import.meta.url));
@@ -23,8 +23,8 @@ test('exit 1 with findings, report.json and one capture per width', { timeout: 9
     assert.ok(report.rules.every((g) => g.fix && g.findings.every((f) => f.evidence && f.rect)));
     const severities = report.rules.map((g) => g.severity);
     assert.deepEqual(severities, [...severities].sort((a, b) => ['high', 'medium', 'low'].indexOf(a) - ['high', 'medium', 'low'].indexOf(b)));
-    assert.ok(existsSync(join(out, 'annotated-1440.png')));
-    assert.ok(existsSync(join(out, 'annotated-390.png')));
+    assert.ok(existsSync(join(out, 'annotated-1440.jpg')));
+    assert.ok(existsSync(join(out, 'annotated-390.jpg')));
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
@@ -47,6 +47,29 @@ test('--widths picks the viewports', { timeout: 60000 }, () => {
 test('exit 2 on a bad target or a bad width', () => {
   assert.equal(run('no such thing').status, 2);
   assert.equal(run(fixture('clean.html'), '--widths', '12').status, 2);
+});
+
+test('a long page comes back as JPEG captures under 4 MB each', { timeout: 120000 }, () => {
+  const dir = mkdtempSync(join(tmpdir(), 'taster-cli-tall-'));
+  try {
+    // 120 sections of gradient, text and pixel noise: a full PNG of this page was 5.6 MB at 1440.
+    const sections = Array.from({ length: 120 }, (_, i) => `<section style="padding:48px;background:linear-gradient(${i * 7}deg,hsl(${i * 3} 70% 60%),hsl(${i * 3 + 90} 70% 40%))"><h2>Section ${i + 1}</h2><p>${'Words that fill a line of text in this section. '.repeat(6)}</p><canvas width="1200" height="40"></canvas></section>`).join('');
+    const noise = "for (const c of document.querySelectorAll('canvas')) { const x = c.getContext('2d'); const d = x.createImageData(c.width, c.height); let s = 7; for (let i = 0; i < d.data.length; i++) { s = (s * 1103515245 + 12345) & 0x7fffffff; d.data[i] = i % 4 === 3 ? 255 : s & 255; } x.putImageData(d, 0, 0); }";
+    writeFileSync(join(dir, 'tall.html'), `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Tall</title></head><body style="margin:0">${sections}<script>${noise}</script></body></html>`);
+    const r = run(join(dir, 'tall.html'), '--out', join(dir, 'out'));
+    assert.ok(r.status === 0 || r.status === 1, r.stderr);
+    const report = JSON.parse(readFileSync(join(dir, 'out', 'report.json'), 'utf8'));
+    const shots = readdirSync(join(dir, 'out')).filter((f) => f.startsWith('annotated-'));
+    assert.deepEqual(shots.map((f) => join(dir, 'out', f)).sort(), [...report.screenshots].sort());
+    assert.ok(shots.includes('annotated-1440.jpg') && shots.includes('annotated-390.jpg'));
+    for (const f of shots) {
+      const data = readFileSync(join(dir, 'out', f));
+      assert.equal(data.subarray(0, 3).toString('hex'), 'ffd8ff', `${f} is not a JPEG`);
+      assert.ok(statSync(join(dir, 'out', f)).size < MAX_SHOT_BYTES, `${f} is ${data.length} bytes`);
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('targets: local pages only, no guessing a missing file into a web address, localhost as http', () => {
