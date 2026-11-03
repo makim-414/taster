@@ -57,7 +57,7 @@ Commit the generated files together with the change that caused them.
 Run these before you open a pull request:
 
 ```bash
-node scripts/gates.mjs               # every job below, in order; installs what is missing first
+node scripts/gates.mjs               # every job below, in order (npm test runs the same); installs what is missing first
 node scripts/gates.mjs web           # one job: validate, browser, web or action
 ```
 

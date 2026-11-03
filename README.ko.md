@@ -361,7 +361,7 @@ action.yml           GitHub Action
 소스를 고친 뒤 CI 가 돌리는 모든 검사를 같은 순서로 돌립니다.
 
 ```bash
-node scripts/gates.mjs           # 네 작업 전부, 빠진 것은 먼저 설치
+node scripts/gates.mjs           # 네 작업 전부(npm test 도 같음), 빠진 것은 먼저 설치
 node scripts/gates.mjs browser   # 작업 하나: validate, browser, web, action
 ```
 
