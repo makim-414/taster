@@ -3731,6 +3731,13 @@
       ],
       "axis": "density"
     },
+    "LAY-07": {
+      "categories": [
+        "commerce",
+        "typography"
+      ],
+      "axis": null
+    },
     "CMP-01": {
       "categories": [
         "hero",
@@ -3802,6 +3809,14 @@
     "CMP-11": {
       "categories": [
         "theme-tokens"
+      ],
+      "axis": null
+    },
+    "CMP-12": {
+      "categories": [
+        "card",
+        "icon",
+        "media-gallery"
       ],
       "axis": null
     },
@@ -3882,6 +3897,20 @@
       ],
       "axis": null
     },
+    "MOT-08": {
+      "categories": [
+        "motion-particle",
+        "card",
+        "button"
+      ],
+      "axis": null
+    },
+    "MOT-09": {
+      "categories": [
+        "motion-particle"
+      ],
+      "axis": null
+    },
     "CPY-01": {
       "categories": [
         "copy"
@@ -3893,6 +3922,14 @@
         "copy",
         "table",
         "chart-kpi"
+      ],
+      "axis": null
+    },
+    "CPY-03": {
+      "categories": [
+        "copy",
+        "empty-state",
+        "table"
       ],
       "axis": null
     },
@@ -3963,6 +4000,18 @@
       ],
       "axis": null
     },
+    "KO-12": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "KO-13": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
     "RSP-01": {
       "categories": [
         "layout-shell"
@@ -4003,6 +4052,13 @@
         "nav-header"
       ],
       "axis": "density"
+    },
+    "RSP-07": {
+      "categories": [
+        "layout-shell",
+        "button"
+      ],
+      "axis": null
     }
   },
   "gaps": [],

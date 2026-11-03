@@ -4,7 +4,7 @@ name: Plain and specific copy
 category: copy
 uses: [introduce-the-product]
 surfaces: [landing, app]
-replaces: [AC-02, CPY-01]
+replaces: [AC-02, CPY-01, CPY-03]
 components: []
 inspiration: []
 status: stable
@@ -34,6 +34,7 @@ It also covers punctuation. Long dashes are the most recognizable mark of genera
 
 ## Don't
 
+- Don't show identifiers as words (CPY-03): NO_ANSWER, created_at or userName on screen means the interface is showing its plumbing. Write the state in words and keep the code for support.
 - Don't explain the interface on the interface: "Click here to", "the number above the bar is", "press the button to" and version tags belong in an (i) that opens on request, not in the screen's copy.
 - Don't attach a cause to a number unless it was measured ("up 12% because of the redesign"). Say what moved and by how much; keep explanations for a write-up that shows its evidence.
 - Do not join clauses with long dashes (AC-02). Use a comma, colon or period.
