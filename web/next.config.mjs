@@ -58,7 +58,8 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // The bookmarklet loads these from any site.
+        // The bookmarklet loads these into other sites' pages with an integrity hash, which needs CORS. Bookmarks
+        // made before the pinned folders load /taster/overlay.js itself, so that address keeps a short cache.
         source: '/taster/:file*',
         headers: [
           { key: 'Access-Control-Allow-Origin', value: '*' },
@@ -67,20 +68,49 @@ const nextConfig = {
         ],
       },
       {
+        // A pinned folder (scripts/copy-fixtures.mjs) is named after its files' hash, so what it holds never changes.
+        source: '/taster/:folder/:file+',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
         source: '/(.*)',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Content-Security-Policy', value: csp("'none'") },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()' },
         ],
       },
       {
         // The gallery runs each component in a frame on this same site. Later rules win, so this one must stay last.
         source: '/stage/:file*',
-        headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }],
+        headers: [
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Content-Security-Policy', value: csp("'self'") },
+        ],
       },
     ];
   },
 };
+
+// Everything comes from this site. Next inlines its boot scripts and the pages carry style attributes, hence
+// unsafe-inline; the diagnosis and the tone page show screens as data: pictures. Only next dev needs eval (React's
+// development build rebuilds server error stacks with it).
+function csp(frameAncestors) {
+  const dev = process.env.NODE_ENV === 'development';
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ''}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "font-src 'self'",
+    "connect-src 'self'",
+    `frame-ancestors ${frameAncestors}`,
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'",
+  ].join('; ');
+}
 
 export default nextConfig;
