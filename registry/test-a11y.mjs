@@ -100,14 +100,15 @@ const skeleton = html(h(R.Skeleton, { className: 'h-3' }))
 expect(/motion-safe:animate-pulse/.test(skeleton) && !/(^|[\s"])animate-pulse/.test(skeleton), 'blocks/skeleton: the pulse runs under reduced motion')
 
 // Part two: the demo page in a browser.
+// Same browser as test-render: CHROME_PATH when set, else the Chromium that Playwright installed.
 function loadPlaywright() {
-  for (const c of ['playwright-core', process.env.PLAYWRIGHT_CORE_PATH, path.join(os.homedir(), '.claude/skills/motion-studio/node_modules/playwright-core')].filter(Boolean)) {
+  for (const c of ['playwright-core', process.env.PLAYWRIGHT_CORE_PATH].filter(Boolean)) {
     try { return require(c) } catch { /* try the next one */ }
   }
-  throw new Error('playwright-core not found. Install it or set PLAYWRIGHT_CORE_PATH.')
+  throw new Error('playwright-core not found: run npm ci --prefix registry, or set PLAYWRIGHT_CORE_PATH.')
 }
 const { chromium } = loadPlaywright()
-const CHROME = process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+const CHROME = process.env.CHROME_PATH
 const demo = path.join(root, 'demo/dist/index.html')
 if (!fs.existsSync(demo)) throw new Error('demo/dist/index.html is missing. Run npm --prefix registry run build-demo first.')
 const stage = (id, theme = 'dark') => `${pathToFileURL(demo).href}?only=${encodeURIComponent(id)}&look=${encodeURIComponent(JSON.stringify({ theme }))}`

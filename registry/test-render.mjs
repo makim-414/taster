@@ -3,25 +3,20 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import os from 'node:os'
 import { createRequire } from 'node:module'
 
-// Uses playwright-core from this package if installed, else from PLAYWRIGHT_CORE_PATH,
-// else from the shared skills folder in the home directory.
+// playwright-core from this package (npm ci --prefix registry), else PLAYWRIGHT_CORE_PATH. The browser is CHROME_PATH
+// when set, else the Chromium that Playwright installed (npx --prefix engine playwright install chromium), the one CI
+// uses, so a local run and CI render with the same build.
 const require = createRequire(import.meta.url)
 function loadPlaywright() {
-  const candidates = [
-    'playwright-core',
-    process.env.PLAYWRIGHT_CORE_PATH,
-    path.join(os.homedir(), '.claude/skills/motion-studio/node_modules/playwright-core'),
-  ].filter(Boolean)
-  for (const c of candidates) {
-    try { return require(c) } catch {}
+  for (const c of ['playwright-core', process.env.PLAYWRIGHT_CORE_PATH].filter(Boolean)) {
+    try { return require(c) } catch { /* try the next one */ }
   }
-  throw new Error('playwright-core not found. Install it or set PLAYWRIGHT_CORE_PATH.')
+  throw new Error('playwright-core not found: run npm ci --prefix registry, or set PLAYWRIGHT_CORE_PATH.')
 }
 const { chromium } = loadPlaywright()
-const CHROME = process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+const CHROME = process.env.CHROME_PATH
 const root = path.dirname(fileURLToPath(import.meta.url))
 const page_url = pathToFileURL(path.join(root, 'demo/dist/index.html')).href
 const ids = JSON.parse(fs.readFileSync(path.join(root, 'registry.json'), 'utf8')).components.map((c) => c.id)
