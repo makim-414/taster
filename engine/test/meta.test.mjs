@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
   COUNTED_FILES,
   DESCRIPTIONS,
+  codexMcpErrors,
   countErrors,
   creditErrors,
   getAt,
@@ -155,4 +156,18 @@ test('a 21st.dev credit keeps its link in one of the component\'s patterns', () 
     'registry blocks/x credits https://21st.dev/@a/components/b, but none of its patterns (other) has it in inspiration',
   ]);
   assert.deepEqual(creditErrors(c('Idea from a 21st.dev list whose source could not be traced', []), byId), []);
+});
+
+test('the Codex plugin starts the MCP server from its own folder, without Claude Code variables', () => {
+  const exists = (rel) => existsSync(join(ROOT, rel));
+  const cx = json('.codex-plugin/plugin.json');
+  assert.deepEqual(codexMcpErrors(cx, exists), []);
+  assert.equal(codexMcpErrors({ ...cx, mcpServers: undefined }, exists).length, 1);
+  // The Claude Code entry from .mcp.json, as Codex would read it.
+  const claude = json('.mcp.json').mcpServers;
+  assert.deepEqual(codexMcpErrors({ mcpServers: claude }, exists), [
+    '.codex-plugin/plugin.json mcpServers.taster needs cwd "." (the plugin folder)',
+    '.codex-plugin/plugin.json mcpServers.taster uses ${CLAUDE_PLUGIN_ROOT}/engine/start.mjs; Codex does not expand it',
+  ]);
+  assert.equal(codexMcpErrors({ mcpServers: { taster: { command: 'node', args: ['./engine/nope.mjs'], cwd: '.' } } }, exists).length, 1);
 });

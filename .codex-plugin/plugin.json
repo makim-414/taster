@@ -17,6 +17,13 @@
     "anti-slop"
   ],
   "skills": "./skills/",
+  "mcpServers": {
+    "taster": {
+      "command": "node",
+      "args": ["./engine/start.mjs"],
+      "cwd": "."
+    }
+  },
   "interface": {
     "displayName": "Taster",
     "shortDescription": "Diagnose AI slop in a frontend, swap it, or build without it.",

@@ -188,3 +188,20 @@ export function creditErrors(components, patternsById) {
   }
   return errors;
 }
+
+// Codex reads the root .mcp.json when its manifest names no MCP servers, and does not expand the ${CLAUDE_PLUGIN_ROOT}
+// that .mcp.json uses for Claude Code. So .codex-plugin/plugin.json names the server itself: cwd "." is the plugin
+// folder in Codex, and each ./ argument is a file in this repository.
+export function codexMcpErrors(manifest, exists) {
+  const servers = manifest.mcpServers;
+  if (!servers || typeof servers !== 'object') return ['.codex-plugin/plugin.json needs mcpServers, or Codex starts the server in .mcp.json without its plugin root'];
+  const errors = [];
+  for (const [name, s] of Object.entries(servers)) {
+    if (s.cwd !== '.') errors.push(`.codex-plugin/plugin.json mcpServers.${name} needs cwd "." (the plugin folder)`);
+    for (const a of [s.command, ...(s.args || [])]) {
+      if (typeof a === 'string' && a.includes('${')) errors.push(`.codex-plugin/plugin.json mcpServers.${name} uses ${a}; Codex does not expand it`);
+      else if (typeof a === 'string' && a.startsWith('./') && !exists(a)) errors.push(`.codex-plugin/plugin.json mcpServers.${name} runs ${a}, which does not exist`);
+    }
+  }
+  return errors;
+}
