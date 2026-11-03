@@ -4,7 +4,7 @@ name: Original logo assets
 category: icon
 uses: [set-the-visual-foundation]
 surfaces: [landing, app]
-replaces: [AC-18]
+replaces: [AC-18, CMP-12]
 components: [marketing/logo-wall]
 inspiration: []
 status: draft
@@ -34,6 +34,7 @@ This also covers third-party marks such as payment, platform or integration logo
 
 ## Don't
 
+- Don't let a flex container stretch the logo (CMP-12). Set one dimension and leave the other auto, or use object-fit: contain and align-self: flex-start.
 - Do not re-trace a logo from a screenshot, or redraw it with "similar" shapes (AC-18).
 - Do not replace the wordmark's typeface with a system or web font because the original font is not installed.
 - Do not stretch, rotate, outline, add shadows or put it in a gradient.

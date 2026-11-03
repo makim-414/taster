@@ -2091,15 +2091,151 @@
       if (moving.length) moving.slice(0, 5).forEach(function (it) { add('MOT-07', it.el, { movingElements: moving.length, reducedMotionRule: false }); });
     };
 
+    // ------------------------------------------------ quality rules (MOT-08, RSP-07, CMP-12, KO-12, LAY-07, MOT-09, KO-13, CPY-03)
+    // A :hover rule that moves the element, outside an @media (hover: hover) block: on touch the hover sticks after a tap,
+    // and on a desktop the card slides away from the pointer that is about to click it.
+    var MOVE_PROPS = ['transform', 'translate', 'scale', 'top', 'bottom', 'marginTop', 'marginBottom'];
+    R['MOT-08'] = function () {
+      var hits = [];
+      scanSheets(function (r) {
+        if (r.type !== 1 || !/:hover/.test(r.selectorText || '')) return;
+        if (!MOVE_PROPS.some(function (p) { var v = r.style[p]; return v && v !== 'none' && v !== '0px' && v !== '0'; })) return;
+        for (var p = r.parentRule; p; p = p.parentRule) {
+          var cond = (p.media && p.media.mediaText) || p.conditionText || '';
+          if (/hover\s*:\s*hover|pointer\s*:\s*fine/.test(cond)) return;
+        }
+        hits.push(r.selectorText);
+      });
+      hits.forEach(function (selText) {
+        selText.split(',').forEach(function (one) {
+          if (!/:hover/.test(one)) return;
+          var base = one.replace(/:hover/g, '').trim() || '*';
+          var els;
+          try { els = document.querySelectorAll(base); } catch (e) { return; }
+          Array.prototype.slice.call(els, 0, 8).forEach(function (el) { if (M.has(el)) add('MOT-08', el, { hoverRule: one.trim().slice(0, 80) }); });
+        });
+      });
+    };
+
+    // A visible control whose center is covered by another element (not a dialog, not a fixed banner).
+    R['RSP-07'] = function () {
+      Array.prototype.forEach.call(document.querySelectorAll(TARGET_SEL), function (el) {
+        var it = M.get(el);
+        if (!it || el.disabled || hiddenFromReader(el) || inOverlay(el)) return;
+        var cx = it.r.l + it.r.w / 2, cy = it.r.t + it.r.h / 2;
+        if (cx < 0 || cy < 0 || cx > vw || cy > vh || it.r.w < 8 || it.r.h < 8) return;
+        var top = document.elementFromPoint(cx, cy);
+        if (!top || top === el || el.contains(top) || top.contains(el)) return;
+        var lab = top.closest('label');
+        if (lab && (lab.contains(el) || (el.id && lab.htmlFor === el.id))) return;
+        if (inOverlay(top) || top.closest('[role="dialog"],[aria-modal="true"],dialog')) return;
+        add('RSP-07', el, { coveredBy: sel(top) });
+      });
+    };
+
+    // An <img> drawn at a different aspect ratio than its file, with object-fit left at fill: it is stretched.
+    R['CMP-12'] = function () {
+      Array.prototype.forEach.call(document.images, function (img) {
+        var it = M.get(img);
+        if (!it || !img.complete || !img.naturalWidth || !img.naturalHeight || it.r.w < 16 || it.r.h < 16) return;
+        if (/\.svg(\?|#|$)|^data:image\/svg/i.test(img.currentSrc || img.src)) return; // SVG keeps its own aspect ratio
+        if ((it.cs.objectFit || 'fill') !== 'fill') return;
+        var bw = it.r.w - px(it.cs.paddingLeft) - px(it.cs.paddingRight) - px(it.cs.borderLeftWidth) - px(it.cs.borderRightWidth);
+        var bh = it.r.h - px(it.cs.paddingTop) - px(it.cs.paddingBottom) - px(it.cs.borderTopWidth) - px(it.cs.borderBottomWidth);
+        var want = bw * img.naturalHeight / img.naturalWidth;
+        if (Math.abs(bh - want) > Math.max(2, want * 0.03)) add('CMP-12', img, { drawn: Math.round(bw) + 'x' + Math.round(bh), file: img.naturalWidth + 'x' + img.naturalHeight });
+      });
+    };
+
+    // Korean headings above 28px on two or more lines with a line height under the font size: the final consonants touch.
+    R['KO-12'] = function () {
+      koEls(4).forEach(function (o) {
+        var fs = px(o.it.cs.fontSize);
+        if (o.st.ratio < 0.5 || fs <= 28 || o.it.cs.lineHeight === 'normal') return;
+        var ratio = px(o.it.cs.lineHeight) / fs;
+        if (ratio < 1.05 && lineCount(o.it.el) >= 2) add('KO-12', o.it.el, { fontSizePx: fs, lineHeight: rn(ratio, 2) });
+      });
+    };
+
+    // A content image several screens tall with almost no text around it: the page is a picture of text.
+    R['LAY-07'] = function () {
+      Array.prototype.forEach.call(document.images, function (img) {
+        var it = M.get(img);
+        if (!it || it.r.h < vh * 3 || it.r.w < vw * 0.4) return;
+        // The section the image belongs to; a bare wrapper around it says nothing about the text near it.
+        var block = img.closest('section,article,main,[role="main"]') || img.parentElement;
+        var words = norm(block.innerText || '').length;
+        if (words < it.r.h / 40) add('LAY-07', img, { heightPx: Math.round(it.r.h), screens: rn(it.r.h / vh, 1), textChars: words });
+      });
+    };
+
+    // Content in the first screen still invisible after the page settled: a scroll reveal that never fired.
+    R['MOT-09'] = function () {
+      var seen = new Set();
+      Array.prototype.forEach.call(document.body.getElementsByTagName('*'), function (el) {
+        if (SKIP[el.tagName] || seen.has(el)) return;
+        var cs = getComputedStyle(el);
+        if (parseFloat(cs.opacity) > 0.05 || cs.display === 'none') return;
+        var r = el.getBoundingClientRect();
+        if (r.bottom <= 0 || r.top >= vh || r.width < 40 || r.height < 16) return;
+        if (el.closest('[aria-hidden="true"],[hidden],[inert],[role="dialog"],[role="tooltip"],[role="menu"],dialog') || inOverlay(el)) return;
+        var text = norm(el.innerText || '');
+        var media = el.querySelector('img,video,picture,canvas');
+        if (text.length < 40 && !media) return;
+        // A waiting reveal: shifted, or carrying a reveal class or attribute.
+        var waiting = cs.transform !== 'none' || el.hasAttribute('data-aos') || /(^|[\s_-])(reveal|fade|aos|animate)/i.test(el.getAttribute('class') || '');
+        if (!waiting) return;
+        Array.prototype.forEach.call(el.getElementsByTagName('*'), function (d) { seen.add(d); });
+        add('MOT-09', el, { opacity: cs.opacity, transform: String(cs.transform).slice(0, 40), textChars: text.length });
+      });
+    };
+
+    // The last line of a Korean heading holding one or two syllables.
+    R['KO-13'] = function () {
+      koEls(6).forEach(function (o) {
+        var it = o.it, fs = px(it.cs.fontSize);
+        if (o.st.ratio < 0.5 || (fs < 22 && !/^h[1-3]$/.test(it.tag))) return;
+        if (lineCount(it.el) < 2) return;
+        var nodes = TN.filter(function (t) { return t.el === it.el; });
+        var last = nodes[nodes.length - 1];
+        if (!last) return;
+        var v = last.node.nodeValue, rng = document.createRange(), lastTop = null, count = 0;
+        for (var i = v.length - 1; i >= 0; i--) {
+          if (/\s/.test(v[i])) continue;
+          rng.setStart(last.node, i); rng.setEnd(last.node, i + 1);
+          var rc = rng.getClientRects()[0];
+          if (!rc) continue;
+          if (lastTop === null) lastTop = rc.top;
+          if (Math.abs(rc.top - lastTop) > 2) break;
+          count++;
+          if (count > 1) return;
+        }
+        // One syllable alone. A two-syllable word on the last line is a short line, not a broken one.
+        if (count === 1) add('KO-13', it.el, { lastLineChars: count, fontSizePx: fs });
+      });
+    };
+
+    // Identifiers shown to the reader: SCREAMING_SNAKE codes, snake_case keys and camelCase field names outside code.
+    var MACHINE = /(^|[^\w/.@-])([A-Z][A-Z0-9]{1,}(?:_[A-Z0-9]+)+|[a-z]{2,}(?:_[a-z0-9]+)+|[a-z]{2,}[A-Z][a-z]+(?:[A-Z][a-z]+)*)(?=$|[^\w/.@-])/;
+    R['CPY-03'] = function () {
+      I.forEach(function (it) {
+        var t = ownText(it.el);
+        if (!t || it.el.closest('code,pre,kbd,samp,var,textarea,script,[data-taster-allow~="code"]')) return;
+        if (/mono/i.test(it.cs.fontFamily)) return;
+        var m = t.match(MACHINE);
+        if (m) add('CPY-03', it.el, { token: m[2], candidate: true });
+      });
+    };
+
     // ------------------------------------------------ execute in a fixed order
     var ORDER = [
       'AC-01', 'AC-02', 'AC-03', 'AC-04', 'AC-05', 'AC-06', 'AC-07', 'AC-08', 'AC-09', 'AC-10', 'AC-11', 'AC-12',
       'AC-13', 'AC-14', 'AC-15', 'AC-16', 'AC-17', 'COL-01', 'COL-02', 'COL-03', 'COL-04', 'COL-06', 'COL-07',
       'COL-05', 'TYP-01', 'TYP-02', 'TYP-03', 'TYP-04', 'TYP-05', 'LAY-01', 'LAY-02', 'LAY-03', 'LAY-04', 'LAY-05',
       'LAY-06', 'CMP-01', 'CMP-02', 'CMP-03', 'CMP-04', 'CMP-05', 'CMP-06', 'CMP-07', 'CMP-09', 'CMP-10', 'CMP-11',
-      'BG-01', 'ICO-01', 'ICO-02', 'ICO-03', 'ICO-04', 'MOT-01', 'MOT-02', 'MOT-03', 'MOT-04', 'MOT-05', 'MOT-06', 'MOT-07', 'CPY-01', 'KO-01', 'KO-02', 'KO-03', 'KO-04', 'KO-05', 'KO-06', 'KO-07',
+      'BG-01', 'ICO-01', 'ICO-02', 'ICO-03', 'ICO-04', 'MOT-01', 'MOT-02', 'MOT-03', 'MOT-04', 'MOT-05', 'MOT-06', 'MOT-07', 'MOT-08', 'MOT-09', 'CPY-01', 'KO-01', 'KO-02', 'KO-03', 'KO-04', 'KO-05', 'KO-06', 'KO-07',
       'KO-08', 'KO-09', 'KO-10', 'KO-11',
-      'RSP-01', 'RSP-02', 'RSP-03', 'RSP-04', 'RSP-05', 'RSP-06', 'COL-08', 'CPY-02'
+      'RSP-01', 'RSP-02', 'RSP-03', 'RSP-04', 'RSP-05', 'RSP-06', 'RSP-07', 'COL-08', 'CPY-02', 'CPY-03', 'CMP-12', 'LAY-07', 'KO-12', 'KO-13'
     ];
     ORDER.forEach(function (id) {
       if (options.rules && options.rules.indexOf(id) < 0) return;

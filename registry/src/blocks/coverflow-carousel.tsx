@@ -1,17 +1,20 @@
 import * as React from 'react'
 import { Icon } from '../icons'
+import { safeHref, youtubeId } from './_url'
 
 // Coverflow carousel: cards on a 3D shelf, the active one in front and its neighbors turned away.
 // Drag, arrow keys, Home and End, and the dock buttons all move one shared index; selecting the
 // front card opens a preview dialog (an image, or a YouTube trailer that loads only on demand).
 // Source: "Glassy Coverflow Carousel" by troyjlorents-gh on 21st.dev
 // (https://21st.dev/@troyjlorents-gh/components/glassy-coverflow-carousel), whose coverflow
-// geometry is adapted from educalvolpz/coverflow-carousel on 21st.dev.
+// geometry is adapted from "Coverflow Carousel" by Edu Calvo (educalvolpz) on 21st.dev
+// (https://21st.dev/@educalvolpz/components/coverflow-carousel).
 // Changes: colors map to the registry tokens instead of --color-*, lucide icons are the registry
 // icon set, the radial glow behind the stage and the brand header are gone (BG-01, COL-07), the
 // position reads "3 of 5" instead of "03 / 05" (LAY-03), the turn angle is a prop, and the root is a section with a min height instead of a full viewport.
 // Upstream license: MIT as stated on the 21st.dev listing (no LICENSE file published),
-// Copyright (c) troyjlorents-gh. Full text in THIRD_PARTY_NOTICES.md.
+// Copyright (c) troyjlorents-gh. The coverflow geometry: MIT as stated on its 21st.dev listing,
+// Copyright (c) Edu Calvo. Full text in THIRD_PARTY_NOTICES.md.
 //
 // patterns/focus-card-carousel.md is the quiet default (flat track, about 8 degrees at most). Use the
 // coverflow when the items are posters or covers and browsing them is the point, not to hold copy.
@@ -22,10 +25,10 @@ export interface CoverflowItem {
   subtitle: string
   image: string
   description?: string
-  /** The live site or page this screenshot stands for. */
+  /** The live site or page this screenshot stands for: http, https or mailto, or a relative path, else no link. */
   href?: string
   linkLabel?: string
-  /** An official YouTube watch URL. The player loads only when the preview opens. */
+  /** An official YouTube watch URL. The player loads only when the preview opens. Any other URL is ignored. */
   trailerUrl?: string
 }
 
@@ -107,20 +110,13 @@ function domainOf(url?: string) {
   }
 }
 
-function trailerEmbed(url?: string) {
-  if (!url) return undefined
-  try {
-    const parsed = new URL(url)
-    const id =
-      parsed.hostname === 'youtu.be'
-        ? parsed.pathname.slice(1)
-        : /(^|\.)youtube\.com$/.test(parsed.hostname)
-          ? parsed.searchParams.get('v')
-          : null
-    return id && /^[\w-]{11}$/.test(id) ? `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1` : undefined
-  } catch {
-    return undefined
-  }
+// Both trailer URLs are built from a checked video id, so a trailerUrl that only looks like YouTube (another scheme
+// with a youtube.com host, say) never reaches the player or the link.
+function trailerEmbed(id?: string) {
+  return id ? `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1` : undefined
+}
+function trailerWatch(id?: string) {
+  return id ? `https://www.youtube.com/watch?v=${id}` : undefined
 }
 
 export function CoverflowCarousel({
@@ -251,7 +247,10 @@ export function CoverflowCarousel({
   }
 
   if (!active) return null
-  const video = trailerEmbed(preview?.trailerUrl)
+  const trailerId = youtubeId(preview?.trailerUrl)
+  const video = trailerEmbed(trailerId)
+  const watch = trailerWatch(trailerId)
+  const site = safeHref(preview?.href)
   return (
     <section
       data-layout={layout}
@@ -305,6 +304,7 @@ export function CoverflowCarousel({
           const abs = Math.abs(offset)
           const hidden = d < -before || d > after
           const selected = slot === index
+          const trailer = Boolean(youtubeId(item.trailerUrl))
           return (
             <button
               key={slot}
@@ -312,7 +312,7 @@ export function CoverflowCarousel({
               className="cf-card"
               data-active={selected || undefined}
               tabIndex={selected ? 0 : -1}
-              aria-label={selected ? (item.trailerUrl ? `Watch ${item.title} trailer` : `Preview ${item.title}`) : `Select ${item.title}`}
+              aria-label={selected ? (trailer ? `Watch ${item.title} trailer` : `Preview ${item.title}`) : `Select ${item.title}`}
               aria-current={selected ? 'true' : undefined}
               aria-hidden={hidden || undefined}
               onClick={() => {
@@ -349,7 +349,7 @@ export function CoverflowCarousel({
                   loading={Math.abs(d) < 2 ? 'eager' : 'lazy'}
                 />
                 <span className="cf-shade" aria-hidden="true" />
-                {item.trailerUrl && (
+                {trailer && (
                   <span className="cf-watch" aria-hidden="true">
                     <Icon name="play" size="sm" /> Watch trailer
                   </span>
@@ -420,7 +420,7 @@ export function CoverflowCarousel({
         {preview && (
           <div className="cf-panel">
             <div className="cf-dbar">
-              <span>{video ? 'Official trailer' : domainOf(preview.href)}</span>
+              <span>{video ? 'Official trailer' : domainOf(site)}</span>
               <button type="button" onClick={() => setPreview(null)}>
                 <Icon name="close" size="sm" /> Close
               </button>
@@ -445,9 +445,9 @@ export function CoverflowCarousel({
               </div>
               <span>{preview.subtitle}</span>
             </div>
-            {(preview.trailerUrl || preview.href) && (
-              <a className="cf-external" href={preview.trailerUrl || preview.href} target="_blank" rel="noreferrer">
-                {preview.trailerUrl ? 'Watch on YouTube' : preview.linkLabel || 'Visit site'} <Icon name="arrow-up-right" size="sm" />
+            {(watch || site) && (
+              <a className="cf-external" href={watch || site} target="_blank" rel="noreferrer">
+                {watch ? 'Watch on YouTube' : preview.linkLabel || 'Visit site'} <Icon name="arrow-up-right" size="sm" />
               </a>
             )}
           </div>

@@ -35,6 +35,11 @@ function serve(): Promise<{ base: string; close: () => void }> {
         return res.writeHead(404).end();
       }
     }
+    // A bot check served with 403, the shape the engine's load check treats as "not the site".
+    if (url.pathname === '/challenge') {
+      const body = await readFile(path.join(TONE_FIXTURES, 'load-403-challenge.html'));
+      return res.writeHead(403, { 'content-type': 'text/html; charset=utf-8' }).end(body);
+    }
     if (url.pathname.startsWith('/fixtures/')) {
       try {
         const body = await readFile(path.join(FIXTURES, path.basename(url.pathname)));
@@ -124,11 +129,48 @@ test('engine through the fence: slop.html is hit, clean.html has zero findings',
     assert.ok(slop.report.rulesHit >= 15, `slop.html hit only ${slop.report.rulesHit} rules`);
     assert.ok(slop.shots['1440']?.startsWith('data:image/jpeg;base64,'), 'missing 1440 capture');
     assert.ok(slop.shots['390']?.startsWith('data:image/jpeg;base64,'), 'missing 390 capture');
+    assert.deepEqual(slop.missed, []);
+    // No time left for a second width: the first width is still the answer, and the rest is named.
+    const short = await runDiagnosis(`${srv.base}/fixtures/slop.html`, { allowLoopback: true, widthBudgetMs: 75000 });
+    assert.deepEqual(short.report.widths, [1440]);
+    assert.deepEqual(short.missed, [390]);
+    assert.ok(short.report.rulesHit >= 15, `partial slop.html hit only ${short.report.rulesHit} rules`);
+    assert.deepEqual(Object.keys(short.shots), ['1440']);
+    // A bot check is not the site: no report at all, instead of "no rules hit" for someone else's block page.
+    await assert.rejects(runDiagnosis(`${srv.base}/challenge`, { allowLoopback: true }), /차단·오류 화면\(HTTP 403\)/);
     const clean = await runDiagnosis(`${srv.base}/fixtures/clean.html`, { allowLoopback: true });
     assert.equal(clean.report.rulesHit, 0, `clean.html hit ${clean.report.rules.map((r) => r.ruleId).join(' ')}`);
     console.log(`slop.html: ${slop.report.rulesHit} rules, ${slop.report.findings} places; clean.html: ${clean.report.rulesHit}`);
   } finally {
     srv.close();
+  }
+});
+
+test('out of time with one width measured: that width is the answer', async (t) => {
+  // The first load answers at once; every later one stalls, so the second width is still loading
+  // when the deadline comes.
+  let loads = 0;
+  const sockets = new Set<import('node:net').Socket>();
+  const server = http.createServer((req, res) => {
+    if (req.url !== '/') return res.writeHead(404).end();
+    if (loads++ === 0) return res.writeHead(200, { 'content-type': 'text/html' }).end('<!doctype html><title>t</title><p style="letter-spacing:.2em;text-transform:uppercase">Stalled second load</p>');
+  });
+  server.on('connection', (s) => (sockets.add(s), s.on('close', () => sockets.delete(s))));
+  const ok = await new Promise<boolean>((resolve) => {
+    server.once('error', () => resolve(false));
+    server.listen(8080, '127.0.0.1', () => resolve(true));
+  });
+  if (!ok) return t.skip('port 8080 is busy');
+  try {
+    const started = Date.now();
+    const result = await runDiagnosis('http://127.0.0.1:8080/', { allowLoopback: true, deadlineMs: 8000, widthBudgetMs: 0 });
+    assert.ok(Date.now() - started < 20000, `took ${Date.now() - started} ms`);
+    assert.deepEqual(result.report.widths, [1440]);
+    assert.deepEqual(result.missed, [390]);
+    assert.ok(loads >= 2, 'second width never started');
+  } finally {
+    for (const s of sockets) s.destroy();
+    server.close();
   }
 });
 

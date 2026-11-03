@@ -2,7 +2,7 @@
 // ACP agent over stdio (Agent Client Protocol, https://agentclientprotocol.com), so editors such as Zed and
 // JetBrains IDEs can run Taster from their agent panel. No language model inside: every reply is computed.
 // Slash commands: /start, /diagnose, /extract, /brand, /explain, /rules, /help. The same functions as the MCP server.
-import { existsSync, mkdtempSync, readFileSync, realpathSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { isAbsolute, join, resolve } from 'node:path';
@@ -86,7 +86,44 @@ function explainText(rule) {
 }
 
 const rulesText = () => RULES.map((r) => `${r.id.padEnd(7)} ${r.detect.level.padEnd(14)} ${r.severity.padEnd(7)} ${r.name}`).join('\n');
-const fence = (text, lang = '') => `\`\`\`${lang}\n${text}\n\`\`\``;
+// A fence longer than any run of backticks inside, so page text quoted in a finding cannot close it early.
+export function fence(text, lang = '') {
+  const ticks = '`'.repeat(Math.max(3, ...[...String(text).matchAll(/`+/g)].map((m) => m[0].length + 1)));
+  return `${ticks}${lang}\n${text}\n${ticks}`;
+}
+// A value read from a page, shown as code so it reads as data next to Taster's own words. Backticks and line breaks
+// are dropped so the value cannot end the span; a long one (a data: logo) is cut.
+const code = (v) => {
+  const s = String(v).replace(/[`\r\n]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return `\`${s.length > 120 ? `${s.slice(0, 120)}...` : s}\``;
+};
+
+// The brand theme as a message: the CSS, the values read from the page as code, then the notes, which name those
+// fields instead of quoting them.
+export function brandMessage(theme) {
+  const s = theme.source || {};
+  const read = [
+    ['source.logo.text', s.logo?.text],
+    ['source.logo.src', s.logo?.src],
+    ['source.color', s.color],
+    ['source.fonts.heading', s.fonts?.heading],
+    ['source.fonts.body', s.fonts?.body],
+    ['source.fonts.logo', s.fonts?.logo],
+  ].filter(([, v]) => v);
+  return [
+    fence(theme.css, 'css'),
+    read.length ? ['Read from the page:', ...read.map(([k, v]) => `- ${k}: ${code(v)}`)].join('\n') : null,
+    theme.notes.map((n) => `- ${n}`).join('\n'),
+  ]
+    .filter(Boolean)
+    .join('\n\n');
+}
+
+// Annotated captures stay on disk so the editor can open them, until the next /diagnose in the same session or until
+// the agent exits.
+function dropCaptures(session) {
+  for (const dir of session.captures) rmSync(dir, { recursive: true, force: true });
+}
 
 class Cancelled extends Error {}
 // The browser work does not take a signal, so a cancelled turn stops waiting for it and drops the result.
@@ -104,6 +141,7 @@ function untilAborted(promise, signal) {
 
 export function createAgent() {
   const sessions = new Map();
+  process.once('exit', () => sessions.forEach(dropCaptures));
 
   return agent({ name: 'taster' })
     .onRequest(methods.agent.initialize, () => ({
@@ -123,7 +161,7 @@ export function createAgent() {
     .onRequest(methods.agent.authenticate, () => ({}))
     .onRequest(methods.agent.session.new, ({ params, client }) => {
       const sessionId = randomUUID();
-      sessions.set(sessionId, { cwd: params.cwd, turn: null });
+      sessions.set(sessionId, { cwd: params.cwd, turn: null, captures: [] });
       // The command list goes out right after the client has the session id.
       setTimeout(() => {
         client
@@ -191,8 +229,10 @@ export function createAgent() {
         } else if (command === 'diagnose') {
           if (!target) await needsTarget('diagnose');
           else {
-            // The annotated captures stay on disk so the editor can open them.
+            // Every folder this session made stays listed: a cancelled run still writing can bring one back.
+            dropCaptures(session);
             const outDir = mkdtempSync(join(tmpdir(), 'taster-acp-'));
+            session.captures.push(outDir);
             await browserRun(`Diagnose ${arg}`, () => diagnose(target, { outDir }), (report) => ({
               summary: `${report.rulesHit} of ${report.measured} measured rules hit, ${report.findings} findings at ${report.widths.join(' and ')} wide`,
               message: fence(formatText(report)),
@@ -212,7 +252,7 @@ export function createAgent() {
           else {
             await browserRun(`Brand ${arg}`, async () => brandTheme(await extract(target)), (theme) => ({
               summary: `${Object.keys(theme.tokens).length} token overrides`,
-              message: `${fence(theme.css, 'css')}\n\n${theme.notes.map((n) => `- ${n}`).join('\n')}`,
+              message: brandMessage(theme),
             }), { locations: fileLocation });
           }
         } else {
@@ -238,6 +278,8 @@ const isMain = (() => {
 })();
 // Serve on this process's stdio until the editor closes it. start.mjs calls this after its first-run install.
 export function serve() {
+  // An editor that stops the agent with a signal still gets the exit cleanup.
+  for (const [signal, status] of [['SIGINT', 130], ['SIGTERM', 143]]) process.once(signal, () => process.exit(status));
   const stream = ndJsonStream(Writable.toWeb(process.stdout), Readable.toWeb(process.stdin));
   const connection = createAgent().connect(stream);
   connection.closed.then(() => process.exit(0));

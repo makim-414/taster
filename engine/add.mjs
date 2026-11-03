@@ -3,21 +3,29 @@
 // npm packages to install. Works from this repository or from a hosted copy (`--from https://...`), which serves the
 // same file list as JSON at /r/<id>.json (web/app/r/[...id]/route.ts).
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { dirname, join, normalize, posix } from 'node:path';
+import { dirname, isAbsolute, join, posix, relative, resolve, win32 } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const REGISTRY_DIR = join(ROOT, 'registry');
 const EXTS = ['.tsx', '.ts', '.js', '.cjs', '.css'];
+// The folders under registry/src a bundle writes into (a test keeps this equal to the groups in registry.json), and
+// the files that sit at the top of the bundle: the tokens, the Tailwind preset and the notices.
+export const GROUPS = ['blocks', 'marketing', 'motion', 'content', 'chat', 'commerce', 'media', 'icons', 'scene'];
+const TOP_FILES = ['tokens.css', 'tailwind-preset.cjs', 'THIRD_PARTY_NOTICES.md'];
+const GROUP_PATH = new RegExp(`^(?:${GROUPS.join('|')})\\/`);
 
 export function loadRegistry() {
   return JSON.parse(readFileSync(join(REGISTRY_DIR, 'registry.json'), 'utf8'));
 }
 
+// The source without block comments and whole-line comments, so an import shown in a JSDoc example is not read as one.
+const code = (source) => source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+
 // Relative imports in a source file: import ... from './x', export ... from '../y', import './z.css'.
 function relativeImports(source) {
   const out = new Set();
-  for (const m of source.matchAll(/(?:from|import)\s+['"](\.{1,2}\/[^'"]+)['"]/g)) out.add(m[1]);
+  for (const m of code(source).matchAll(/(?:from|import)\s+['"](\.{1,2}\/[^'"]+)['"]/g)) out.add(m[1]);
   return [...out];
 }
 
@@ -54,7 +62,7 @@ export function resolveComponents(ids, { tokens = true } = {}) {
     files.set(rel, content);
     const comp = byFile.get(rel);
     if (comp) {
-      for (const d of comp.deps || []) if (!/^(blocks|motion|marketing|icons)\//.test(d)) npm.add(d);
+      for (const d of comp.deps || []) if (!GROUP_PATH.test(d)) npm.add(d);
       if (comp.credit) credits.push({ id: comp.id, license: comp.license, credit: comp.credit });
     }
     for (const spec of relativeImports(content)) queue.push(resolveRelative(rel, spec));
@@ -65,7 +73,7 @@ export function resolveComponents(ids, { tokens = true } = {}) {
   // React is assumed; everything else a file imports by bare name must be in some component's deps.
   for (const [rel, content] of files) {
     if (!/\.(tsx?|jsx?)$/.test(rel)) continue;
-    for (const m of content.matchAll(/from\s+['"]([^.'"/][^'"]*)['"]/g)) {
+    for (const m of code(content).matchAll(/from\s+['"]([^.'"/][^'"]*)['"]/g)) {
       const pkg = m[1].startsWith('@') ? m[1].split('/').slice(0, 2).join('/') : m[1].split('/')[0];
       if (pkg !== 'react' && pkg !== 'react-dom') npm.add(pkg);
     }
@@ -78,20 +86,48 @@ export function resolveComponents(ids, { tokens = true } = {}) {
   };
 }
 
+/** True for a path a bundle may carry: a source file inside one of the groups, or one of the top files. */
+export function isRegistryPath(path) {
+  if (typeof path !== 'string') return false;
+  if (TOP_FILES.includes(path)) return true;
+  const parts = path.split('/');
+  // Every segment is a plain name: no empty, dot or dot-dot segment, no hidden file, no backslash.
+  return parts.length >= 2 && GROUPS.includes(parts[0]) && parts.every((s) => /^[\w-][\w.-]*$/.test(s)) && EXTS.includes(posix.extname(path));
+}
+
 /** Write a resolved bundle (local or fetched) into `dir`, keeping the blocks/, motion/, icons/ layout. */
 export function writeBundle(bundle, dir, { overwrite = false } = {}) {
+  const base = resolve(dir);
+  // Every path is checked before anything is written, so a bad bundle leaves nothing behind. A path must be
+  // relative, without .. segments, and land inside `dir`: comparing resolved paths, not string prefixes, so a
+  // sibling such as taster-evil/ next to taster/ is outside too.
+  const refuse = (f) => new Error(`Refusing to write outside ${dir}: ${f.path}`);
+  const targets = bundle.files.map((f) => {
+    const p = f.path;
+    if (typeof p !== 'string' || posix.isAbsolute(p) || win32.isAbsolute(p) || p.split(/[\\/]/).includes('..')) throw refuse(f);
+    const target = resolve(base, p);
+    const rel = relative(base, target);
+    if (!rel || rel.startsWith('..') || isAbsolute(rel)) throw refuse(f);
+    return target;
+  });
   const written = [];
   const skipped = [];
-  for (const f of bundle.files) {
-    const target = normalize(join(dir, f.path));
-    if (!target.startsWith(normalize(dir))) throw new Error(`Refusing to write outside ${dir}: ${f.path}`);
+  bundle.files.forEach((f, i) => {
+    const target = targets[i];
     if (existsSync(target) && !overwrite && readFileSync(target, 'utf8') !== f.content) {
       skipped.push(f.path);
-      continue;
+      return;
     }
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, f.content);
     written.push(f.path);
+  });
+  // Taster's own MIT notice travels with the copied files, as its terms ask. A copy already there is kept.
+  const license = join(base, 'TASTER_LICENSE.txt');
+  if (!existsSync(license)) {
+    mkdirSync(base, { recursive: true });
+    writeFileSync(license, readFileSync(join(ROOT, 'LICENSE'), 'utf8'));
+    written.push('TASTER_LICENSE.txt');
   }
   return { written, skipped };
 }
@@ -106,7 +142,11 @@ export async function fetchBundle(ids, from) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`${url} answered ${res.status}`);
     const b = await res.json();
-    for (const f of b.files) files.set(f.path, f.content);
+    // A hosted copy is not trusted to name where files go: only registry paths with text content are taken.
+    for (const f of b.files) {
+      if (!isRegistryPath(f.path) || typeof f.content !== 'string') throw new Error(`${url} lists ${JSON.stringify(f.path)}, which is not a registry path`);
+      files.set(f.path, f.content);
+    }
     for (const p of b.npm) npm.add(p);
     credits.push(...(b.credits || []));
   }

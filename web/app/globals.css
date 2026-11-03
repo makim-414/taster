@@ -270,6 +270,10 @@ button.example {
   font-size: var(--t-title);
   color: var(--text-muted);
 }
+.report-note {
+  margin: calc(-1 * var(--sp-4)) 0 var(--sp-6);
+  color: var(--text-muted);
+}
 
 .hits {
   list-style: none;
@@ -329,7 +333,9 @@ code {
   overflow-wrap: anywhere;
 }
 .hit-evidence {
+  /* Evidence is the detector's own data (selectors, property names), so it is code, in the page's own face. */
   display: block;
+  font: inherit;
   color: var(--text-subtle);
 }
 

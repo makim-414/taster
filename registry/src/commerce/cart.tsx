@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Cart: line items on the left and the order summary on the right, stacked on phones. A line has a 72px
 // image, the name, its option text, a quantity stepper, the line price and a plain "Remove" text button.
@@ -107,7 +108,7 @@ export function Cart({
                 <div className="min-w-0">
                   <p className={cn('text-body font-medium text-text', KEEP)}>
                     {l.href ? (
-                      <a href={l.href} className="rounded-sm outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring">
+                      <a href={safeHref(l.href)} className="rounded-sm outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring">
                         {l.name}
                       </a>
                     ) : (
@@ -175,7 +176,7 @@ export function Cart({
           </div>
         </dl>
         <a
-          href={checkout.href}
+          href={safeHref(checkout.href)}
           className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-md bg-accent px-6 text-title font-medium text-accent-fg outline-none transition-[opacity,transform] duration-press ease-out hover:opacity-90 active:scale-press focus-visible:ring-2 focus-visible:ring-ring"
         >
           {checkout.label}

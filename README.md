@@ -103,24 +103,32 @@ It uses Playwright's Chromium if installed, otherwise your Google Chrome.
 
 ### Lint the source
 
-The same rules in their source form, for review and CI, no browser needed:
+The same rules in their source form, for review and CI, no browser needed. The npm package is not published yet, so
+clone this repository once and run its CLI from your app folder:
 
 ```bash
-npx @makim-414/taster lint src                                   # tinted pills, transition-all, hard-coded colors ...
-npx @makim-414/taster lint src --baseline taster-baseline.json --write-baseline   # adopt on an old codebase
-npx @makim-414/taster lint src --baseline taster-baseline.json  # then counts may only go down
+git clone https://github.com/makim-414/taster.git /path/to/taster   # once
+npm ci --prefix /path/to/taster/engine                              # once
+node /path/to/taster/engine/cli.mjs lint src                                  # tinted pills, transition-all, hard-coded colors ...
+node /path/to/taster/engine/cli.mjs lint src --baseline taster-baseline.json --write-baseline   # adopt on an old codebase
+node /path/to/taster/engine/cli.mjs lint src --baseline taster-baseline.json  # then counts may only go down
 ```
 
-A line passes with a comment `taster-allow <reason>`; an allow without a reason is reported.
+A line passes with a comment `taster-allow <reason>`; an allow without a reason is reported. Once the package is on
+npm, `npx @makim-414/taster lint src` replaces the clone.
 
 ### Add components to your app
 
+From your app folder, with the clone from the step above:
+
 ```bash
-node engine/cli.mjs add blocks/button blocks/citations --dir src/components/taster
+node /path/to/taster/engine/cli.mjs add blocks/button blocks/citations --dir src/components/taster
 ```
 
-Copies each component with every file it imports and the token files; no shadcn or other CLI involved. Add
-`--from https://taster-six.vercel.app` to read the hosted copy instead of a clone. See `registry/README.md`.
+Copies each component with every file it imports and the token files into `--dir`, relative to the folder you run it
+in; no shadcn or other CLI involved. `--from https://taster-six.vercel.app` reads the component files from the hosted
+copy instead of the clone; the command itself still runs from the clone until the npm release. See
+`registry/README.md`.
 
 ### Choose by eye with your agent
 
@@ -224,7 +232,7 @@ cannot carry poster type, deep shadows need a restrained palette). `taxonomy/axe
 setting. Read [taxonomy/SCHEMA.md](taxonomy/SCHEMA.md).
 
 <!-- taxonomy:start -->
-122 patterns, 80 rules, 144 components, 33 categories in 8 families, 40 uses, 8 surfaces, 8 weighting axes, 10 constraints.
+122 patterns, 88 rules, 144 components, 33 categories in 8 families, 40 uses, 8 surfaces, 8 weighting axes, 10 constraints.
 
 | Family | Categories | Patterns |
 |---|---|---|

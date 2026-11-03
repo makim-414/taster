@@ -2,12 +2,14 @@
 
 import * as React from 'react'
 import { cn } from './_cn'
+import { safeHref } from './_url'
 
 // AppShell. Sidebar plus sticky top bar plus content column, tokens only, no Radix.
 // The brand is a prop (never hardcoded). Mobile gets a drawer, desktop a fixed sidebar.
 
 export interface NavItem {
   label: string
+  /** http, https or mailto, or a relative path. Any other scheme draws a button instead (blocks/_url.ts). */
   href?: string
   onClick?: () => void
   icon?: React.ReactNode
@@ -44,9 +46,10 @@ function NavLink({ item }: { item: NavItem }) {
       )}
     </>
   )
-  if (item.href) {
+  const href = safeHref(item.href)
+  if (href) {
     return (
-      <a href={item.href} aria-current={item.active ? 'page' : undefined} className={cls}>
+      <a href={href} aria-current={item.active ? 'page' : undefined} className={cls}>
         {inner}
       </a>
     )
