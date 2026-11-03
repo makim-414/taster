@@ -6,7 +6,7 @@ uses: [enter-data, filter-and-search]
 surfaces: [app]
 replaces: []
 components: [blocks/combobox, blocks/datepicker, blocks/calendar, blocks/select-menu, blocks/tag-input]
-inspiration: [https://ui.shadcn.com/docs/components/combobox, https://ui.shadcn.com/docs/components/date-picker, https://cmdk.paco.me]
+inspiration: [https://ui.shadcn.com/docs/components/combobox, https://ui.shadcn.com/docs/components/date-picker, https://cmdk.paco.me, https://github.com/azabroflovski/oyna-ui]
 status: stable
 ---
 

@@ -6,7 +6,7 @@ uses: [browse-media, explain-features]
 surfaces: [landing, commerce, app, editorial]
 replaces: [AC-17, CMP-12, LAY-02]
 components: [blocks/card, blocks/badge, blocks/glass-folder, blocks/side-folder, blocks/orbit-illustration, marketing/case-study-card, commerce/product-card]
-inspiration: []
+inspiration: [https://21st.dev/@kedhareswer/components/glass-folder-cards]
 status: stable
 ---
 

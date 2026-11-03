@@ -4,28 +4,25 @@
    (https://motiq.dev/components/compare-reveal), MIT licensed, picked from 21st.dev.
    Kept: the spring that follows the pointer, the one-time intro sweep, keyboard control and
    double-click to centre. Changed for Taster: plain CSS on the registry tokens, no glow, no
-   blurred glass chips and no all-caps labels (captions sit under the frame instead). */
+   blurred glass chips and no all-caps labels (captions sit under the frame instead). The loop
+   stops once the divider is at rest and starts again on pointer or key input; the spring itself
+   is in compare-spring.ts. */
+// Upstream license: MIT, Copyright (c) 2026 Mahammad Rustamov (https://github.com/RMahammad/motiq). Full text in THIRD_PARTY_NOTICES.md.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { clamp, step } from './compare-spring.ts';
 
 type Side = { src: string; alt: string };
 
-const SPRING_K = 140;
-const SPRING_C = 18;
-const SWEEP_SECONDS = 2.6;
 const KEY_STEP = 2;
 const KEY_STEP_LARGE = 10;
 
-const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-
-// 50 -> 92 -> 8 -> 50 over the sweep, one cubic ease per leg.
-function sweepAt(u: number): number {
-  if (u < 0.38) return lerp(50, 92, easeInOutCubic(u / 0.38));
-  if (u < 0.78) return lerp(92, 8, easeInOutCubic((u - 0.38) / 0.4));
-  return lerp(8, 50, easeInOutCubic((u - 0.78) / 0.22));
-}
+// web/scripts/compare/render.mjs writes each picture at 1600x1072 and a 780px wide copy, <name>-780.jpg, so a phone
+// downloads the small one. SIZES follows .page in globals.css: 1120px at most, 16px side padding, 32px from 768px up.
+const WIDTH = 1600;
+const HEIGHT = 1072;
+const SIZES = '(min-width: 1120px) 1056px, (min-width: 768px) calc(100vw - 64px), calc(100vw - 32px)';
+const srcSetOf = (src: string) => `${src.replace(/\.jpg$/, '-780.jpg')} 780w, ${src} ${WIDTH}w`;
 
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -47,6 +44,8 @@ export function CompareReveal({ before, after, label }: { before: Side; after: S
   const reduced = useReducedMotion();
   const [onScreen, setOnScreen] = useState(false);
   const sim = useRef({ x: 50, v: 0, target: 50, dragging: false, pointerId: null as number | null, introActive: false, introDone: false, introStart: 0 });
+  // Starts the animation loop again if it stopped at rest. Null while the loop cannot run (off screen, reduced motion).
+  const wake = useRef<(() => void) | null>(null);
 
   const paint = useCallback(() => {
     const x = clamp(sim.current.x, 0, 100);
@@ -78,27 +77,24 @@ export function CompareReveal({ before, after, label }: { before: Side; after: S
       s.introStart = performance.now() / 1000;
     }
     let raf = 0;
-    let last = performance.now();
+    let last = 0;
     const frame = (ts: number) => {
       const dt = Math.min(0.05, Math.max(0.001, (ts - last) / 1000));
       last = ts;
-      if (s.introActive) {
-        const u = (ts / 1000 - s.introStart) / SWEEP_SECONDS;
-        if (u >= 1) {
-          s.introActive = false;
-          s.introDone = true;
-          s.target = 50;
-        } else {
-          s.target = sweepAt(u);
-        }
-      }
-      s.v += ((s.target - s.x) * SPRING_K - s.v * SPRING_C) * dt;
-      s.x = clamp(s.x + s.v * dt, 0, 100);
+      const moving = step(s, ts / 1000, dt);
       paint();
+      raf = moving ? requestAnimationFrame(frame) : 0;
+    };
+    wake.current = () => {
+      if (raf) return;
+      last = performance.now();
       raf = requestAnimationFrame(frame);
     };
-    raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    wake.current();
+    return () => {
+      cancelAnimationFrame(raf);
+      wake.current = null;
+    };
   }, [reduced, onScreen, paint]);
 
   const commit = (next: number) => {
@@ -111,6 +107,7 @@ export function CompareReveal({ before, after, label }: { before: Side; after: S
       s.v = 0;
       paint();
     }
+    wake.current?.();
   };
 
   const fromPointer = (clientX: number) => {
@@ -158,10 +155,10 @@ export function CompareReveal({ before, after, label }: { before: Side; after: S
       onDoubleClick={() => commit(50)}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="compare-img" src={after.src} alt={after.alt} draggable={false} />
+      <img className="compare-img" src={after.src} srcSet={srcSetOf(after.src)} sizes={SIZES} width={WIDTH} height={HEIGHT} fetchPriority="high" alt={after.alt} draggable={false} />
       <div ref={topRef} className="compare-top" style={{ clipPath: 'inset(0 50% 0 0)' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="compare-img" src={before.src} alt={before.alt} draggable={false} />
+        <img className="compare-img" src={before.src} srcSet={srcSetOf(before.src)} sizes={SIZES} width={WIDTH} height={HEIGHT} alt={before.alt} draggable={false} />
       </div>
       <div ref={dividerRef} className="compare-divider" style={{ left: '50%' }}>
         <button
