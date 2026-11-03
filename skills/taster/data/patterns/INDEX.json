@@ -2314,7 +2314,7 @@
     "components": [
       "motion/marquee"
     ],
-    "summary": "A seamless horizontal loop that pauses on hover, for logos or tickers."
+    "summary": "One continuous horizontal loop that pauses on hover, for logos or tickers."
   },
   {
     "id": "scroll-reveal-wrapper",
