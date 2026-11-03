@@ -1,11 +1,13 @@
-// Derives cross links from pattern frontmatter, writes rules/RULES.md and patterns/README.md,
-// and copies data into the skill bundle. Run after editing patterns, rules or the registry.
+// Derives cross links from pattern frontmatter, writes rules/RULES.md and patterns/README.md, the counts in the README
+// blocks and the package and plugin descriptions, and copies data into the skill bundle. Run after editing patterns,
+// rules or the registry.
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, SKILL_DATA, readJson, writeJson, loadPatterns, bundleFiles } from './lib.mjs';
 import { computeGaps } from './check-taxonomy.mjs';
 import { renderAll } from '../engine/exports.mjs';
 import { extensionRules, orbRecipesModule } from './lib.mjs';
+import { DESCRIPTIONS, getAt, setAt } from './check-meta.mjs';
 
 const patterns = loadPatterns().map((p) => p.data).filter(Boolean);
 const taxonomy = readJson('taxonomy/taxonomy.json');
@@ -95,6 +97,27 @@ for (const [file, render] of Object.entries(rulesBlock)) {
   const open = '<!-- rules:start -->', close = '<!-- rules:end -->';
   if (text.includes(open) && text.includes(close)) {
     fs.writeFileSync(at, text.slice(0, text.indexOf(open) + open.length) + '\n' + render(counts) + text.slice(text.indexOf(close)));
+  }
+}
+
+// Package and plugin descriptions, from the same counts as the README blocks. scripts/check-meta.mjs says where each
+// one lives; validate.mjs reads every count stated in prose back.
+const metaCounts = { rules: rules.rules.length, measured, patterns: patterns.length, components: registry.components.length };
+for (const d of DESCRIPTIONS) {
+  const text = d.text(metaCounts);
+  if (d.max && text.length > d.max) throw new Error(`${d.file} ${d.at.join('.')} would have ${text.length} characters, the limit is ${d.max}`);
+  const file = path.join(ROOT, d.file);
+  const src = fs.readFileSync(file, 'utf8');
+  const was = getAt(JSON.parse(src), d.at);
+  if (was === text) continue;
+  // Swap the one string in place so the file keeps its hand formatting; rewrite it whole only when that is not exact.
+  const from = JSON.stringify(was);
+  const swapped = typeof was === 'string' && src.split(from).length === 2 ? src.replace(from, () => JSON.stringify(text)) : null;
+  if (swapped && getAt(JSON.parse(swapped), d.at) === text) fs.writeFileSync(file, swapped);
+  else {
+    const doc = JSON.parse(src);
+    setAt(doc, d.at, text);
+    writeJson(d.file, doc);
   }
 }
 
