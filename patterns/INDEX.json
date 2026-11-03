@@ -355,6 +355,7 @@
     ],
     "replaces": [
       "AC-17",
+      "CMP-12",
       "LAY-02"
     ],
     "components": [
@@ -904,7 +905,8 @@
       "app"
     ],
     "replaces": [
-      "AC-18"
+      "AC-18",
+      "CMP-12"
     ],
     "components": [
       "marketing/logo-wall"
@@ -987,7 +989,8 @@
     ],
     "replaces": [
       "AC-02",
-      "CPY-01"
+      "CPY-01",
+      "CPY-03"
     ],
     "components": [],
     "summary": "Use commas, colons, middle dots or a tilde for ranges instead of long dashes, and replace stock AI phrasing with one concrete fact only this product can state."
@@ -1028,7 +1031,8 @@
     ],
     "replaces": [
       "KO-03",
-      "KO-11"
+      "KO-11",
+      "LAY-07"
     ],
     "components": [
       "content/prose",
@@ -1051,7 +1055,8 @@
     ],
     "replaces": [
       "KO-01",
-      "KO-10"
+      "KO-10",
+      "KO-13"
     ],
     "components": [
       "content/prose"
@@ -1077,7 +1082,8 @@
       "KO-05",
       "KO-06",
       "KO-08",
-      "KO-11"
+      "KO-11",
+      "KO-12"
     ],
     "components": [
       "content/prose"
@@ -1972,7 +1978,9 @@
     "surfaces": [
       "app"
     ],
-    "replaces": [],
+    "replaces": [
+      "CPY-03"
+    ],
     "components": [
       "blocks/alert",
       "blocks/button",
@@ -2126,7 +2134,9 @@
     "surfaces": [
       "commerce"
     ],
-    "replaces": [],
+    "replaces": [
+      "LAY-07"
+    ],
     "components": [
       "blocks/accordion",
       "commerce/product-gallery",
@@ -2317,7 +2327,8 @@
       "landing"
     ],
     "replaces": [
-      "MOT-01"
+      "MOT-01",
+      "MOT-09"
     ],
     "components": [
       "motion/scroll-enter"
@@ -2390,7 +2401,8 @@
       "RSP-02",
       "RSP-03",
       "RSP-04",
-      "RSP-05"
+      "RSP-05",
+      "RSP-07"
     ],
     "components": [
       "blocks/settings-section"
@@ -2564,7 +2576,8 @@
       "MOT-04",
       "MOT-05",
       "MOT-06",
-      "MOT-07"
+      "MOT-07",
+      "MOT-08"
     ],
     "components": [],
     "summary": "Interface motion that is quick, physical and optional: named properties, entrances from 0.95 not scale(0), ease-out, durations by frequency and a reduced motion version."
