@@ -3,19 +3,18 @@
 // address following the spot, the text for the agent, no sideways scroll, no page error. The capture route is answered
 // locally (one picture, one block page), so no outside site is opened.
 // Usage: node scripts/check-tone.mjs [base url]   (default http://localhost:3240)
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { chromium } from 'playwright-core';
 import { axesToTokens, nearestRefs, toneAxes } from '../../engine/tone.mjs';
 
 const BASE = process.argv[2] || 'http://localhost:3240';
-const MAC_CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const OUT = new URL('../shots/', import.meta.url);
 mkdirSync(OUT, { recursive: true });
 const catalog = JSON.parse(readFileSync(new URL('../../taxonomy/tone-refs.json', import.meta.url), 'utf8'));
 const geek = new Set(catalog.refs.filter((r) => r.genres.includes('geek')).map((r) => r.name));
 const picture = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800"><rect width="1280" height="800" fill="#d9d9d6"/></svg>')}`;
 
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || (existsSync(MAC_CHROME) ? MAC_CHROME : undefined) });
+const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
 let failures = 0;
 const ok = (cond, label) => {
   console.log(`${cond ? 'PASS' : 'FAIL'} ${label}`);

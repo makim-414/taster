@@ -5,14 +5,13 @@
 // test/metadata.test.ts checks the same headers in next.config.mjs without a server.
 // Usage: node scripts/check-metadata.mjs [base url]   (default http://localhost:3240)
 import http from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { chromium } from 'playwright-core';
 
 const BASE = process.argv[2] || 'http://localhost:3240';
 const ROOT = new URL('../../', import.meta.url);
 const DETECT = readFileSync(new URL('rules/detect.js', ROOT), 'utf8');
 const IDS = JSON.parse(readFileSync(new URL('registry/registry.json', ROOT), 'utf8')).components.map((c) => c.id);
-const MAC_CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
 let failures = 0;
 const ok = (cond, label) => {
@@ -23,7 +22,7 @@ const picture = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www
 // Each frame writes down the policy violations it sees; Chrome's console line about them is the second witness.
 const RECORD = "addEventListener('securitypolicyviolation', (e) => { (window.__csp ||= []).push(`${e.violatedDirective} ${e.blockedURI || 'inline'}`); }, true);";
 
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || (existsSync(MAC_CHROME) ? MAC_CHROME : undefined) });
+const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
 
 // Opens one page with the API answered locally and returns what the policy and the page said while it ran.
 async function visit(path, { width = 1280, act } = {}) {

@@ -13,7 +13,7 @@
     "dev": "next dev --port 3240",
     "prebuild": "node scripts/copy-fixtures.mjs",
     "build": "next build",
-    "start": "next start --port 3240",
+    "start": "next start --port ${PORT:-3240}",
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-strip-types test/*.test.ts",
     "self-check": "node scripts/self-check.mjs"
