@@ -42,6 +42,14 @@ All notable changes to Taster are recorded here. The format follows
 - The light theme has its own sidebar surface.
 - The engine reads a transparent page background as the canvas instead of black, reads the heading face across h1 to
   h3 with the logo face apart, and takes the body face from main text instead of a header paragraph.
+- The web pages each have their own link preview and canonical address, the board's no longer points at the home
+  page, and the preview picture counts the measured rules apart from the total. A missing page shows Taster's own 404
+  screen. `/robots.txt` and `/sitemap.xml` exist, and every response carries a content security policy and a
+  permissions policy.
+- A component page's install line works from inside your app (`--from` the hosted site), and its English summary is
+  marked as English.
+- The bookmarklet's files live in a folder named after their hash, so the browser can keep them for good without
+  ever running an old copy against a new bookmark.
 
 ## [0.1.0] - 2026-11-02
 
