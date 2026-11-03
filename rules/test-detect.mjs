@@ -1,21 +1,20 @@
-// Runs detect.js against the fixtures in headless Chrome and checks the results.
-// Playwright location: PLAYWRIGHT_CORE (a path to playwright-core), else the default below, else the installed package.
+// Runs detect.js against the fixtures in headless Chromium and checks the results.
+// Playwright location: PLAYWRIGHT_CORE or PLAYWRIGHT_CORE_PATH (a path to playwright or playwright-core), else
+// engine/node_modules/playwright, else the installed package.
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-// Chrome: CHROME_PATH, else the macOS Chrome app if it exists, else the Chromium that playwright installed (CI on Linux).
-const MAC_CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const CHROME = process.env.CHROME_PATH || (fs.existsSync(MAC_CHROME) ? MAC_CHROME : undefined);
-const DEFAULT_PW = path.join(os.homedir(), '.claude', 'skills', 'motion-studio', 'node_modules', 'playwright-core');
+// Browser: the Chromium that Playwright installed (npx --prefix engine playwright install chromium), the one CI uses,
+// so a local run and CI measure with the same build. CHROME_PATH picks another Chrome on purpose.
+const CHROME = process.env.CHROME_PATH;
 const ENGINE_PW = path.join(here, '..', 'engine', 'node_modules', 'playwright');
 
 async function loadPlaywright() {
   const candidates = [];
-  if (process.env.PLAYWRIGHT_CORE) candidates.push(process.env.PLAYWRIGHT_CORE);
-  candidates.push(ENGINE_PW, DEFAULT_PW);
+  for (const v of [process.env.PLAYWRIGHT_CORE, process.env.PLAYWRIGHT_CORE_PATH]) if (v) candidates.push(v);
+  candidates.push(ENGINE_PW);
   for (const c of candidates) {
     try {
       const pkgPath = path.join(c, 'package.json');
@@ -35,7 +34,7 @@ async function loadPlaywright() {
       // try the next package name
     }
   }
-  throw new Error('playwright not found: run npm install --prefix engine, or set PLAYWRIGHT_CORE');
+  throw new Error('playwright not found: run npm ci --prefix engine, or set PLAYWRIGHT_CORE');
 }
 
 const failures = [];
@@ -49,7 +48,15 @@ const detectSrc = path.join(here, 'detect.js');
 
 const pw = await loadPlaywright();
 const chromium = pw.chromium;
-const browser = await chromium.launch(CHROME ? { executablePath: CHROME, headless: true } : { headless: true });
+let browser;
+try {
+  browser = await chromium.launch(CHROME ? { executablePath: CHROME, headless: true } : { headless: true });
+} catch (e) {
+  console.error(String((e && e.message) || e).split('\n')[0]);
+  console.error(CHROME ? `CHROME_PATH does not start: ${CHROME}` : 'Install the browser: npx --prefix engine playwright install chromium');
+  process.exit(1);
+}
+console.log(`browser: ${CHROME || 'Playwright Chromium'} ${browser.version()}`);
 
 async function open(file, width) {
   const page = await browser.newPage({ viewport: { width, height: width >= 768 ? 900 : 844 } });
