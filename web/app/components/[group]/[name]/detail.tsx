@@ -4,11 +4,13 @@ import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { CopyButton } from '../../copy-button';
 import { LookBar } from '../../look-bar';
+import type { Lang } from '../../../../lib/catalog';
 import { LiveFrame, MAX_PICKS, useStudio } from '../../studio';
 
 const WIDTHS = [{ id: 'fill', label: '넓게', px: 0 }, { id: 'tablet', label: '태블릿', px: 768 }, { id: 'phone', label: '휴대폰', px: 390 }];
 
-export function Detail({ id, name, kind, summary, install, children }: { id: string; name: string; kind: string; summary: string; install: string; children: ReactNode }) {
+// kind and summary come from the repository's English data, so they carry their own lang on these Korean pages.
+export function Detail({ id, name, kind, kindLang, summary, summaryLang, install, children }: { id: string; name: string; kind: string; kindLang: Lang; summary: string; summaryLang: Lang; install: string; children: ReactNode }) {
   const { look, ready, picks, togglePick } = useStudio();
   const [width, setWidth] = useState('fill');
   const [height, setHeight] = useState(480);
@@ -20,8 +22,8 @@ export function Detail({ id, name, kind, summary, install, children }: { id: str
       <header className="detail-head">
         <div>
           <h1>{name}</h1>
-          <p className="card-kind">{kind}</p>
-          {summary && <p className="detail-summary">{summary}</p>}
+          {kind !== name && <p className="card-kind" lang={kindLang}>{kind}</p>}
+          {summary && <p className="detail-summary" lang={summaryLang}>{summary}</p>}
         </div>
         <button type="button" className="button" aria-pressed={picked} disabled={!picked && picks.length >= MAX_PICKS} onClick={() => togglePick(id)}>{picked ? '담음' : '비교에 담기'}</button>
       </header>

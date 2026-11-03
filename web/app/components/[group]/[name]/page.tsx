@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { CATALOG, sourceOf } from '../../../../lib/catalog';
+import { CATALOG, langOf, sourceOf } from '../../../../lib/catalog';
+import { pageMetadata, SITE } from '../../../../lib/page-meta';
 import { CopyButton } from '../../copy-button';
 import { Detail } from './detail';
 
@@ -14,8 +15,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { group, name } = await params;
   const item = CATALOG.find((c) => c.id === `${group}/${name}`);
-  return { title: item ? `${item.name} · Taster 부품` : 'Taster 부품', description: item?.summary, alternates: { canonical: `/components/${group}/${name}` } };
+  return pageMetadata({ title: item ? `${item.name} · Taster 부품` : 'Taster 부품', description: item?.summary || undefined, path: `/components/${group}/${name}` });
 }
+
+// Until the CLI is on npm, the add command runs from a clone of the repository (engine installed once with
+// npm ci --prefix engine) and reads the files from this site, so it works from inside the visitor's own app.
+const installLine = (id: string) => `node /path/to/taster/engine/cli.mjs add ${id} --from ${SITE} --dir src/components/taster`;
 
 export default async function Page({ params }: Params) {
   const { group, name } = await params;
@@ -23,14 +28,14 @@ export default async function Page({ params }: Params) {
   if (!item) notFound();
   const source = sourceOf(item);
   return (
-    <Detail id={item.id} name={item.name} kind={item.categoryName} summary={item.summary} install={`node engine/cli.mjs add ${item.id} --dir src/components/taster`}>
+    <Detail id={item.id} name={item.name} kind={item.categoryName} kindLang={item.categoryLang} summary={item.summary} summaryLang={item.summaryLang} install={installLine(item.id)}>
       <div className="facts">
         {item.patterns.length > 0 && (
           <section>
             <h2>언제 쓰나요</h2>
             <ul>
               {item.patterns.map((p) => (
-                <li key={p.id}><a href={`https://github.com/makim-414/taster/blob/main/patterns/${p.id}.md`}>{p.name}</a><span>{p.summary}</span></li>
+                <li key={p.id} lang={langOf(p.name + p.summary)}><a href={`https://github.com/makim-414/taster/blob/main/patterns/${p.id}.md`}>{p.name}</a><span>{p.summary}</span></li>
               ))}
             </ul>
           </section>
@@ -38,7 +43,7 @@ export default async function Page({ params }: Params) {
         {item.fixes.length > 0 && (
           <section>
             <h2>대신 없애 주는 AI 티</h2>
-            <ul className="plain-list">{item.fixes.map((f) => <li key={f.id}>{f.name} ({f.id})</li>)}</ul>
+            <ul className="plain-list">{item.fixes.map((f) => <li key={f.id} lang={langOf(f.name)}>{f.name} ({f.id})</li>)}</ul>
           </section>
         )}
         <section>
@@ -53,7 +58,8 @@ export default async function Page({ params }: Params) {
       <details className="source">
         <summary>코드 보기</summary>
         <div className="source-tools"><CopyButton text={source} label="코드 복사" /></div>
-        <pre><code>{source}</code></pre>
+        {/* It scrolls, so it takes keyboard focus to scroll without a mouse. */}
+        <pre tabIndex={0} aria-label={`${item.name} 소스 코드`}><code>{source}</code></pre>
       </details>
     </Detail>
   );

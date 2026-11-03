@@ -66,13 +66,14 @@ jobs:
         run: node web/scripts/check-traces.mjs
       - name: Address guard, limits and fenced engine on the fixtures
         run: npm --prefix web test
-      - name: The pages have zero findings at 1440 and 390, and the gallery and the tone page work on a phone, a tablet and a desktop
+      - name: The pages have zero findings at 1440 and 390, the gallery and the tone page work on a phone, a tablet and a desktop, and the head tags, the 404 screen and the headers hold
         run: |
           npm --prefix web start &
           for i in $(seq 1 30); do curl -sf http://localhost:3240 > /dev/null && break; sleep 2; done
           node web/scripts/self-check.mjs
           node web/scripts/check-gallery.mjs
           node web/scripts/check-tone.mjs
+          node web/scripts/check-metadata.mjs
   action:
     runs-on: ubuntu-latest
     steps:
