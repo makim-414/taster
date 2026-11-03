@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Photo hero: one photograph fills the band, a plain dark scrim rises from the bottom so the text reads,
 // and the headline and one action sit at the bottom left. Nothing is centered.
@@ -51,7 +52,7 @@ export function PhotoHero({ image, title, lead, action, credit, as: Heading = 'h
           </Heading>
           {lead ? <p className={cn('mt-3 max-w-[52ch] text-title font-reg leading-[var(--lh-normal)] text-on-scrim-muted', KEEP)}>{lead}</p> : null}
           {action ? (
-            <a href={action.href} className={cn(ACTION, 'mt-6')}>
+            <a href={safeHref(action.href)} className={cn(ACTION, 'mt-6')}>
               {action.label}
             </a>
           ) : null}

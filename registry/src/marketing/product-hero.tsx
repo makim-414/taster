@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Product hero: a left-weighted headline block beside a real product screen that is cropped by the
 // right edge of the band, so the visual gets the larger share and reads as the actual thing, not a mockup.
@@ -82,11 +83,11 @@ export function ProductHero({
           </Heading>
           <p className={cn('mt-4 text-title font-reg leading-[var(--lh-normal)] text-text-muted text-pretty', KEEP)}>{lead}</p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2">
-            <a href={primary.href} className={SOLID}>
+            <a href={safeHref(primary.href)} className={SOLID}>
               {primary.label}
             </a>
             {secondary ? (
-              <a href={secondary.href} className={TEXT_LINK}>
+              <a href={safeHref(secondary.href)} className={TEXT_LINK}>
                 {secondary.label}
               </a>
             ) : null}
