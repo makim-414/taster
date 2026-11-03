@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Pull quote: an attributed quotation set off inside a long read, one face, one weight, one ink, with the
 // opening mark hung in the margin so the text edge stays straight, and hairlines above and below instead
@@ -22,9 +23,10 @@ export interface PullQuoteProps extends React.HTMLAttributes<HTMLElement> {
 const KEEP = 'break-keep [overflow-wrap:break-word]'
 
 export function PullQuote({ quote, name, detail, source, hang = true, className, ...props }: PullQuoteProps) {
+  const href = safeHref(source?.href)
   return (
     <figure className={cn('mx-0 my-12 max-w-[680px] border-y border-border py-8', className)} {...props}>
-      <blockquote cite={source?.href} className="relative m-0">
+      <blockquote cite={href} className="relative m-0">
         <span
           aria-hidden
           className={cn(
@@ -37,8 +39,8 @@ export function PullQuote({ quote, name, detail, source, hang = true, className,
         <p className={cn('text-h2 font-medium leading-[var(--lh-snug)] text-text text-pretty [&:lang(ko)]:leading-[calc(var(--lh-normal)+0.1)]', KEEP)}>{quote}</p>
       </blockquote>
       <figcaption className={cn('mt-5 text-body', KEEP)}>
-        {source ? (
-          <a href={source.href} className="rounded-sm font-medium text-text underline underline-offset-4 outline-none hover:text-text-muted focus-visible:ring-2 focus-visible:ring-ring">
+        {href ? (
+          <a href={href} className="rounded-sm font-medium text-text underline underline-offset-4 outline-none hover:text-text-muted focus-visible:ring-2 focus-visible:ring-ring">
             {name}
           </a>
         ) : (

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // CTA band: one sentence that names the next step, one solid action, at most one quieter alternative and
 // an optional line of true conditions. Sentence left and actions right on wide screens, stacked on phones.
@@ -43,11 +44,11 @@ export function CtaBand({ title, primary, secondary, note, as: Heading = 'h2', t
         {note ? <p className={cn('mt-2 text-label text-text-subtle', KEEP)}>{note}</p> : null}
       </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:shrink-0">
-        <a href={primary.href} className={cn(BTN, 'bg-accent text-accent-fg hover:opacity-90')}>
+        <a href={safeHref(primary.href)} className={cn(BTN, 'bg-accent text-accent-fg hover:opacity-90')}>
           {primary.label}
         </a>
         {secondary ? (
-          <a href={secondary.href} className={cn(BTN, 'border border-border text-text hover:border-text-subtle')}>
+          <a href={safeHref(secondary.href)} className={cn(BTN, 'border border-border text-text hover:border-text-subtle')}>
             {secondary.label}
           </a>
         ) : null}

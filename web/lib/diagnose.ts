@@ -49,8 +49,12 @@ export function loadEngine(): Promise<Engine> {
 const SHOT_HEIGHT: Record<number, number> = { 1440: 3600, 390: 5600 };
 const SHOT_BYTES = 1_400_000;
 const SHOT_TIMEOUT_MS = 12000;
+// The route gets 90 s in all. On a heavy page one width can take most of a minute (load and idle
+// waits, then the capture), so the next width only starts while this much time is left, and a
+// diagnosis that runs out of time answers with the widths it did measure.
+const WIDTH_BUDGET_MS = 35000;
 
-export type Diagnosis = { report: Summary; shots: Record<string, string>; requests: number };
+export type Diagnosis = { report: Summary; shots: Record<string, string>; missed: number[]; requests: number };
 
 export class PageLoadError extends Error {}
 
@@ -62,12 +66,20 @@ function safeHostForLog(url: string): string {
   }
 }
 
+function firstLine(err: unknown, max: number): string {
+  return String((err as Error)?.message || err).split('\n')[0].slice(0, max);
+}
+
 // allowLoopback is for test/fixtures.test.ts only; the API route never passes it.
-export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopback = false } = {}): Promise<Diagnosis> {
+export async function runDiagnosis(url: string, { deadlineMs = 75000, widthBudgetMs = WIDTH_BUDGET_MS, allowLoopback = false } = {}): Promise<Diagnosis> {
+  const started = Date.now();
   const engine = await loadEngine();
   const browser: Browser = await launchBrowser();
   const budget: Budget = { requests: 0, bytes: 0, blocked: null, allowLoopback };
   const shots: Record<string, string> = {};
+  // Once a capture times out the renderer is not painting, and the next width would only wait
+  // out the same timeout, so the remaining captures are skipped.
+  let paintStalled = false;
 
   // detectOnce only calls browser.newPage and page.close, so a thin stand-in adds the fence and
   // captures the screenshot as JPEG in memory instead of a file path. All pages share one
@@ -83,6 +95,7 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
       const width = options.viewport ? options.viewport.width : 0;
       const original = page.screenshot.bind(page);
       page.screenshot = (async (o: { clip?: { x: number; y: number; width: number; height: number } } = {}) => {
+        if (paintStalled) return Buffer.alloc(0);
         const cap = SHOT_HEIGHT[width] || 4000;
         const clip = o.clip ? { ...o.clip, width: Math.min(o.clip.width, width * 1.5), height: Math.min(o.clip.height, cap) } : undefined;
         // The findings are already measured when the capture runs, so a page whose renderer will
@@ -93,7 +106,8 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
           shots[width] = `data:image/jpeg;base64,${buf.toString('base64')}`;
           return buf;
         } catch (err) {
-          console.error('diagnose capture skipped', width, String((err as Error).message || err).split('\n')[0].slice(0, 200));
+          paintStalled = true;
+          console.error('diagnose capture skipped', width, firstLine(err, 200));
           return Buffer.alloc(0);
         }
       }) as Page['screenshot'];
@@ -105,26 +119,41 @@ export async function runDiagnosis(url: string, { deadlineMs = 80000, allowLoopb
     },
   };
 
+  // detectOnce returns a whole run or nothing, so runs only ever holds finished widths.
+  const runs: RawRun[] = [];
   let timer: NodeJS.Timeout | undefined;
-  const deadline = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new PageLoadError('시간 안에 페이지를 다 열지 못했습니다.')), deadlineMs);
+  const deadline = new Promise<'late'>((resolve) => {
+    timer = setTimeout(() => resolve('late'), Math.max(0, deadlineMs - (Date.now() - started)));
   });
   try {
     const work = (async () => {
-      const runs: RawRun[] = [];
       for (const viewport of engine.VIEWPORTS) {
+        if (runs.length && Date.now() - started > deadlineMs - widthBudgetMs) break;
         try {
           runs.push(await engine.detectOnce(fenced, url, viewport, { screenshot: `shot-${viewport.width}.jpg`, timeout: 15000, maxPerRule: 20 }));
         } catch (err) {
-          console.error('diagnose load failed', safeHostForLog(url), viewport.width, String((err as Error).message || err).split('\n')[0].slice(0, 300), await tmpFree());
+          console.error('diagnose load failed', safeHostForLog(url), viewport.width, firstLine(err, 300), await tmpFree());
           if (budget.blocked) throw new PageLoadError(budget.blocked);
-          throw new PageLoadError(`페이지를 열지 못했습니다. (${String((err as Error).message || err).split('\n')[0].slice(0, 120)})`);
+          // A later width that fails still leaves the widths already measured to report.
+          if (runs.length) break;
+          throw new PageLoadError(`페이지를 열지 못했습니다. (${firstLine(err, 120)})`);
         }
       }
-      return engine.summarize(url, runs);
+      return 'done' as const;
     })();
-    const report = await Promise.race([work, deadline]);
-    return { report, shots, requests: budget.requests };
+    // After the deadline the unfinished width rejects once the browser closes; nothing waits on it.
+    work.catch(() => {});
+    const outcome = await Promise.race([work, deadline]);
+    const measured = runs.slice();
+    if (!measured.length) throw new PageLoadError('시간 안에 페이지를 다 열지 못했습니다.');
+    if (outcome === 'late') console.error('diagnose out of time', safeHostForLog(url), 'measured', measured.map((r) => r.viewport.width).join(','));
+    const done = new Set(measured.map((r) => r.viewport.width));
+    return {
+      report: engine.summarize(url, measured),
+      shots: Object.fromEntries(Object.entries(shots).filter(([w]) => done.has(Number(w)))),
+      missed: engine.VIEWPORTS.map((v) => v.width).filter((w) => !done.has(w)),
+      requests: budget.requests,
+    };
   } finally {
     clearTimeout(timer);
     await closeBrowser(browser);

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Audience split: a question, then two or three doors, one per audience, each a whole link with a title
 // that names the reader ("I run a store"), one sentence on what they get, and the place it leads.
@@ -37,7 +38,7 @@ export function AudienceSplit({ title, doors, footer, as: Heading = 'h2', classN
         {doors.map((d) => (
           <li key={d.href} className="min-w-0">
             <a
-              href={d.href}
+              href={safeHref(d.href)}
               className="group flex h-full flex-col rounded-xl border border-border p-6 outline-none transition-colors duration-press ease-out hover:border-text-subtle focus-visible:ring-2 focus-visible:ring-ring lg:p-8"
             >
               <Door className={cn('text-title font-semibold text-text', KEEP)}>{d.title}</Door>

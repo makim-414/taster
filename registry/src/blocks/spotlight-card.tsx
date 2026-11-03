@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from './_cn'
+import { safeHref } from './_url'
 import { useStyleOnce } from '../motion/_motion'
 
 // Spotlight card: a hairline card whose 1px edge catches a light that follows the pointer. The inside stays flat, so
@@ -11,7 +12,7 @@ import { useStyleOnce } from '../motion/_motion'
 // scrolling when a drag started on a card.
 
 export interface SpotlightCardProps extends React.HTMLAttributes<HTMLElement> {
-  /** Makes the whole card a link. */
+  /** Makes the whole card a link: http, https or mailto, or a relative path. Any other scheme leaves a plain card. */
   href?: string
   /** Light color, any CSS color or token. Default var(--text), a neutral sheen. */
   color?: string
@@ -81,7 +82,7 @@ function register(el: HTMLElement, radius: number) {
   }
 }
 
-export function SpotlightCard({ href, color, radius = 200, strength = 0.45, className, style, children, ...props }: SpotlightCardProps) {
+export function SpotlightCard({ href: rawHref, color, radius = 200, strength = 0.45, className, style, children, ...props }: SpotlightCardProps) {
   useStyleOnce('ds-spotlight-card', CSS)
   const ref = React.useRef<HTMLElement | null>(null)
   React.useEffect(() => {
@@ -96,6 +97,7 @@ export function SpotlightCard({ href, color, radius = 200, strength = 0.45, clas
   const setRef = (el: HTMLElement | null) => {
     ref.current = el
   }
+  const href = safeHref(rawHref)
   return href ? (
     <a ref={setRef} href={href} className={cn('ds-spot', className)} style={vars} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
       {children}

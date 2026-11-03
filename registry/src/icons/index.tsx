@@ -80,8 +80,11 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function Icon(
         strokeWidth: strokeWidth ?? 'var(--icon-stroke, 2)',
         ...style,
       }}
-      dangerouslySetInnerHTML={{ __html: (title ? `<title>${title}</title>` : '') + paths[name] }}
-    />
+    >
+      {/* The title is text React escapes; only the constant glyph strings above are set as markup. */}
+      {title ? <title>{title}</title> : null}
+      <g dangerouslySetInnerHTML={{ __html: paths[name] ?? '' }} />
+    </svg>
   )
 })
 

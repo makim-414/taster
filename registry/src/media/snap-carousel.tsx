@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 import { useReducedMotion } from '../motion/_motion'
 
 // Snap carousel: a row of media cards that scrolls sideways with native scroll snapping, so touch,
@@ -105,6 +106,7 @@ export function SnapCarousel({ items, label, ratio = '4/5', labels = {}, classNa
         className="m-0 flex list-none snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain rounded-sm p-0 pb-2 outline-none [scrollbar-width:thin] focus-visible:ring-2 focus-visible:ring-ring"
       >
         {items.map((it, i) => {
+          const href = safeHref(it.href)
           const body = (
             <>
               <div className={cn('overflow-hidden rounded-md bg-bg-sunken', RATIO[ratio])}>
@@ -122,8 +124,8 @@ export function SnapCarousel({ items, label, ratio = '4/5', labels = {}, classNa
               aria-label={`${i + 1} ${L.of} ${items.length}`}
               className="w-[78%] shrink-0 snap-start sm:w-[44%] lg:w-[30%]"
             >
-              {it.href ? (
-                <a href={it.href} className="block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              {href ? (
+                <a href={href} className="block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   {body}
                 </a>
               ) : (

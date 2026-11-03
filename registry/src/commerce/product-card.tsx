@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Product card: one product tile for a grid or a row. A photo at one ratio (a second photo shows on
 // hover and on keyboard focus where supplied), the name, one descriptor line, the price and, when there is
@@ -44,7 +45,7 @@ const RATIO = { '4/5': 'aspect-[4/5]', '1/1': 'aspect-square', '3/4': 'aspect-[3
 export function ProductCard({ product: p, ratio = '4/5', wasLabel = 'Was', nowLabel = 'Now', className, ...props }: ProductCardProps) {
   return (
     <article lang={p.lang} className={cn('min-w-0', className)} {...props}>
-      <a href={p.href} className="group block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-[color:var(--bg)]">
+      <a href={safeHref(p.href)} className="group block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-[color:var(--bg)]">
         <div className={cn('relative overflow-hidden rounded-md bg-bg-sunken', RATIO[ratio])}>
           <img src={p.image.src} alt={p.image.alt} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
           {p.hoverImage ? (

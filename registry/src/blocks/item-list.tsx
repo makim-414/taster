@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from './_cn'
+import { safeHref } from './_url'
 
 // ItemList. Single line rows instead of a stack of boxed cards: optional leading media (an avatar or a thumbnail),
 // a name, one line of description, trailing meta and one trailing action, hairline dividers between rows.
@@ -26,7 +27,9 @@ export function ItemList({ items, className, ...props }: ItemListProps) {
   return (
     <ul className={cn('divide-y divide-border', className)} {...props}>
       {items.map((it) => {
-        const interactive = Boolean(it.href || it.onSelect)
+        // A URL safeHref refuses leaves the row as a button or plain text, the same as no href.
+        const href = safeHref(it.href)
+        const interactive = Boolean(href || it.onSelect)
         const bodyCls = cn(
           'flex min-h-11 min-w-0 flex-1 flex-col justify-center text-left outline-none',
           interactive && 'after:absolute after:inset-0 after:rounded-md focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-ring',
@@ -47,8 +50,8 @@ export function ItemList({ items, className, ...props }: ItemListProps) {
             )}
           >
             {it.leading && <div className="shrink-0">{it.leading}</div>}
-            {it.href ? (
-              <a href={it.href} className={bodyCls} aria-current={it.selected ? 'true' : undefined}>
+            {href ? (
+              <a href={href} className={bodyCls} aria-current={it.selected ? 'true' : undefined}>
                 {body}
               </a>
             ) : it.onSelect ? (

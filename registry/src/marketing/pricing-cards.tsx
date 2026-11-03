@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 import { useInViewOnce, useStyleOnce } from '../motion/_motion'
 
 // Pricing cards: one card per plan with the same slots in the same places, sliding in one after
@@ -91,7 +92,7 @@ export function PricingCards({ plans, recommendedLabel = 'Recommended', classNam
               ))}
             </ul>
             <a
-              href={p.cta.href}
+              href={safeHref(p.cta.href)}
               className={cn(
                 LINK,
                 p.recommended

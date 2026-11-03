@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Inline signup: a band whose one job is to collect one address for one stated thing, such as early
 // access, a waitlist or a release note you actually send. One field, one button, one line that says what
@@ -34,7 +35,7 @@ export function InlineSignup({
   placeholder,
   submitLabel,
   onSubmit,
-  action,
+  action: rawAction,
   doneMessage = (e) => `Sent a confirmation to ${e}. Open it to finish.`,
   errorMessage = 'That address did not go through. Check it and try again.',
   note,
@@ -48,6 +49,8 @@ export function InlineSignup({
   const [email, setEmail] = React.useState('')
   const [status, setStatus] = React.useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const doneRef = React.useRef<HTMLParagraphElement>(null)
+  // A refused URL (blocks/_url.ts) counts as no action, so the form stays unwired instead of posting to this page.
+  const action = safeHref(rawAction)
   const wired = !!onSubmit || !!action
 
   React.useEffect(() => {
