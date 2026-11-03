@@ -380,7 +380,7 @@ action.yml           the GitHub Action
 Edit sources, then run every gate CI runs, in the same order:
 
 ```bash
-node scripts/gates.mjs           # all four jobs; installs what is missing first
+node scripts/gates.mjs           # all four jobs (npm test runs the same); installs what is missing first
 node scripts/gates.mjs browser   # one job: validate, browser, web or action
 ```
 

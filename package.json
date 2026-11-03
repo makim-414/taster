@@ -27,7 +27,7 @@
     "taster": "bin/taster.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "files": [
     "bin/",
@@ -40,6 +40,8 @@
     "rules/RULES.md",
     "patterns/",
     "taxonomy/",
+    "!taxonomy/*.test.mjs",
+    "!taxonomy/fixtures/",
     "registry/registry.json",
     "registry/src/",
     "registry/stage/",
@@ -52,7 +54,8 @@
     "commands/",
     "README.md",
     "README.ko.md",
-    "LICENSE"
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "dependencies": {
     "@agentclientprotocol/sdk": "2.1.0",
@@ -61,6 +64,7 @@
     "zod": "4.6.7"
   },
   "scripts": {
+    "test": "node scripts/gates.mjs",
     "build": "node scripts/build-docs.mjs",
     "validate": "node scripts/validate.mjs",
     "check:taxonomy": "node scripts/check-taxonomy.mjs",
