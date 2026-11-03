@@ -1,21 +1,20 @@
-// Runs detect.js against the fixtures in headless Chrome and checks the results.
-// Playwright location: PLAYWRIGHT_CORE (a path to playwright-core), else the default below, else the installed package.
+// Runs detect.js against the fixtures in headless Chromium and checks the results.
+// Playwright location: PLAYWRIGHT_CORE or PLAYWRIGHT_CORE_PATH (a path to playwright or playwright-core), else
+// engine/node_modules/playwright, else the installed package.
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-// Chrome: CHROME_PATH, else the macOS Chrome app if it exists, else the Chromium that playwright installed (CI on Linux).
-const MAC_CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const CHROME = process.env.CHROME_PATH || (fs.existsSync(MAC_CHROME) ? MAC_CHROME : undefined);
-const DEFAULT_PW = path.join(os.homedir(), '.claude', 'skills', 'motion-studio', 'node_modules', 'playwright-core');
+// Browser: the Chromium that Playwright installed (npx --prefix engine playwright install chromium), the one CI uses,
+// so a local run and CI measure with the same build. CHROME_PATH picks another Chrome on purpose.
+const CHROME = process.env.CHROME_PATH;
 const ENGINE_PW = path.join(here, '..', 'engine', 'node_modules', 'playwright');
 
 async function loadPlaywright() {
   const candidates = [];
-  if (process.env.PLAYWRIGHT_CORE) candidates.push(process.env.PLAYWRIGHT_CORE);
-  candidates.push(ENGINE_PW, DEFAULT_PW);
+  for (const v of [process.env.PLAYWRIGHT_CORE, process.env.PLAYWRIGHT_CORE_PATH]) if (v) candidates.push(v);
+  candidates.push(ENGINE_PW);
   for (const c of candidates) {
     try {
       const pkgPath = path.join(c, 'package.json');
@@ -35,7 +34,7 @@ async function loadPlaywright() {
       // try the next package name
     }
   }
-  throw new Error('playwright not found: run npm install --prefix engine, or set PLAYWRIGHT_CORE');
+  throw new Error('playwright not found: run npm ci --prefix engine, or set PLAYWRIGHT_CORE');
 }
 
 const failures = [];
@@ -49,15 +48,28 @@ const detectSrc = path.join(here, 'detect.js');
 
 const pw = await loadPlaywright();
 const chromium = pw.chromium;
-const browser = await chromium.launch(CHROME ? { executablePath: CHROME, headless: true } : { headless: true });
+let browser;
+try {
+  browser = await chromium.launch(CHROME ? { executablePath: CHROME, headless: true } : { headless: true });
+} catch (e) {
+  console.error(String((e && e.message) || e).split('\n')[0]);
+  console.error(CHROME ? `CHROME_PATH does not start: ${CHROME}` : 'Install the browser: npx --prefix engine playwright install chromium');
+  process.exit(1);
+}
+console.log(`browser: ${CHROME || 'Playwright Chromium'} ${browser.version()}`);
 
-async function scan(file, width = 1440) {
+async function open(file, width) {
   const page = await browser.newPage({ viewport: { width, height: width >= 768 ? 900 : 844 } });
   const pageErrors = [];
   page.on('pageerror', (e) => pageErrors.push(String(e)));
   await page.goto(pathToFileURL(path.join(here, 'fixtures', file)).href);
   await page.evaluate(() => document.fonts.ready);
   await page.addScriptTag({ path: detectSrc });
+  return { page, pageErrors };
+}
+
+async function scan(file, width = 1440) {
+  const { page, pageErrors } = await open(file, width);
   const result = await page.evaluate(() => window.tasterDetect({}));
 
   // highlight then clear must leave the DOM as it was
@@ -74,18 +86,32 @@ async function scan(file, width = 1440) {
   return { result, hl, mutated: before !== after, pageErrors };
 }
 
+// options.rules on its own: a rule that reads other rules' results must still fire when it is the only one asked for.
+async function only(file, list) {
+  const { page } = await open(file, 1440);
+  const result = await page.evaluate((l) => window.tasterDetect({ rules: l }), list);
+  await page.close();
+  return result;
+}
+
 const out = {};
-for (const f of ['slop.html', 'slop-extra.html', 'clean.html']) out[f] = await scan(f);
+// The clean page runs at both widths and must have zero findings of any level.
+for (const w of [1440, 390]) out[`clean.html@${w}`] = await scan('clean.html', w);
 
 // Render integrity rules: every one fires on slop-render.html at a phone width; the touch rule stays off above 1024.
 const render390 = await scan('slop-render.html', 390);
 const render1440 = await scan('slop-render.html', 1440);
 
-// The engine fixtures from the other detector (feat/diagnose-engine), run at both widths the engine uses.
+// Every other fixture has a list of rules it must hit in expected-engine.json, checked at both widths the engine uses.
+// An empty list means zero findings.
 const expectedEngine = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'expected-engine.json'), 'utf8'));
 const engineOut = {};
 for (const f of Object.keys(expectedEngine)) {
   for (const w of [1440, 390]) engineOut[`${f}@${w}`] = await scan(f, w);
+}
+const alone = {};
+for (const [id, needs] of Object.entries({ 'COL-05': ['COL-01', 'COL-03', 'COL-07'], 'LAY-04': ['LAY-02'] })) {
+  alone[id] = { needs, result: await only('slop.html', [id]) };
 }
 await browser.close();
 
@@ -109,31 +135,35 @@ for (const [f, o] of Object.entries(out)) {
   check(!o.mutated, `${f}: highlight and clear changed the DOM`);
   check(o.hl.left === 0, `${f}: ${o.hl.left} outlines left after clear`);
   check(r.findings.length === 0 || o.hl.outlined > 0, `${f}: highlight outlined nothing`);
-  for (const x of r.findings) {
+  check(Array.isArray(r.thirdParty), `${f}: report has no thirdParty list`);
+  for (const x of r.findings.concat(r.thirdParty || [])) {
     check(level[x.ruleId] !== undefined, `${f}: unknown rule id ${x.ruleId}`);
     check(typeof x.selector === 'string' && x.selector.length > 0, `${f}: ${x.ruleId} missing selector`);
     check(x.rect && x.rect.w >= 0 && x.rect.h >= 0, `${f}: ${x.ruleId} bad rect`);
     check(x.text.length <= 60, `${f}: ${x.ruleId} text longer than 60`);
   }
+  const counted = Object.values(r.counts).reduce((a, b) => a + b, 0);
+  check(counted >= r.findings.length, `${f}: counts add up to ${counted}, below ${r.findings.length} findings`);
 }
 
-const slop = out['slop.html'].result;
+const slop = engineOut['slop.html@1440'].result;
 const slopIds = ids(slop);
 check(slopIds.length >= 15, `slop.html found only ${slopIds.length} distinct rule ids (need 15)`);
 const slopDet = slopIds.filter((i) => level[i] === 'deterministic');
 console.log(`slop.html deterministic rules: ${slopDet.length}`);
 console.log('slop.html ids: ' + slopIds.join(' '));
 
-const union = new Set([...slopIds, ...ids(out['slop-extra.html'].result), ...Object.values(engineOut).flatMap((o) => ids(o.result))]);
-const detAll = rules.filter((r) => r.detect.level === 'deterministic').map((r) => r.id);
-const heuAll = rules.filter((r) => r.detect.level === 'heuristic').map((r) => r.id);
-console.log('deterministic rules not covered by fixtures: ' + (detAll.filter((i) => !union.has(i)).join(' ') || 'none'));
-console.log('heuristic rules not covered by fixtures: ' + (heuAll.filter((i) => !union.has(i)).join(' ') || 'none'));
+// Every measured rule needs a fixture that makes it fire; turning a rule off must fail this script.
+const union = new Set([render390, render1440, ...Object.values(engineOut)].flatMap((o) => ids(o.result)));
+const measured = rules.filter((r) => r.detect.level !== 'manual').map((r) => r.id);
+const uncovered = measured.filter((i) => !union.has(i));
+check(uncovered.length === 0, `measured rules without a positive fixture: ${uncovered.join(' ')}`);
+console.log(`measured rules with a positive fixture: ${measured.length - uncovered.length} of ${measured.length}`);
 
-const clean = out['clean.html'].result;
-const cleanDet = clean.findings.filter((x) => level[x.ruleId] === 'deterministic');
-check(cleanDet.length === 0, `clean.html has ${cleanDet.length} deterministic findings: ` + cleanDet.map((x) => `${x.ruleId}@${x.selector}`).join(', '));
-if (clean.findings.length) console.log('clean.html non-deterministic findings: ' + clean.findings.map((x) => `${x.ruleId}@${x.selector}`).join(', '));
+for (const w of [1440, 390]) {
+  const clean = out[`clean.html@${w}`].result;
+  check(clean.findings.length === 0, `clean.html at ${w}: expected 0 findings, got ` + clean.findings.map((x) => `${x.ruleId}@${x.selector}`).join(', '));
+}
 
 for (const [key, o] of Object.entries(engineOut)) {
   const [f, w] = key.split('@');
@@ -145,6 +175,37 @@ for (const [key, o] of Object.entries(engineOut)) {
     check(o.result.findings.length === 0, `${f} at ${w}: expected 0 findings, got ${o.result.findings.map((x) => `${x.ruleId}@${x.selector}`).join(', ')}`);
   }
   console.log(`${key}: expected ${want.length}, found ${want.length - missing.length}, total findings ${o.result.findings.length}`);
+}
+
+// TYP-05 skips wordmarks (clean-type.html) and reports a heading once, even when each word is its own span.
+for (const w of [1440, 390]) {
+  const typ = engineOut[`slop-type.html@${w}`].result.findings.filter((x) => x.ruleId === 'TYP-05').map((x) => x.selector).sort();
+  const want = ['#t-pct', '#t-split', '#t-story'];
+  check(JSON.stringify(typ) === JSON.stringify(want), `slop-type.html at ${w}: TYP-05 on ${typ.join(' ') || 'nothing'}, want ${want.join(' ')}`);
+}
+
+// A consent manager's banner is a third-party widget: its findings go to thirdParty, not to the site's counts.
+for (const w of [1440, 390]) {
+  const r = engineOut[`consent-overlay.html@${w}`].result;
+  const tp = r.thirdParty || [];
+  check(tp.length > 0 && tp.every((x) => x.thirdParty === 'consent'), `consent-overlay.html at ${w}: expected consent findings in thirdParty, got ${tp.length}`);
+  check(Object.keys(r.counts).length === 0, `consent-overlay.html at ${w}: counts should leave out the banner, got ${JSON.stringify(r.counts)}`);
+  console.log(`consent-overlay.html@${w}: ${tp.length} third-party findings (${Array.from(new Set(tp.map((x) => x.ruleId))).join(' ')}) kept out of the counts`);
+}
+
+// Known gaps: these fixtures record what a rule cannot measure yet. When the rule starts to fire, the gap is closed:
+// move the fixture's id into expected-engine.json as a positive one.
+for (const [f, id] of Object.entries({ 'gap-col08-backdrop.html': 'COL-08' })) {
+  for (const w of [1440, 390]) {
+    const hit = engineOut[`${f}@${w}`].result.findings.some((x) => x.ruleId === id);
+    check(!hit, `${f} at ${w}: ${id} now fires here, so this gap is closed; make the fixture a positive one`);
+  }
+}
+
+for (const [id, o] of Object.entries(alone)) {
+  const got = Object.keys(o.result.counts).sort();
+  check(JSON.stringify(got) === JSON.stringify([id]), `slop.html with rules [${id}]: counts ${JSON.stringify(o.result.counts)}, want only ${id} (it reads ${o.needs.join(' ')})`);
+  check(o.result.findings.every((x) => x.ruleId === id), `slop.html with rules [${id}]: reported rules it was not asked for`);
 }
 
 if (failures.length) {

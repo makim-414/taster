@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consent sample</title>
+<style>
+/* A plain page with a consent manager's banner on top, under the vendor's element ids. The banner styles are
+   written for this fixture: small uppercase buttons with wide tracking, 38px tall. Those findings belong to the
+   widget, not the site. */
+@font-face { font-family: "Fixture Sans"; src: local("Helvetica Neue"), local("Arial"), local("Helvetica"), local("DejaVu Sans"); }
+* { box-sizing: border-box; }
+body { margin: 0; background: #ffffff; color: #1a1a1a; font-family: "Fixture Sans", sans-serif; font-size: 17px; line-height: 1.6; }
+main { max-width: 880px; margin: 0 auto; padding: 72px 24px 240px; }
+h1 { font-size: 40px; line-height: 1.2; margin: 0 0 20px; }
+p { margin: 0 0 16px; max-width: 36em; color: #55575a; }
+#onetrust-banner-sdk { position: fixed; left: 0; right: 0; bottom: 0; background: #ffffff; color: #1a1a1a; box-shadow: 0 0 18px rgba(0, 0, 0, 0.2); padding: 16px 24px; font-size: 16px; line-height: 1.5; }
+.onetrust-pc-dark-filter.ot-hide { display: none; }
+#onetrust-policy-title { font-size: 18px; margin: 0 0 8px; }
+#onetrust-policy-text { font-size: 14px; margin: 0 0 12px; max-width: none; }
+#onetrust-button-group { display: flex; flex-wrap: wrap; gap: 8px; }
+#onetrust-banner-sdk button { display: inline-block; height: 38px; padding: 0 30px; color: #555555; font: 600 11px/38px "Fixture Sans", sans-serif; letter-spacing: 0.1rem; text-transform: uppercase; white-space: nowrap; background: transparent; border-radius: 2px; border: 1px solid #bbbbbb; cursor: pointer; }
+#onetrust-accept-btn-handler, #onetrust-reject-all-handler { background: #1a1a1a; color: #ffffff; border-color: #1a1a1a; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Plan the week in one place</h1>
+  <p>Write the plan, share it with the team and keep the notes next to the work they describe.</p>
+  <p>Every change is kept, so the history of a decision is one click away.</p>
+</main>
+<div id="onetrust-consent-sdk">
+  <div class="onetrust-pc-dark-filter ot-hide"></div>
+  <div id="onetrust-banner-sdk" role="region" aria-label="Cookie banner">
+    <div id="onetrust-policy">
+      <h2 id="onetrust-policy-title">We value your privacy</h2>
+      <p id="onetrust-policy-text">We use cookies to improve your experience and to measure traffic. <a href="#">Cookie Policy</a></p>
+    </div>
+    <div id="onetrust-button-group">
+      <button id="onetrust-pc-btn-handler">Cookie Settings</button>
+      <button id="onetrust-reject-all-handler">Reject All</button>
+      <button id="onetrust-accept-btn-handler">Accept All Cookies</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
