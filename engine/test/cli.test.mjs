@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -10,6 +11,16 @@ import { MAX_SHOT_BYTES, RULES, toUrl } from '../diagnose.mjs';
 const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
 const fixture = (name) => fileURLToPath(new URL(`../../rules/fixtures/${name}`, import.meta.url));
 const run = (...args) => spawnSync(process.execPath, [cli, ...args], { encoding: 'utf8', timeout: 90000 });
+// For a run against a server in this process: spawnSync would block the server from answering.
+const runAsync = (...args) =>
+  new Promise((resolve) => {
+    const child = spawn(process.execPath, [cli, ...args]);
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (d) => (stdout += d));
+    child.stderr.on('data', (d) => (stderr += d));
+    child.on('close', (status) => resolve({ status, stdout, stderr }));
+  });
 
 test('exit 1 with findings, report.json and one capture per width', { timeout: 90000 }, () => {
   const out = mkdtempSync(join(tmpdir(), 'taster-cli-'));
@@ -129,12 +140,37 @@ test('targets: local pages only, no guessing a missing file into a web address, 
   }
 });
 
+test('several targets: a block page fails the run with exit 2 after the others are read, and SARIF says why', { timeout: 120000 }, async () => {
+  const challenge = readFileSync(new URL('./fixtures/load-403-challenge.html', import.meta.url), 'utf8');
+  const server = createServer((req, res) => {
+    if (req.url === '/challenge') return res.writeHead(403, { 'content-type': 'text/html', 'cf-mitigated': 'challenge' }).end(challenge);
+    res.writeHead(200, { 'content-type': 'text/html' }).end(readFileSync(fixture('slop.html')));
+  });
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const out = mkdtempSync(join(tmpdir(), 'taster-cli-blocked-'));
+  try {
+    const r = await runAsync(`${base}/challenge`, `${base}/slop`, '--widths', '1440', '--sarif', join(out, 't.sarif'), '--summary', join(out, 's.md'), '--fail-on', 'none');
+    assert.equal(r.status, 2, r.stderr);
+    assert.match(r.stdout, /^not diagnosed: got a bot check page \(HTTP 403, title "Just a moment\.\.\."\) instead of the site at http:\/\/127\.0\.0\.1:\d+\/challenge\./);
+    assert.match(r.stdout, /\/slop\n\d+ of \d+ measured rules hit at 1440 wide/, 'the target after the block page was still diagnosed');
+    const sarif = JSON.parse(readFileSync(join(out, 't.sarif'), 'utf8')).runs[0];
+    assert.equal(sarif.invocations[0].executionSuccessful, false);
+    assert.equal(sarif.invocations[0].toolExecutionNotifications.length, 1);
+    assert.ok(sarif.results.length > 0 && sarif.results.every((x) => x.locations[0].physicalLocation.artifactLocation.uri === `${base}/slop`), 'no results for the block page');
+    assert.match(readFileSync(join(out, 's.md'), 'utf8'), /\*\*http:\/\/127\.0\.0\.1:\d+\/challenge\*\*: not diagnosed/);
+  } finally {
+    server.close();
+    rmSync(out, { recursive: true, force: true });
+  }
+});
+
 test('--version prints the package version, --help names every taster command', () => {
   const version = run('--version');
   assert.equal(version.status, 0);
   assert.equal(version.stdout.trim(), JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')).version);
   const help = run('--help');
-  for (const line of ['taster <url-or-file>...', 'taster mcp', 'taster acp [--setup]', 'taster setup', 'taster --version', 'TASTER_ROOT', 'TASTER_WEB_URL', '2 error']) {
+  for (const line of ['taster <url-or-file>...', 'taster mcp', 'taster acp [--setup]', 'taster setup', 'taster --version', 'TASTER_ROOT', 'TASTER_WEB_URL', '2 error or a target not diagnosed']) {
     assert.ok(help.stdout.includes(line), `--help is missing ${line}`);
   }
   assert.equal(run('help').stdout, help.stdout);

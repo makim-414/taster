@@ -60,12 +60,16 @@ pills, thick left bars, caps with wide tracking, long dashes, emoji, transition-
 pixel one-offs, stock palette classes and Tailwind screens that drop the defaults. --baseline makes it a ratchet:
 counts per file and check may only go down. A line passes with a comment taster-allow <reason>.
 
+Not diagnosed: when a URL answers with a bot check, a block page, an HTTP error (4xx, 5xx) or a redirect to a
+sign-in page on another host, nothing is measured and the report says so instead of listing findings. Taster
+does not get past checks or sign-in.
+
 Environment
   TASTER_ROOT=<dir>     open local files only inside <dir>
   TASTER_WEB_URL=<url>  where the component and board links the MCP server gives point,
                         default https://taster-six.vercel.app (for a self-hosted copy of the site)
 
-Exit codes: 0 no findings at --fail-on or above, 1 findings, 2 error`;
+Exit codes: 0 no findings at --fail-on or above, 1 findings, 2 error or a target not diagnosed`;
 
 function viewportsFrom(list) {
   if (!list) return VIEWPORTS;
@@ -224,6 +228,9 @@ async function main() {
     if (values.sarif) writeFileSync(values.sarif, `${JSON.stringify(toSarif(reports), null, 2)}\n`);
     if (values.summary) appendFileSync(values.summary, `${toSummary(reports)}\n`);
   }
+  // A target that was not diagnosed fails the run as an error, after every other target has been read, since
+  // its findings would have been about a block or error page, not the site.
+  if (reports.some((r) => r.diagnosed === false)) return 2;
   const worst = Math.max(0, ...reports.flatMap((r) => r.rules.map((h) => ranks[h.severity] || 0)));
   return worst >= ranks[failOn] ? 1 : 0;
 }

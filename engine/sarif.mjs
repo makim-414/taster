@@ -1,6 +1,8 @@
 // Diagnose reports as SARIF 2.1.0, so GitHub code scanning (and any SARIF viewer) shows findings on the source.
 // A finding knows its CSS selector, not a source line, so for a local file the line is found by searching the
 // file for the element's own text (then its id or class); when nothing matches it points at line 1 and says so.
+// A target that was not diagnosed (a bot check, an error or sign-in page came back) has no results: it is a tool
+// execution notification at level error, and the run is marked as not successful.
 import { existsSync, readFileSync } from 'node:fs';
 import { relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -41,6 +43,14 @@ function needlesFor(finding) {
   return out;
 }
 
+// Why a rule flags what it flags, and its basis when the rule states one. The help says why it is flagged, not
+// that a finding proves how the page was made.
+function helpFor(r) {
+  const basis = r.basis ? `\n\nBasis: ${r.basis}` : '';
+  const patterns = r.fix_patterns?.length ? `\n\nPatterns: ${r.fix_patterns.map((p) => `[${p}](${HELP_BASE}${p}.md)`).join(', ')}` : '';
+  return { text: `Why it is flagged: ${r.why}${basis}\n\nFix: ${r.fix}`, markdown: `**Why it is flagged:** ${r.why}${basis}\n\n**Fix:** ${r.fix}${patterns}` };
+}
+
 /**
  * @param {object[]} reports diagnose reports (engine/diagnose.mjs), one per target
  * @param {{ cwd?: string }} [options] paths in the SARIF are relative to cwd (the repository root in CI)
@@ -52,16 +62,27 @@ export function toSarif(reports, { cwd = process.cwd() } = {}) {
     name: r.name.replace(/[^A-Za-z0-9]+(.)?/g, (_, c) => (c ? c.toUpperCase() : '')),
     shortDescription: { text: r.name },
     fullDescription: { text: r.what },
-    help: { text: `${r.why}\n\nFix: ${r.fix}`, markdown: `${r.why}\n\n**Fix:** ${r.fix}${r.fix_patterns?.length ? `\n\nPatterns: ${r.fix_patterns.map((p) => `[${p}](${HELP_BASE}${p}.md)`).join(', ')}` : ''}` },
+    help: helpFor(r),
     helpUri: r.fix_patterns?.[0] ? `${HELP_BASE}${r.fix_patterns[0]}.md` : undefined,
     defaultConfiguration: { level: LEVEL[r.severity] || 'warning' },
-    properties: { severity: r.severity, check: r.detect.level, tags: ['design', 'ui'] },
+    properties: { severity: r.severity, check: r.detect.level, ...(r.basis && { basis: r.basis }), tags: ['design', 'ui'] },
   }));
   const results = [];
+  const notifications = [];
   for (const report of reports) {
     const file = localPath(report.url);
     const lines = file && existsSync(file) ? readFileSync(file, 'utf8').split('\n') : null;
     const uri = file ? relative(cwd, file).split('\\').join('/') : report.url;
+    if (report.diagnosed === false) {
+      const { reason, status, title, finalUrl, message } = report.notDiagnosed;
+      notifications.push({
+        level: 'error',
+        message: { text: message },
+        locations: [{ physicalLocation: { artifactLocation: { uri } } }],
+        properties: { reason, status, title, finalUrl },
+      });
+      continue;
+    }
     for (const hit of report.rules) {
       // The same element at two widths is one result with both widths named.
       const seen = new Map();
@@ -97,6 +118,7 @@ export function toSarif(reports, { cwd = process.cwd() } = {}) {
     runs: [
       {
         tool: { driver: { name: 'Taster', informationUri: 'https://github.com/makim-414/taster', version: '0.1.0', rules } },
+        invocations: [{ executionSuccessful: notifications.length === 0, toolExecutionNotifications: notifications }],
         results,
       },
     ],
@@ -107,7 +129,11 @@ export function toSarif(reports, { cwd = process.cwd() } = {}) {
 export function toSummary(reports) {
   const out = ['## Taster', ''];
   for (const r of reports) {
-    out.push(`**${r.url}**: ${r.rulesHit} of ${r.measured} measured rules hit at ${r.widths.join(' and ')} wide`, '');
+    if (r.diagnosed === false) {
+      out.push(`**${r.url}**: ${r.notDiagnosed.message}`, '');
+      continue;
+    }
+    out.push(`**${r.url}**: ${r.rulesHit} of ${r.measured} measured rules hit at ${r.widths.join(' and ')} wide${r.redirected ? ` (redirected to ${r.finalUrl})` : ''}`, '');
     if (!r.rules.length) continue;
     out.push('| Rule | Severity | Count | Fix |', '|---|---|---|---|');
     for (const h of r.rules) out.push(`| ${h.ruleId} ${h.name} | ${h.severity} | ${Object.values(h.counts).reduce((a, b) => a + b, 0)} | ${h.fix.replace(/\|/g, '/')} |`);
