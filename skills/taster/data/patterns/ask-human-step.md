@@ -5,7 +5,7 @@ category: chat-ai
 uses: [confirm-an-action, ask-the-assistant]
 surfaces: [ai-chat]
 replaces: []
-components: [blocks/button]
+components: [blocks/button, chat/approval-step]
 inspiration: []
 status: stable
 ---
@@ -28,6 +28,7 @@ In both cases the thread shows a visible paused state: "Waiting for your answer"
 
 ## Do
 
+- Mark the person's turn with the same hue as the agent's work and change only lightness, chroma and the cell's shape (filled, hatched with a thin border, dashed with a slow pulse). A second hue for "your turn" reads as a different product; check it in a grayscale capture.
 - Put the consequence in the option label: "Send to 240 customers" is better than "Option A".
 - Make buttons at least 44px high, the safe default visually primary only when the agent recommends it.
 - Move focus to the card when it appears and return it to the composer afterward. Do not steal focus if the person is typing.

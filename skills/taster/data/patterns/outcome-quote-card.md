@@ -5,7 +5,7 @@ category: testimonial
 uses: [prove-trust]
 surfaces: [landing]
 replaces: [AC-17, CMP-08]
-components: [blocks/card]
+components: [blocks/card, marketing/customer-quote, marketing/case-study-card]
 inspiration: [https://21st.dev/@uilayout.contact/components/testimonial-1]
 status: stable
 ---

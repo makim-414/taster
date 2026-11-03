@@ -1,0 +1,13 @@
+{
+  "expect": "COVERAGE",
+  "why": "Every rule needs a rule map entry.",
+  "patch": [
+    {
+      "op": "delete",
+      "path": [
+        "ruleMap",
+        "AC-01"
+      ]
+    }
+  ]
+}

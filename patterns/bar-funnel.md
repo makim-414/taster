@@ -27,6 +27,7 @@ An ordered process where each stage can only lose people: visit, signup, activat
 
 ## Do
 
+- Ordered steps are order, not brand: use one hue at five lightness steps (about 30, 45, 60, 80 and 100%) and repeat the same steps for dots, bars and progress fills.
 - Show both views of the same loss: percent of start and percent of previous stage.
 - Keep stage names to one or two words and in the order users actually go through.
 - Label the time window and the cohort ("Signups in September").

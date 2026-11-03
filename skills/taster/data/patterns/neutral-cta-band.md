@@ -5,7 +5,7 @@ category: cta
 uses: [ask-for-action]
 surfaces: [landing]
 replaces: [CMP-04, COL-01, COL-07]
-components: [blocks/button]
+components: [blocks/button, marketing/cta-band, marketing/inline-signup]
 inspiration: []
 status: stable
 ---

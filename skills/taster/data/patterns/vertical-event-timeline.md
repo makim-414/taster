@@ -5,7 +5,7 @@ category: timeline-stepper
 uses: [show-when-things-happen]
 surfaces: [app, editorial]
 replaces: []
-components: []
+components: [blocks/activity-feed]
 inspiration: []
 status: stable
 ---

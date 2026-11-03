@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field Notes logo</title>
+<link rel="stylesheet" href="system.css">
+<link rel="stylesheet" href="site.css">
+<style>
+  /* The wordmark is set in its own face, in the header and the footer. The same face on body text is off the system. */
+  .wordmark { font-family: 'Wordmark Serif', Georgia, serif; letter-spacing: -0.02em; }
+  footer { padding: var(--sp-4) var(--sp-6); }
+</style>
+</head>
+<body>
+  <header>
+    <a class="wordmark" href="home.html">Field Notes</a>
+    <nav aria-label="Main"><a href="pricing.html">Pricing</a><a href="home.html#notes">Notes</a></nav>
+  </header>
+  <main>
+    <section>
+      <h1>Notes that keep their place</h1>
+      <p>Write once, find it again by the place you wrote it.</p>
+      <p class="wordmark">Set in the wordmark face, but this is body text.</p>
+      <form>
+        <input type="email" aria-label="Email" placeholder="you@example.com">
+        <button class="button" type="button">Get started</button>
+      </form>
+    </section>
+    <section>
+      <h2>What you get</h2>
+      <div class="cards">
+        <div class="card"><h3>Places</h3><p>Every note keeps the room it was written in.</p><span class="badge">Included</span></div>
+        <div class="card"><h3>Search</h3><p>Find a note by a word or by where it was.</p><span class="badge">Included</span></div>
+      </div>
+    </section>
+  </main>
+  <footer><a class="logo wordmark" href="home.html">Field Notes</a></footer>
+</body>
+</html>

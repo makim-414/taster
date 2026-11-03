@@ -1,19 +1,25 @@
 // The Taster MCP server, shared by the stdio entry (mcp.mjs) and the hosted HTTP endpoint (http.mjs).
 // Prompt: start (the opening question). Diagnose tools: diagnose, list_rules, explain_rule.
-// Brand tool: brand_theme. Rebuild tool: extract_content. Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
+// Brand tool: brand_theme. System tools: design_system, tune_system, system_for_category. Rebuild tool: extract_content.
+// Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
 // Choosing tools: browse_components and preview_component answer with pictures and links to the live gallery.
+// Screen by screen tools: check_consistency, plan_screens, plan_next, plan_update.
 // Hosted mode has no local files and opens pages only through the host's fenced browser, so it swaps the local
 // diagnose for `remote.diagnose` (public http(s) URLs only), brand_theme for `remote.brand` when the host gives one,
-// leaves out extract_content, and answers preview_component with the still and the live link instead of a render.
+// leaves out extract_content, the system tools and the screen by screen tools (they open pages in a local browser
+// and read or write files), and answers preview_component with the still and the live link instead of a render.
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, launch, viewportFor } from './diagnose.mjs';
 import { brandTheme } from './brand.mjs';
 import { boardUrl, browseComponents, componentUrl, getComponent, getPattern, listPatterns, loadTaxonomy, previewPath, stagePath, suggestSwaps } from './catalog.mjs';
+import { checkConsistency, formatConsistencyText } from './consistency.mjs';
+import { applyStep, checkScreen, nextStep, planFromExtract, planPath, planRelative, readPlan, writePlan } from './plan.mjs';
+import * as sys from './system.mjs';
 
 const json = (value) => ({ type: 'text', text: JSON.stringify(value, null, 2) });
 const START_GUIDE = fileURLToPath(new URL('../skills/taster/references/start.md', import.meta.url));
@@ -333,12 +339,172 @@ export function createServer({ remote } = {}) {
     'taxonomy',
     {
       title: 'Taxonomy',
-      description: 'Families, categories, uses and surfaces used to organize and filter patterns, plus the icon slot map (iconography): which slots get an icon, which stay empty, and the one-set rules.',
+      description: 'The strict taxonomy: families and categories (each with definition, includes, excludes and examples), the classify decision key over a boolean feature vocabulary, uses, surfaces, the weighting axes with the tokens each drives, snap steps, per-category relevance, design constraints, the rule map and gaps, plus the icon slot map (iconography). See taxonomy/SCHEMA.md.',
       inputSchema: {},
       annotations: readOnly,
     },
     guard(async () => ({ content: [json(loadTaxonomy())] })),
   );
+
+  // Local only: these open pages in a local browser and read or write taster.system.json, theme.css and taster.plan.json.
+  if (!remote) {
+    // Design system tools (engine/system.mjs): brand and references in, balanced axes and every token out.
+    const systemArg = z.union([z.string(), z.record(z.string(), z.any())]).describe('path to a taster.system.json, or the system object itself');
+    const load = (s) => (typeof s === 'string' ? sys.readSystem(s) : s);
+    const run = (name, fn) => async (args) => {
+      try {
+        return { content: [json(await fn(args || {}))] };
+      } catch (err) {
+        return { isError: true, content: [{ type: 'text', text: `${name} failed: ${err.message}` }] };
+      }
+    };
+    server.registerTool(
+      'design_system',
+      {
+        title: 'Make the design system',
+        description:
+          "Turn the brand's identity and the tone of references into one balanced design system before any screen is built. Reads the brand site (color, typeface, logo, light or dark) and measures each page in a real browser for the eight axes (radii, spacing and control heights, text contrast, type scale, hues, shadows, motion, borders). Axes come from builder intent first, then the references, then the brand site, then the taxonomy default; balance keeps every design constraint. Returns axes with step names, axisNotes saying where each came from and what balance moved (quoting the principle), every token the axes drive plus the brand tokens, and a theme.css block. With out, writes taster.system.json and theme.css there.",
+        inputSchema: {
+          brand: z.string().optional().describe('the brand site: URL or local HTML file'),
+          references: z.array(z.string()).max(6).optional().describe('pages whose tone the builder likes'),
+          axes: z.record(z.string(), z.number()).optional().describe('builder intent, e.g. { "density": 0.75 }; values on the taxonomy snap steps'),
+          surface: z.string().optional().describe('surface id from the taxonomy, recorded for the screens'),
+          scheme: z.enum(['dark', 'light']).optional(),
+          out: z.string().optional().describe('directory to write taster.system.json and theme.css'),
+        },
+        annotations: { openWorldHint: true },
+      },
+      run('design_system', async ({ brand, references = [], axes, surface, scheme, out }) => {
+        const system = await sys.designSystem({ brand: brand || null, references, intent: { axes, surface, scheme } });
+        return out ? { files: sys.writeSystem(out, system), system } : system;
+      }),
+    );
+    server.registerTool(
+      'tune_system',
+      {
+        title: 'Move a weight',
+        description:
+          'The exchange with the builder: move one or more axes of a design system. The moved axes stay where the builder put them, the others move the least needed to keep every constraint, and the result says which moved and why (the constraint principle). Tokens and theme.css are regenerated. Given a path, the files are rewritten in place.',
+        inputSchema: { system: systemArg, axes: z.record(z.string(), z.number()).describe('e.g. { "roundness": 1 }') },
+      },
+      run('tune_system', async ({ system, axes }) => {
+        const next = sys.tuneSystem(load(system), axes);
+        const summary = next.tuned[next.tuned.length - 1].summary;
+        if (typeof system === 'string' && existsSync(system)) return { summary, files: sys.writeSystem(dirname(system), next), system: next };
+        return { summary, system: next };
+      }),
+    );
+    server.registerTool(
+      'system_for_category',
+      {
+        title: 'Tokens that matter for a part',
+        description: "For one taxonomy category, the axes ordered by relevance with this system's step and the tokens each drives, so the builder of that part knows which values matter most. Parts read these through the alias tokens only.",
+        inputSchema: { system: systemArg, category: z.string().describe('category id, e.g. table, hero, button') },
+        annotations: readOnly,
+      },
+      run('system_for_category', async ({ system, category }) => sys.systemForCategory(load(system), category)),
+    );
+
+    // ---- screen by screen: one screen or one part at a time, approved by the builder, checked before the next ----
+    const filesArg = z.union([z.string(), z.array(z.string()).min(1)]).optional();
+
+    server.registerTool(
+      'check_consistency',
+      {
+        title: 'Check screens against each other and the system',
+        description:
+          'Render each screen (URL or local HTML file) at 1440 and 390 wide and read the computed values of every button, input, card, h1 to h3, body text, link and badge: radius, typeface, size, weight, line height, padding, gap, text, fill and border colors, shadow, transition duration. Returns drift (the same component drawn differently on two screens, with selectors and screen ids) and, when a system is given (theme CSS with :root tokens, or { tokens } JSON; a list loads in order), every value that is not one of its tokens with the nearest token. A system may declare the logo wordmark\'s own face (identity.logoFont in taster.system.json, or logoFont here): inside the site\'s logo or home link in the header and footer that face is listed under exempt instead of off-system, for font-family only. ok is true only with zero findings.',
+        inputSchema: {
+          screens: z.array(z.string()).min(1).describe('URLs or HTML file paths, in the order the screens were built'),
+          system: filesArg.describe('theme CSS or { tokens } JSON path, or a list such as [tokens.css, theme.css]'),
+          widths: z.array(z.number().int().min(320).max(3840)).max(9).optional(),
+          logoFont: z.string().optional().describe("the logo wordmark's own face; exempt inside the logo only, overrides the system's identity.logoFont"),
+        },
+        annotations: { readOnlyHint: true, openWorldHint: true },
+      },
+      guard(async ({ screens, system, widths, logoFont }) => {
+        const report = await checkConsistency(screens, { system: system ?? null, identity: logoFont ?? null, widths });
+        return { content: [json(report), { type: 'text', text: formatConsistencyText(report) }] };
+      }),
+    );
+
+    server.registerTool(
+      'plan_screens',
+      {
+        title: 'Plan the screens',
+        description:
+          'Read the start page and list the screens to work through: the page itself, then every same-site page its nav links to. Each screen gets a draft purpose, optional parts (byPart splits a read page into its sections) and status planned. With out, writes taster.plan.json there. Then call plan_next and follow it: one screen or part at a time, proposed to the builder, built only after their OK, checked before the next.',
+        inputSchema: {
+          target: z.string().describe('the start page: URL or local HTML file'),
+          route: z.enum(['swap', 'rebuild', 'build']).optional().describe('default rebuild'),
+          system: filesArg.describe('the design system file(s) every screen is checked against'),
+          byPart: z.boolean().optional(),
+          out: z.string().optional().describe('folder to write taster.plan.json into'),
+        },
+        annotations: { openWorldHint: true },
+      },
+      guard(async ({ target, route = 'rebuild', system, byPart = false, out }) => {
+        const sys = system == null ? null : (Array.isArray(system) ? system : [system]).map((f) => (out ? planRelative(out, f) : f));
+        const plan = planFromExtract(await extract(target), { route, system: sys && sys.length === 1 ? sys[0] : sys, byPart, baseDir: out || null });
+        const file = out ? writePlan(out, plan) : null;
+        return { content: [json({ file, plan, next: nextStep(plan) })] };
+      }),
+    );
+
+    server.registerTool(
+      'plan_next',
+      {
+        title: 'The next step',
+        description: 'Read taster.plan.json and return exactly one next action: propose a screen or part, wait for the builder, build it, check it, or done. Never build before the builder approved; never start the next screen before this one is checked.',
+        inputSchema: { plan: z.string().describe('path to taster.plan.json or its folder') },
+        annotations: readOnly,
+      },
+      guard(async ({ plan }) => ({ content: [json(nextStep(readPlan(plan)))] })),
+    );
+
+    server.registerTool(
+      'plan_update',
+      {
+        title: 'Record a step',
+        description:
+          'Move the screen (or part) in progress one step and save the plan: propose (planned to proposed; may set purpose and parts), revise (the builder asked for changes, back to planned), approve (needs note with the builder\'s own words), build (approved to built; output is the built file or URL), check (built to checked), accept (records a named exception the builder approved on the screen: rule is a detector rule id such as AC-03, or drift:<role>:<property> / off-system:<role>:<property>; needs reason, and by with the builder\'s own words). A check without counts runs diagnose on the output and check_consistency against the checked screens and the system itself, and refuses unless every remaining finding is an accepted exception (with none accepted, unless both are zero). Accepted exceptions stay in the plan and in every next step. Out of order steps are refused with the reason.',
+        inputSchema: {
+          plan: z.string().describe('path to taster.plan.json or its folder'),
+          event: z.object({
+            type: z.enum(['propose', 'revise', 'approve', 'build', 'check', 'accept']),
+            screen: z.string(),
+            part: z.string().optional(),
+            note: z.string().optional(),
+            purpose: z.string().optional(),
+            parts: z.array(z.union([z.string(), z.object({ id: z.string().optional(), purpose: z.string() })])).optional(),
+            output: z.string().optional(),
+            findings: z.number().int().min(0).optional(),
+            drift: z.number().int().min(0).optional(),
+            remaining: z.array(z.string()).optional().describe('check with counts: the findings left, named as accept names them'),
+            rule: z.string().optional().describe('accept: AC-03, drift:<role>:<property> or off-system:<role>:<property>'),
+            reason: z.string().optional().describe('accept: why it cannot be fixed here, for example it needs a markup change'),
+            by: z.string().optional().describe("accept: the builder's own words approving the exception"),
+          }),
+        },
+      },
+      guard(async ({ plan: path, event }) => {
+        const file = planPath(path);
+        const plan = readPlan(file);
+        let check = null;
+        if (event.type === 'check' && (event.findings === undefined || event.drift === undefined)) {
+          check = await checkScreen(plan, event.screen, { baseDir: dirname(file) });
+          if ((check.findings || check.drift) && check.unaccepted.length) {
+            const refused = `Not clean: ${check.findings} detector findings, ${check.drift} consistency findings. Not accepted: ${check.unaccepted.join(', ')}. Fix them and check again; when one needs a change outside the builder's control, ask the builder and record { type: "accept", screen, rule, reason, by: "<their words>" }.`;
+            return { isError: true, content: [json({ refused, check })] };
+          }
+          event = { ...event, findings: check.findings, drift: check.drift, remaining: check.remaining };
+        }
+        const next = applyStep(plan, event);
+        writePlan(file, next);
+        return { content: [json({ file, next: nextStep(next), plan: next, check })] };
+      }),
+    );
+  }
 
   return server;
 }

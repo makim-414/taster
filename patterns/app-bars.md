@@ -5,7 +5,7 @@ category: nav-header
 uses: [navigate-the-app]
 surfaces: [app, dashboard]
 replaces: [CMP-05]
-components: [blocks/app-shell, blocks/tabs]
+components: [blocks/app-shell, blocks/tabs, marketing/breadcrumb]
 inspiration: []
 status: stable
 ---

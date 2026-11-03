@@ -13,7 +13,7 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [server] }));
   try {
     const { tools } = await client.listTools();
-    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,browse_components,diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,preview_component,suggest_swaps,taxonomy');
+    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,browse_components,check_consistency,design_system,diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,plan_next,plan_screens,plan_update,preview_component,suggest_swaps,system_for_category,taxonomy,tune_system');
 
     // The opening question comes from the skill's start guide, so the prompt and the skill say the same thing.
     const { prompts } = await client.listPrompts();
@@ -35,6 +35,22 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
     assert.match(t.css, /:root, :root\[data-theme\], \.theme-dark, \.theme-light \{/);
     assert.ok(t.tokens['--success'] && t.tokens['--danger'] && t.notes.length >= 3);
 
+    // Design system: make it, move a weight, read what matters for one part.
+    const made = await client.callTool({ name: 'design_system', arguments: { brand: fixture, axes: { density: 0.75 } } });
+    assert.ok(!made.isError, made.content[0].text);
+    const sys = JSON.parse(made.content[0].text);
+    assert.equal(sys.axes.density, 0.75);
+    assert.equal(sys.axisNotes.density.source, 'intent');
+    assert.match(sys.css, /\n:root, :root\[data-theme\] \{/);
+    const tuned = await client.callTool({ name: 'tune_system', arguments: { system: sys, axes: { roundness: 1 } } });
+    assert.ok(!tuned.isError, tuned.content[0].text);
+    const tunedBody = JSON.parse(tuned.content[0].text);
+    assert.equal(tunedBody.system.axes.roundness, 1);
+    assert.ok(tunedBody.summary.length >= 1);
+    const part = JSON.parse((await client.callTool({ name: 'system_for_category', arguments: { system: tunedBody.system, category: 'card' } })).content[0].text);
+    assert.equal(part.category, 'card');
+    assert.ok(part.axes.length >= 1);
+    assert.ok((await client.callTool({ name: 'tune_system', arguments: { system: sys, axes: { roundness: 3 } } })).isError);
     // Choosing by eye: numbered candidates, one picture each, a live link each, and one board link for all of them.
     const browsed = await client.callTool({ name: 'browse_components', arguments: { query: 'hero', limit: 3, theme: 'light', brand: '#e4002b' } });
     assert.ok(!browsed.isError, browsed.content[0].text);

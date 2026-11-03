@@ -67,6 +67,7 @@ import {
   LightBeams,
   ThinkingOrb, ORB_RECIPES,
 } from '../../src'
+import { AppSections } from './sections-app'
 import { ONLY } from './stage'
 
 
@@ -161,6 +162,7 @@ function SelectMenuDemo() {
     </div>
   )
 }
+import { ContentSections, ContentFooters } from './sections-content'
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   if (ONLY) return ONLY === id ? <section data-registry-id={id} className="min-w-0"><div className="min-w-0">{children}</div></section> : null
@@ -394,6 +396,7 @@ const STEPS: ShowcaseStep[] = [
 export function Sections() {
   return (
     <>
+      <ContentSections />
       <Section id="blocks/accordion" title="Accordion"><AccordionDemo /></Section>
 
       <Section id="blocks/alert" title="Alert">
@@ -960,6 +963,8 @@ export function Sections() {
       </Section>
 
 
+      <AppSections />
+      <ContentFooters />
     </>
   )
 }

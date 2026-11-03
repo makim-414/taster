@@ -18,7 +18,8 @@
       "LAY-01"
     ],
     "components": [
-      "blocks/button"
+      "blocks/button",
+      "marketing/product-hero"
     ],
     "summary": "Left-weighted headline and a short sentence next to a real product screen or the actual result a visitor came for, instead of a centered title floating over a gradient."
   },
@@ -61,6 +62,7 @@
     ],
     "components": [
       "blocks/button",
+      "marketing/photo-hero",
       "blocks/banner-hero"
     ],
     "summary": "Real photography carries the hero: a full-bleed photo with a gentle bottom scrim, or a serif headline over two or three overlapping photos. Film grain and slightly muted tone replace the glossy AI photo look."
@@ -101,7 +103,8 @@
     ],
     "components": [
       "blocks/input",
-      "blocks/button"
+      "blocks/button",
+      "marketing/split-form-hero"
     ],
     "summary": "The first action is an input inside the hero, such as a link to analyze. Submitting slides the hero into a short form or a sample result on the same screen, so the page needs no heavy contact form further down."
   },
@@ -179,13 +182,16 @@
       "AC-17",
       "CMP-07"
     ],
-    "components": [],
+    "components": [
+      "marketing/product-hero",
+      "marketing/feature-rows"
+    ],
     "summary": "A rounded frame around a true screenshot or recording of the product. Drawn skeleton mockups and fake terminals are replaced by the real screen."
   },
   {
     "id": "split-section-header",
     "name": "Split section header",
-    "category": "feature-section",
+    "category": "typography",
     "uses": [
       "explain-features",
       "emphasize-text"
@@ -199,7 +205,9 @@
       "TYP-03",
       "TYP-04"
     ],
-    "components": [],
+    "components": [
+      "content/section-heading"
+    ],
     "summary": "Lowercase eyebrow and a large left-aligned title on one side, small supporting text on the other. Replaces the centered all-caps kicker and giant title."
   },
   {
@@ -241,7 +249,9 @@
     ],
     "components": [
       "blocks/card",
-      "blocks/separator"
+      "blocks/separator",
+      "marketing/feature-rows",
+      "marketing/feature-grid"
     ],
     "summary": "Pick the plainest layout the content allows: a list, a two-column table or a simple grid sized to the number of items, with photographs doing the work when they exist. Spacing tightens inside groups and widens between them."
   },
@@ -284,7 +294,8 @@
     ],
     "components": [
       "blocks/alert",
-      "blocks/badge"
+      "blocks/badge",
+      "blocks/status-list"
     ],
     "summary": "Severity is told with a text label and a brighter full border, not a thick colored bar on the left edge of the card."
   },
@@ -304,7 +315,8 @@
     ],
     "components": [
       "blocks/card",
-      "blocks/separator"
+      "blocks/separator",
+      "blocks/description-list"
     ],
     "summary": "One container per idea. Inner boxes are removed and groups are separated by spacing and thin dividers."
   },
@@ -322,7 +334,8 @@
       "COL-07"
     ],
     "components": [
-      "blocks/card"
+      "blocks/card",
+      "blocks/spotlight-card"
     ],
     "summary": "On hover a soft light follows the pointer along the card border only, instead of a colored glow shadow around the whole card."
   },
@@ -347,7 +360,12 @@
     ],
     "components": [
       "blocks/card",
-      "blocks/badge"
+      "blocks/badge",
+      "blocks/glass-folder",
+      "blocks/side-folder",
+      "blocks/orbit-illustration",
+      "marketing/case-study-card",
+      "commerce/product-card"
     ],
     "summary": "The result, product or article image is the tile; the caption is thin and sits below or on a bottom scrim. Hub cards and article cards follow the same shape."
   },
@@ -366,7 +384,10 @@
       "CMP-02"
     ],
     "components": [
-      "blocks/card"
+      "blocks/card",
+      "blocks/session-list",
+      "blocks/description-list",
+      "blocks/item-list"
     ],
     "summary": "A single-line row with media or icon, title, short description and a trailing action, replacing a stack of boxed cards. Option cards use a stronger border and a check when selected."
   },
@@ -391,7 +412,10 @@
     ],
     "components": [
       "blocks/dropdown",
-      "blocks/button"
+      "blocks/button",
+      "blocks/liquid-nav",
+      "marketing/site-header",
+      "marketing/breadcrumb"
     ],
     "summary": "Transparent at the top, solid hairline bar after scrolling, labels in normal case. Optional mega menu with text-led items and one short description each, or a minimal wordmark and one action for single-purpose pages."
   },
@@ -411,7 +435,8 @@
     ],
     "components": [
       "blocks/app-shell",
-      "blocks/tabs"
+      "blocks/tabs",
+      "marketing/breadcrumb"
     ],
     "summary": "A thin sticky top bar with title, sidebar toggle and page actions, plus a bottom tab bar of three to five destinations on phones."
   },
@@ -430,7 +455,9 @@
       "AC-01",
       "CMP-10"
     ],
-    "components": [],
+    "components": [
+      "marketing/site-footer"
+    ],
     "summary": "Brand and short link columns in normal case, a business or legal block and a bottom row with contact email. No newsletter form by default."
   },
   {
@@ -447,7 +474,9 @@
     "replaces": [
       "CMP-10"
     ],
-    "components": [],
+    "components": [
+      "marketing/slim-footer"
+    ],
     "summary": "A single thin row with copyright and legal links for pages that do not need a sitemap."
   },
   {
@@ -466,7 +495,9 @@
       "COL-07"
     ],
     "components": [
-      "blocks/button"
+      "blocks/button",
+      "marketing/cta-band",
+      "marketing/inline-signup"
     ],
     "summary": "A flat band on a neutral surface with one sentence, one primary and at most one secondary button. No radial glow or gradient box."
   },
@@ -485,7 +516,8 @@
       "LAY-02"
     ],
     "components": [
-      "blocks/card"
+      "blocks/card",
+      "marketing/audience-split"
     ],
     "summary": "Two or three entry cards that send visitors to the path for their type, instead of a generic feature row."
   },
@@ -528,7 +560,9 @@
       "blocks/card",
       "blocks/badge",
       "blocks/button",
-      "blocks/toggle"
+      "blocks/toggle",
+      "marketing/pricing-cards",
+      "marketing/plan-rows"
     ],
     "summary": "One card per real plan with aligned slots for name, price, billing note and features. A monthly or yearly toggle updates every price. Recommended is a text label and a stronger border, not a scaled center card."
   },
@@ -547,7 +581,8 @@
       "AC-11"
     ],
     "components": [
-      "blocks/table"
+      "blocks/table",
+      "marketing/plan-table"
     ],
     "summary": "Grouped feature rows, the recommended column marked quietly, and cell formats for check, dash, limit and number in neutral ink."
   },
@@ -565,7 +600,9 @@
     ],
     "replaces": [],
     "components": [
-      "blocks/input"
+      "blocks/input",
+      "blocks/slider",
+      "marketing/usage-estimator"
     ],
     "summary": "A small calculator that starts from a preset and shows what a plan or order will cost for the entered usage."
   },
@@ -584,7 +621,9 @@
       "CMP-08"
     ],
     "components": [
-      "blocks/card"
+      "blocks/card",
+      "marketing/customer-quote",
+      "marketing/case-study-card"
     ],
     "summary": "A testimonial that leads with a measured result and a named person and company. No stars, stock avatars or invented quotes."
   },
@@ -603,7 +642,8 @@
       "CMP-08"
     ],
     "components": [
-      "blocks/badge"
+      "blocks/badge",
+      "marketing/logo-wall"
     ],
     "summary": "Real customer or integration logos in one neutral color on a single row, plus bordered neutral chips for certifications. Omit the strip when there is nothing real to show."
   },
@@ -623,7 +663,10 @@
       "AC-10",
       "TYP-03"
     ],
-    "components": [],
+    "components": [
+      "marketing/customer-quote",
+      "content/pull-quote"
+    ],
     "summary": "A pull quote set in one typeface with a large opening mark and attribution, not an italic fragment with a bar on the left."
   },
   {
@@ -641,7 +684,8 @@
       "CMP-04"
     ],
     "components": [
-      "blocks/accordion"
+      "blocks/accordion",
+      "marketing/faq-groups"
     ],
     "summary": "Questions separated by hairlines; one answer open at a time, a chevron or plus that turns. No emoji or colored icons."
   },
@@ -660,7 +704,8 @@
       "TYP-04"
     ],
     "components": [
-      "blocks/accordion"
+      "blocks/accordion",
+      "marketing/reveal-faq"
     ],
     "summary": "Section title on the left, accordion on the right, answers that fade in, and an optional image that appears beside the list for the open item."
   },
@@ -683,14 +728,16 @@
       "RSP-06"
     ],
     "components": [
-      "blocks/button"
+      "blocks/button",
+      "blocks/button-group",
+      "blocks/copy-button"
     ],
     "summary": "Primary actions are a solid fill in the accent token, secondary is an outline, tertiary is plain text. No glow, no gradient, no ghost primary. Grouped actions share one border."
   },
   {
     "id": "action-label-button",
     "name": "Specific action label",
-    "category": "button",
+    "category": "copy",
     "uses": [
       "start-an-action"
     ],
@@ -725,7 +772,8 @@
       "AC-08"
     ],
     "components": [
-      "blocks/badge"
+      "blocks/badge",
+      "blocks/status-list"
     ],
     "summary": "Status as neutral text with an optional small flat dot; semantic color appears only on the dot and only for real error or success."
   },
@@ -753,7 +801,7 @@
   {
     "id": "filter-chip",
     "name": "Filter chip",
-    "category": "badge-label",
+    "category": "form-input",
     "uses": [
       "filter-and-search"
     ],
@@ -766,7 +814,8 @@
     ],
     "components": [
       "blocks/badge",
-      "blocks/toggle"
+      "blocks/toggle",
+      "blocks/filter-chips"
     ],
     "summary": "A scrolling row of chips that filter a list; selected chips invert tone and unselected stay quiet."
   },
@@ -859,7 +908,9 @@
       "AC-18",
       "CMP-12"
     ],
-    "components": [],
+    "components": [
+      "marketing/logo-wall"
+    ],
     "summary": "Use the supplied vector or pixel logo unchanged, exported as outlines from the design tool; never redraw it or swap its typeface."
   },
   {
@@ -878,7 +929,9 @@
       "TYP-03",
       "TYP-05"
     ],
-    "components": [],
+    "components": [
+      "content/section-heading"
+    ],
     "summary": "A headline in one typeface and one color, with a small eyebrow set in normal case at default letter spacing. Emphasis by rewriting the sentence or changing weight, never by gradient text or one italic serif word."
   },
   {
@@ -918,13 +971,15 @@
     "replaces": [
       "AC-09"
     ],
-    "components": [],
+    "components": [
+      "motion/digit-swap"
+    ],
     "summary": "UI text uses the body typeface with tabular-nums for aligned figures, instead of a monospaced font for labels."
   },
   {
     "id": "plain-honest-copy",
     "name": "Plain and specific copy",
-    "category": "typography",
+    "category": "copy",
     "uses": [
       "introduce-the-product"
     ],
@@ -943,7 +998,7 @@
   {
     "id": "animated-text",
     "name": "Animated text",
-    "category": "typography",
+    "category": "motion-particle",
     "uses": [
       "emphasize-text"
     ],
@@ -955,7 +1010,12 @@
       "MOT-01",
       "TYP-03"
     ],
-    "components": [],
+    "components": [
+      "motion/text-reveal",
+      "motion/typewriter",
+      "motion/gooey-text",
+      "motion/text-scramble"
+    ],
     "summary": "Use text motion once and with purpose: words firm up as the reader scrolls, one headline word cycles, a tagline types out. Never a different effect on every heading."
   },
   {
@@ -974,7 +1034,12 @@
       "KO-11",
       "LAY-07"
     ],
-    "components": [],
+    "components": [
+      "content/prose",
+      "content/article",
+      "content/footnotes",
+      "content/code-block"
+    ],
     "summary": "Reading column with comfortable measure, paragraph rhythm, quotes without side bars and policy pages that render as plain prose."
   },
   {
@@ -993,7 +1058,9 @@
       "KO-10",
       "KO-13"
     ],
-    "components": [],
+    "components": [
+      "content/prose"
+    ],
     "summary": "Set word-break: keep-all with overflow-wrap: anywhere for long strings, and left-align Korean text instead of justifying it."
   },
   {
@@ -1018,13 +1085,15 @@
       "KO-11",
       "KO-12"
     ],
-    "components": [],
+    "components": [
+      "content/prose"
+    ],
     "summary": "Declare lang on the document, name a Korean face such as Pretendard on purpose, body at 15 to 16px with line height 1.6 to 1.8, no uppercase on Hangul, tracking between 0 and minus 0.02em, and weight or color instead of synthetic italics."
   },
   {
     "id": "korean-natural-copy",
     "name": "Korean-first copy",
-    "category": "typography",
+    "category": "copy",
     "uses": [
       "introduce-the-product"
     ],
@@ -1056,26 +1125,6 @@
       "blocks/app-shell"
     ],
     "summary": "Sidebar, sticky top bar and content area as one reusable frame; the sidebar becomes a drawer on small screens and the brand is a prop."
-  },
-  {
-    "id": "language-playground",
-    "name": "Language playground in the site shell",
-    "category": "layout-shell",
-    "uses": [
-      "start-an-action",
-      "organize-the-page",
-      "navigate-the-site"
-    ],
-    "surfaces": [
-      "developer-docs"
-    ],
-    "replaces": [],
-    "components": [
-      "blocks/button",
-      "blocks/dropdown",
-      "blocks/tabs"
-    ],
-    "summary": "Keep the landing header, page column and light page on the playground of a language or developer tool site; make only the code card dark, let the code fill it and open the output under the code on the first Run."
   },
   {
     "id": "product-first-section-order",
@@ -1111,7 +1160,8 @@
       "LAY-06"
     ],
     "components": [
-      "blocks/separator"
+      "blocks/separator",
+      "blocks/settings-section"
     ],
     "summary": "Tight spacing for related items, wider spacing between unrelated groups, taken from a small token scale. Groups are separated by one pixel dividers in a border token rather than nested boxes."
   },
@@ -1153,7 +1203,9 @@
       "CMP-04",
       "COL-01"
     ],
-    "components": [],
+    "components": [
+      "content/article"
+    ],
     "summary": "Print-like sheets on a warm paper tone: narrow title column cover, numbered sections, spreads with evidence and tables."
   },
   {
@@ -1175,7 +1227,7 @@
   {
     "id": "token-themes",
     "name": "Token themes",
-    "category": "layout-shell",
+    "category": "theme-tokens",
     "uses": [
       "set-the-visual-foundation",
       "switch-views"
@@ -1194,7 +1246,9 @@
       "COL-08"
     ],
     "components": [
-      "blocks/toggle"
+      "blocks/toggle",
+      "blocks/theme-scope",
+      "blocks/appearance-picker"
     ],
     "summary": "Raw values, roles and component tokens in three layers with one brand variable on top, and both light and dark defined as token sets with a switch. Dark steps by gray levels, not neon glow."
   },
@@ -1233,7 +1287,9 @@
     ],
     "components": [
       "blocks/app-shell",
-      "blocks/dropdown"
+      "blocks/dropdown",
+      "blocks/tree-view",
+      "blocks/sidebar-nav"
     ],
     "summary": "Grouped menu with a collapsed icon rail and a drawer on mobile, a workspace switcher on top, one indicator that slides between links. The active item uses a surface tone, not a colored bar or glowing dot."
   },
@@ -1253,7 +1309,8 @@
     "components": [
       "blocks/command-palette",
       "blocks/shortcuts-cheatsheet",
-      "blocks/use-hotkeys"
+      "blocks/use-hotkeys",
+      "blocks/kbd"
     ],
     "summary": "Open with a shortcut, type to filter grouped commands and pages, move with arrows, trap focus inside. A companion sheet lists keyboard shortcuts by area."
   },
@@ -1277,14 +1334,58 @@
     ],
     "components": [
       "blocks/tabs",
-      "blocks/toggle"
+      "blocks/toggle",
+      "blocks/underline-tabs"
     ],
     "summary": "Two to four options in one container where the active option lifts to the surface tone, or text tabs with a thin underline for sibling pages. Includes language switches that show codes. Colored pill tabs are replaced by tone steps."
   },
   {
+    "id": "pagination",
+    "name": "Pagination",
+    "category": "tabs-segmented",
+    "uses": [
+      "browse-records",
+      "switch-views"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard",
+      "editorial"
+    ],
+    "replaces": [
+      "AC-04",
+      "RSP-01"
+    ],
+    "components": [
+      "blocks/pagination"
+    ],
+    "summary": "Previous and Next in words, page numbers with gaps and aria-current on the page in view, folding to \"Page 4 of 12\" on phones instead of wrapping."
+  },
+  {
+    "id": "in-page-toc",
+    "name": "On this page",
+    "category": "tabs-segmented",
+    "uses": [
+      "read-long-text",
+      "organize-the-page"
+    ],
+    "surfaces": [
+      "editorial",
+      "app"
+    ],
+    "replaces": [
+      "AC-10",
+      "AC-01"
+    ],
+    "components": [
+      "blocks/page-toc"
+    ],
+    "summary": "Plain anchor links to the sections of a long page with one hairline rail; the section in view gets full ink and aria-current, never a colored bar."
+  },
+  {
     "id": "step-workflow-section",
     "name": "Step workflow section",
-    "category": "timeline-stepper",
+    "category": "feature-section",
     "uses": [
       "guide-through-steps",
       "explain-features"
@@ -1300,7 +1401,8 @@
     "components": [
       "marketing/workflow-section",
       "blocks/tabs",
-      "blocks/accordion"
+      "blocks/accordion",
+      "marketing/step-showcase"
     ],
     "summary": "Number steps only when order matters. A workflow is shown as tabs or a vertical accordion, the body in neutral tones, with one always-visible assistant dock below."
   },
@@ -1321,7 +1423,8 @@
       "AC-08"
     ],
     "components": [
-      "blocks/progress"
+      "blocks/progress",
+      "blocks/stepper"
     ],
     "summary": "Passed stages are filled dots, pending are empty rings, below target are faint dots, all in one row. A segmented bar fits signup and install flows."
   },
@@ -1357,7 +1460,9 @@
       "editorial"
     ],
     "replaces": [],
-    "components": [],
+    "components": [
+      "blocks/activity-feed"
+    ],
     "summary": "Dated entries in order with a thin spine, used for roadmaps, change logs and review history."
   },
   {
@@ -1392,7 +1497,9 @@
     "replaces": [],
     "components": [
       "blocks/input",
-      "blocks/button"
+      "blocks/button",
+      "blocks/stepper",
+      "blocks/wizard"
     ],
     "summary": "A short multi-step flow with back, progress and one question per screen, optionally with a spotlight tour that lights one area at a time."
   },
@@ -1415,7 +1522,8 @@
     ],
     "components": [
       "blocks/kpi",
-      "blocks/trend"
+      "blocks/trend",
+      "blocks/stat-strip"
     ],
     "summary": "Label, one large number, a small delta and a caption or comparison line. No icon box or gradient tile; delta uses sign and text, not tinted pills."
   },
@@ -1437,7 +1545,8 @@
       "COL-01"
     ],
     "components": [
-      "blocks/kpi"
+      "blocks/kpi",
+      "blocks/stat-strip"
     ],
     "summary": "Three or four real figures in a row with a source line, hierarchy by ink tone, not gradient. Each figure can open its calculation and source rows."
   },
@@ -1478,7 +1587,8 @@
     "components": [
       "blocks/line",
       "blocks/trend",
-      "blocks/spark"
+      "blocks/spark",
+      "blocks/sparkline-table"
     ],
     "summary": "A hairline series with a low-opacity fill or none, quiet grid, readable tooltip and a period selector. Sparklines drop axes and labels entirely."
   },
@@ -1533,7 +1643,8 @@
       "AC-08"
     ],
     "components": [
-      "blocks/progress"
+      "blocks/progress",
+      "blocks/meter"
     ],
     "summary": "A thin neutral bar or ring that fills to a value, with the figure beside it and threshold markers instead of green and red."
   },
@@ -1573,7 +1684,9 @@
       "CMP-02"
     ],
     "components": [
-      "blocks/table"
+      "blocks/table",
+      "blocks/selectable-table",
+      "blocks/sparkline-table"
     ],
     "summary": "Sentence-case headers, right-aligned tabular figures, hairline row dividers, no zebra stripes or all-caps headers; header and footer stay fixed while the body scrolls."
   },
@@ -1594,7 +1707,8 @@
       "AC-09"
     ],
     "components": [
-      "blocks/datagrid"
+      "blocks/datagrid",
+      "blocks/selectable-table"
     ],
     "summary": "Click-to-sort headers, column chooser, density option, sticky first column, pagination and row drilldown; state can live in the URL. Decision queues add a verdict, stage progress and a next action per row."
   },
@@ -1616,7 +1730,14 @@
       "RSP-06"
     ],
     "components": [
-      "blocks/input"
+      "blocks/input",
+      "blocks/sensitive-input",
+      "blocks/settings-section",
+      "blocks/field",
+      "blocks/textarea",
+      "blocks/slider",
+      "blocks/file-dropzone",
+      "blocks/tag-input"
     ],
     "summary": "A transparent field with a neutral border and a focus ring, label above, hint and inline error text below, in the body typeface. File drop targets follow the same field style. Settings pages use a label column and a value column with a save bar that appears only after a change."
   },
@@ -1635,7 +1756,9 @@
     "components": [
       "blocks/combobox",
       "blocks/datepicker",
-      "blocks/calendar"
+      "blocks/calendar",
+      "blocks/select-menu",
+      "blocks/tag-input"
     ],
     "summary": "A searchable select with option descriptions and grouped headers, apply-on-confirm for multi select, and a date picker that opens a calendar popover."
   },
@@ -1651,7 +1774,10 @@
     ],
     "replaces": [],
     "components": [
-      "blocks/toggle"
+      "blocks/toggle",
+      "blocks/radio-group",
+      "blocks/checkbox-group",
+      "blocks/switch-list"
     ],
     "summary": "On state fills with the accent token; labels are part of the control so the whole row is the hit area."
   },
@@ -1671,7 +1797,8 @@
     ],
     "components": [
       "blocks/input",
-      "blocks/button"
+      "blocks/button",
+      "blocks/field"
     ],
     "summary": "One email field and one button when a real list exists, or at most three fields with labels in normal case and one clear submit button. Never on every page ending."
   },
@@ -1688,7 +1815,9 @@
     "replaces": [],
     "components": [
       "blocks/input",
-      "blocks/button"
+      "blocks/button",
+      "blocks/field",
+      "blocks/otp-input"
     ],
     "summary": "Email and password fields with an optional provider button and a strength meter on sign up."
   },
@@ -1708,7 +1837,9 @@
     "replaces": [],
     "components": [
       "blocks/input",
-      "blocks/combobox"
+      "blocks/combobox",
+      "blocks/search-field",
+      "blocks/filter-chips"
     ],
     "summary": "Search with autocomplete or a static index, sort and one primary action in a single row above a list, filters as selects or chips."
   },
@@ -1729,7 +1860,8 @@
       "CMP-05"
     ],
     "components": [
-      "blocks/dialog"
+      "blocks/dialog",
+      "blocks/drawer"
     ],
     "summary": "A centered panel on a dim backdrop with a thin close icon, or a sheet sliding from the edge for row details and a lightbox for media. Blur is allowed here because layers overlap."
   },
@@ -1748,7 +1880,8 @@
     ],
     "components": [
       "blocks/dialog",
-      "blocks/alert"
+      "blocks/alert",
+      "blocks/confirm-dialog"
     ],
     "summary": "Says exactly what disappears and what stays, whether it can be undone, and for irreversible actions asks the name to be typed."
   },
@@ -1805,7 +1938,10 @@
       "COL-06"
     ],
     "components": [
-      "blocks/alert"
+      "blocks/alert",
+      "blocks/toast",
+      "blocks/banner",
+      "blocks/notification-list"
     ],
     "summary": "A neutral surface with a one pixel border; color appears only on a small title or icon slot, never a tinted full-width banner. Toasts carry one follow-up action, pause on hover and can offer undo."
   },
@@ -1826,7 +1962,8 @@
       "CPY-02"
     ],
     "components": [
-      "blocks/skeleton"
+      "blocks/skeleton",
+      "blocks/empty-state"
     ],
     "summary": "One line explaining why it is empty and one action, no big illustration or colored icon circle. In data views the axes, headers and labels stay and only the value cells show a dash."
   },
@@ -1846,7 +1983,8 @@
     ],
     "components": [
       "blocks/alert",
-      "blocks/button"
+      "blocks/button",
+      "blocks/empty-state"
     ],
     "summary": "A plain message for failure, missing permission or a locked feature with the reason, what to do and a retry or request button."
   },
@@ -1884,7 +2022,8 @@
       "COL-01"
     ],
     "components": [
-      "blocks/progress"
+      "blocks/progress",
+      "blocks/spinner"
     ],
     "summary": "A thin neutral track with a solid fill, a small outlined ring and plain text for pending work, and a pill above the tab bar for background jobs. No gradient and no orange pill with glow."
   },
@@ -1902,7 +2041,9 @@
     "replaces": [
       "MOT-01"
     ],
-    "components": [],
+    "components": [
+      "motion/glass-logo-reveal"
+    ],
     "summary": "A logo drawn line by line once on first visit and then faded out, never on every route."
   },
   {
@@ -1918,7 +2059,9 @@
       "editorial"
     ],
     "replaces": [],
-    "components": [],
+    "components": [
+      "media/before-after"
+    ],
     "summary": "A draggable divider over one frame to compare an original and an edited version, or two text versions side by side with removed and added lines marked."
   },
   {
@@ -1934,7 +2077,9 @@
     ],
     "replaces": [],
     "components": [
-      "blocks/skeleton"
+      "blocks/skeleton",
+      "media/gallery-lightbox",
+      "media/snap-carousel"
     ],
     "summary": "Lazy thumbnails with a play overlay and a placeholder, laid out as a strip or mosaic whose count adapts to the width, plus inline social embeds and editable image slots."
   },
@@ -1953,7 +2098,9 @@
       "LAY-02"
     ],
     "components": [
-      "blocks/card"
+      "blocks/card",
+      "blocks/coverflow-carousel",
+      "media/snap-carousel"
     ],
     "summary": "Cards rotate along an arc or one is enlarged in the center while neighbors recede, with side buttons."
   },
@@ -1972,7 +2119,8 @@
     ],
     "components": [
       "blocks/card",
-      "blocks/button"
+      "blocks/button",
+      "commerce/product-card"
     ],
     "summary": "A single still hero, category entries as worlds, best-seller rails with a four by five product grid and a consultation entry, in a light editorial tone."
   },
@@ -1990,7 +2138,9 @@
       "LAY-07"
     ],
     "components": [
-      "blocks/accordion"
+      "blocks/accordion",
+      "commerce/product-gallery",
+      "commerce/buy-box"
     ],
     "summary": "Image and info in two columns, option selector, ingredient story, full list in an accordion, reviews, cross-sell and an expandable delivery estimate."
   },
@@ -2005,7 +2155,10 @@
       "commerce"
     ],
     "replaces": [],
-    "components": [],
+    "components": [
+      "commerce/buy-box",
+      "commerce/cart"
+    ],
     "summary": "Line items, a free-shipping progress line, order summary and a stepped checkout."
   },
   {
@@ -2019,7 +2172,9 @@
       "app"
     ],
     "replaces": [],
-    "components": [],
+    "components": [
+      "blocks/location-map"
+    ],
     "summary": "A map with pins linked to a list; moving the map filters the list, and a world map works as a hero."
   },
   {
@@ -2035,7 +2190,10 @@
     "replaces": [],
     "components": [
       "blocks/input",
-      "blocks/button"
+      "blocks/button",
+      "blocks/citations",
+      "chat/chat-thread",
+      "chat/message-composer"
     ],
     "summary": "Operator messages as bubbles, agent replies as plain text, tool steps and approval cards inline, jump to latest, and an input that grows with text with slash commands and send or stop."
   },
@@ -2057,7 +2215,8 @@
     ],
     "components": [
       "blocks/card",
-      "blocks/kpi"
+      "blocks/kpi",
+      "blocks/citations"
     ],
     "summary": "A conclusion sentence first, then a table, chart or widget with headline number, then evidence, a confidence note, source chips and an as-of date."
   },
@@ -2074,7 +2233,8 @@
     ],
     "replaces": [],
     "components": [
-      "blocks/accordion"
+      "blocks/accordion",
+      "chat/tool-call"
     ],
     "summary": "A collapsible line per tool call showing name, arguments, status and a summary."
   },
@@ -2093,7 +2253,8 @@
       "AC-07"
     ],
     "components": [
-      "blocks/skeleton"
+      "blocks/skeleton",
+      "chat/agent-status"
     ],
     "summary": "A single shimmering line or typing dots that describes what the agent is doing now, a feed where new actions enter and earlier ones fade, and a small orb animated only beside the latest reply."
   },
@@ -2110,7 +2271,8 @@
     ],
     "replaces": [],
     "components": [
-      "blocks/button"
+      "blocks/button",
+      "chat/approval-step"
     ],
     "summary": "The agent pauses with choices, a free-text field and a pager, or a review queue of keep or remove buttons."
   },
@@ -2131,6 +2293,8 @@
       "COL-03"
     ],
     "components": [
+      "motion/mesh-drift",
+      "motion/point-field",
       "motion/light-beams"
     ],
     "summary": "A GPU or canvas point cloud in neutral tones that forms shapes slowly, or thin noise-driven lines on a calm surface, replacing purple orbs and aurora blobs."
@@ -2147,7 +2311,9 @@
       "landing"
     ],
     "replaces": [],
-    "components": [],
+    "components": [
+      "motion/marquee"
+    ],
     "summary": "A seamless horizontal loop that pauses on hover, for logos or tickers."
   },
   {
@@ -2164,7 +2330,9 @@
       "MOT-01",
       "MOT-09"
     ],
-    "components": [],
+    "components": [
+      "motion/scroll-enter"
+    ],
     "summary": "A fade-up on first entry and a height-expanding reveal for panels, instead of the same entrance on every block."
   },
   {
@@ -2182,7 +2350,9 @@
       "MOT-01"
     ],
     "components": [
-      "blocks/kpi"
+      "blocks/kpi",
+      "motion/number-ticker",
+      "motion/digit-swap"
     ],
     "summary": "A figure rolls to its value once when it enters the view, reserves its final width and gives assistive tech the end value only."
   },
@@ -2203,7 +2373,9 @@
       "BG-01",
       "MOT-01"
     ],
-    "components": [],
+    "components": [
+      "scene/point-globe"
+    ],
     "summary": "A restrained 3D scene behind the hero, a half globe rising from a container edge, a particle core that reshapes while scrolling, or a 3D graph built from real data. Runs only when visible."
   },
   {
@@ -2232,8 +2404,51 @@
       "RSP-05",
       "RSP-07"
     ],
-    "components": [],
+    "components": [
+      "blocks/settings-section"
+    ],
     "summary": "Layout habits that keep text readable from 360px to 1440px (content box columns, shrinkable children, planned narrow forms) and the nine widths to check them at."
+  },
+  {
+    "id": "master-detail-split",
+    "name": "Master detail split",
+    "category": "layout-shell",
+    "uses": [
+      "browse-records",
+      "show-details-on-demand"
+    ],
+    "surfaces": [
+      "app",
+      "dashboard"
+    ],
+    "replaces": [
+      "CMP-02",
+      "RSP-01"
+    ],
+    "components": [
+      "blocks/master-detail"
+    ],
+    "summary": "A list pane beside a detail pane split by one hairline; below the md breakpoint one pane at a time with a Back button and focus moved to the detail heading."
+  },
+  {
+    "id": "language-playground",
+    "name": "Language playground in the site shell",
+    "category": "layout-shell",
+    "uses": [
+      "start-an-action",
+      "organize-the-page",
+      "navigate-the-site"
+    ],
+    "surfaces": [
+      "developer-docs"
+    ],
+    "replaces": [],
+    "components": [
+      "blocks/button",
+      "blocks/dropdown",
+      "blocks/tabs"
+    ],
+    "summary": "Keep the landing header, page column and light page on the playground of a language or developer tool site; make only the code card dark, let the code fill it and open the output under the code on the first Run."
   },
   {
     "id": "agent-thinking-orb",

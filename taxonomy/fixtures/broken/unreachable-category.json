@@ -1,0 +1,15 @@
+{
+  "expect": "UNREACHABLE",
+  "why": "A category that no step can return is outside the decision key.",
+  "patch": [
+    {
+      "op": "delete",
+      "path": [
+        "classify",
+        {
+          "category": "map"
+        }
+      ]
+    }
+  ]
+}

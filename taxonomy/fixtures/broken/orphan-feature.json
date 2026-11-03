@@ -1,0 +1,16 @@
+{
+  "expect": "ORPHAN",
+  "why": "A feature that no decision step reads cannot decide anything.",
+  "patch": [
+    {
+      "op": "push",
+      "path": [
+        "features"
+      ],
+      "value": {
+        "id": "is_shiny",
+        "definition": "Has a shine effect on its surface."
+      }
+    }
+  ]
+}

@@ -5,7 +5,7 @@ category: layout-shell
 uses: [organize-the-page, read-long-text]
 surfaces: [landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat, developer-docs]
 replaces: [RSP-01, RSP-02, RSP-03, RSP-04, RSP-05, RSP-07]
-components: []
+components: [blocks/settings-section]
 inspiration: []
 status: stable
 ---

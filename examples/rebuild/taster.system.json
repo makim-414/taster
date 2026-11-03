@@ -1,0 +1,391 @@
+{
+  "version": "1.0.0",
+  "taxonomy": "1.0.0",
+  "source": {
+    "brand": "before.html",
+    "references": []
+  },
+  "surface": null,
+  "scheme": "dark",
+  "identity": {
+    "name": "Acme Ledger",
+    "logo": {
+      "kind": "text",
+      "text": "Acme Ledger"
+    },
+    "color": "#4c1d95",
+    "fonts": {
+      "heading": "Inter",
+      "body": "Inter",
+      "logo": "Inter"
+    },
+    "logoFont": "Inter",
+    "tokens": {
+      "--brand": "#4c1d95",
+      "--accent-fg": "#ffffff",
+      "--font": "'IBM Plex Sans', 'IBM Plex Sans KR', -apple-system, system-ui, sans-serif",
+      "--success": "#5bbd74",
+      "--danger": "#fd7468",
+      "--destructive": "#fd7468",
+      "--delta-up": "#5bbd74",
+      "--delta-down": "#fd7468"
+    },
+    "notes": [
+      "Brand color #4c1d95 from the site's own buttons and links becomes --brand; text on it is #ffffff (contrast 11.0:1).",
+      "The site uses Inter, one of the faces generated pages default to (TYP-01, TYP-02). Using IBM Plex instead. If Inter is part of the brand on purpose, set --font back to it and accept the finding.",
+      "Success #5bbd74 and failure #fd7468 for a dark page. Use them flat, only for real outcomes; AC-08 allows dots in exactly these colors.",
+      "Hue gap to the brand: success 144 degrees, failure 93 degrees.",
+      "Logo is set as text (\"Acme Ledger\"). Ask the owner for the logo file before shipping; do not invent a mark.",
+      "The logo text is set in Inter. It stays the logo's own face (identity.logoFont): consistency checks list it as exempt inside the logo only, and the same face anywhere else is off the system."
+    ]
+  },
+  "axes": {
+    "density": 0.25,
+    "contrast": 0.5,
+    "roundness": 1,
+    "type-expression": 1,
+    "color-restraint": 1,
+    "elevation": 0.5,
+    "motion": 0,
+    "stroke": 0.5
+  },
+  "steps": {
+    "density": "airy",
+    "contrast": "standard",
+    "roundness": "pillow",
+    "type-expression": "poster",
+    "color-restraint": "achromatic",
+    "elevation": "raised",
+    "motion": "still",
+    "stroke": "light"
+  },
+  "axisNotes": {
+    "density": {
+      "value": 0.25,
+      "step": "airy",
+      "meaning": "Between Spacious and Regular.",
+      "source": "brand",
+      "from": "before.html: 48px controls (spacious), 26px card padding (airy), 17px gaps (snug), body line height 1.6 (spacious)",
+      "moved": null
+    },
+    "contrast": {
+      "value": 0.5,
+      "step": "standard",
+      "meaning": "Standard: muted text well above 4.5:1, surfaces step by a small tone.",
+      "source": "brand",
+      "from": "before.html: the quieter quarter of body text at 7.3:1, 1 text runs under 4.5:1",
+      "moved": null
+    },
+    "roundness": {
+      "value": 1,
+      "step": "pillow",
+      "meaning": "Pillow: about 20px or more on cards; full pills only on small controls.",
+      "source": "brand",
+      "from": "before.html: 18px on 3 cards",
+      "moved": null
+    },
+    "type-expression": {
+      "value": 1,
+      "step": "poster",
+      "meaning": "Poster: an expressive display face, display four times body or more, tight leading on headlines.",
+      "source": "brand",
+      "from": "before.html: largest text 76px at weight 800 over 14px body (5.43x)",
+      "moved": null
+    },
+    "color-restraint": {
+      "value": 1,
+      "step": "achromatic",
+      "meaning": "Achromatic: neutral surfaces and one brand slot, semantic colors only for real outcomes.",
+      "source": "brand",
+      "from": "before.html: 2 hue families (277, 354 degrees), colored fills on 87% of the page",
+      "moved": {
+        "from": 0.5,
+        "fromStep": "two-hue",
+        "to": 1,
+        "toStep": "achromatic",
+        "because": [
+          {
+            "constraint": "loud-type-quiet-color",
+            "principle": "Type and color do not both shout: the louder the type, the fewer hues around it."
+          }
+        ]
+      }
+    },
+    "elevation": {
+      "value": 0.5,
+      "step": "raised",
+      "meaning": "Raised: a small shadow on cards and a larger one on floating layers.",
+      "source": "brand",
+      "from": "before.html: shadows (reach 35px) only on 2 controls or overlays, not on cards",
+      "moved": {
+        "from": 0.75,
+        "fromStep": "floating",
+        "to": 0.5,
+        "toStep": "raised",
+        "because": [
+          {
+            "constraint": "no-pillow-default",
+            "principle": "Large radius and deep soft shadow together are the default generated card; one of the two carries the softness."
+          }
+        ]
+      }
+    },
+    "motion": {
+      "value": 0,
+      "step": "still",
+      "meaning": "Still: state changes are instant, only opacity and color fade.",
+      "source": "brand",
+      "from": "before.html: no transitions on 2 interactive elements",
+      "moved": null
+    },
+    "stroke": {
+      "value": 0.5,
+      "step": "light",
+      "meaning": "Light: one pixel borders at low opacity on containers and fields.",
+      "source": "brand",
+      "from": "before.html: 3 borders and rules, 1px at 1.32:1 against their background",
+      "moved": null
+    }
+  },
+  "measured": {
+    "brand": {
+      "scheme": "dark",
+      "axes": {
+        "density": {
+          "value": 0.25,
+          "evidence": "48px controls (spacious), 26px card padding (airy), 17px gaps (snug), body line height 1.6 (spacious)"
+        },
+        "contrast": {
+          "value": 0.5,
+          "evidence": "the quieter quarter of body text at 7.3:1, 1 text runs under 4.5:1"
+        },
+        "roundness": {
+          "value": 1,
+          "evidence": "18px on 3 cards"
+        },
+        "type-expression": {
+          "value": 1,
+          "evidence": "largest text 76px at weight 800 over 14px body (5.43x)"
+        },
+        "color-restraint": {
+          "value": 0.5,
+          "evidence": "2 hue families (277, 354 degrees), colored fills on 87% of the page"
+        },
+        "elevation": {
+          "value": 0.75,
+          "evidence": "shadows (reach 35px) only on 2 controls or overlays, not on cards"
+        },
+        "motion": {
+          "value": 0,
+          "evidence": "no transitions on 2 interactive elements"
+        },
+        "stroke": {
+          "value": 0.5,
+          "evidence": "3 borders and rules, 1px at 1.32:1 against their background"
+        }
+      }
+    },
+    "references": []
+  },
+  "tokens": {
+    "--accent-fg": "#ffffff",
+    "--success": "#5bbd74",
+    "--danger": "#fd7468",
+    "--destructive": "#fd7468",
+    "--delta-up": "#5bbd74",
+    "--delta-down": "#fd7468",
+    "--sp-1": "4px",
+    "--sp-2": "10px",
+    "--sp-3": "14px",
+    "--sp-4": "18px",
+    "--sp-5": "22px",
+    "--sp-6": "28px",
+    "--sp-8": "36px",
+    "--sp-12": "54px",
+    "--sp-16": "72px",
+    "--control-sm": "34px",
+    "--control-md": "38px",
+    "--lh-normal": "1.55",
+    "--lh-snug": "1.325",
+    "--muted-foreground": "oklch(0.708 0 0)",
+    "--text-subtle": "oklch(0.65 0 0)",
+    "--muted": "oklch(0.269 0 0)",
+    "--secondary": "oklch(0.269 0 0)",
+    "--radius": "1.25rem",
+    "--r-sm": "12px",
+    "--r-md": "16px",
+    "--r-card": "20px",
+    "--r-xl": "28px",
+    "--r-2xl": "36px",
+    "--r-3xl": "44px",
+    "--r-4xl": "52px",
+    "--font": "'IBM Plex Sans', 'IBM Plex Sans KR', -apple-system, system-ui, sans-serif",
+    "--t-display": "60px",
+    "--t-h1": "44px",
+    "--t-h2": "32px",
+    "--t-title": "18px",
+    "--lh-tight": "1",
+    "--w-semi": "700",
+    "--brand": "#4c1d95",
+    "--highlight": "oklch(0.7 0 0)",
+    "--accent-soft": "oklch(0.38 0.178 293.745 / 12%)",
+    "--chart-1": "oklch(0.98 0 0)",
+    "--chart-2": "oklch(0.82 0 0)",
+    "--chart-3": "oklch(0.66 0 0)",
+    "--chart-4": "oklch(0.5 0 0)",
+    "--chart-5": "oklch(0.38 0 0)",
+    "--chart-6": "oklch(0.28 0 0)",
+    "--success-soft": "oklch(0.721 0.141 149.912 / 12%)",
+    "--warning-soft": "oklch(0.72 0.14 38 / 12%)",
+    "--danger-soft": "oklch(0.72 0.17 27.166 / 12%)",
+    "--sh-card": "0 1px 3px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.25)",
+    "--sh-pop": "0 10px 30px rgba(0,0,0,.4)",
+    "--card": "oklch(1 0 0 / 4%)",
+    "--popover": "oklch(0.2 0 0)",
+    "--scrim": "oklch(0 0 0 / 60%)",
+    "--dur-press": "100ms",
+    "--dur-tooltip": "100ms",
+    "--dur-dropdown": "120ms",
+    "--dur-modal": "150ms",
+    "--stagger-step": "0ms",
+    "--press-scale": "1",
+    "--enter-scale": "1",
+    "--enter-offset": "0px",
+    "--blur-mask": "0px",
+    "--border": "oklch(1 0 0 / 12%)",
+    "--border-soft": "rgba(255, 255, 255, 0.09)",
+    "--input": "oklch(1 0 0 / 20%)",
+    "--icon-stroke": "2"
+  },
+  "contrast": {
+    "floor": 4.5,
+    "lowest": {
+      "text": "--text-subtle",
+      "surface": "--muted",
+      "ratio": 4.68,
+      "aa": true
+    },
+    "pairs": [
+      {
+        "text": "--foreground",
+        "surface": "--background",
+        "ratio": 19.41,
+        "aa": true
+      },
+      {
+        "text": "--foreground",
+        "surface": "--card",
+        "ratio": 18.23,
+        "aa": true
+      },
+      {
+        "text": "--foreground",
+        "surface": "--popover",
+        "ratio": 17.34,
+        "aa": true
+      },
+      {
+        "text": "--foreground",
+        "surface": "--muted",
+        "ratio": 14.5,
+        "aa": true
+      },
+      {
+        "text": "--foreground",
+        "surface": "--secondary",
+        "ratio": 14.5,
+        "aa": true
+      },
+      {
+        "text": "--muted-foreground",
+        "surface": "--background",
+        "ratio": 7.84,
+        "aa": true
+      },
+      {
+        "text": "--muted-foreground",
+        "surface": "--card",
+        "ratio": 7.36,
+        "aa": true
+      },
+      {
+        "text": "--muted-foreground",
+        "surface": "--popover",
+        "ratio": 7,
+        "aa": true
+      },
+      {
+        "text": "--muted-foreground",
+        "surface": "--muted",
+        "ratio": 5.86,
+        "aa": true
+      },
+      {
+        "text": "--muted-foreground",
+        "surface": "--secondary",
+        "ratio": 5.86,
+        "aa": true
+      },
+      {
+        "text": "--text-subtle",
+        "surface": "--background",
+        "ratio": 6.27,
+        "aa": true
+      },
+      {
+        "text": "--text-subtle",
+        "surface": "--card",
+        "ratio": 5.88,
+        "aa": true
+      },
+      {
+        "text": "--text-subtle",
+        "surface": "--popover",
+        "ratio": 5.6,
+        "aa": true
+      },
+      {
+        "text": "--text-subtle",
+        "surface": "--muted",
+        "ratio": 4.68,
+        "aa": true
+      },
+      {
+        "text": "--text-subtle",
+        "surface": "--secondary",
+        "ratio": 4.68,
+        "aa": true
+      },
+      {
+        "text": "--success",
+        "surface": "--background",
+        "ratio": 8.66,
+        "aa": true
+      },
+      {
+        "text": "--danger",
+        "surface": "--background",
+        "ratio": 7.6,
+        "aa": true
+      },
+      {
+        "text": "--accent-fg",
+        "surface": "--brand",
+        "ratio": 10.95,
+        "aa": true
+      }
+    ]
+  },
+  "css": "/* Design system generated by Taster. Load after registry/src/tokens.css; components read the alias tokens only. */\n/* density airy, contrast standard, roundness pillow, type-expression poster, color-restraint achromatic, elevation raised, motion still, stroke light; dark scheme */\n:root, :root[data-theme] {\n  --accent-fg: #ffffff;\n  --success: #5bbd74;\n  --danger: #fd7468;\n  --destructive: #fd7468;\n  --delta-up: #5bbd74;\n  --delta-down: #fd7468;\n  --sp-1: 4px;\n  --sp-2: 10px;\n  --sp-3: 14px;\n  --sp-4: 18px;\n  --sp-5: 22px;\n  --sp-6: 28px;\n  --sp-8: 36px;\n  --sp-12: 54px;\n  --sp-16: 72px;\n  --control-sm: 34px;\n  --control-md: 38px;\n  --lh-normal: 1.55;\n  --lh-snug: 1.325;\n  --muted-foreground: oklch(0.708 0 0);\n  --text-subtle: oklch(0.65 0 0);\n  --muted: oklch(0.269 0 0);\n  --secondary: oklch(0.269 0 0);\n  --radius: 1.25rem;\n  --r-sm: 12px;\n  --r-md: 16px;\n  --r-card: 20px;\n  --r-xl: 28px;\n  --r-2xl: 36px;\n  --r-3xl: 44px;\n  --r-4xl: 52px;\n  --font: 'IBM Plex Sans', 'IBM Plex Sans KR', -apple-system, system-ui, sans-serif;\n  --t-display: 60px;\n  --t-h1: 44px;\n  --t-h2: 32px;\n  --t-title: 18px;\n  --lh-tight: 1;\n  --w-semi: 700;\n  --brand: #4c1d95;\n  --highlight: oklch(0.7 0 0);\n  --accent-soft: oklch(0.38 0.178 293.745 / 12%);\n  --chart-1: oklch(0.98 0 0);\n  --chart-2: oklch(0.82 0 0);\n  --chart-3: oklch(0.66 0 0);\n  --chart-4: oklch(0.5 0 0);\n  --chart-5: oklch(0.38 0 0);\n  --chart-6: oklch(0.28 0 0);\n  --success-soft: oklch(0.721 0.141 149.912 / 12%);\n  --warning-soft: oklch(0.72 0.14 38 / 12%);\n  --danger-soft: oklch(0.72 0.17 27.166 / 12%);\n  --sh-card: 0 1px 3px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.25);\n  --sh-pop: 0 10px 30px rgba(0,0,0,.4);\n  --card: oklch(1 0 0 / 4%);\n  --popover: oklch(0.2 0 0);\n  --scrim: oklch(0 0 0 / 60%);\n  --dur-press: 100ms;\n  --dur-tooltip: 100ms;\n  --dur-dropdown: 120ms;\n  --dur-modal: 150ms;\n  --stagger-step: 0ms;\n  --press-scale: 1;\n  --enter-scale: 1;\n  --enter-offset: 0px;\n  --blur-mask: 0px;\n  --border: oklch(1 0 0 / 12%);\n  --border-soft: rgba(255, 255, 255, 0.09);\n  --input: oklch(1 0 0 / 20%);\n  --icon-stroke: 2;\n}\n.theme-dark, .theme-light {\n  --brand: #4c1d95;\n  --accent-fg: #ffffff;\n  --font: 'IBM Plex Sans', 'IBM Plex Sans KR', -apple-system, system-ui, sans-serif;\n  --success: #5bbd74;\n  --danger: #fd7468;\n  --destructive: #fd7468;\n  --delta-up: #5bbd74;\n  --delta-down: #fd7468;\n}\n@media (prefers-reduced-motion: reduce) {\n  :root, :root[data-theme] {\n    --dur-press: 1ms;\n    --dur-tooltip: 1ms;\n    --dur-dropdown: 1ms;\n    --dur-modal: 1ms;\n    --stagger-step: 0ms;\n    --press-scale: 1;\n    --enter-scale: 1;\n    --enter-offset: 0px;\n    --blur-mask: 0px;\n  }\n}\n@media (prefers-reduced-transparency: reduce) {\n  :root, :root[data-theme] {\n    --bg-elev: var(--bg-sunken);\n    --scrim: oklch(0 0 0 / 80%);\n  }\n}\n",
+  "notes": [
+    "Brand color #4c1d95 from the site's own buttons and links becomes --brand; text on it is #ffffff (contrast 11.0:1).",
+    "The site uses Inter, one of the faces generated pages default to (TYP-01, TYP-02). Using IBM Plex instead. If Inter is part of the brand on purpose, set --font back to it and accept the finding.",
+    "Success #5bbd74 and failure #fd7468 for a dark page. Use them flat, only for real outcomes; AC-08 allows dots in exactly these colors.",
+    "Hue gap to the brand: success 144 degrees, failure 93 degrees.",
+    "Logo is set as text (\"Acme Ledger\"). Ask the owner for the logo file before shipping; do not invent a mark.",
+    "The logo text is set in Inter. It stays the logo's own face (identity.logoFont): consistency checks list it as exempt inside the logo only, and the same face anywhere else is off the system.",
+    "Balance: color-restraint moved two-hue (0.5) to achromatic (1): \"Type and color do not both shout: the louder the type, the fewer hues around it.\" (loud-type-quiet-color).",
+    "Balance: elevation moved floating (0.75) to raised (0.5): \"Large radius and deep soft shadow together are the default generated card; one of the two carries the softness.\" (no-pillow-default)."
+  ],
+  "tuned": []
+}

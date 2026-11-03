@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, PATTERN_SECTIONS, readJson, loadPatterns, bundleFiles, parseFrontmatter } from './lib.mjs';
+import { runAll as runTaxonomyChecks } from './check-taxonomy.mjs';
 import { previewFile, stageHash } from '../registry/stage-hash.mjs';
 
 const errors = [];
@@ -24,6 +25,9 @@ for (const f of tax.families) for (const c of f.categories) {
   if (!catIds.has(c)) err(`family ${f.id} lists unknown category ${c}`);
   else if (tax.categories.find((x) => x.id === c).family !== f.id) err(`category ${c} family mismatch`);
 }
+
+// Strict taxonomy: definitions, partition, decision key, axes, constraints, coverage (scripts/check-taxonomy.mjs).
+for (const e of runTaxonomyChecks().errors) err(`taxonomy: ${e}`);
 
 // Rules
 const rules = readJson('rules/rules.json').rules;
