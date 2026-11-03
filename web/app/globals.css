@@ -1,9 +1,12 @@
 /* Only registry/src/tokens.css and themes/light.css values, read through var().
-   One token is rebound: --font. The registry default is IBM Plex Sans with IBM Plex Sans KR;
+   Two tokens are rebound. --font: the registry default is IBM Plex Sans with IBM Plex Sans KR;
    this site sets Korean body text in Noto Sans KR instead, self-hosted from app/fonts (see
-   layout.tsx). The stack leads with a named face, since a system stack alone trips AC-15. */
+   layout.tsx). The stack leads with a named face, since a system stack alone trips AC-15.
+   --font-mono: the registry's code faces are all Latin, and component sources carry Korean
+   comments, so the site's Korean face follows them for Hangul (KO-02). */
 :root {
   --font: var(--font-sans), 'Apple SD Gothic Neo', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace, var(--font-sans), 'Apple SD Gothic Neo';
 }
 html {
   background: var(--bg);
