@@ -13,6 +13,7 @@ const EXTS = ['.tsx', '.ts', '.js', '.cjs', '.css'];
 // the files that sit at the top of the bundle: the tokens, the Tailwind preset and the notices.
 export const GROUPS = ['blocks', 'marketing', 'motion', 'content', 'chat', 'commerce', 'media', 'icons', 'scene'];
 const TOP_FILES = ['tokens.css', 'tailwind-preset.cjs', 'THIRD_PARTY_NOTICES.md'];
+const GROUP_PATH = new RegExp(`^(?:${GROUPS.join('|')})\\/`);
 
 export function loadRegistry() {
   return JSON.parse(readFileSync(join(REGISTRY_DIR, 'registry.json'), 'utf8'));
@@ -58,7 +59,7 @@ export function resolveComponents(ids, { tokens = true } = {}) {
     files.set(rel, content);
     const comp = byFile.get(rel);
     if (comp) {
-      for (const d of comp.deps || []) if (!/^(blocks|motion|marketing|icons)\//.test(d)) npm.add(d);
+      for (const d of comp.deps || []) if (!GROUP_PATH.test(d)) npm.add(d);
       if (comp.credit) credits.push({ id: comp.id, license: comp.license, credit: comp.credit });
     }
     for (const spec of relativeImports(content)) queue.push(resolveRelative(rel, spec));

@@ -13,6 +13,8 @@ test('add pulls in every relative import, the token files and the notices', () =
   assert.equal(new Set(paths).size, paths.length, 'no file twice');
   assert.deepEqual(b.npm, []);
   assert.deepEqual(resolveComponents(['blocks/select-menu']).npm, ['@radix-ui/react-select']);
+  // A dependency on another registry group is a file in the bundle, not an npm package to install.
+  assert.deepEqual(resolveComponents(['content/article']).npm, []);
 });
 
 test('add refuses unknown ids and keeps files the user changed', () => {
