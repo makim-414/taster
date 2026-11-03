@@ -34,5 +34,7 @@ console.log(`overlay copied to public/taster/${version}`);
 // The gallery's live stage and preview pictures. registry/ holds them for the MCP tools too. Generated, not committed.
 const reg = new URL('../../registry/', import.meta.url);
 cpSync(new URL('stage/index.html', reg), new URL('../public/stage/index.html', import.meta.url));
+// The license texts of the packages the stage bundles; the stage page points to this file next to it.
+cpSync(new URL('stage/THIRD_PARTY_LICENSES.txt', reg), new URL('../public/stage/THIRD_PARTY_LICENSES.txt', import.meta.url));
 cpSync(new URL('previews/', reg), new URL('../public/previews/', import.meta.url), { recursive: true });
-console.log('stage and previews copied to public');
+console.log('stage, its license texts and previews copied to public');
