@@ -1,8 +1,8 @@
 // Runs rules/detect.js in Chromium at each viewport, the way references/diagnose.md describes,
 // and joins the findings with rules/rules.json (name, severity, fix, fix patterns).
-import { existsSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
+import { isAbsolute, join, relative, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 
 const ROOT = new URL('../', import.meta.url);
@@ -36,12 +36,32 @@ export async function launch() {
 const SEVERITY_ORDER = { high: 0, medium: 1, low: 2 };
 const MAX_SHOT_HEIGHT = 8000;
 const LOAD_WAIT = 15000;
+// Local files are opened only as pages. Anything else (notes, keys, configs) is refused, even through a link.
+const LOCAL_PAGE = /\.(html?|xhtml|svg)$/i;
+// A name that looks like a file is never guessed into a web address: report.md is also a real domain.
+const FILE_NAME = /\.(html?|xhtml|svg|md|mdx|markdown|txt|json|xml|csv|ya?ml|[cm]?[jt]sx?|css|vue|svelte|astro)$/i;
 
-// Accepts an http(s) URL, a file:// URL or a path to a local HTML file.
+function localPage(path) {
+  if (!existsSync(path)) throw new Error(`File not found: ${path}`);
+  const real = realpathSync(path);
+  if (!statSync(real).isFile() || !LOCAL_PAGE.test(real)) throw new Error(`Only local .html, .htm, .xhtml and .svg files are opened: ${real}`);
+  // TASTER_ROOT keeps local reads inside one folder (a project, a shared machine).
+  if (process.env.TASTER_ROOT) {
+    const root = realpathSync(resolve(process.env.TASTER_ROOT));
+    const rel = relative(root, real);
+    if (rel.startsWith('..') || isAbsolute(rel)) throw new Error(`Outside TASTER_ROOT (${root}): ${real}`);
+  }
+  return pathToFileURL(path).href;
+}
+
+// Accepts an http(s) URL, localhost:<port> or 127.0.0.1:<port> (as http), a bare domain (as https), or a local
+// HTML file as a path or a file:// URL.
 export function toUrl(target) {
-  if (/^https?:\/\//i.test(target) || /^file:\/\//i.test(target)) return target;
+  if (/^https?:\/\//i.test(target)) return target;
+  if (/^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?([/?#]|$)/i.test(target)) return `http://${target}`;
+  if (/^file:\/\//i.test(target)) return localPage(fileURLToPath(target));
   const path = resolve(target);
-  if (existsSync(path)) return pathToFileURL(path).href;
+  if (existsSync(path) || (FILE_NAME.test(target) && !/^[\w.-]+\.[a-z]{2,}\//i.test(target))) return localPage(path);
   if (/^[\w.-]+\.[a-z]{2,}(\/|$)/i.test(target)) return `https://${target}`;
   throw new Error(`Not a URL or an existing file: ${target}`);
 }

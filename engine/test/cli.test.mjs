@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { fileURLToPath } from 'node:url';
-import { RULES } from '../diagnose.mjs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { RULES, toUrl } from '../diagnose.mjs';
 
 const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
 const fixture = (name) => fileURLToPath(new URL(`../../rules/fixtures/${name}`, import.meta.url));
@@ -47,6 +47,41 @@ test('--widths picks the viewports', { timeout: 60000 }, () => {
 test('exit 2 on a bad target or a bad width', () => {
   assert.equal(run('no such thing').status, 2);
   assert.equal(run(fixture('clean.html'), '--widths', '12').status, 2);
+});
+
+test('targets: local pages only, no guessing a missing file into a web address, localhost as http', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'taster-cli-files-'));
+  const root = process.env.TASTER_ROOT;
+  try {
+    writeFileSync(join(dir, 'secret.txt'), 'SECRET-CANARY');
+    writeFileSync(join(dir, 'page.html'), '<!doctype html><title>page</title>');
+    symlinkSync(join(dir, 'secret.txt'), join(dir, 'looks-like-a-page.html'));
+    assert.throws(() => toUrl('missing-page.html'), /^Error: File not found: .*missing-page\.html$/);
+    assert.throws(() => toUrl('report.md'), /File not found/, 'report.md is also a domain, so it must not be guessed');
+    assert.throws(() => toUrl('docs/notes.txt'), /File not found/);
+    assert.equal(toUrl('localhost:3000'), 'http://localhost:3000');
+    assert.equal(toUrl('127.0.0.1:8080/pricing'), 'http://127.0.0.1:8080/pricing');
+    assert.equal(toUrl('example.com'), 'https://example.com');
+    assert.equal(toUrl('example.com/index.html'), 'https://example.com/index.html');
+    assert.equal(toUrl(join(dir, 'page.html')), pathToFileURL(join(dir, 'page.html')).href);
+    assert.throws(() => toUrl(join(dir, 'secret.txt')), /Only local \.html, \.htm, \.xhtml and \.svg files are opened/);
+    assert.throws(() => toUrl(pathToFileURL(join(dir, 'secret.txt')).href), /Only local/);
+    assert.throws(() => toUrl(join(dir, 'looks-like-a-page.html')), /Only local/, 'a link is judged by the file it points at');
+    assert.throws(() => toUrl(dir), /Only local/, 'a folder is not a page');
+    mkdirSync(join(dir, 'inside'));
+    writeFileSync(join(dir, 'inside', 'a.html'), '<!doctype html><title>a</title>');
+    process.env.TASTER_ROOT = join(dir, 'inside');
+    assert.equal(toUrl(join(dir, 'inside', 'a.html')), pathToFileURL(join(dir, 'inside', 'a.html')).href);
+    assert.throws(() => toUrl(join(dir, 'page.html')), /Outside TASTER_ROOT/);
+    delete process.env.TASTER_ROOT;
+    const read = run(join(dir, 'secret.txt'), '--extract');
+    assert.equal(read.status, 2);
+    assert.ok(!read.stdout.includes('SECRET-CANARY'));
+  } finally {
+    if (root === undefined) delete process.env.TASTER_ROOT;
+    else process.env.TASTER_ROOT = root;
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('--rules lists every rule and --explain prints the fix', () => {
