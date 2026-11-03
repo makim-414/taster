@@ -26,6 +26,8 @@ test('the tone catalog holds places, links and words, never a picture', () => {
     assert.ok(r.note.en.length > 20 && r.note.ko.length > 8, `${r.id} note`);
     for (const g of r.genres) assert.ok(genres.has(g), `${r.id} unknown genre ${g}`);
     if (r.praise) {
+      assert.ok(['praise', 'mention'].includes(r.praise.kind), `${r.id} praise.kind`);
+      if (r.praise.kind === 'mention') assert.ok(r.praise.caveat?.en && r.praise.caveat?.ko, `${r.id}: a mention says what kind of post it is`);
       assert.match(new URL(r.praise.url).host, hosts[r.praise.on], `${r.id} praise link is not a public post on ${r.praise.on}`);
       assert.match(r.praise.date, /^\d{4}-\d{2}-\d{2}$/);
     }

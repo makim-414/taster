@@ -80,10 +80,10 @@ function RefCard({ r, number, shot, onRetry }: { r: ToneRef; number: number; sho
         {r.genres.length > 0 && <p className="ref-caveat">결: {r.genres.map((g) => catalog.genres.find((x) => x.id === g)?.ko).join(', ')}</p>}
         <p className="ref-links">
           <a href={r.url} target="_blank" rel="noopener noreferrer">{hostOf(r.url)} 열기</a>
-          {p && <a href={p.url} target="_blank" rel="noopener noreferrer">{PRAISE_ON[p.on]} 칭찬 글, {p.date}</a>}
+          {p && <a href={p.url} target="_blank" rel="noopener noreferrer">{PRAISE_ON[p.on]} {p.kind === 'mention' ? '언급 글' : '칭찬 글'}, {p.date}</a>}
         </p>
         {p?.caveat && <p className="ref-caveat">{p.caveat.ko}</p>}
-        {!p && <p className="ref-caveat">손으로 놓은 기준점이고, 연결한 칭찬 글은 아직 없습니다.</p>}
+        {!p && <p className="ref-caveat">손으로 놓은 기준점이고, 연결한 칭찬이나 언급 글은 아직 없습니다.</p>}
       </div>
     </li>
   );
