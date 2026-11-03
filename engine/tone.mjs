@@ -5,9 +5,12 @@
 //
 // The spot sets the eight weighting axes by their ids and snap steps (density, contrast, roundness, type-expression,
 // color-restraint, elevation, motion, stroke). `toneAxes` returns them as { id: step }, the shape a design system
-// takes as builder intent, so a later system can replace `axesToTokens` without changing callers. For now the rule
-// is simple: each corner of the map holds one setting, the spot blends the four, the genre nudges, and every value
-// snaps to its nearest step. Readability is a floor, not a dial: no setting lowers text contrast below the defaults.
+// takes as builder intent. The rule: each corner of the map holds one setting, the spot blends the four, the genre
+// nudges, every value snaps to its nearest step, and the result goes through the design system's balance()
+// (taxonomy/axes.mjs), so a tone never breaks a design constraint (for example, loud type only with quiet color) and
+// what the tone page shows is what design_system would build from these axes. Readability is a floor, not a dial: no
+// setting lowers text contrast below the defaults.
+import { balance } from '../taxonomy/axes.mjs';
 
 export const TONE_AXES = [
   { id: 'density', name: 'Density', ko: '밀도', steps: [0, 0.25, 0.5, 0.75, 1], names: ['spacious', 'airy', 'regular', 'snug', 'compact'], namesKo: ['넉넉함', '여유', '보통', '촘촘', '빽빽'] },
@@ -20,12 +23,14 @@ export const TONE_AXES = [
   { id: 'stroke', name: 'Stroke', ko: '선', steps: [0, 0.25, 0.5, 0.75, 1], names: ['none', 'hairline', 'light', 'medium', 'heavy'], namesKo: ['없음', '머리카락', '가늘게', '보통', '굵게'] },
 ];
 
-// One setting per corner of the map, named after the quadrants in tone-refs.json.
+// One setting per corner of the map, named after the quadrants in tone-refs.json. Each corner already keeps every
+// design constraint: loud type only with quiet color, so the launch corner is colorful with branded type and the
+// studio corner has poster type in ink.
 const CORNERS = {
   'clean-saas': { density: 0.7, contrast: 0.5, roundness: 0.5, 'type-expression': 0.25, 'color-restraint': 1, elevation: 0.25, motion: 0.25, stroke: 0.25 },
-  'launch-promo': { density: 0.3, contrast: 0.75, roundness: 0.75, 'type-expression': 0.7, 'color-restraint': 0.5, elevation: 0.75, motion: 1, stroke: 0 },
+  'launch-promo': { density: 0.3, contrast: 0.75, roundness: 0.75, 'type-expression': 0.5, 'color-restraint': 0.5, elevation: 0.75, motion: 1, stroke: 0 },
   'editorial-luxury': { density: 0, contrast: 0.5, roundness: 0, 'type-expression': 0.5, 'color-restraint': 1, elevation: 0, motion: 0, stroke: 0.5 },
-  'creative-studio': { density: 0.3, contrast: 1, roundness: 0.1, 'type-expression': 1, 'color-restraint': 0.5, elevation: 0.1, motion: 1, stroke: 0.5 },
+  'creative-studio': { density: 0.3, contrast: 1, roundness: 0.1, 'type-expression': 1, 'color-restraint': 1, elevation: 0.1, motion: 1, stroke: 0.5 },
 };
 
 // A genre moves a few axes the same way wherever the spot is, after what its sites share (tone-refs.json genres).
@@ -58,7 +63,11 @@ export function snap(axis, value) {
   return best;
 }
 
-/** The eight axes for a spot, each on its snap step. */
+// balance() searches the snapped grid for the smallest change that keeps every constraint. The spot moves every frame
+// while dragging, so results are kept per snapped setting (a few hundred at most).
+const balanced = new Map();
+
+/** The eight axes for a spot, each on its snap step and inside every design constraint. */
 export function toneAxes(spot, genre) {
   const { x, y } = readSpot(spot);
   const nudge = GENRE_NUDGE[genre] || {};
@@ -68,7 +77,10 @@ export function toneAxes(spot, genre) {
     const blended = (1 - x) * (1 - y) * c('clean-saas') + (1 - x) * y * c('launch-promo') + x * (1 - y) * c('editorial-luxury') + x * y * c('creative-studio');
     out[a.id] = snap(a, clamp01(blended + (nudge[a.id] || 0)));
   }
-  return out;
+  const key = TONE_AXES.map((a) => out[a.id]).join(',');
+  if (!balanced.has(key)) balanced.set(key, balance(out));
+  const kept = balanced.get(key);
+  return Object.fromEntries(TONE_AXES.map((a) => [a.id, kept[a.id]]));
 }
 
 /** The axes with their names and step names, for people. */
