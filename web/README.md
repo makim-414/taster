@@ -34,11 +34,19 @@ Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLI
 - Page load 15 s per width (plus the engine's own load and idle waits), 80 s for the whole run, 400 requests and
   60 MB per run.
 
-## Link preview
+## Link preview, crawlers and headers
 
-`app/layout.tsx` sets Open Graph and Twitter card tags; the image is `public/og.png`, rendered from
-`scripts/og/card.html` with the registry tokens by `node scripts/og/render.mjs`. Re-render it when the copy or the
-address changes.
+Each page sets its own title, description, canonical address and Open Graph and Twitter card tags through
+`lib/page-meta.ts`; `app/layout.tsx` holds only the defaults. The image is `public/og.png`, rendered from
+`scripts/og/card.html` with the registry tokens by `node scripts/og/render.mjs`, which also writes the rule counts it
+drew to `scripts/og/meta.json`. Re-render it when the copy, the address or the rules change: `npm --prefix web test`
+fails while the counts are stale. `app/robots.ts` keeps crawlers off `/api/` and `/board`, `app/sitemap.ts` lists the
+pages and every component, and `app/not-found.tsx` is the 404 screen.
+
+`next.config.mjs` sends a content security policy (everything from this site, data: pictures, no framing except the
+stage by this site) and a permissions policy on every response. The bookmarklet's files under `/taster/` are open to
+every origin; a folder named after their hash is cached for good, the old `/taster/*.js` for five minutes.
+`node scripts/check-metadata.mjs` checks all of it on a running build.
 
 ## Commands
 
@@ -50,6 +58,7 @@ npm --prefix web run typecheck
 npm --prefix web run build
 npm --prefix web test             # guard, limits, fenced engine on rules/fixtures
 npm --prefix web run self-check   # detect.js on this app at 1440 and 390, must be 0
+node web/scripts/check-metadata.mjs   # head tags, 404, robots, sitemap, headers, no policy violation (with the server up)
 ```
 
 The fixture tests serve `rules/fixtures` on loopback and pass a test-only `allowLoopback` argument; no request
