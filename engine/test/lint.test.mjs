@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, mkdirSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -47,10 +47,28 @@ test('a slop component is reported with rule ids, a clean one and node_modules a
   const { files, findings } = lintPaths(['.'], dir);
   assert.equal(files, 3);
   const bad = new Set(findings.filter((f) => f.file === 'src/Bad.tsx').map((f) => f.rule));
-  for (const id of ['AC-06', 'SRC-03', 'MOT-02', 'AC-04', 'AC-01', 'AC-02', 'SRC-02', 'SRC-01']) assert.ok(bad.has(id), `missing ${id}`);
+  for (const id of ['AC-10', 'SRC-03', 'MOT-02', 'AC-04', 'AC-01', 'AC-02', 'SRC-02', 'SRC-01']) assert.ok(bad.has(id), `missing ${id}`);
+  // A thick left bar is the accent bar rule, not the tinted notice band.
+  assert.ok(!bad.has('AC-06'));
   assert.equal(findings.filter((f) => f.file === 'src/Good.tsx').length, 0);
   assert.ok(findings.some((f) => f.file === 'tailwind.config.js' && f.rule === 'SRC-04'));
   assert.ok(!findings.some((f) => f.file.startsWith('node_modules')));
+});
+
+test('links are not followed while walking, so a link loop ends', { skip: process.platform === 'win32' }, () => {
+  const dir = mkdtempSync(join(tmpdir(), 'taster-lint-link-'));
+  mkdirSync(join(dir, 'a'));
+  writeFileSync(join(dir, 'a', 'Ok.tsx'), '<p className="text-sm text-text-muted">Plain</p>\n');
+  symlinkSync('..', join(dir, 'a', 'loop'));
+  const outside = mkdtempSync(join(tmpdir(), 'taster-lint-outside-'));
+  writeFileSync(join(outside, 'Bad.tsx'), '<p className="bg-indigo-600">x</p>\n');
+  symlinkSync(join(outside, 'Bad.tsx'), join(dir, 'a', 'Bad.tsx'));
+  symlinkSync('a', join(dir, 'linked'));
+  const r = run(['.'], dir);
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /0 findings in 1 files/);
+  // A link named on the command line is still read.
+  assert.equal(lintPaths(['linked'], dir).files, 1);
 });
 
 test('taster-allow needs a reason', () => {
