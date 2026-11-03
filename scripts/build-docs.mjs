@@ -73,6 +73,31 @@ if (readme.includes(start) && readme.includes(end)) {
   fs.writeFileSync(readmePath, next);
 }
 
+// README rules block, in English and Korean: how many rules are measured, what they rest on (rules.json basis), and the
+// outside write-ups their refs cite, most cited first. Refs on these hosts are standards, as in check-rules.mjs.
+const STANDARD_HOSTS = new Set(['www.w3.org', 'developer.mozilla.org', 'developer.apple.com']);
+const measured = rules.rules.filter((r) => r.detect.level !== 'manual').length;
+const basisCount = (b) => rules.rules.filter((r) => r.basis.includes(b)).length;
+const observedOnly = rules.rules.filter((r) => r.basis.join() === 'taster-observation').length;
+const cited = new Map();
+for (const r of rules.rules) for (const ref of r.refs) if (!STANDARD_HOSTS.has(new URL(ref.url).hostname)) cited.set(ref.label, (cited.get(ref.label) || 0) + 1);
+const sources = [...cited].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([label]) => label).join('; ');
+const counts = [rules.rules.length, measured, rules.rules.length - measured, basisCount('external'), basisCount('standard'), basisCount('taster-observation'), observedOnly];
+const rulesBlock = {
+  'README.md': ([n, m, eye, ext, std, obs, only]) =>
+    `${n} rules, ${m} measured in a real browser and ${eye} judged by eye from the captures. Each rule's \`basis\` in \`rules/rules.json\` says what it rests on: ${ext} cite outside write-ups about generated pages, ${std} a web standard or platform guide, and ${obs} rest on Taster's own observation, ${only} of them on that alone. A rule can rest on more than one.\n\nOutside write-ups cited, most cited first: ${sources}.\n`,
+  'README.ko.md': ([n, m, eye, ext, std, obs, only]) =>
+    `규칙 ${n}개, 그중 ${m}개는 실제 브라우저에서 재고 ${eye}개는 캡처를 보고 눈으로 판단합니다. 규칙마다 \`rules/rules.json\` 의 \`basis\` 에 근거가 적혀 있습니다. ${ext}개는 생성된 페이지를 다룬 외부 글, ${std}개는 웹 표준이나 플랫폼 가이드, ${obs}개는 Taster 가 직접 본 것에 근거하고, 그중 ${only}개는 직접 본 것만이 근거입니다. 한 규칙이 여러 근거를 가질 수 있습니다.\n\n인용한 외부 글(많이 인용한 순): ${sources}.\n`,
+};
+for (const [file, render] of Object.entries(rulesBlock)) {
+  const at = path.join(ROOT, file);
+  const text = fs.readFileSync(at, 'utf8');
+  const open = '<!-- rules:start -->', close = '<!-- rules:end -->';
+  if (text.includes(open) && text.includes(close)) {
+    fs.writeFileSync(at, text.slice(0, text.indexOf(open) + open.length) + '\n' + render(counts) + text.slice(text.indexOf(close)));
+  }
+}
+
 // exports/: the rules as instruction files for agents without MCP (AGENTS.md, Cursor, Windsurf, Cline, Copilot,
 // Gemini, Claude). Rendered after rules.json is rewritten above, so the fix lines stay current.
 for (const [rel, content] of Object.entries(renderAll())) {

@@ -9,5 +9,10 @@ the tab.
 are stale. The web app serves the same three files for the bookmarklet on `/bookmarklet`, in a folder named after
 their hash (`/taster/<version>-<hash>/`), and at `/taster/*.js` for bookmarks made before those folders.
 
+The bookmarklet holds the overlay's sha384 and the overlay those of the other two files, so a click runs only the files
+the bookmark was made with, and none of these requests sends a Referer. A bookmark saved before the hashed folders
+loads `/taster/overlay.js`, which is not pinned, and that first request carries a Referer: drag the bookmarklet from
+https://taster-six.vercel.app/bookmarklet again. The extension needs none of this; it carries its own copies.
+
 Install before a store listing: open `chrome://extensions` (or `edge://extensions`), turn on developer mode, choose
 Load unpacked and pick this folder.

@@ -6,10 +6,14 @@ Runs the slop detector (`rules/detect.js`) in a real Chromium at 1440 and 390 wi
 
 ## Setup
 
+Node.js 22 or later. From the repository root:
+
 ```bash
-npm install --prefix engine
-npx --prefix engine playwright install chromium
+npm ci --prefix engine
+node engine/setup.mjs    # finds a browser (Playwright's Chromium, then Google Chrome), downloads Chromium only if neither starts
 ```
+
+`npx --prefix engine playwright install chromium` installs Chromium directly.
 
 ## CLI
 
@@ -26,7 +30,27 @@ node engine/cli.mjs --plan https://example.com --out work --system theme.css  # 
 node engine/cli.mjs --rules                          # every rule, how it is checked, severity
 node engine/cli.mjs --explain KO-01                  # what, why, how it is found, fix
 node engine/cli.mjs lint src                         # the rules' source form, no browser (also: node engine/lint.mjs)
+node engine/cli.mjs --help                           # every option, and the exit codes
 ```
+
+`add` copies components into an app, relative to the folder it runs in, so run it from the app folder by the clone's
+path: `node /path/to/taster/engine/cli.mjs add blocks/button --dir src/components/taster` (see
+`registry/README.md`).
+
+A page that answers with a bot check, a block or error page (HTTP 4xx or 5xx), or a sign-in page on another host is not
+diagnosed: nothing is measured, the report says why, and the exit code is 2. Nothing here gets past a check or a
+sign-in.
+
+### Environment
+
+- `TASTER_ROOT=<dir>`: open local files only inside `<dir>` (the CLI, the MCP server and the ACP agent). Without it,
+  any local `.html`, `.htm`, `.xhtml` or `.svg` file the user's account can read is opened; other local files are
+  refused.
+- `TASTER_WEB_URL=<url>`: where the component, board and tone map links that the MCP tools give point, default
+  `https://taster-six.vercel.app`, for a self-hosted copy of the site.
+
+What the local tools can reach (addresses, files, what they write) is in
+[SECURITY.md](../SECURITY.md#what-the-local-tools-can-reach).
 
 ### Source lint
 
@@ -44,7 +68,7 @@ extended (the defaults vanish and every sm: and lg: class stops generating CSS).
 - `--selftest` runs every check on lines it must catch and lines it must pass, so a check that stops matching fails CI.
 - Comments, Markdown code fences, `node_modules`, build output and minified files are skipped.
 
-Exit code is 0 with no findings, 1 with findings, 2 on error. The report groups findings by rule, most severe first, with exact counts per width, the selector, page rect and evidence for each spot, the fix and the fix patterns. It also lists the manual rules, which the detector does not measure and you judge from the captures.
+Exit code is 0 with no findings, 1 with findings, 2 on an error or a target that was not diagnosed. The report groups findings by rule, most severe first, with exact counts per width, the selector, page rect and evidence for each spot, the fix and the fix patterns. It also lists the manual rules, which the detector does not measure and you judge from the captures.
 
 ## MCP server
 
@@ -54,10 +78,21 @@ Tools: `pick_tone` (a spot on the tone map: the nearest real sites with their fi
 
 Screen by screen (`skills/taster/references/screens.md`): `check_consistency` (render every screen at 1440 and 390 and report the same component drawn differently on two screens, and every radius, spacing step, typeface, color, shadow or duration that is not one of the system's tokens; the logo face a system declares as `identity.logoFont` is listed apart as exempt, inside the logo only), `plan_screens` (the start page and its same-site nav pages as `taster.plan.json`), `plan_next` (exactly one next step) and `plan_update` (records propose, revise, approve, build, check and accept; refuses a build before the builder's approval and a new screen before the last one is checked, runs the check itself, and passes it only when every finding left is an exception the builder accepted, with the reason and their words on record).
 
+What a page says (the report of `diagnose`, the content of `extract_content`, the page values in `brand_theme`)
+comes back inside an `<untrusted_page_content>` block after a sentence from Taster, so the agent reads it as data and
+never as instructions. A page that is not the site (a bot check, a block, error or sign-in page) is an error that
+starts with `not diagnosed`, with no findings. Captures come back as JPEG images of at most 4 MB each and their
+temporary folder is deleted with the answer; a capture that would not fit is left in the system temporary folder and
+named by its path.
+
+`start.mjs` installs the engine's dependencies on its first start, then serves `mcp.mjs` on stdio. That first install
+can take longer than a client waits for a server: run `npm ci --prefix /path/to/taster/engine` once beforehand, or
+reconnect the server after it finishes.
+
 Claude Code:
 
 ```bash
-claude mcp add taster -- node /path/to/taster/engine/mcp.mjs
+claude mcp add taster -- node /path/to/taster/engine/start.mjs
 ```
 
 Codex, in `~/.codex/config.toml`:
@@ -65,17 +100,30 @@ Codex, in `~/.codex/config.toml`:
 ```toml
 [mcp_servers.taster]
 command = "node"
-args = ["/path/to/taster/engine/mcp.mjs"]
+args = ["/path/to/taster/engine/start.mjs"]
+```
+
+Cursor, in `.cursor/mcp.json` (or `~/.cursor/mcp.json`):
+
+```json
+{ "mcpServers": { "taster": { "command": "node", "args": ["/path/to/taster/engine/start.mjs"] } } }
 ```
 
 ## Hosted MCP (HTTP)
 
 `server.mjs` builds the MCP server; `mcp.mjs` serves it on stdio and `http.mjs` answers one Streamable HTTP request
 statelessly (`handleMcpRequest(request, { remote })`), so it runs on serverless functions. Hosted mode takes
-`remote.diagnose(url)` from the host instead of opening a local browser and leaves out `extract_content`,
-`brand_theme` (unless the host gives `remote.brand`), the design system tools and the screen by screen tools, which
-open pages in a local browser and read or write files. `web/app/api/mcp/route.ts` mounts it at `/api/mcp`, with diagnose going through the same fence as
-`/api/diagnose` (public http(s) only, request budget, per-IP window, one browser at a time).
+`remote.diagnose(url)` from the host instead of opening a local browser, and `brand_theme` and the reference screens of
+`pick_tone` only when the host gives `remote.brand` and `remote.tone`. It leaves out `extract_content`, the design
+system tools and the screen by screen tools, which open pages in a local browser and read or write files, and
+`preview_component` answers with the still and a live link instead of a render.
+
+`web/app/api/mcp/route.ts` mounts it at `/api/mcp` and gives all three, so the hosted server lacks only
+`extract_content`, the design system tools and the screen by screen tools. `diagnose`, `brand_theme` and the reference
+screens go through the same fence as `/api/diagnose` and `/api/brand`: public http(s) only, a request budget, per
+client limits that each instance keeps on its own, and one browser at a time. The route takes one JSON-RPC message
+per POST (a batch gets 400), counts every tool call against a per client minute, and answers with an error instead of
+anything over 4 MB (`web/README.md`).
 
 ## ACP agent
 
@@ -85,7 +133,9 @@ commands, which it advertises with `available_commands_update` after `session/ne
 
 - `/start`: the opening question, read from `skills/taster/references/start.md`.
 - `/diagnose <url or file>`: one `tool_call` for the browser run (the annotated captures as its locations), then the
-  findings as text. A relative path is read from the session's `cwd`.
+  findings as text. A relative path is read from the session's `cwd`. The captures go to a `taster-acp-` folder in the
+  system temporary folder, so the editor can open them, and are deleted at the next `/diagnose` in the same session or
+  when the agent exits.
 - `/extract <url>`, `/brand <url>`: content JSON, or the theme CSS and notes.
 - `/explain <rule id>`, `/rules`, `/help`.
 
@@ -114,11 +164,13 @@ printf '%s\n' '{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocol
 
 ## Checks
 
+`node scripts/gates.mjs` runs these with every other gate, in CI's order (see `CONTRIBUTING.md`). One by one:
+
 ```bash
 node rules/test-detect.mjs           # fixtures: exact rule sets on slop pages, zero on the clean page at both widths
 node engine/scripts/check-rules.mjs  # rules.json schema, and detect.js checks exactly the measured rules
 npm --prefix engine test             # CLI, MCP, ACP, extract, consistency and the plan steps
-node engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop, both rebuilt screens are clean, consistent and on the system
+node engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop (the count the READMEs give), both rebuilt screens are clean, consistent and on the system
 ```
 
 To add a measured rule: write the check in `rules/detect.js` (`flag('XX-00', el, evidence)`), set its `detect.level` to `deterministic` in `rules/rules.json`, make a fixture in `rules/fixtures/` hit it and add the id to `rules/fixtures/expected-engine.json`. The clean fixture must stay at zero.

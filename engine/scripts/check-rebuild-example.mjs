@@ -25,6 +25,12 @@ const fail = (msg) => {
 const [diagBefore, diagAfter] = [await diagnose(before), await diagnose(after)];
 if (diagBefore.rulesHit < 10) fail(`the original should be clearly slop, only ${diagBefore.rulesHit} rules hit`);
 if (diagAfter.rulesHit !== 0) fail(`the rebuild still hits ${diagAfter.rules.map((r) => r.ruleId).join(', ')}`);
+// Both READMEs say how many rules the original breaks, so a change to the rules or the example updates them too.
+for (const [readme, said] of [['README.md', /breaks (\d+) of the rules/], ['README.ko.md', /\((\d+)개 규칙에 걸림\)/]]) {
+  const count = said.exec(readFileSync(fileURLToPath(new URL(`../../${readme}`, import.meta.url)), 'utf8'))?.[1];
+  if (!count) fail(`${readme} no longer says how many rules examples/rebuild/before.html breaks (${said})`);
+  if (Number(count) !== diagBefore.rulesHit) fail(`${readme} says the original breaks ${count} rules, it breaks ${diagBefore.rulesHit}`);
+}
 
 const [contentBefore, contentAfter] = [await extract(before), await extract(after)];
 const parity = contentParity(contentBefore, contentAfter);
