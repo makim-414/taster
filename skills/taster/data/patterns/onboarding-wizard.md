@@ -5,7 +5,7 @@ category: timeline-stepper
 uses: [guide-through-steps, capture-contact]
 surfaces: [auth-onboarding]
 replaces: []
-components: [blocks/input, blocks/button]
+components: [blocks/input, blocks/button, blocks/stepper, blocks/wizard]
 inspiration: []
 status: stable
 ---

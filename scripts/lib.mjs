@@ -54,6 +54,9 @@ export function loadPatterns() {
 export function bundleFiles() {
   const pairs = [
     ['taxonomy/taxonomy.json', 'skills/taster/data/taxonomy.json'],
+    ['taxonomy/taxonomy.schema.json', 'skills/taster/data/taxonomy.schema.json'],
+    ['taxonomy/axes.mjs', 'skills/taster/data/axes.mjs'],
+    ['taxonomy/classify.mjs', 'skills/taster/data/classify.mjs'],
     ['taxonomy/tone-refs.json', 'skills/taster/data/tone-refs.json'],
     ['rules/rules.json', 'skills/taster/data/rules.json'],
     ['rules/detect.js', 'skills/taster/data/detect.js'],

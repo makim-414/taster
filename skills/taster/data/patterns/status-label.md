@@ -5,7 +5,7 @@ category: badge-label
 uses: [label-a-state]
 surfaces: [dashboard, app]
 replaces: [AC-04, AC-05, AC-07, AC-08]
-components: [blocks/badge]
+components: [blocks/badge, blocks/status-list]
 inspiration: []
 status: stable
 ---

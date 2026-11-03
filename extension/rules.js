@@ -295,5 +295,29 @@ window.__tasterRules = {
  "CPY-02": {
   "name": "Empty value traces on screen",
   "severity": "high"
+ },
+ "MOT-02": {
+  "name": "Transition on every property",
+  "severity": "low"
+ },
+ "MOT-03": {
+  "name": "Entrance that starts from nothing",
+  "severity": "low"
+ },
+ "MOT-04": {
+  "name": "Slow start on interface motion",
+  "severity": "low"
+ },
+ "MOT-05": {
+  "name": "Layout properties animated",
+  "severity": "low"
+ },
+ "MOT-06": {
+  "name": "Slow controls",
+  "severity": "low"
+ },
+ "MOT-07": {
+  "name": "No reduced motion version",
+  "severity": "medium"
  }
 };

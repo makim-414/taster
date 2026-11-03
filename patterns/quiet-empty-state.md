@@ -5,7 +5,7 @@ category: empty-state
 uses: [handle-no-data]
 surfaces: [app, dashboard]
 replaces: [AC-07, AC-11, CPY-02]
-components: [blocks/skeleton]
+components: [blocks/skeleton, blocks/empty-state]
 inspiration: []
 status: stable
 ---
@@ -27,6 +27,8 @@ Use the structural variant (keep axes, headers and labels, dash the values) for 
 
 ## Do
 
+- Keep a confirmed zero and an unknown count apart: "0 items" is a fact, "- items" (or "Not counted yet") says the count could not be read. Two screens that merge them hide an outage behind a zero; pin the difference with a test.
+- Show an unconfigured feature in its place with the step that sets it up, instead of hiding the entry until it is configured. A permission-blocked screen keeps its skeleton without values; an empty chart turns its tooltip off and does not invent dates.
 - Distinguish three cases with different copy: never had data, filtered to nothing, failed to load (that last one is the error state).
 - Keep the empty area the same height as the content would be, so the page does not collapse.
 - Write what the person can do in the verb the button uses: "Create invoice", not "Get started".

@@ -5,7 +5,7 @@ category: layout-shell
 uses: [organize-the-page]
 surfaces: [landing, app, dashboard]
 replaces: [CMP-02, LAY-06]
-components: [blocks/separator]
+components: [blocks/separator, blocks/settings-section]
 inspiration: []
 status: stable
 ---

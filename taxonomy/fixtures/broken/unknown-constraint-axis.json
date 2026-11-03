@@ -1,0 +1,18 @@
+{
+  "expect": "UNKNOWN",
+  "why": "A constraint may only use declared axes.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "constraints",
+        {
+          "id": "dense-screens-move-less"
+        },
+        "terms",
+        "ornament"
+      ],
+      "value": 1
+    }
+  ]
+}

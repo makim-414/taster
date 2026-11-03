@@ -5,7 +5,7 @@ category: empty-state
 uses: [handle-no-data, notify-the-user]
 surfaces: [app]
 replaces: []
-components: [blocks/alert, blocks/button]
+components: [blocks/alert, blocks/button, blocks/empty-state]
 inspiration: []
 status: stable
 ---

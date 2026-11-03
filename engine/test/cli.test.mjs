@@ -58,3 +58,25 @@ test('--rules lists every rule and --explain prints the fix', () => {
   assert.match(one.stdout, /Fix: word-break: keep-all/);
   assert.equal(run('--explain', 'NOPE-01').status, 2);
 });
+
+test('--system writes the design system and --tune moves a weight in place', { timeout: 90000 }, () => {
+  const out = mkdtempSync(join(tmpdir(), 'taster-cli-system-'));
+  const sys = (name) => fileURLToPath(new URL(`./fixtures/system/${name}.html`, import.meta.url));
+  try {
+    const r = run('--system', sys('sharp-and-dense'), '--ref', sys('round-and-airy'), '--axis', 'motion=0.25', '--out', out);
+    assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /motion +0\.25 +minimal +intent: the builder set 0\.25/);
+    const made = JSON.parse(readFileSync(join(out, 'taster.system.json'), 'utf8'));
+    assert.equal(readFileSync(join(out, 'theme.css'), 'utf8'), made.css);
+    const t = run('--tune', join(out, 'taster.system.json'), 'density=1');
+    assert.equal(t.status, 0, t.stderr);
+    assert.match(t.stdout, /type-expression moved branded \(0\.5\) to plain \(0\.25\): "The more a screen holds, the quieter its type/);
+    const tuned = JSON.parse(readFileSync(join(out, 'taster.system.json'), 'utf8'));
+    assert.equal(tuned.axes.density, 1);
+    assert.equal(tuned.tuned.length, 1);
+    assert.equal(run('--tune', join(out, 'taster.system.json'), 'density=9').status, 2);
+    assert.equal(run('--system', '--axis', 'wobble=1').status, 2);
+  } finally {
+    rmSync(out, { recursive: true, force: true });
+  }
+});

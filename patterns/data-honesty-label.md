@@ -29,6 +29,7 @@ Use it whenever a figure on screen did not come straight from a system of record
 
 ## Do
 
+- Report the size of a change, not its cause. "Biggest move: Search, +4.1%p" is a fact; "because of the new campaign" is a guess. Mark a notable day as "appeared together, cause not confirmed". Words like because of, thanks to, 때문에 and 덕분에 next to a number are the tell.
 - Put the label where the eye lands first, next to the number, not in a legend at the bottom.
 - Use the same four words across the whole product. Add a fifth kind only if the data has one that cannot be described by these four.
 - Show a dash instead of a made-up value for pending items, and keep the label.
