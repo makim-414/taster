@@ -56,6 +56,16 @@ test('add writes only inside its folder', () => {
   assert.ok(!existsSync(join(dir, 'blocks', 'ok.tsx')));
 });
 
+test('add copies the Taster license next to the files and keeps a copy already there', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'taster-add-license-'));
+  const b = resolveComponents(['blocks/badge']);
+  assert.ok(writeBundle(b, dir).written.includes('TASTER_LICENSE.txt'));
+  assert.equal(readFileSync(join(dir, 'TASTER_LICENSE.txt'), 'utf8'), readFileSync(new URL('../../LICENSE', import.meta.url), 'utf8'));
+  writeFileSync(join(dir, 'TASTER_LICENSE.txt'), 'mine\n');
+  assert.ok(!writeBundle(b, dir, { overwrite: true }).written.includes('TASTER_LICENSE.txt'));
+  assert.equal(readFileSync(join(dir, 'TASTER_LICENSE.txt'), 'utf8'), 'mine\n');
+});
+
 test('every path a local bundle has is one a hosted bundle may have', () => {
   const registry = loadRegistry();
   assert.deepEqual([...new Set(registry.components.map((c) => c.file.split('/')[1]))].sort(), [...GROUPS].sort());

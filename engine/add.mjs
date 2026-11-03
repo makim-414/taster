@@ -119,6 +119,13 @@ export function writeBundle(bundle, dir, { overwrite = false } = {}) {
     writeFileSync(target, f.content);
     written.push(f.path);
   });
+  // Taster's own MIT notice travels with the copied files, as its terms ask. A copy already there is kept.
+  const license = join(base, 'TASTER_LICENSE.txt');
+  if (!existsSync(license)) {
+    mkdirSync(base, { recursive: true });
+    writeFileSync(license, readFileSync(join(ROOT, 'LICENSE'), 'utf8'));
+    written.push('TASTER_LICENSE.txt');
+  }
   return { written, skipped };
 }
 
