@@ -14,8 +14,9 @@ Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLI
   same rules as the `pick_tone` tool). The address carries the spot, so an agent can hand over a link.
 - `app/api/tone-shot/route.ts`: POST `{ ids }`, up to four ids from `taxonomy/tone-refs.json`, never a typed
   address. Opens each first screen through the same fence (`lib/tone-shot.ts` with `engine/tone-capture.mjs`):
-  cookie banners are only rejected, and a bot check or block page comes back as `blocked` with no picture. Pictures
-  are kept in the instance's memory for 30 minutes and never written anywhere. 20 calls per IP per 10 minutes.
+  cookie banners are only rejected, a banner without a reject button comes back as `consent` and a bot check or
+  block page as `blocked`, both with no picture. Pictures are never written to disk and are kept in server memory up
+  to 30 minutes. 20 calls per IP per 10 minutes, and a ceiling per minute across all visitors.
 
 ## Safety
 

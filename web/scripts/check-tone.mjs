@@ -46,23 +46,36 @@ try {
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));
+    // The capture route answers by id: the second nearest site is a block page, the third has a banner with no reject
+    // button, the rest are pictures.
+    const expectedRefs = nearestRefs(catalog, { x: 0.8, y: 0.18 });
+    const answer = { [expectedRefs[1].id]: { status: 'blocked' }, [expectedRefs[2].id]: { status: 'consent' } };
     const asked = [];
     await page.route('**/api/tone-shot', async (route) => {
       const ids = JSON.parse(route.request().postData() || '{}').ids || [];
       asked.push(ids);
-      await route.fulfill({ json: { shots: Object.fromEntries(ids.map((id, i) => [id, i === 1 ? { status: 'blocked' } : { status: 'ok', image: picture }])) } });
+      await route.fulfill({ json: { shots: Object.fromEntries(ids.map((id) => [id, answer[id] || { status: 'ok', image: picture }])) } });
     });
 
-    // A shared address puts the spot on Kinfolk: it comes first, with three more, and their screens are asked for.
+    // A shared address puts the spot on Kinfolk: it comes first, with three more.
     const res = await page.goto(`${BASE}/tone?x=0.8&y=0.18&theme=light`, { waitUntil: 'networkidle' });
     ok(res.status() === 200, `${name}: tone page opens`);
     ok(await waitFor(async () => (await page.locator('.ref-card').count()) === 4), `${name}: four nearest references`);
     const first = await cardNames(page);
-    const expected = nearestRefs(catalog, { x: 0.8, y: 0.18 }).map((r) => r.name);
+    const expected = expectedRefs.map((r) => r.name);
     ok(first.join('|') === expected.join('|'), `${name}: nearest four in order (${first.join(', ')})`);
-    ok(await waitFor(async () => (await page.locator('.ref-shot img').count()) >= 1), `${name}: a first screen shows in a card`);
+    // Sites open only for cards on screen: nothing is asked for a card below the fold until it scrolls in.
+    const below = await page.$$eval('.ref-card', (cards) => cards.filter((c) => c.getBoundingClientRect().top > innerHeight + 160).length);
+    await page.waitForTimeout(900);
+    const askedEarly = new Set(asked.flat());
+    ok(askedEarly.size <= 4 - below, `${name}: no site opens for a card off screen (${below} below the fold, ${askedEarly.size} asked)`);
+    for (const card of await page.locator('.ref-card').all()) await card.scrollIntoViewIfNeeded();
+    ok(await waitFor(async () => new Set(asked.flat()).size === 4), `${name}: each card's site is asked for once it is on screen`);
+    ok(asked.flat().length === 4, `${name}: no site is asked for twice (${asked.flat().length} asks)`);
+    ok(await waitFor(async () => (await page.locator('.ref-shot img').count()) === 2), `${name}: first screens show in the cards`);
     ok((await page.locator('.ref-shot-note', { hasText: '봇 확인' }).count()) === 1, `${name}: a block page shows as a link only`);
-    ok(asked.length >= 1 && asked[0].length === 4, `${name}: the four screens were asked for in one call`);
+    ok((await page.locator('.ref-shot-note', { hasText: '쿠키 창' }).count()) === 1, `${name}: a banner with no reject button shows as a link only`);
+    await page.evaluate(() => scrollTo(0, 0));
     ok((await page.locator('.ref-links a').first().getAttribute('href')) === catalog.refs.find((r) => r.name === first[0]).url, `${name}: the card links to the site`);
 
     // The parts wear the tokens of the spot, then follow it when it moves.

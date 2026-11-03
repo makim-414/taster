@@ -1,7 +1,8 @@
 'use client';
 
 // The tone step on the web: a pad on two axes, the nearest real sites (first screens opened on request by
-// /api/tone-shot, never stored), and Taster parts running live in the tokens of that spot. The rules are
+// /api/tone-shot, never written to disk, kept in server memory up to 30 minutes), and Taster parts running live in
+// the tokens of that spot. The rules are
 // engine/tone.mjs, the same code the pick_tone tool runs, so the page and the agent give the same answer.
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
@@ -13,10 +14,12 @@ import { LiveFrame, useStudio, type Look } from '../components/studio';
 
 const catalog = data as unknown as ToneCatalog;
 const PRAISE_ON = { x: 'X', reddit: 'Reddit', hackernews: 'Hacker News' } as const;
-type Shot = { status: 'ok'; image: string } | { status: 'blocked' | 'failed' | 'busy' | 'loading' };
+type Shot = { status: 'ok'; image: string } | { status: 'blocked' | 'consent' | 'failed' | 'busy' | 'loading' | 'idle' };
 const NO_SHOT: Record<Exclude<Shot['status'], 'ok'>, string> = {
+  idle: '카드가 화면에 들어오면 첫 화면을 엽니다.',
   loading: '첫 화면을 여는 중입니다.',
   blocked: '봇 확인이나 차단 화면이 떠서 화면 없이 링크만 둡니다.',
+  consent: '거부 단추가 없는 쿠키 창이 떠서, 수락하거나 가리지 않고 링크만 둡니다.',
   failed: '제때 열리지 않았습니다. 링크로 직접 열어 보세요.',
   busy: '요청이 몰려 잠시 뒤에 다시 엽니다.',
 };
@@ -32,8 +35,7 @@ const toPx = (r: Spot, w: number, h: number) => ({ x: INSET + r.x * (w - 2 * INS
 
 // Names beside the dots, placed one by one where they cover no other name and no dot; a name that fits nowhere is
 // left out (its card still says it). The nearest go first. On a narrow pad only the nearest get names.
-function placeNames(refs: ToneRef[], near: string[], w: number, h: number, measure: (text: string) => number, everyone: boolean) {
-  const lineH = 18;
+function placeNames(refs: ToneRef[], near: string[], w: number, h: number, measure: (text: string) => number, everyone: boolean, lineH: number) {
   const dots: Box[] = refs.map((r) => {
     const p = toPx(r, w, h);
     return { x: p.x - DOT / 2, y: p.y - DOT / 2, w: DOT, h: DOT };
@@ -59,17 +61,28 @@ function placeNames(refs: ToneRef[], near: string[], w: number, h: number, measu
   return out;
 }
 
-function RefCard({ r, number, shot, onRetry }: { r: ToneRef; number: number; shot?: Shot; onRetry: () => void }) {
+function RefCard({ r, number, shot, onRetry, onSeen }: { r: ToneRef; number: number; shot?: Shot; onRetry: () => void; onSeen: (id: string) => void }) {
   const p = r.praise;
+  const card = useRef<HTMLLIElement>(null);
+  // A site is opened only once its card is on screen (or about to be), not on every visit to the page.
+  useEffect(() => {
+    const el = card.current;
+    if (!el) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) onSeen(r.id);
+    }, { rootMargin: '120px' });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [r.id, onSeen]);
   return (
-    <li className="ref-card">
+    <li className="ref-card" ref={card}>
       <div className="ref-shot">
         {shot?.status === 'ok' ? (
           // A data URL from the capture route: nothing for an image optimizer to fetch.
           <img src={shot.image} alt={`${r.name} 첫 화면`} width={1280} height={800} />
         ) : (
           <p className="ref-shot-note">
-            {NO_SHOT[shot?.status === undefined ? 'loading' : shot.status]}
+            {NO_SHOT[shot?.status === undefined ? 'idle' : shot.status]}
             {(shot?.status === 'failed' || shot?.status === 'busy') && <button type="button" className="text-button" onClick={onRetry}>다시 열기</button>}
           </p>
         )}
@@ -109,6 +122,8 @@ export function Tone() {
   const [dragging, setDragging] = useState(false);
   const [shots, setShots] = useState<Record<string, Shot>>({});
   const [retry, setRetry] = useState(0);
+  const [seen, setSeen] = useState<string[]>([]);
+  const onSeen = useCallback((id: string) => setSeen((s) => (s.includes(id) ? s : [...s, id])), []);
   const [names, setNames] = useState<Record<string, { left: number; top: number }>>({});
   const [size, setSize] = useState({ w: 400, h: 400 });
   const [href, setHref] = useState('');
@@ -149,7 +164,9 @@ export function Tone() {
     const ctx = document.createElement('canvas').getContext('2d');
     if (!ctx) return;
     ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-    setNames(placeNames(catalog.refs, nearKey.split(','), width, height, (t) => ctx.measureText(t).width, width >= 400));
+    // A name's box is one line of the pad's own text: its line height token, read back in pixels.
+    const lineH = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.3;
+    setNames(placeNames(catalog.refs, nearKey.split(','), width, height, (t) => ctx.measureText(t).width, width >= 400, Math.ceil(lineH)));
   }, [nearKey]);
   useEffect(() => {
     layout();
@@ -161,10 +178,12 @@ export function Tone() {
     return () => observer.disconnect();
   }, [layout]);
 
-  // First screens for the nearest four, once the spot rests. A busy answer is asked again on the next move.
+  // First screens for the nearest cards that are on screen, once the spot rests. A busy answer is asked again on the
+  // next move.
+  const seenKey = seen.join(',');
   useEffect(() => {
     if (!ready || dragging) return;
-    const want = nearKey.split(',').filter((id) => !shotsNow.current[id] || shotsNow.current[id].status === 'busy');
+    const want = nearKey.split(',').filter((id) => seen.includes(id) && (!shotsNow.current[id] || shotsNow.current[id].status === 'busy'));
     if (!want.length) return;
     const mark = (status: Shot['status']) => setShots((s) => ({ ...s, ...Object.fromEntries(want.map((id) => [id, { status } as Shot])) }));
     const timer = setTimeout(async () => {
@@ -179,7 +198,7 @@ export function Tone() {
       }
     }, 450);
     return () => clearTimeout(timer);
-  }, [nearKey, dragging, ready, retry]);
+  }, [nearKey, seenKey, dragging, ready, retry]);
 
   // The address follows the spot once it rests (browsers limit how often it may change).
   useEffect(() => {
@@ -305,7 +324,7 @@ export function Tone() {
             <h2 id="refs-title">가까운 실제 사이트</h2>
             <ol className="ref-list">
               {near.map((r, i) => (
-                <RefCard key={r.id} r={r} number={i + 1} shot={shots[r.id]} onRetry={() => { setShots((s) => { const next = { ...s }; delete next[r.id]; return next; }); setRetry((n) => n + 1); }} />
+                <RefCard key={r.id} r={r} number={i + 1} shot={shots[r.id]} onSeen={onSeen} onRetry={() => { setShots((s) => { const next = { ...s }; delete next[r.id]; return next; }); setRetry((n) => n + 1); }} />
               ))}
             </ol>
           </section>
@@ -340,7 +359,7 @@ export function Tone() {
           {source && <p className="tone-hint">{source} 에서 읽은 브랜드를 함께 입혔습니다.</p>}
         </section>
 
-        <p className="tone-note">레퍼런스 화면은 요청할 때 각 사이트의 첫 화면을 열어 보여 주고, 어디에도 저장하지 않습니다. 봇 확인이나 차단 화면이 나오면 우회하지 않고 링크만 둡니다. 쿠키 창은 거부만 누르고, 거부 단추가 없으면 가리기만 합니다. 위치는 손으로 놓았습니다.</p>
+        <p className="tone-note">레퍼런스 화면은 카드가 화면에 들어올 때 각 사이트의 첫 화면을 열어 보여 줍니다. 디스크에는 쓰지 않고 서버 메모리에만 최대 30분 둡니다. 봇 확인이나 차단 화면이 나오면 우회하지 않고 링크만 둡니다. 쿠키 창은 거부만 누르고, 거부 단추가 없으면 수락하거나 가리지 않고 링크만 둡니다. 위치는 손으로 놓았습니다.</p>
       </main>
     </div>
   );
