@@ -1007,7 +1007,7 @@
       ],
       "deps": [],
       "license": "MIT",
-      "credit": "Gooey Text Morphing by Victor Welander, MIT as listed, https://21st.dev/@victorwelander/components/gooey-text-morphing"
+      "credit": "Gooey Text Morphing by Victor Welander, MIT as listed (no LICENSE file published), https://21st.dev/@victorwelander/components/gooey-text-morphing"
     },
     {
       "id": "motion/marquee",
@@ -1084,7 +1084,7 @@
       ],
       "deps": [],
       "license": "MIT",
-      "credit": "DARK MONO from the 21st.dev Shader Builder, MIT as listed, https://21st.dev/@admin_5eaa986a/components/dark-mono"
+      "credit": "DARK MONO by thom (21st.dev @admin_5eaa986a), generated with the 21st.dev Shader Builder, MIT as listed, https://21st.dev/@admin_5eaa986a/components/dark-mono"
     },
     {
       "id": "motion/digit-swap",
@@ -1140,7 +1140,7 @@
       ],
       "deps": [],
       "license": "MIT",
-      "credit": "Glassy Coverflow Carousel by troyjlorents-gh, MIT as listed, https://21st.dev/@troyjlorents-gh/components/glassy-coverflow-carousel"
+      "credit": "Glassy Coverflow Carousel by Troy Lorents (troyjlorents-gh), MIT as listed, https://21st.dev/@troyjlorents-gh/components/glassy-coverflow-carousel; coverflow geometry from Coverflow Carousel by Eduardo Calvo (SmoothUI), MIT, https://21st.dev/@educalvolpz/components/coverflow-carousel"
     },
     {
       "id": "blocks/select-menu",
@@ -1677,7 +1677,7 @@
       ],
       "deps": [],
       "license": "MIT",
-      "credit": "Written for this registry; idea from Spotlight Card by jahed on 21st.dev, license unknown (no code taken)"
+      "credit": "Written for this registry; idea from Spotlight Card by jahed on 21st.dev, https://21st.dev/@jahed/components/spotlight-card, license unknown (no code taken)"
     },
     {
       "id": "motion/thinking-orb",
@@ -1702,7 +1702,7 @@
       ],
       "deps": [],
       "license": "MIT",
-      "credit": "Written for this registry; idea from Campsite ThemePicker via 21st.dev, CC BY-NC 4.0 (no code taken)"
+      "credit": "Written for this registry; idea from Campsite ThemePicker via 21st.dev, https://github.com/campsite/campsite, CC BY-NC 4.0 (no code taken)"
     },
     {
       "id": "blocks/curved-stream-hero",
@@ -1713,7 +1713,7 @@
       ],
       "deps": [],
       "license": "MIT",
-      "credit": "Written for this registry; idea from Tilted Grid Hero by ruixen.ui on 21st.dev, license not confirmed (no code taken)"
+      "credit": "Written for this registry; idea from Tilted Grid Hero by ruixen.ui on 21st.dev, https://21st.dev/@ruixen.ui/components/tilted-grid-hero, license not confirmed (no code taken)"
     },
     {
       "id": "blocks/banner-hero",
@@ -1724,7 +1724,7 @@
       ],
       "deps": [],
       "license": "MIT",
-      "credit": "Written for this registry; idea from Responsive Hero Banner by sensewood8 on 21st.dev, license not confirmed (no code taken)"
+      "credit": "Written for this registry; idea from Responsive Hero Banner by sensewood8 on 21st.dev, https://21st.dev/@sensewood8/components/responsive-hero-banner, license not confirmed (no code taken)"
     },
     {
       "id": "motion/wireframe-form",
@@ -1735,7 +1735,7 @@
       ],
       "deps": [],
       "license": "MIT",
-      "credit": "Written for this registry; idea from Wireframe Forms by mengto on 21st.dev, license not confirmed (no code taken)"
+      "credit": "Written for this registry; idea from Wireframe Forms by mengto on 21st.dev, https://21st.dev/@mengto/components/wireframe-forms, license not confirmed (no code taken)"
     },
     {
       "id": "motion/light-beams",
