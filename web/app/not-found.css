@@ -1,0 +1,9 @@
+/* The 404 screen (app/not-found.tsx). Registry tokens only, read through var(). The masthead draws the only rule, so
+   the section below it has none of its own. */
+.not-found {
+  max-width: 720px;
+  padding: var(--sp-12) 0 var(--sp-8);
+}
+.not-found p {
+  margin: var(--sp-3) 0 var(--sp-5);
+}

@@ -16,6 +16,10 @@ export type CatalogItem = {
   family: string;
   familyName: string;
   summary: string;
+  // The language of summary and categoryName, for a lang attribute on the Korean pages: the repository writes them in
+  // English (patterns/INDEX.json, taxonomy/taxonomy.json).
+  summaryLang: Lang;
+  categoryLang: Lang;
   patterns: { id: string; name: string; summary: string }[];
   uses: string[];
   surfaces: string[];
@@ -25,6 +29,11 @@ export type CatalogItem = {
   credit: string;
   file: string;
 };
+
+export type Lang = 'en' | 'ko';
+const HANGUL = /[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af]/;
+/** 'ko' for text with Hangul in it, 'en' for the rest. */
+export const langOf = (text: string): Lang => (HANGUL.test(text) ? 'ko' : 'en');
 
 type Pattern = { id: string; name: string; summary: string; category: string; uses?: string[]; surfaces?: string[]; replaces?: string[]; components?: string[] };
 type Component = { id: string; file: string; category: string; deps?: string[]; license?: string; credit?: string; patterns?: string[] };
@@ -45,16 +54,20 @@ export const CATALOG: CatalogItem[] = (registry.components as Component[]).map((
   own.sort((a, b) => Number(b.category === c.category) - Number(a.category === c.category));
   const family = familyOf.get(c.category);
   const [group, slug] = c.id.split('/');
+  const summary = own[0]?.summary || '';
+  const kind = categoryName.get(c.category) || c.category;
   return {
     id: c.id,
     group,
     slug,
     name: nameOf(c.id),
     category: c.category,
-    categoryName: categoryName.get(c.category) || c.category,
+    categoryName: kind,
     family: family?.id || 'other',
     familyName: family?.name || 'Other',
-    summary: own[0]?.summary || '',
+    summary,
+    summaryLang: langOf(summary),
+    categoryLang: langOf(kind),
     patterns: own.map((p) => ({ id: p.id, name: p.name, summary: p.summary })),
     uses: [...new Set(own.flatMap((p) => p.uses || []))],
     surfaces: [...new Set(own.flatMap((p) => p.surfaces || []))],
