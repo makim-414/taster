@@ -6,13 +6,14 @@
 
 <!-- Tick what you ran. CONTRIBUTING.md lists every command in CI order. -->
 
+- [ ] `node scripts/gates.mjs` (all four jobs below), or the jobs this change touches
 - [ ] `node scripts/build-docs.mjs`, and the generated files it changed are in this pull request
 - [ ] validate: `node scripts/validate.mjs`, `node scripts/check-taxonomy.mjs`, `node --test taxonomy/axes.test.mjs`,
-  `node engine/scripts/check-rules.mjs`, registry typecheck, lint selftest and baseline
-- [ ] browser: `node rules/test-detect.mjs`, `npm --prefix engine test`, the rebuild and icon slot examples
-- [ ] web: typecheck, build, `check-traces`, `npm --prefix web test`, `self-check`, `check-gallery`, `check-tone`,
-  `check-metadata`
-- [ ] The registry render test, if a component or its demo changed
+  `node engine/scripts/check-rules.mjs`, registry typecheck, lint selftest and baseline, the gate script tests, commit emails
+- [ ] browser: `node rules/test-detect.mjs`, `npm --prefix engine test`, the rebuild and icon slot examples, the registry
+  render, accessibility and injection tests
+- [ ] web: build, `check-traces`, `npm --prefix web test`, `self-check`, `check-gallery`, `check-tone`, `check-metadata`,
+  `check-a11y`
 - [ ] A line under `Unreleased` in `CHANGELOG.md`, if a user would notice the change
 
 ## Screens
