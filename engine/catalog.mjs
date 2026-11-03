@@ -11,6 +11,7 @@ export const loadRules = () => readJson('rules/rules.json').rules;
 export const loadPatterns = () => readJson('patterns/INDEX.json');
 export const loadRegistry = () => readJson('registry/registry.json');
 export const loadTaxonomy = () => readJson('taxonomy/taxonomy.json');
+export const loadToneRefs = () => readJson('taxonomy/tone-refs.json');
 
 export function patternsForRule(ruleId) {
   const rule = loadRules().find((r) => r.id === ruleId);

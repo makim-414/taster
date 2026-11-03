@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 
 const NEED = {
   'app/r/[...slug]/route.js': ['engine/add.mjs', 'registry/registry.json', 'registry/src/blocks/badge.tsx', 'registry/THIRD_PARTY_NOTICES.md'],
-  'app/api/mcp/route.js': ['engine/http.mjs', 'engine/server.mjs', 'engine/catalog.mjs', 'engine/system.mjs', 'engine/measure.js', 'engine/consistency.mjs', 'engine/plan.mjs', 'taxonomy/axes.mjs', 'registry/previews/blocks-button.dark.jpg', 'rules/rules.json', 'patterns/INDEX.json', 'taxonomy/taxonomy.json', 'registry/registry.json', 'skills/taster/references/start.md'],
+  'app/api/mcp/route.js': ['engine/http.mjs', 'engine/server.mjs', 'engine/catalog.mjs', 'engine/system.mjs', 'engine/measure.js', 'engine/consistency.mjs', 'engine/plan.mjs', 'engine/tone.mjs', 'engine/tone-capture.mjs', 'taxonomy/axes.mjs', 'registry/previews/blocks-button.dark.jpg', 'rules/rules.json', 'patterns/INDEX.json', 'taxonomy/taxonomy.json', 'taxonomy/tone-refs.json', 'registry/registry.json', 'skills/taster/references/start.md'],
+  'app/api/tone-shot/route.js': ['node_modules/playwright-core/package.json', 'node_modules/@sparticuz/chromium/package.json'],
   'app/api/brand/route.js': ['engine/brand.mjs', 'engine/diagnose.mjs', 'engine/extract.js', 'rules/detect.js'],
   'app/api/diagnose/route.js': ['engine/diagnose.mjs', 'rules/detect.js', 'rules/rules.json'],
 };

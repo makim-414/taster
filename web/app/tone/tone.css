@@ -1,0 +1,70 @@
+/* The tone page. Only registry token values through var(), like gallery.css. Controls are 44px below the desk width
+   (rule RSP-06), the layout starts from the phone, and the pad uses ink only: no dot carries a hue (AC-08). */
+.tone-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-8) var(--sp-6); }
+@media (min-width: 1024px) {
+  .tone-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: start; }
+  .tone-map { position: sticky; top: var(--sp-4); }
+}
+.tone-map, .tone-refs, .tone-parts { min-width: 0; }
+.tone-map h2, .tone-refs h2, .tone-parts h2 { margin: 0; font-size: var(--t-title); font-weight: var(--w-semi); }
+.tone-genres { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-3) 0 var(--sp-2); }
+.tone-genre-note { margin: 0 0 var(--sp-2); }
+.tone-genre-note b { color: var(--text); font-weight: var(--w-semi); }
+
+.pad-row { display: flex; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-1) var(--sp-1); font-size: var(--t-sm); color: var(--text-muted); }
+.pad {
+  position: relative; aspect-ratio: 1 / 1; overflow: hidden; border-radius: var(--r-card); background: var(--bg-sunken);
+  font-size: var(--t-sm); touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair;
+}
+@media (min-width: 640px) { .pad { aspect-ratio: 4 / 3; } }
+.pad:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.pad-plot { position: absolute; top: 0; left: 0; display: block; pointer-events: none; overflow: visible; }
+.pad-axis { stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 4; }
+.pad-dot { fill: var(--bg); stroke: var(--text-subtle); stroke-width: 1.5; transition: opacity var(--dur-dropdown) var(--ease-out); }
+.pad-dot[data-near] { fill: var(--text); stroke: var(--text); }
+.pad-dot[data-out], .pad-name[data-out] { opacity: 0.3; }
+.pad-you { fill: color-mix(in oklch, var(--bg) 40%, transparent); stroke: var(--text); stroke-width: 2; }
+.pad:not([data-dragging]) .pad-you { transition: transform var(--dur-dropdown) var(--ease-out); }
+.pad-name { position: absolute; line-height: var(--lh-snug); white-space: nowrap; color: var(--text-muted); pointer-events: none; }
+.pad-name[data-near] { color: var(--text); font-weight: var(--w-med); }
+
+.tone-readout { margin: var(--sp-3) 0 0; font-size: var(--t-body); color: var(--text-muted); }
+.tone-readout b { color: var(--text); font-weight: var(--w-semi); font-variant-numeric: tabular-nums; }
+.tone-hint { margin: var(--sp-2) 0 0; font-size: var(--t-sm); line-height: var(--lh-normal); color: var(--text-muted); }
+.tone-all { margin-top: var(--sp-4); border-top: 1px solid var(--border); }
+.tone-all summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-weight: var(--w-med); }
+.tone-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); padding-bottom: var(--sp-2); }
+
+.ref-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-6) var(--sp-4); margin: var(--sp-3) 0 0; padding: 0; list-style: none; }
+@media (min-width: 640px) { .ref-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ref-card { min-width: 0; }
+.ref-shot { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--r-md); background: var(--bg-sunken); }
+.ref-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.ref-shot-note { display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); margin: 0; padding: var(--sp-4); max-width: 22rem; text-align: center; font-size: var(--t-sm); line-height: var(--lh-normal); color: var(--text-muted); }
+.ref-text h3 { margin: var(--sp-3) 0 0; font-size: var(--t-title); font-weight: var(--w-med); line-height: var(--lh-snug); }
+.ref-number { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.ref-note { margin: var(--sp-1) 0 0; font-size: var(--t-body); line-height: var(--lh-normal); color: var(--text-muted); }
+.ref-links { display: flex; flex-wrap: wrap; gap: 0 var(--sp-4); margin: var(--sp-1) 0 0; font-size: var(--t-sm); }
+.ref-links a { display: inline-flex; align-items: center; min-height: 44px; text-underline-offset: 3px; }
+.ref-caveat { margin: 0; font-size: var(--t-sm); color: var(--text-muted); }
+
+.tone-parts { margin-top: var(--sp-12); padding-top: var(--sp-8); border-top: 1px solid var(--border); }
+.tone-parts-lede { margin: var(--sp-2) 0 0; max-width: 44rem; font-size: var(--t-body); line-height: var(--lh-normal); color: var(--text-muted); }
+.axes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2) var(--sp-4); margin: var(--sp-5) 0 var(--sp-5); }
+@media (min-width: 768px) { .axes { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.axis { display: flex; justify-content: space-between; gap: var(--sp-2); padding-bottom: var(--sp-2); border-bottom: 1px solid var(--border); min-width: 0; }
+.axis dt { color: var(--text-muted); font-size: var(--t-body); }
+.axis dd { margin: 0; font-size: var(--t-body); font-weight: var(--w-med); text-align: right; }
+.parts { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-6); margin-top: var(--sp-6); }
+.part { margin: 0; min-width: 0; }
+.part figcaption { margin-bottom: var(--sp-2); font-size: var(--t-sm); color: var(--text-muted); }
+.part-frame { overflow: hidden; border: 1px solid var(--border); border-radius: var(--r-card); background: var(--bg-sunken); }
+
+.tone-note { margin: var(--sp-8) 0 0; max-width: 48rem; font-size: var(--t-sm); line-height: var(--lh-normal); color: var(--text-muted); }
+
+@media (min-width: 1024px) and (not (pointer: coarse)) {
+  .tone-all summary, .ref-links a { min-height: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pad-you, .pad-dot { transition: none; }
+}

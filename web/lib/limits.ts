@@ -2,20 +2,41 @@
 // runs more than one Chromium at a time. State lives in memory, so it resets with the instance;
 // it stops casual abuse, and a platform firewall rule can sit in front for the rest.
 const WINDOW_MS = 10 * 60 * 1000;
-const PER_IP = 6;
-const hits = new Map<string, number[]>();
 
-export function takeToken(ip: string, now = Date.now()): { ok: boolean; retryAfter: number } {
-  const recent = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
-  if (recent.length >= PER_IP) {
+/** A sliding window of `perIp` calls per ten minutes, with its own memory. */
+export function createWindow(perIp: number) {
+  const hits = new Map<string, number[]>();
+  return function take(ip: string, now = Date.now()): { ok: boolean; retryAfter: number } {
+    const recent = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+    if (recent.length >= perIp) {
+      hits.set(ip, recent);
+      return { ok: false, retryAfter: Math.ceil((recent[0] + WINDOW_MS - now) / 1000) };
+    }
+    recent.push(now);
     hits.set(ip, recent);
-    return { ok: false, retryAfter: Math.ceil((recent[0] + WINDOW_MS - now) / 1000) };
-  }
-  recent.push(now);
-  hits.set(ip, recent);
-  if (hits.size > 5000) for (const [k, v] of hits) if (!v.some((t) => now - t < WINDOW_MS)) hits.delete(k);
-  return { ok: true, retryAfter: 0 };
+    if (hits.size > 5000) for (const [k, v] of hits) if (!v.some((t) => now - t < WINDOW_MS)) hits.delete(k);
+    return { ok: true, retryAfter: 0 };
+  };
 }
+
+// Diagnoses and brand reads: six per ten minutes.
+export const takeToken = createWindow(6);
+// Reference first screens for the tone page: one call opens up to four sites, and moving the spot asks again.
+export const takeShotToken = createWindow(20);
+
+/** A ceiling across every caller: at most `perMinute` calls in any sixty seconds on this instance. */
+export function createCeiling(perMinute: number) {
+  let recent: number[] = [];
+  return function take(now = Date.now()): boolean {
+    recent = recent.filter((t) => now - t < 60_000);
+    if (recent.length >= perMinute) return false;
+    recent.push(now);
+    return true;
+  };
+}
+
+// However many visitors there are, one instance opens third party sites for at most 12 capture calls a minute.
+export const takeShotCeiling = createCeiling(12);
 
 export function clientIp(headers: Headers): string {
   return headers.get('x-real-ip') || (headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'unknown';

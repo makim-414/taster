@@ -40,6 +40,8 @@ const nextConfig = {
       './node_modules/playwright-core/**',
       './node_modules/@sparticuz/chromium/**',
     ],
+    // The capture code (engine/tone-capture.mjs) and the catalog are bundled into the route; only the browser is traced.
+    '/api/tone-shot': ['./node_modules/playwright-core/**', './node_modules/@sparticuz/chromium/**'],
     '/api/diagnose': [
       '../engine/*.mjs',
       '../engine/*.js',

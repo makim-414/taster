@@ -64,13 +64,25 @@ try {
       await page.close();
     }
   }
-  // The gallery pages. The components inside frames are the registry's business; this measures the page around them.
+  // The gallery pages and the tone page. The components inside frames are the registry's business; this measures the
+  // page around them. Reference screens on the tone page are answered locally: one picture, one block page.
+  const picture = placeholder(1280, 800);
   for (const width of [1440, 390]) {
-    for (const path of ['/components', '/components/blocks/button', '/components/blocks/banner-hero', '/board?ids=blocks/button,blocks/card&brand=e4002b']) {
+    for (const path of ['/components', '/components/blocks/button', '/components/blocks/banner-hero', '/board?ids=blocks/button,blocks/card&brand=e4002b', '/tone?x=0.8&y=0.18', '/tone?x=0.2&y=0.9&genre=geek&theme=light']) {
       const page = await browser.newPage({ viewport: { width, height: width === 390 ? 844 : 900 } });
       const errors = [];
       page.on('pageerror', (e) => errors.push(e.message));
+      await page.route('**/api/tone-shot', (route) => {
+        const ids = JSON.parse(route.request().postData() || '{}').ids || [];
+        return route.fulfill({ json: { shots: Object.fromEntries(ids.map((id, i) => [id, i === 1 ? { status: 'blocked' } : { status: 'ok', image: picture }])) } });
+      });
       await page.goto(BASE + path, { waitUntil: 'networkidle' });
+      if (path.startsWith('/tone')) {
+        // Sites open only once their cards are on screen.
+        for (const card of await page.locator('.ref-card').all()) await card.scrollIntoViewIfNeeded();
+        await page.waitForSelector('.ref-shot img');
+        await page.evaluate(() => scrollTo(0, 0));
+      }
       await page.evaluate(() => document.querySelectorAll('details').forEach((d) => (d.open = true)));
       await page.addScriptTag({ content: DETECT });
       const report = await page.evaluate(() => window.tasterDetect({ maxPerRule: 10 }));
