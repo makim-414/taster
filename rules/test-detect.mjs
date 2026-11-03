@@ -116,12 +116,15 @@ for (const [f, o] of Object.entries(out)) {
   check(!o.mutated, `${f}: highlight and clear changed the DOM`);
   check(o.hl.left === 0, `${f}: ${o.hl.left} outlines left after clear`);
   check(r.findings.length === 0 || o.hl.outlined > 0, `${f}: highlight outlined nothing`);
-  for (const x of r.findings) {
+  check(Array.isArray(r.thirdParty), `${f}: report has no thirdParty list`);
+  for (const x of r.findings.concat(r.thirdParty || [])) {
     check(level[x.ruleId] !== undefined, `${f}: unknown rule id ${x.ruleId}`);
     check(typeof x.selector === 'string' && x.selector.length > 0, `${f}: ${x.ruleId} missing selector`);
     check(x.rect && x.rect.w >= 0 && x.rect.h >= 0, `${f}: ${x.ruleId} bad rect`);
     check(x.text.length <= 60, `${f}: ${x.ruleId} text longer than 60`);
   }
+  const counted = Object.values(r.counts).reduce((a, b) => a + b, 0);
+  check(counted >= r.findings.length, `${f}: counts add up to ${counted}, below ${r.findings.length} findings`);
 }
 
 const slop = engineOut['slop.html@1440'].result;
@@ -160,6 +163,15 @@ for (const w of [1440, 390]) {
   const typ = engineOut[`slop-type.html@${w}`].result.findings.filter((x) => x.ruleId === 'TYP-05').map((x) => x.selector).sort();
   const want = ['#t-pct', '#t-split', '#t-story'];
   check(JSON.stringify(typ) === JSON.stringify(want), `slop-type.html at ${w}: TYP-05 on ${typ.join(' ') || 'nothing'}, want ${want.join(' ')}`);
+}
+
+// A consent manager's banner is a third-party widget: its findings go to thirdParty, not to the site's counts.
+for (const w of [1440, 390]) {
+  const r = engineOut[`consent-overlay.html@${w}`].result;
+  const tp = r.thirdParty || [];
+  check(tp.length > 0 && tp.every((x) => x.thirdParty === 'consent'), `consent-overlay.html at ${w}: expected consent findings in thirdParty, got ${tp.length}`);
+  check(Object.keys(r.counts).length === 0, `consent-overlay.html at ${w}: counts should leave out the banner, got ${JSON.stringify(r.counts)}`);
+  console.log(`consent-overlay.html@${w}: ${tp.length} third-party findings (${Array.from(new Set(tp.map((x) => x.ruleId))).join(' ')}) kept out of the counts`);
 }
 
 // Known gaps: these fixtures record what a rule cannot measure yet. When the rule starts to fire, the gap is closed:

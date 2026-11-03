@@ -21,8 +21,9 @@
  *
  * Result:
  *   { url, viewport:{width,height,dpr}, findings:[{ruleId, selector, text, rect, evidence}],
- *     counts:{ruleId:n}, notes:[], errors:[] }
- * rect is in document coordinates (x, y, w, h in CSS pixels).
+ *     counts:{ruleId:n}, thirdParty:[finding + {thirdParty:'consent'}], notes:[], errors:[] }
+ * rect is in document coordinates (x, y, w, h in CSS pixels). thirdParty holds what a consent manager's banner
+ * (vendor ids) would add. It is not in findings or counts: the widget is not the site's design.
  *
  * Rules that need meaning (AC-18, AC-19, CMP-08) are manual and not run. CPY-01 and KO-07
  * report phrase candidates only. Thresholds mirror rules.json detect.css.
@@ -326,36 +327,54 @@
   }
 
   // ---------------------------------------------------------------- main
+  // Consent managers are third-party widgets a site embeds. Vendor ids only: a banner the site builds itself is its own design.
+  // detect.js never presses their buttons.
+  var CONSENT_SEL = '#onetrust-consent-sdk,#CybotCookiebotDialog,#usercentrics-root,.osano-cm-window,#truste-consent-track,' +
+    '[id^="sp_message_container"],.qc-cmp2-container,#didomi-host';
+
   function run(options) {
     options = options || {};
     clearHighlights();
     var vw = window.innerWidth, vh = window.innerHeight;
     var viewport = { width: vw, height: vh, dpr: window.devicePixelRatio || 1 };
     if (options.clear) {
-      return { url: location.href, viewport: viewport, page: { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }, cleared: true, findings: [], counts: {}, notes: [], errors: [] };
+      return { url: location.href, viewport: viewport, page: { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }, cleared: true, findings: [], counts: {}, thirdParty: [], notes: [], errors: [] };
     }
     FACES = loadedFaces();
 
     var cap = options.maxPerRule || 40;
     var findings = [], notes = [], errors = [], counts = {}, hits = {}, seen = {}, toHL = [];
+    // What a third-party widget draws is not the site's design: those findings go to thirdParty, outside counts.
+    var thirdParty = [], partyCounts = {};
 
     function add(ruleId, el, evidence) {
       if (!el) return;
       seen[ruleId] = seen[ruleId] || new Set();
       if (seen[ruleId].has(el)) return;
       seen[ruleId].add(el);
+      var party = el.closest && el.closest(CONSENT_SEL) ? 'consent' : null;
+      if (party) {
+        partyCounts[ruleId] = (partyCounts[ruleId] || 0) + 1;
+        if (partyCounts[ruleId] <= cap) thirdParty.push(finding(ruleId, el, evidence, party));
+        return;
+      }
       counts[ruleId] = (counts[ruleId] || 0) + 1;
       (hits[ruleId] = hits[ruleId] || []).push(el);
       if (counts[ruleId] > cap) return;
+      findings.push(finding(ruleId, el, evidence));
+      toHL.push(el);
+    }
+    function finding(ruleId, el, evidence, party) {
       var r = el.getBoundingClientRect();
-      findings.push({
+      var f = {
         ruleId: ruleId,
         selector: sel(el),
         text: norm(el.innerText !== undefined ? el.innerText : el.textContent).slice(0, 60),
         rect: { x: Math.round(r.left + window.scrollX), y: Math.round(r.top + window.scrollY), w: Math.round(r.width), h: Math.round(r.height) },
         evidence: evidence || {}
-      });
-      toHL.push(el);
+      };
+      if (party) f.thirdParty = party;
+      return f;
     }
 
     // ------------------------------------------------ collect elements and text
@@ -2269,7 +2288,7 @@
 
     if (options.highlight) highlight(toHL);
 
-    return { url: location.href, viewport: viewport, page: { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }, version: VERSION, findings: findings, counts: counts, notes: notes, errors: errors };
+    return { url: location.href, viewport: viewport, page: { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }, version: VERSION, findings: findings, counts: counts, thirdParty: thirdParty, notes: notes, errors: errors };
   }
 
   run.version = VERSION;
