@@ -127,7 +127,7 @@ test('engine through the fence: slop.html is hit, clean.html has zero findings',
     assert.ok(short.report.rulesHit >= 15, `partial slop.html hit only ${short.report.rulesHit} rules`);
     assert.deepEqual(Object.keys(short.shots), ['1440']);
     // A bot check is not the site: no report at all, instead of "no rules hit" for someone else's block page.
-    await assert.rejects(runDiagnosis(`${srv.base}/challenge`, { allowLoopback: true }), /차단·오류 화면\(HTTP 403\)/);
+    await assert.rejects(runDiagnosis(`${srv.base}/challenge`, { allowLoopback: true }), { code: 'not-diagnosed', message: /^not diagnosed: got a bot check page \(HTTP 403/ });
     const clean = await runDiagnosis(`${srv.base}/fixtures/clean.html`, { allowLoopback: true });
     assert.equal(clean.report.rulesHit, 0, `clean.html hit ${clean.report.rules.map((r) => r.ruleId).join(' ')}`);
     console.log(`slop.html: ${slop.report.rulesHit} rules, ${slop.report.findings} places; clean.html: ${clean.report.rulesHit}`);
