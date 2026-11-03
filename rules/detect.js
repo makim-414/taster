@@ -389,6 +389,15 @@
         M.set(el, it);
       }
     }
+    // A closed <details> keeps layout boxes for its content, but nobody sees it: only its own summary shows.
+    function folded(el) {
+      for (var d = el.closest && el.closest('details:not([open])'); d; d = d.parentElement && d.parentElement.closest('details:not([open])')) {
+        var s = d.querySelector(':scope > summary');
+        if (!s || !s.contains(el)) return true;
+      }
+      return false;
+    }
+    // Text in a closed <details> is left out here, so every text rule (ownText and TN) skips what nobody can read.
     var OWN = new Map(), TN = [];
     var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
     var n;
@@ -396,7 +405,7 @@
       var v = n.nodeValue;
       if (!v || !v.trim()) continue;
       var p = n.parentElement;
-      if (!p || !M.has(p)) continue;
+      if (!p || !M.has(p) || folded(p)) continue;
       TN.push({ node: n, el: p, text: v });
       OWN.set(p, ((OWN.get(p) || '') + ' ' + v).replace(/\s+/g, ' ').trim());
     }
@@ -1546,16 +1555,18 @@
     // -------- copy candidates (manual rules, candidates only)
     var AI_COPY = /\b(elevate your|unlock the (power|potential)|supercharge|seamless(ly)?|revolutioni[sz]e|game[- ]changer|next[- ]gen(eration)?|to the next level|reimagine[d]?|build faster,? ship smarter|(build|ship|move|work) (faster|smarter),|not (just|only|merely|simply) (a |an |the )?[^.,;!?]{1,40}?,? but\b|it'?s not (just )?(about )?[^.,;!?]{1,40}?, it'?s\b)/i;
     var KO_COPY = /\uACBD\uD5D8\uD558\uC138\uC694|\uC0C8\uB85C\uC6B4 \uCC28\uC6D0|\uC758 \uBBF8\uB798\uB97C|\uB9CC\uB098\uBCF4\uC138\uC694|\uCC28\uC6D0\uC774 \uB2E4\uB978|\uD55C \uB2E8\uACC4 \uB354 \uC5C5\uADF8\uB808\uC774\uB4DC|\uB2E8\uC21C\uD55C [^.,]{1,20}(\uC774|\uAC00) \uC544\uB2CC/;
+    // Copy is what the page says to its reader: a code listing or a sample of keyboard input is not copy.
+    var NOT_COPY = 'code,pre,kbd,samp';
     R['CPY-01'] = function () {
       I.forEach(function (it) {
         var t = ownText(it.el);
-        if (t && AI_COPY.test(t)) add('CPY-01', it.el, { candidate: true, match: (t.match(AI_COPY) || [])[0] });
+        if (t && AI_COPY.test(t) && !it.el.closest(NOT_COPY)) add('CPY-01', it.el, { candidate: true, match: (t.match(AI_COPY) || [])[0] });
       });
     };
     R['KO-07'] = function () {
       I.forEach(function (it) {
         var t = ownText(it.el);
-        if (t && KO_COPY.test(t)) add('KO-07', it.el, { candidate: true, match: (t.match(KO_COPY) || [])[0] });
+        if (t && KO_COPY.test(t) && !it.el.closest(NOT_COPY)) add('KO-07', it.el, { candidate: true, match: (t.match(KO_COPY) || [])[0] });
       });
     };
 
@@ -1748,10 +1759,7 @@
       return o;
     }
     function hiddenFromReader(el) {
-      // A closed <details> keeps layout boxes for its content, but nobody sees them.
-      var fold = el.closest && el.closest('details:not([open])');
-      if (fold && !el.closest('summary')) return true;
-      return opacityOf(el) < 0.1 || !!el.closest('[aria-hidden="true"],[inert]');
+      return folded(el) || opacityOf(el) < 0.1 || !!el.closest('[aria-hidden="true"],[inert]');
     }
     // Fixed and sticky layers (headers, cookie banners, chat buttons) cover content on purpose.
     function inOverlay(el) {

@@ -33,6 +33,11 @@ h1 { font-size: 44px; line-height: 1.3; letter-spacing: -2%; margin: 0 0 24px; f
 h2 { font-size: 26px; line-height: 1.35; margin: 0 0 20px; }
 p { margin: 0 0 16px; color: var(--ink-soft); max-width: 36em; letter-spacing: -1%; }
 .label { font-size: 12px; text-transform: uppercase; letter-spacing: 2%; margin: 0 0 12px; }
+/* A folded source listing: nobody reads it until it is opened. */
+details.source { margin-top: 32px; }
+details.source summary { padding: 10px 0; cursor: pointer; }
+/* A code face that is not installed anywhere, so the Hangul comment would fall back if anyone opened it. */
+details.source pre, details.source code { font-family: "Fixture Code", monospace; font-size: 14px; }
 .btn { display: inline-block; padding: 12px 28px; background: var(--ink); color: #ffffff; text-decoration: none; border-radius: 4px; font-size: 16px; }
 .link { margin-left: 24px; color: var(--ink); }
 .figure { display: block; width: 480px; max-width: 100%; height: auto; margin-top: 40px; }
@@ -59,6 +64,7 @@ footer { padding: 40px 48px; font-size: 14px; color: var(--ink-soft); border-top
     <h2>일하는 방식</h2>
     <p>소프트웨어 개발 서비스를 제공하는 회사입니다. 데이터 분석과 클라우드 인프라 구축 경험을 바탕으로 사업의 성장을 지원합니다. 매주 진행 상황을 문서로 공유하고, 결정이 필요한 항목은 미리 정리해서 전달합니다.</p>
     <blockquote>처음 상담에서 범위를 좁혀 준 덕분에 일정이 절반으로 줄었습니다.</blockquote>
+    <pre class="snippet"><code>// loops seamlessly</code></pre>
   </section>
   <section class="pair">
     <p class="label">Since 2019</p>
@@ -68,6 +74,8 @@ footer { padding: 40px 48px; font-size: 14px; color: var(--ink-soft); border-top
       <dt>설계</dt><dd>화면과 데이터 구조를 함께 확정합니다.</dd>
       <dt>운영</dt><dd>배포 이후 안정화까지 함께 합니다.</dd>
     </dl>
+    <details class="source"><summary>코드 보기</summary><p>One seamless handoff from plan to release.</p><pre><code>// two copies of the track loop seamlessly
+// 화면 폭에 맞춰 다시 잽니다</code></pre></details>
   </section>
 </main>
 <footer>&copy; Sample Inc. 문의는 메일로 보내 주세요.</footer>
