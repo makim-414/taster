@@ -50,7 +50,7 @@ Slop version (fixes AC-01, CMP-10):
   <h4 style="text-transform:uppercase;letter-spacing:0.16em;font-size:11px">Product</h4>
   ...
   <form class="newsletter">
-    <input type="email" placeholder="you@company.com" />
+    <input type="email" placeholder="you@example.com" />
     <button>Subscribe</button>  <!-- posts nowhere -->
   </form>
 </footer>

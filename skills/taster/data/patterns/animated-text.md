@@ -6,7 +6,7 @@ uses: [emphasize-text]
 surfaces: [landing]
 replaces: [COL-04, MOT-01, TYP-03]
 components: [motion/text-reveal, motion/typewriter, motion/gooey-text, motion/text-scramble]
-inspiration: [https://21st.dev/@dillionverma/components/text-reveal, https://21st.dev/@kapishdima/components/marker-highlight]
+inspiration: [https://21st.dev/@dillionverma/components/text-reveal, https://21st.dev/@kapishdima/components/marker-highlight, https://21st.dev/@victorwelander/components/gooey-text-morphing, https://motion-primitives.com/docs/text-scramble]
 status: draft
 ---
 

@@ -28,11 +28,17 @@ Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLI
   Each redirect hop is checked again.
 - The browser is pointed at a dead proxy, so anything that is not intercepted (WebSocket, WebRTC, workers,
   cross-origin frames) fails instead of reaching the network. Only GET and HEAD leave the server.
-- Per IP: 6 diagnoses per 10 minutes per instance, and a Vercel firewall rule ("diagnose rate limit per IP") that
-  answers 429 after 10 POSTs to `/api/diagnose` per IP per 10 minutes across all instances. One Chromium per
-  instance at a time, a short queue, then 503.
-- Page load 15 s per width (plus the engine's own load and idle waits), 80 s for the whole run, 400 requests and
-  60 MB per run.
+- Per client (one IPv4 address or one IPv6 /64) on each instance: 6 diagnoses and brand reads per 10 minutes and 60
+  MCP tool calls a minute. Across all clients on each instance: 12 diagnoses and brand reads and 300 MCP tool calls
+  a minute (`lib/limits.ts`). A Vercel firewall rule ("diagnose rate limit per IP") answers 429 after 10 POSTs to
+  `/api/diagnose` per IP per 10 minutes across all instances. `/api/diagnose`, `/api/brand` and `/api/mcp` send
+  `retry-after` with their 429 and 503 answers.
+- One Chromium per instance at a time and two waiting. The wait and the run share the route's time limit less 10 s
+  (80 s of the 90 for a diagnosis): the run gets what the wait left, and a call that would start with too little is
+  answered 503 at once instead of timing out.
+- `/api/mcp` takes one JSON-RPC message per POST (a batch gets 400) and answers with an error instead of anything
+  over 4 MB.
+- Page load 15 s per width (plus the engine's own load and idle waits), 400 requests and 60 MB per run.
 
 ## Link preview, crawlers and headers
 

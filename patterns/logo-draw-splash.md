@@ -6,7 +6,7 @@ uses: [show-progress, set-the-mood]
 surfaces: [landing]
 replaces: [MOT-01]
 components: [motion/glass-logo-reveal]
-inspiration: []
+inspiration: [https://21st.dev/@shepovalovdenis/components/liquid-glass-logo-reveal, https://github.com/zanwei/glass-icon-reveal]
 status: draft
 ---
 

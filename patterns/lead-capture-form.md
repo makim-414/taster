@@ -64,7 +64,7 @@ import { Button } from './blocks/button'
 
 <form onSubmit={subscribe} className="flex max-w-md gap-2">
   <label htmlFor="em" className="sr-only">Email</label>
-  <Input id="em" type="email" required autoComplete="email" placeholder="you@company.com" />
+  <Input id="em" type="email" required autoComplete="email" placeholder="you@example.com" />
   <Button type="submit">Send me the price list</Button>
 </form>
 <p className="mt-2 text-xs text-text-muted">One email now, then one a month. Unsubscribe in one click.</p>
