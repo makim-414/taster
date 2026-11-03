@@ -89,12 +89,18 @@ claude mcp add taster -- node /path/to/taster/engine/start.mjs
 
 ### 내 앱에 부품 넣기
 
+npm 패키지는 아직 게시 전이라, 이 리포를 한 번 받아 두고 내 앱 폴더에서 그 CLI 를 실행합니다.
+
 ```bash
-node engine/cli.mjs add blocks/button blocks/citations --dir src/components/taster
+git clone https://github.com/makim-414/taster.git /path/to/taster   # 한 번만
+npm ci --prefix /path/to/taster/engine                              # 한 번만
+node /path/to/taster/engine/cli.mjs add blocks/button blocks/citations --dir src/components/taster
 ```
 
-부품마다 그 부품이 import 하는 파일과 토큰 파일을 함께 복사합니다. shadcn 같은 다른 CLI 는 필요 없습니다. 클론
-없이 받으려면 `--from https://taster-six.vercel.app` 를 붙이세요. 자세한 내용은 `registry/README.md`.
+부품마다 그 부품이 import 하는 파일과 토큰 파일을 함께, 명령을 실행한 폴더 기준 `--dir` 아래로 복사합니다. shadcn
+같은 다른 CLI 는 필요 없습니다. `--from https://taster-six.vercel.app` 를 붙이면 부품 파일을 클론 대신 호스팅
+사본에서 읽지만, npm 게시 전까지 명령 자체는 클론에서 실행합니다. 게시 뒤에는 `npx @makim-414/taster add ...` 로
+바뀝니다. 자세한 내용은 `registry/README.md`.
 
 ### MCP 없는 에이전트용 규칙 파일
 
