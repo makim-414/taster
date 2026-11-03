@@ -184,6 +184,9 @@ export function summarize(url, runs) {
       };
     })
     .sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity] || Math.max(...Object.values(b.counts)) - Math.max(...Object.values(a.counts)) || a.ruleId.localeCompare(b.ruleId));
+  // What a consent manager's banner drew (detect.js thirdParty) is not counted; only how many, counted like findings.
+  const consent = (run) => (run.thirdParty || []).filter((f) => f.thirdParty === 'consent');
+  const consentIds = [...new Set(counted.flatMap((run) => consent(run).map((f) => f.ruleId)))];
   return {
     url,
     ...load,
@@ -191,6 +194,7 @@ export function summarize(url, runs) {
     measured: RULES.filter((r) => r.detect.level !== 'manual').length,
     rulesHit: rules.length,
     findings: rules.reduce((n, r) => n + Math.max(...Object.values(r.counts)), 0),
+    consentFindings: consentIds.reduce((n, id) => n + Math.max(...counted.map((run) => consent(run).filter((f) => f.ruleId === id).length)), 0),
     rules,
     judgeByEye: RULES.filter((r) => r.detect.level === 'manual').map((r) => r.id),
     screenshots: counted.flatMap((run) => run.screenshots || [run.screenshot]).filter(Boolean),
