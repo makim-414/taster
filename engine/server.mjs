@@ -31,6 +31,7 @@ const PRAISE_ON = { x: 'X', reddit: 'Reddit', hackernews: 'Hacker News' };
 const hostOf = (url) => new URL(url).host.replace(/^www\./, '');
 const MISSING = {
   blocked: 'the site answered with a bot check or a block page, which Taster does not get around',
+  consent: 'the site showed a cookie banner with no reject button, which Taster neither accepts nor hides',
   busy: 'too many captures right now, open the tone page a little later',
   failed: 'the site did not open in time',
 };
@@ -333,7 +334,7 @@ export function createServer({ remote } = {}) {
     {
       title: 'Pick a tone on the map',
       description:
-        `Place the look on the tone map before choosing components: x runs from commerce (0) to brand personality (1), y from minimal (0) to expressive (1), and a genre (${genreIds.join(', ')}) narrows the references. Returns the nearest real sites, numbered, each with its first screen opened now (not stored; a bot check or block page comes back as a link only, and cookie banners are only rejected), what it is and the public post that praised it (or, marked as such, only mentioned it); the eight axes this spot sets (density, contrast, roundness, type-expression, color-restraint, elevation, motion, stroke) with step names; token overrides and a theme.css block; ` +
+        `Place the look on the tone map before choosing components: x runs from commerce (0) to brand personality (1), y from minimal (0) to expressive (1), and a genre (${genreIds.join(', ')}) narrows the references. Returns the nearest real sites, numbered, each with its first screen opened now (never written to disk, kept in server memory up to 30 minutes; a bot check, a block page or a cookie banner without a reject button comes back as a link only, and cookie banners are only rejected), what it is and the public post that praised it (or, marked as such, only mentioned it); the eight axes this spot sets (density, contrast, roundness, type-expression, color-restraint, elevation, motion, stroke) with step names; token overrides and a theme.css block; ` +
         `${remote ? 'a live link to Taster parts wearing those tokens' : 'a picture of a Taster part wearing those tokens'}; and the tone page where the user can drag the spot. The references set the direction, the parts show what Taster will build. Show every picture and the link, ask which reference is closest or which way to move, and wait.`,
       inputSchema: {
         x: z.number().min(0).max(1).optional().describe('0 commerce to 1 brand personality, default 0.5'),

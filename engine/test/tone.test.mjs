@@ -141,7 +141,7 @@ function serveStatus(code) {
   return new Promise((resolve) => server.listen(0, '127.0.0.1', () => resolve({ url: `http://127.0.0.1:${server.address().port}/`, close })));
 }
 
-test('first screens: reject only, never accept, and no picture of a block page', { timeout: 60000 }, async () => {
+test('first screens: reject only, never accept or hide, and no picture of a consent banner or a block page', { timeout: 60000 }, async () => {
   const browser = await launch();
   const denied = await serveStatus(403);
   try {
@@ -152,11 +152,16 @@ test('first screens: reject only, never accept, and no picture of a block page',
     assert.equal(await page.evaluate(() => document.body.dataset.consent), 'rejected');
     assert.ok(both.image.length > 2000 && both.image[0] === 0xff && both.image[1] === 0xd8, 'a JPEG');
 
-    const acceptOnly = await readFirstScreen(page, fixture('tone-accept-only.html'), { settleMs: 50 });
-    assert.equal(acceptOnly.status, 'ok');
-    assert.equal(acceptOnly.rejected, '');
-    assert.equal(await page.evaluate(() => document.body.dataset.consent), undefined, 'an accept button was pressed');
-    assert.equal(await page.evaluate(() => getComputedStyle(document.getElementById('onetrust-banner-sdk')).display), 'none');
+    // A banner with no reject button is neither accepted nor hidden: no picture, link only.
+    for (const name of ['tone-accept-only.html', 'tone-cookie-layer.html']) {
+      const acceptOnly = await readFirstScreen(page, fixture(name), { settleMs: 50 });
+      assert.equal(acceptOnly.status, 'consent', name);
+      assert.equal(acceptOnly.image, undefined, `${name} has a picture`);
+      assert.equal(await page.evaluate(() => document.body.dataset.consent), undefined, `${name}: an accept button was pressed`);
+    }
+    assert.notEqual(await page.evaluate(() => getComputedStyle(document.querySelector('.notice')).display), 'none', 'the banner was hidden');
+    // A fixed header with a button and no cookie words is not a banner.
+    assert.equal((await readFirstScreen(page, fixture('tone-fixed-header.html'), { settleMs: 50 })).status, 'ok');
 
     const check = await readFirstScreen(page, fixture('tone-blocked.html'), { settleMs: 50 });
     assert.equal(check.status, 'blocked');

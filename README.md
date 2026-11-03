@@ -131,7 +131,8 @@ wearing your brand. On the board, press the pick button and paste the sentence i
 Before the parts, the `pick_tone` tool places the look on a tone map: commerce to brand personality, minimal to
 expressive, and an optional genre (geek and developer, editorial and serif, illustration and play, product photo hero,
 product screen hero, utility and density). It answers with the nearest real sites, opened on request
-and never stored, the eight axes and tokens of that spot, and Taster parts wearing them. The references set the
+(never written to disk, kept in server memory up to 30 minutes; a bot check, a block page or a cookie banner without a reject button leaves a link only), the eight axes
+and tokens of that spot, and Taster parts wearing them. The references set the
 direction; the parts show what Taster builds. [taster-six.vercel.app/tone](https://taster-six.vercel.app/tone) is the
 same map to drag by hand.
 
