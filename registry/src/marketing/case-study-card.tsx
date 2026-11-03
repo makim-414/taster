@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Case study card: a link to one customer story that leads with what changed, measured, and only then
 // who it was. A cover image of the real work is optional. The whole card is one link with one focus ring.
@@ -34,7 +35,7 @@ export function CaseStudyCard({ study, as: Heading = 'h3', className, ...props }
   return (
     <article lang={study.lang} className={cn('min-w-0', className)} {...props}>
       <a
-        href={study.href}
+        href={safeHref(study.href)}
         className="group flex h-full flex-col rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-[color:var(--bg)]"
       >
         {study.cover ? (

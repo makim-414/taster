@@ -32,7 +32,7 @@ node engine/cli.mjs lint src                         # the rules' source form, n
 
 `lint` reads tsx, jsx, vue, svelte, html, css and md files for the code form of the rules, so slop is caught in
 review before anything renders. Checks that mirror a measured rule carry its id and its fix (AC-01 caps with wide
-tracking, AC-02 long dashes, AC-03 emoji, AC-04 tinted pill, AC-05 outlined pill, AC-06 thick left bar, AC-08 colored
+tracking, AC-02 long dashes, AC-03 emoji, AC-04 tinted pill, AC-05 outlined pill, AC-10 thick left bar, AC-08 colored
 dot, AC-09 mono labels, MOT-02 transition-all, MOT-04 ease-in). Checks that only make sense in source use SRC ids:
 SRC-01 hard-coded color in a component (custom property definitions and var() fallbacks pass), SRC-02 pixel one-off
 outside the scale, SRC-03 stock palette class instead of a token, SRC-04 Tailwind screens replaced instead of

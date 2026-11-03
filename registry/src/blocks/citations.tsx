@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from './_cn'
+import { safeHref } from './_url'
 import { useReducedMotion, useStyleOnce } from '../motion/_motion'
 
 // Citations: numbered markers inside an answer, and a sources list under it that opens and closes.
@@ -17,6 +18,7 @@ export interface CitationItem {
   title: React.ReactNode
   /** Shown after the title, and used for the initial when there is no favicon. */
   domain?: string
+  /** http, https or mailto, or a relative path. Any other scheme draws the row without a link (blocks/_url.ts). */
   url?: string
 }
 
@@ -109,6 +111,7 @@ export function CitationList({ citations, idPrefix, favicons = false, className 
   return (
     <ol className={cn('grid gap-0.5', className)}>
       {citations.map((c, i) => {
+        const url = safeHref(c.url)
         const body = (
           <>
             <SourceMark item={c} favicons={favicons} />
@@ -117,15 +120,15 @@ export function CitationList({ citations, idPrefix, favicons = false, className 
               {c.domain ? <span className="truncate text-caption text-text-subtle">{c.domain}</span> : null}
             </span>
             <span className="tabular-nums text-caption tabular-nums text-text-subtle">{i + 1}</span>
-            {c.url ? <Stroke d='<path d="M7 17 17 7"/><path d="M8 7h9v9"/>' className="h-3.5 w-3.5 flex-none text-text-subtle" /> : null}
+            {url ? <Stroke d='<path d="M7 17 17 7"/><path d="M8 7h9v9"/>' className="h-3.5 w-3.5 flex-none text-text-subtle" /> : null}
           </>
         )
         const row = 'flex min-h-11 items-center gap-2 rounded-md px-1.5 outline-none desk:min-h-8 focus-visible:ring-2 focus-visible:ring-ring'
         const id = targetId(idPrefix, c.id)
         return (
           <li key={c.id} className="ds-cite-row">
-            {c.url ? (
-              <a id={id} href={c.url} target="_blank" rel="noreferrer noopener" className={cn(row, 'transition-colors hover:bg-bg-elev')}>
+            {url ? (
+              <a id={id} href={url} target="_blank" rel="noreferrer noopener" className={cn(row, 'transition-colors hover:bg-bg-elev')}>
                 {body}
               </a>
             ) : (

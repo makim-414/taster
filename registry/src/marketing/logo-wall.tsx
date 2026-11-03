@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Logo wall: a sentence-case caption and one row of customer or partner marks at one optical height, in
 // one ink, wrapping to two rows on phones. Marks come in as the supplied SVG or image files; until a file
@@ -63,7 +64,7 @@ export function LogoWall({ caption, items, more, pendingLabel = 'Logo file pendi
         {items.map((it) => (
           <li key={it.name} className="min-w-0">
             {it.href ? (
-              <a href={it.href} className="inline-flex min-h-11 items-center rounded-sm outline-none transition-opacity duration-press ease-out hover:opacity-70 focus-visible:ring-2 focus-visible:ring-ring">
+              <a href={safeHref(it.href)} className="inline-flex min-h-11 items-center rounded-sm outline-none transition-opacity duration-press ease-out hover:opacity-70 focus-visible:ring-2 focus-visible:ring-ring">
                 <Mark item={it} pendingLabel={pendingLabel} />
               </a>
             ) : (

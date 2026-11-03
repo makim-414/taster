@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Site header: the wordmark on the left, three to five primary links, a quiet sign-in link and one solid
 // action on the right. A link can open a text-led menu panel (a label and one line each, no icon tiles).
@@ -86,7 +87,7 @@ function MenuLink({ link }: { link: HeaderLink }) {
         <ul className="m-0 grid list-none p-0">
           {link.items?.map((it) => (
             <li key={it.href + it.label}>
-              <a href={it.href} className="block rounded-md px-3 py-3 outline-none transition-colors duration-press ease-out hover:bg-bg-sunken focus-visible:ring-2 focus-visible:ring-ring">
+              <a href={safeHref(it.href)} className="block rounded-md px-3 py-3 outline-none transition-colors duration-press ease-out hover:bg-bg-sunken focus-visible:ring-2 focus-visible:ring-ring">
                 <span className={cn('block text-sm font-medium text-text', KEEP)}>{it.label}</span>
                 {it.description ? <span className={cn('mt-0.5 block text-label text-text-muted', KEEP)}>{it.description}</span> : null}
               </a>
@@ -133,7 +134,7 @@ export function SiteHeader({
       {...props}
     >
       <div className="flex h-16 items-center gap-4">
-        <a href={brandHref} className="inline-flex h-11 shrink-0 items-center rounded-sm text-title font-semibold text-text outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <a href={safeHref(brandHref)} className="inline-flex h-11 shrink-0 items-center rounded-sm text-title font-semibold text-text outline-none focus-visible:ring-2 focus-visible:ring-ring">
           {brand}
         </a>
         <nav aria-label="Main" className="ml-4 hidden lg:block">
@@ -143,7 +144,7 @@ export function SiteHeader({
                 <MenuLink key={l.label} link={l} />
               ) : (
                 <li key={l.href + l.label}>
-                  <a href={l.href} aria-current={l.current ? 'page' : undefined} className={NAV_LINK}>
+                  <a href={safeHref(l.href)} aria-current={l.current ? 'page' : undefined} className={NAV_LINK}>
                     {l.label}
                   </a>
                 </li>
@@ -153,12 +154,12 @@ export function SiteHeader({
         </nav>
         <div className="ml-auto flex items-center gap-2">
           {signIn ? (
-            <a href={signIn.href} className={cn(NAV_LINK, 'hidden sm:inline-flex')}>
+            <a href={safeHref(signIn.href)} className={cn(NAV_LINK, 'hidden sm:inline-flex')}>
               {signIn.label}
             </a>
           ) : null}
           {action ? (
-            <a href={action.href} className={SOLID}>
+            <a href={safeHref(action.href)} className={SOLID}>
               {action.label}
             </a>
           ) : null}
@@ -204,7 +205,7 @@ export function SiteHeader({
             {links.map((l) => (
               <li key={l.href + l.label}>
                 <a
-                  href={l.href}
+                  href={safeHref(l.href)}
                   aria-current={l.current ? 'page' : undefined}
                   className={cn('flex min-h-12 items-center rounded-md px-3 text-title font-medium text-text-muted outline-none hover:text-text focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:text-text', KEEP)}
                 >
@@ -214,7 +215,7 @@ export function SiteHeader({
                   <ul className="m-0 mb-2 grid list-none p-0 pl-3">
                     {l.items.map((it) => (
                       <li key={it.href + it.label}>
-                        <a href={it.href} className={cn('flex min-h-11 items-center rounded-md px-3 text-body text-text-muted outline-none hover:text-text focus-visible:ring-2 focus-visible:ring-ring', KEEP)}>
+                        <a href={safeHref(it.href)} className={cn('flex min-h-11 items-center rounded-md px-3 text-body text-text-muted outline-none hover:text-text focus-visible:ring-2 focus-visible:ring-ring', KEEP)}>
                           {it.label}
                         </a>
                       </li>
@@ -227,7 +228,7 @@ export function SiteHeader({
         </nav>
         {signIn ? (
           <div className="border-t border-border p-4">
-            <a href={signIn.href} className="flex h-11 items-center justify-center rounded-md border border-border text-body font-medium text-text outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <a href={safeHref(signIn.href)} className="flex h-11 items-center justify-center rounded-md border border-border text-body font-medium text-text outline-none focus-visible:ring-2 focus-visible:ring-ring">
               {signIn.label}
             </a>
           </div>
