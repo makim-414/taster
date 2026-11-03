@@ -1,11 +1,16 @@
 {
   "version": "0.1.0",
+  "basis_kinds": {
+    "external": "Outside write-ups about generated pages name this trait. Each ref quotes, or sums up in a line marked summary, what the page says, with the date it was read.",
+    "standard": "A web standard or platform guide (W3C, WCAG, MDN, Apple) describes the problem. These rules are about screen quality, whoever or whatever made the page.",
+    "taster-observation": "Taster's own observation or threshold, written in the observation field. No outside source backs that part yet."
+  },
   "rules": [
     {
       "id": "AC-01",
       "name": "All-caps label with wide letter spacing",
       "what": "Small labels above headings, scroll hints and section heads set in capitals with the letters pushed apart.",
-      "why": "The single most common decoration in generated landing pages. It signals 'premium' while carrying no information. Seen again and again in our own work.",
+      "why": "One of the commonest tells of a generated page. It signals 'premium' while carrying no information.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with its own text, not inside nav, where text-transform is uppercase (or the Latin text has no lowercase letters) and computed letter-spacing is at least 0.05em.",
@@ -30,34 +35,47 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": [
         {
           "label": "Anthropic frontend-design skill",
-          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
-        },
-        {
-          "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "supports": "a tracked-out ALL-CAPS eyebrow label above every heading",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
-        },
-        {
-          "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "a tiny uppercase, letter-spaced label above the hero headline",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "The same tiny uppercase label repeated above every section heading",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Solo Design, AI design slop tells",
-          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/",
+          "supports": "The uppercase label with a dot in front",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Hallmark",
-          "url": "https://github.com/Nutlope/hallmark"
+          "url": "https://github.com/Nutlope/hallmark",
+          "supports": "the eyebrow above every heading, tracked-capital labels",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "Eyebrow / kicker: tiny tracked uppercase label above every heading",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -65,7 +83,7 @@
       "id": "AC-02",
       "name": "Em dash or en dash in interface text",
       "what": "Long dashes between clauses, or labels shaped like 'WORD, dash, explanation'.",
-      "why": "A signature of generated prose. In interface labels it reads as template chrome. Seen again and again in our own work.",
+      "why": "A signature of generated prose. In interface labels it reads as template chrome.",
       "detect": {
         "level": "deterministic",
         "signal": "Visible text nodes containing U+2014 or U+2013. An en dash between two digits is ignored as a legitimate range. Headings, labels and buttons weigh more than body prose.",
@@ -95,22 +113,37 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": [
         {
           "label": "Anthropic frontend-design skill",
-          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "supports": "Lists labels built as a word, a spaced em dash and a fragment among the template chrome of generated pages.",
+          "summary": true,
+          "accessed": "2026-11-03"
         },
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "A dash in every sentence is a familiar AI writing habit.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "Em dash habit",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/petergyang/no-ai-slop"
         },
         {
           "label": "taste-skill",
-          "url": "https://github.com/Leonxlnx/taste-skill"
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "more than a handful of em dashes",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -118,7 +151,7 @@
       "id": "AC-03",
       "name": "Emoji as icons or bullets",
       "what": "Emoji and pictographs used for feature icons, headings, bullets and labels.",
-      "why": "It shows no icon decision was made, and emoji render differently on every platform, which breaks the tone. Seen again and again in our own work.",
+      "why": "It shows no icon decision was made, and emoji render differently on every platform, which breaks the tone.",
       "detect": {
         "level": "deterministic",
         "signal": "Visible text containing Unicode Extended_Pictographic or Dingbats characters. Copyright, registered and trademark signs are ignored, as is text inside user content areas (editable regions, textareas).",
@@ -139,26 +172,42 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": [
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "an emoji on every heading, button, and bullet",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "Emoji on headings and bullets",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/petergyang/no-ai-slop"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "standing in for designed icons in feature cards and headings",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "Sidebar or nav with emoji icons",
+          "accessed": "2026-11-03"
         },
         {
           "label": "taste-skill",
-          "url": "https://github.com/Leonxlnx/taste-skill"
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "Emoji as icons or bullets",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -166,7 +215,7 @@
       "id": "AC-04",
       "name": "Tinted pill badge",
       "what": "A short label in a fully rounded capsule with a pale colored fill and text in the same hue.",
-      "why": "Component kits ship it as the default status chip, so generated pages scatter it everywhere, often in four or five hues at once. Seen again and again in our own work.",
+      "why": "Generated pages scatter decorative pills everywhere, and once there are many of them no badge means anything.",
       "detect": {
         "level": "deterministic",
         "signal": "border-radius at least half the height, background a chromatic color with alpha 0.05 to 0.3 or a pale tint (lightness 85% or more), text color within 40 degrees of the background hue, one to three words.",
@@ -199,13 +248,25 @@
       ],
       "severity": "high",
       "korean": false,
-      "refs": []
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work, often in four or five hues on one page.",
+      "refs": [
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "in bulk each stops meaning anything",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "AC-05",
       "name": "Colored outline pill badge",
       "what": "The same capsule label, now with a transparent fill and a saturated colored border.",
-      "why": "It is the tinted pill with the fill removed. Swapping one for the other does not remove the habit. Seen again and again in our own work.",
+      "why": "It is the tinted pill with the fill removed. Swapping one for the other does not remove the habit.",
       "detect": {
         "level": "deterministic",
         "signal": "border-radius at least half the height, transparent background, a border of at least 1px with saturation of 30% or more, one to three words. Buttons and inputs are excluded.",
@@ -232,13 +293,17 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": []
     },
     {
       "id": "AC-06",
       "name": "Tinted notice band",
       "what": "A full-width notice or warning box laid on a pale yellow or blue fill.",
-      "why": "A template habit that solves information order with a colored surface. Seen again and again in our own work.",
+      "why": "A template habit that solves information order with a colored surface.",
       "detect": {
         "level": "deterministic",
         "signal": "Block at least 80% as wide as its parent, chromatic tinted background, height under 160px, containing an icon (svg, img or icon element) and text.",
@@ -265,13 +330,25 @@
       ],
       "severity": "medium",
       "korean": false,
-      "refs": []
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
+      "refs": [
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "a status or alert where the border, text, and background are all one hue",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "AC-07",
       "name": "Orange 'processing' pill with a glow",
       "what": "A progress state shown as an orange pill with a soft glow around it.",
-      "why": "Decorating the state makes it look like a warning. Seen again and again in our own work.",
+      "why": "Decorating the state makes it look like a warning.",
       "detect": {
         "level": "deterministic",
         "signal": "A tinted pill (the AC-04 conditions) with hue 20 to 50 degrees and a colored box-shadow whose blur is 8px or more.",
@@ -299,13 +376,17 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": []
     },
     {
       "id": "AC-08",
       "name": "Colored status dot",
       "what": "A small colored circle placed in front of a label to mean 'live', 'active' or 'online'.",
-      "why": "A stock dashboard ornament. Color alone carries the meaning, which also fails color-blind readers. Seen again and again in our own work.",
+      "why": "A stock dashboard ornament. Color alone carries the meaning, which also fails color-blind readers.",
       "detect": {
         "level": "deterministic",
         "signal": "Element 4 to 12px square with fully rounded corners, an opaque chromatic background, no text, followed by text. Not flagged when the dot is flat and still and its color is the page's own success or failure token (--success, --danger, --destructive, --error, --delta-up, --delta-down, --positive, --negative on :root). A running animation or a colored box-shadow is always flagged and raises the weight.",
@@ -333,18 +414,37 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external",
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "A pulsing status dot draws attention even when nothing changes.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "a status indicator (online / ready / live) drawn as a solid dot",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "The glowing status dot",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
+        },
+        {
+          "label": "WCAG 2.2, 1.4.1 Use of Color",
+          "url": "https://www.w3.org/TR/WCAG22/#use-of-color",
+          "supports": "Color is not used as the only visual means of conveying information",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -352,7 +452,7 @@
       "id": "AC-09",
       "name": "Monospace font for interface labels",
       "what": "Labels, numbers and small headings set in a monospace face outside of code.",
-      "why": "Borrowed 'developer' flavor. It lowers readability and has nothing to do with the content. Seen again and again in our own work.",
+      "why": "Borrowed 'developer' flavor. It lowers readability and has nothing to do with the content.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with its own text outside code, pre, kbd, samp and var, and outside fields and code editors (textarea, input, contenteditable regions, role=textbox, and CodeMirror, Monaco and Ace containers), whose first available family in the computed stack is monospace. Short texts (labels, captions, numbers) matter most.",
@@ -394,18 +494,23 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": [
         {
           "label": "Anthropic frontend-design skill",
-          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "supports": "a monospace face for small data labels",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
-        },
-        {
-          "label": "Solo Design, AI design slop tells",
-          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Body copy or ordinary labels set in a code font for hacker atmosphere",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -413,7 +518,7 @@
       "id": "AC-10",
       "name": "Thick colored accent bar on one edge of a card",
       "what": "A card or callout with a heavy colored stripe down its left side.",
-      "why": "One of the most repeated generated layouts. The bar adds a color without adding order. Seen again and again in our own work.",
+      "why": "Outside catalogs rate it one of the surest signs of a generated layout. The bar adds a color without adding order.",
       "detect": {
         "level": "deterministic",
         "signal": "border-left-width (or top) of at least 2px and thicker than every other side, a saturated color (30% or more), and the element has a background or a radius. blockquote gets lower weight.",
@@ -443,26 +548,42 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "A thick colored stripe turns an ordinary card into something that looks like an alert.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "a pale rounded box with a 4px colored bar down the left",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "Cards with a colored left border",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "colored left borders are almost as reliable a sign of AI-generated design as em-dashes",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "A three or four pixel colored border on one side of an ordinary card",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -470,7 +591,7 @@
       "id": "AC-11",
       "name": "Glyph inside a filled circle",
       "what": "A white check inside a green circle, or an icon on a colored or gray disc.",
-      "why": "A template part used to dress up check lists and feature lists. Seen again and again in our own work.",
+      "why": "A template part used to dress up check lists and feature lists.",
       "detect": {
         "level": "deterministic",
         "signal": "Non-interactive element 16 to 48px square with fully rounded corners and a filled background, whose only child is one svg or a single non-alphanumeric character.",
@@ -504,13 +625,17 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": []
     },
     {
       "id": "AC-12",
       "name": "Heavy contact form in the middle of a landing page",
       "what": "A large form with name, company, phone and message fields placed mid page or at the end of a landing page.",
-      "why": "It fills the ending when there is nothing else to say. Seen again and again in our own work.",
+      "why": "It fills the ending when there is nothing else to say.",
       "detect": {
         "level": "heuristic",
         "signal": "A form with three or more text inputs plus a textarea on a page whose URL and title do not look like a contact page. Whether the form is really operated cannot be judged from the page.",
@@ -531,13 +656,17 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": []
     },
     {
       "id": "AC-13",
       "name": "Rainbow charts",
       "what": "Every chart series in a different saturated color, bars filled red, yellow and green.",
-      "why": "When every value gets its own color, nothing reads as important. Seen again and again in our own work.",
+      "why": "When every value gets its own color, nothing reads as important.",
       "detect": {
         "level": "heuristic",
         "signal": "Inside an svg of at least 150 by 80px, the shapes whose fill or stroke is saturated (40% or more) cover four or more 30 degree hue buckets. Canvas charts need pixel sampling and are not covered.",
@@ -564,13 +693,17 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": []
     },
     {
       "id": "AC-14",
       "name": "Flat gray card with a hairline border, everywhere",
       "what": "White or gray cards with a 1px gray border and the same radius fill the whole screen.",
-      "why": "It is the default of popular component kits, so the product looks like an app you have seen before. Seen again and again in our own work.",
+      "why": "It is the default of popular component kits, so the product looks like an app you have seen before.",
       "detect": {
         "level": "heuristic",
         "signal": "Boxes of at least 120 by 60px with an opaque near-white or light gray background (lightness 95% or more), a 1px neutral border on all sides, no box-shadow and radius 6 to 12px. Fires only when four or more exist, because human-made sites use them too. Read together with CMP-04.",
@@ -601,13 +734,25 @@
       ],
       "severity": "low",
       "korean": false,
-      "refs": []
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "components that look exactly like the documentation examples",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "AC-15",
       "name": "Browser or system default font left as is",
       "what": "Headings and body rendered in whatever the browser or the operating system picks.",
-      "why": "It shows nobody chose a typeface. It also renders differently on every machine. Seen again and again in our own work.",
+      "why": "It shows nobody chose a typeface. It also renders differently on every machine.",
       "detect": {
         "level": "deterministic",
         "signal": "The rendered font of h1 to h3 and of body (the first available family in the stack, checked against loaded FontFaces and measured installation) is a browser default serif or sans-serif, or a system-ui alias.",
@@ -640,13 +785,31 @@
       ],
       "severity": "high",
       "korean": false,
-      "refs": []
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
+      "refs": [
+        {
+          "label": "prg.sh, why AI keeps building the same purple gradient",
+          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website",
+          "supports": "Overused font families (Inter, Roboto, Arial, system fonts)",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Inter (or a system sans) as the only typeface on the page",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "AC-16",
       "name": "Ghost button as the main call to action",
       "what": "The first and most important button on the page is only an outline with no fill.",
-      "why": "It looks refined in a mockup and gets lost on the page. The primary action stops reading as primary. Seen again and again in our own work.",
+      "why": "It looks refined in a mockup and gets lost on the page. The primary action stops reading as primary.",
       "detect": {
         "level": "deterministic",
         "signal": "The first button-like control in the first screen (outside nav) has a transparent background and a visible border.",
@@ -668,13 +831,17 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": []
     },
     {
       "id": "AC-17",
       "name": "Drawn mockup instead of the real thing",
       "what": "CSS shapes or a hand-drawn fake screen where a product photo or a real screenshot belongs.",
-      "why": "It reads like a slide deck, and anyone can tell it is not the product. Seen again and again in our own work.",
+      "why": "It reads like a slide deck, and anyone can tell it is not the product.",
       "detect": {
         "level": "heuristic",
         "signal": "No img, video, canvas, picture, iframe or large background image in the first screen, and an element of at least 240 by 140px that holds six or more text-less decorative boxes nested three levels deep. Illustration-led sites are hard to separate.",
@@ -700,13 +867,25 @@
       ],
       "severity": "medium",
       "korean": false,
-      "refs": []
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
+      "refs": [
+        {
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "Fake dashboard hero built from grey bars and donut charts",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "AC-18",
       "name": "Logo or wordmark redrawn, font swapped",
       "what": "A supplied logo redrawn as similar shapes, or a wordmark retyped in a system font.",
-      "why": "When an agent rebuilds an asset from its own understanding, shading and proportions are lost and it shows at once. Seen again and again in our own work.",
+      "why": "When an agent rebuilds an asset from its own understanding, shading and proportions are lost and it shows at once.",
       "detect": {
         "level": "manual",
         "signal": "Needs the original asset for comparison, so it cannot be measured on an arbitrary site. It is a rule for the generation process.",
@@ -719,13 +898,25 @@
       ],
       "severity": "medium",
       "korean": false,
-      "refs": []
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
+      "refs": [
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "Vector art the machine can't really draw, used as the product's mark",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "AC-19",
       "name": "Generated photo look",
       "what": "Golden hour light, glossy skin, bright and saturated generated photos.",
-      "why": "It is the average of generated imagery, so it reads as AI at a glance. Seen again and again in our own work.",
+      "why": "It is the average of generated imagery, so it reads as AI at a glance.",
       "detect": {
         "level": "manual",
         "signal": "Needs an image classifier. It cannot be measured from CSS or DOM.",
@@ -740,7 +931,19 @@
       ],
       "severity": "medium",
       "korean": false,
-      "refs": []
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Vivid sky, vivid foliage, glowing skin, no dull or dead zones anywhere.",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "COL-01",
@@ -776,42 +979,65 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "Purple gradients and bright cyan on dark backgrounds are familiar AI defaults.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Indigo-to-violet hero washes and gradient buttons",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "It's the factory setting of Tailwind demos and template galleries",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "Indigo-to-violet gradient",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "VibeCode Purple",
+          "accessed": "2026-11-03"
         },
         {
           "label": "slop-detect",
-          "url": "https://slop-detect.com"
+          "url": "https://slop-detect.com/",
+          "supports": "VibeCode purple CTA",
+          "accessed": "2026-11-03",
+          "derived_from": "https://www.adriankrebs.ch/blog/design-slop/"
         },
         {
           "label": "925 Studios, AI slop design tells",
-          "url": "https://www.925studios.co/blog/ai-slop-design-tells"
+          "url": "https://www.925studios.co/blog/ai-slop-design-tells",
+          "supports": "The blue-to-purple gradient is the single loudest AI tell in 2026.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "taste-skill",
-          "url": "https://github.com/Leonxlnx/taste-skill"
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "Violet / indigo gradients on hero, buttons and glows",
+          "accessed": "2026-11-03"
         },
         {
           "label": "prg.sh, why AI keeps building the same purple gradient",
-          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website"
+          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website",
+          "supports": "Purple/indigo accent colors",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -850,22 +1076,39 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Anthropic frontend-design skill",
-          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "supports": "a warm cream background (near #F4F1EA) with a high-contrast serif display",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "The second-wave default that appeared after purple gradients became a public joke.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Solo Design, AI design slop tells",
-          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/",
+          "supports": "The amber-and-cream wash that signals \"tasteful AI startup.\"",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "Coverage of the Claude design aesthetic",
-          "url": "https://letsdatascience.com/news/anthropics-claude-design-shapes-new-design-aesthetic-aaf43749"
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "Yellow-cream ground + terracotta / rust / clay accent",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "Paul Bakaus, Impeccable 3.5 launch post",
+          "url": "https://x.com/pbakaus/status/2060208540992880794",
+          "supports": "74% of pages used the cream AI-default background",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -896,30 +1139,40 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "Glowing borders and accents can turn a dark interface into a wall of neon.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Cyan, violet, or pink accents on near-black backgrounds",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Anthropic frontend-design skill",
-          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "supports": "a near-black background with a single bright acid-green or vermilion accent",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Solo Design, AI design slop tells",
-          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/",
+          "supports": "A dark bento, a bright accent, and a colored glow behind the hero card",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
-        },
-        {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "Glow-lit premium dark mode",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         }
       ]
     },
@@ -952,26 +1205,34 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "A gradient makes color change across a heading or number, often just for decoration.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Gradient fill clipped to headings and to big metric numbers, carrying no meaning.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "background-clip:text rainbow fills on headings",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
-        },
-        {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "Gradient headline text",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         }
       ]
     },
@@ -1005,14 +1266,21 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "When a prompt bans purple, models cascade to emerald (#10B981) as the next safe accent",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Solo Design, AI design slop tells",
-          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
+          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/",
+          "supports": "Ban indigo and the model doesn't go neutral. It goes emerald green",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1047,18 +1315,22 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
-          "label": "Solo Design, AI design slop tells",
-          "url": "https://solodesign.cc/blog/ai-design-slop-the-tells/"
-        },
-        {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "Default rainbow of tinted boxes",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "A bowl of default rainbow candy where every box shouts a different colour.",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1066,7 +1338,7 @@
       "id": "COL-07",
       "name": "Large colored glow shadow",
       "what": "Wide, soft shadows tinted with the accent color around buttons and cards.",
-      "why": "It imitates light that is not there and makes every element compete for attention. Seen again and again in our own work.",
+      "why": "It imitates light that is not there and makes every element compete for attention.",
       "detect": {
         "level": "deterministic",
         "signal": "box-shadow with blur of 24px or more and a shadow color with saturation of 40% or more (not gray or black). Shadows with color alpha under 0.15 are ignored.",
@@ -1088,14 +1360,23 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": [
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "Large colored glows and colored box-shadows",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "colored box-shadow glows used as dark-mode accents",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1103,7 +1384,7 @@
       "id": "TYP-01",
       "name": "Inter everywhere",
       "what": "Every heading and every paragraph set in Inter.",
-      "why": "Inter is a fine typeface and the default of most starters. Using it for everything is the absence of a type decision.",
+      "why": "Inter is a fine typeface and the default of many starters. Using it for everything is the absence of a type decision.",
       "detect": {
         "level": "deterministic",
         "signal": "The rendered font (document.fonts load result plus first available family) of h1 to h3 and of body text is Inter.",
@@ -1123,34 +1404,52 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "Familiar defaults such as Inter and Geist can make unrelated products look alike.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "the configured default of the Tailwind and shadcn stack",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "Every AI-built page draws from the same five faces.",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "Inter used for everything",
+          "accessed": "2026-11-03"
         },
         {
           "label": "slop-detect",
-          "url": "https://slop-detect.com"
+          "url": "https://slop-detect.com/",
+          "supports": "Inter / Geist font stack",
+          "accessed": "2026-11-03",
+          "derived_from": "https://www.adriankrebs.ch/blog/design-slop/"
         },
         {
           "label": "925 Studios, AI slop design tells",
-          "url": "https://www.925studios.co/blog/ai-slop-design-tells"
+          "url": "https://www.925studios.co/blog/ai-slop-design-tells",
+          "supports": "When a model picks a font with no brand direction, it picks Inter",
+          "accessed": "2026-11-03"
         },
         {
           "label": "prg.sh, why AI keeps building the same purple gradient",
-          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website"
+          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website",
+          "supports": "Inter or Roboto font (never anything with personality)",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1189,18 +1488,21 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "LLM tend to use certain font combos like Space Grotesk, Instrument Serif and Geist",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
-        },
-        {
-          "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Space Grotesk is the reach when the model or the user tries to escape Inter",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1208,7 +1510,7 @@
       "id": "TYP-03",
       "name": "One italic serif word in the headline",
       "what": "One word inside a sans-serif headline switched to an italic serif or a different color.",
-      "why": "A cliche that imitates editorial taste. It appears in nearly every generated hero.",
+      "why": "A cliche that imitates editorial taste. Outside catalogs count it among the commonest tells of a generated headline.",
       "detect": {
         "level": "deterministic",
         "signal": "A child of h1 or h2 that differs from its parent in font family, italic style or color, and whose text is under 40% of the heading length.",
@@ -1234,26 +1536,40 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Anthropic frontend-design skill",
-          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "supports": "Accenting just a single word or phrase in a headline",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "Serif italic for one accent word in an otherwise-Inter hero",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "One word in serif italic",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "the most viral AI headline tic",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "a single serif-italic accent word dropped inside a sans headline",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1283,18 +1599,28 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "a whole marketing sentence set at display size",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "A whole sentence at display size",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "A long headline at display size can fill the first screen by itself.",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1326,14 +1652,33 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "Letters pushed too close together become hard to distinguish.",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "Paul Bakaus, letter-spacing measurement",
-          "url": "https://x.com/pbakaus/status/2060208540992880794"
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "letter spacing crushed on display type",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "sets the whole pitch huge and crushes the tracking",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "Paul Bakaus, Impeccable 3.5 launch post",
+          "url": "https://x.com/pbakaus/status/2060208540992880794",
+          "supports": "76% reached for extreme letter-spacing",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1341,7 +1686,7 @@
       "id": "LAY-01",
       "name": "The centered hero formula",
       "what": "Centered headline, a pill badge above it, two buttons below.",
-      "why": "Every builder opens with the same sequence, so the first screen reads as a template.",
+      "why": "Generated pages open with the same sequence, so the first screen reads as a template.",
       "detect": {
         "level": "heuristic",
         "signal": "In the first screen, a centered h1 that has a pill-shaped short text element before it and two or more button-like controls after it inside the same container. Thresholds need tuning because it judges composition.",
@@ -1363,26 +1708,40 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "Centered hero set in a generic sans",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
-        },
-        {
-          "label": "slop-detect",
-          "url": "https://slop-detect.com"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Centered stack: badge, a full sentence set at 64 pixels or larger",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "a pill that says \"Now in beta\" above a centered headline",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
           "label": "prg.sh, why AI keeps building the same purple gradient",
-          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website"
+          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website",
+          "supports": "Hero section with centered text and a CTA button",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "Centred headline, subtitle, two buttons, screenshot below",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1420,30 +1779,47 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Exactly three equal cards below the hero, each with an icon on top",
+          "accessed": "2026-11-03"
         },
         {
           "label": "slop-detect",
-          "url": "https://slop-detect.com"
+          "url": "https://slop-detect.com/",
+          "supports": "3-up icon card grid",
+          "accessed": "2026-11-03",
+          "derived_from": "https://www.adriankrebs.ch/blog/design-slop/"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "The three-card feature grid",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
           "label": "925 Studios, AI slop design tells",
-          "url": "https://www.925studios.co/blog/ai-slop-design-tells"
+          "url": "https://www.925studios.co/blog/ai-slop-design-tells",
+          "supports": "a row of three feature cards, rounded corners, soft shadow",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "Identical feature cards, each with an icon on top",
+          "accessed": "2026-11-03"
         },
         {
           "label": "prg.sh, why AI keeps building the same purple gradient",
-          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website"
+          "url": "https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website",
+          "supports": "Three features in boxes below, each with an icon",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1451,7 +1827,7 @@
       "id": "LAY-03",
       "name": "01 / 02 / 03 section numbers",
       "what": "Small zero-padded numbers stamped above each section or step.",
-      "why": "Numbering implies a sequence. On most landing pages there is none, so the numbers are decoration.",
+      "why": "Numbering implies a sequence. Feature sections have none, so the numbers are decoration.",
       "detect": {
         "level": "deterministic",
         "signal": "Two or more small text elements (font-size 24px or less) whose whole text matches ^0[1-9]\\.?$.",
@@ -1474,26 +1850,34 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Anthropic frontend-design skill",
-          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "supports": "Many generic designs use numbered markers (01 / 02 / 03)",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "a giant faint ordinal beside every marketing section",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "01 / 02 / 03 section markers",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
-        },
-        {
-          "label": "taste-skill",
-          "url": "https://github.com/Leonxlnx/taste-skill"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Two-digit display numbers as section labels",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1528,14 +1912,21 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "The full skeleton in fixed order: hero, logo wall, three-card features",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "Stock section order: hero, logos, features, testimonial, pricing, CTA",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1565,22 +1956,22 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "An asymmetric boxed grid, often dark with accent-colored tiles.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
-        },
-        {
-          "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
-        },
-        {
-          "label": "Slopdar",
-          "url": "https://slopdar.com"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "Bento grid of tinted tiles",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         }
       ]
     },
@@ -1610,18 +2001,27 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "Equal gaps everywhere make it hard to tell what belongs together.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "one spacing value stamped across the page",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "One spacing value everywhere, identical section padding top to bottom",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1629,7 +2029,7 @@
       "id": "CMP-01",
       "name": "Announcement pill above the headline",
       "what": "A rounded 'New: something' chip sitting right above the hero headline.",
-      "why": "Copied from a handful of startup sites until it became the default hero opener, usually with nothing new to announce.",
+      "why": "The default hero opener of generated pages, usually with nothing new to announce.",
       "detect": {
         "level": "deterministic",
         "signal": "Just before the first h1 (previous sibling, or a sibling of its parent), a short text element whose radius is at least half its height.",
@@ -1647,22 +2047,41 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "A small pill above the headline can look clickable and compete with the message.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "slop-detect",
-          "url": "https://slop-detect.com"
+          "url": "https://slop-detect.com/",
+          "supports": "Eyebrow launch pill",
+          "accessed": "2026-11-03",
+          "derived_from": "https://www.adriankrebs.ch/blog/design-slop/"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "The announcement pill",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "Badge right above the hero H1",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "emit it whether or not there is anything to announce",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1699,22 +2118,34 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "Cards inside cards create visual noise and excessive depth.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "a bordered, rounded, shadowed card holding another card holding another",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "Cards inside cards",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Every content block boxed, then boxes nested inside boxes",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1722,7 +2153,7 @@
       "id": "CMP-03",
       "name": "Rounded square icon tile",
       "what": "A pale colored rounded square above a heading with a same-colored icon inside.",
-      "why": "The default 'decoration box' for icons. It nearly always comes with three cards in a row.",
+      "why": "The default 'decoration box' for icons, usually tiled into a row of feature cards.",
       "detect": {
         "level": "deterministic",
         "signal": "Square 32 to 64px, radius 6 to 16px, chromatic tinted background, a single svg child, and the next sibling is a heading.",
@@ -1751,22 +2182,34 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "An icon in a rounded square above a heading is a familiar AI feature-card pattern.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "every feature gets a rounded-square chip + a line icon",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "Rounded-square icon tiles",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/yetone/kill-ai-slop"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "A small rounded-square icon container above a heading",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1802,18 +2245,27 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Anthropic frontend-design skill",
-          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "supports": "one border-radius on everything regardless of hierarchy, the same soft grey shadow",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "One large border radius (16 to 24 pixels) applied to every card",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "Soft grey drop shadow under every card",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1849,26 +2301,40 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "Blur effects, glass cards, and glow borders used as decoration",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Frosted-glass blur on cards, modals, and navs where there is no layering problem to solve",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "Glassmorphism",
+          "accessed": "2026-11-03"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "every card a translucent backdrop-blur pane",
+          "accessed": "2026-11-03"
         },
         {
           "label": "slop-detect",
-          "url": "https://slop-detect.com"
+          "url": "https://slop-detect.com/",
+          "supports": "glassmorphic cards generated pages converge on",
+          "accessed": "2026-11-03",
+          "derived_from": "https://www.adriankrebs.ch/blog/design-slop/"
         }
       ]
     },
@@ -1904,22 +2370,34 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "three big numbers in a row: 10k+ developers, 99.9% uptime, 24/7 support",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "The invented stat row",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/petergyang/no-ai-slop"
         },
         {
-          "label": "Adrian Krebs, design slop",
-          "url": "https://adriankrebs.ch/blog/design-slop/"
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "Stat banner rows",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "the tell sharpens when the numbers are invented",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1952,18 +2430,15 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
-        },
-        {
-          "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
-        },
-        {
-          "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "A code-window mockup with three macOS traffic-light dots as the hero visual",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -1989,14 +2464,21 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "some shipped pages carry fully hallucinated logo sets",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "Invented social proof: logos, quotes, star rows",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2004,7 +2486,7 @@
       "id": "CMP-09",
       "name": "Three pricing tiers with the middle one raised",
       "what": "Three price cards where only the middle one gets a colored border, a badge or a scale up.",
-      "why": "The same scene in every SaaS template.",
+      "why": "The stock pricing scene of SaaS templates.",
       "detect": {
         "level": "deterministic",
         "signal": "Three sibling cards with a currency amount where only the middle one differs in border color, scale or badge text.",
@@ -2027,14 +2509,15 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
-        },
-        {
-          "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Three tiers, \"Most Popular\" badge on the middle one",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2063,10 +2546,15 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Hallmark",
-          "url": "https://github.com/Nutlope/hallmark"
+          "url": "https://github.com/Nutlope/hallmark",
+          "supports": "an email sign-up at the end of every page, a form that says thanks",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2098,14 +2586,22 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "slop-detect",
-          "url": "https://slop-detect.com"
+          "url": "https://slop-detect.com/",
+          "supports": "Perma-dark + grey body",
+          "accessed": "2026-11-03",
+          "derived_from": "https://www.adriankrebs.ch/blog/design-slop/"
         },
         {
           "label": "css-slop-detector",
-          "url": "https://github.com/hahahahahahahahah6/css-slop-detector"
+          "url": "https://github.com/hahahahahahahahah6/css-slop-detector",
+          "supports": "pure-black dark mode with no light toggle",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2137,18 +2633,28 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "A bright halo on a dark page is a familiar AI background effect.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "slop-detect",
-          "url": "https://slop-detect.com"
+          "url": "https://slop-detect.com/",
+          "supports": "Aurora mesh blob",
+          "accessed": "2026-11-03",
+          "derived_from": "https://www.adriankrebs.ch/blog/design-slop/"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Abstract purple or violet gradient blobs floating behind the hero",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2178,14 +2684,15 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
-        },
-        {
-          "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "Sparkles for AI, Zap for fast, Shield for secure",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2221,6 +2728,10 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "No outside source on file yet; this is Taster's own rule.",
       "refs": []
     },
     {
@@ -2251,13 +2762,17 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "No outside source on file yet; this is Taster's own rule.",
       "refs": []
     },
     {
       "id": "ICO-04",
       "name": "An icon on every card",
       "what": "Each card or item in a group of three or more opens with a decorative icon above its heading and description.",
-      "why": "The icon is there because the slot looked empty, not because it says something. It is the most common way generated pages fill feature sections.",
+      "why": "The icon is there because the slot looked empty, not because it says something.",
       "detect": {
         "level": "deterministic",
         "signal": "Three or more siblings outside nav, header and footer, each containing a heading and a description of four words or more, where the first visible element is an icon (svg, icon font or image up to 48px) that is decorative (not inside a control, no accessible name, empty alt) and comes before the heading.",
@@ -2278,7 +2793,23 @@
       ],
       "severity": "medium",
       "korean": false,
-      "refs": []
+      "basis": [
+        "external"
+      ],
+      "refs": [
+        {
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "the universal AI feature-card template",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "the icons rarely relate to the content, they just fill the grid",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "MOT-01",
@@ -2310,18 +2841,27 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
           "label": "Anthropic frontend-design skill",
-          "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design"
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "supports": "fade-and-slide-up entrances on each section and hover transitions on every card are the generic default",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "A dialog that bounces or overshoots can make a routine action feel fussy.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Signs of AI design",
-          "url": "https://github.com/febbhav/signs-of-ai-design"
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "on every section, scroll-triggered, with a uniform stagger",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2329,7 +2869,7 @@
       "id": "CPY-01",
       "name": "Generated copy voice",
       "what": "Weightless parallel lines like 'Build faster, ship smarter' and 'not X, but Y' constructions.",
-      "why": "A sentence that fits any product says nothing. Seen again and again in our own work.",
+      "why": "A sentence that fits any product says nothing.",
       "detect": {
         "level": "heuristic",
         "signal": "A list of stock phrases can produce candidates, but judging needs meaning. Separate lists per language are required. detect.js reports candidates only.",
@@ -2354,22 +2894,36 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": [
         {
           "label": "925 Studios, AI slop design tells",
-          "url": "https://www.925studios.co/blog/ai-slop-design-tells"
+          "url": "https://www.925studios.co/blog/ai-slop-design-tells",
+          "supports": "weightless headline copy (\"Build faster. Ship smarter.\")",
+          "accessed": "2026-11-03"
         },
         {
           "label": "Impeccable slop catalog",
-          "url": "https://impeccable.style/slop"
+          "url": "https://impeccable.style/slop/",
+          "supports": "Repeated lines like \"Not a feature. A platform.\" make every point sound like a slogan.",
+          "accessed": "2026-11-03"
         },
         {
           "label": "AI Slop Detector by Made with Jev",
-          "url": "https://madewithjev.com/free-tools/ai-slop-detector"
+          "url": "https://madewithjev.com/free-tools/ai-slop-detector",
+          "supports": "The AI copywriting voice",
+          "accessed": "2026-11-03",
+          "derived_from": "https://github.com/petergyang/no-ai-slop"
         },
         {
           "label": "kill-ai-slop",
-          "url": "https://github.com/yetone/kill-ai-slop"
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "A rhythmic fingerprint: symmetrical, one notch too excited, specifics-free.",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2377,7 +2931,7 @@
       "id": "KO-01",
       "name": "Korean words broken mid-word",
       "what": "Korean lines that wrap in the middle of a word because word-break was left at the default.",
-      "why": "Browsers may break between any two Hangul syllables. Lines that split a word read as careless to every Korean reader. Seen again and again in our own work.",
+      "why": "Unless word-break: keep-all is set, browsers may break Korean between any two syllables, so a word can end one line and start the next. Korean typesetting allows both syllable and word breaking; on screens Taster asks for whole words.",
       "detect": {
         "level": "deterministic",
         "signal": "Element whose text is at least 50% Hangul, with word-break other than keep-all, where a Range measurement shows a line ending between two Hangul syllables of the same word.",
@@ -2402,10 +2956,23 @@
       ],
       "severity": "high",
       "korean": true,
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work, and a split word reads as careless to Korean readers.",
       "refs": [
         {
-          "label": "MDN: word-break",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/word-break"
+          "label": "MDN, word-break",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/word-break",
+          "supports": "Word breaks should not be used for Chinese/Japanese/Korean (CJK) text.",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "W3C Requirements for Hangul Text Layout",
+          "url": "https://www.w3.org/TR/klreq/",
+          "supports": "line breaking is done on character or word basis",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2413,7 +2980,7 @@
       "id": "KO-02",
       "name": "Only a Latin font declared for Korean text",
       "what": "The font stack lists only Latin faces, so Hangul falls back to the operating system font.",
-      "why": "Mac and Windows render different Korean faces, and Latin and Hangul weights and sizes stop matching. A trace of an English default left as is. Seen again and again in our own work.",
+      "why": "Mac and Windows render different Korean faces, and Latin and Hangul weights and sizes stop matching. A trace of an English default left as is.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with Hangul text whose font stack has at least one named family but none of them is a known Korean font or measures as Hangul-capable (checked with loaded FontFaces and a canvas width test).",
@@ -2439,13 +3006,17 @@
       ],
       "severity": "high",
       "korean": true,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": []
     },
     {
       "id": "KO-03",
       "name": "Tight line height on Korean text",
       "what": "Korean paragraphs set with the line height tuned for Latin text.",
-      "why": "Hangul is dense and square. A line height that suits English makes Korean paragraphs feel cramped. Seen again and again in our own work.",
+      "why": "Hangul is dense and square, and a line height that suits English makes Korean paragraphs feel cramped. The 1.5 floor is Taster's own threshold.",
       "detect": {
         "level": "deterministic",
         "signal": "Body-like element (not a heading, font-size 28px or less) with at least 50% Hangul and two or more lines whose line-height divided by font-size is under 1.5.",
@@ -2468,12 +3039,11 @@
       ],
       "severity": "high",
       "korean": true,
-      "refs": [
-        {
-          "label": "W3C Requirements for Hangul Text Layout",
-          "url": "https://www.w3.org/TR/klreq/"
-        }
-      ]
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
+      "refs": []
     },
     {
       "id": "KO-04",
@@ -2497,10 +3067,17 @@
       ],
       "severity": "medium",
       "korean": true,
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "Reading it as a Latin template translated without review is Taster's own inference.",
       "refs": [
         {
-          "label": "MDN: text-transform",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform"
+          "label": "W3C Requirements for Hangul Text Layout",
+          "url": "https://www.w3.org/TR/klreq/",
+          "supports": "There is no uppercase/lowercase distinction in Korean syllables",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2508,7 +3085,7 @@
       "id": "KO-05",
       "name": "Letter spacing that is too wide or too tight on Korean",
       "what": "Korean text tracked out like an English label, or squeezed like an English headline.",
-      "why": "Hangul syllables are already evenly spaced. Wide tracking breaks words apart and tight tracking makes syllables collide.",
+      "why": "Korean is set with zero space between syllables by default. Letter spacing far from zero works against that in either direction.",
       "detect": {
         "level": "deterministic",
         "signal": "Element containing Hangul with computed letter-spacing above 0.05em or below -0.03em.",
@@ -2526,10 +3103,17 @@
       ],
       "severity": "medium",
       "korean": true,
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "Taster's own reading: wide tracking breaks Korean words apart and tight tracking makes syllables collide.",
       "refs": [
         {
           "label": "W3C Requirements for Hangul Text Layout",
-          "url": "https://www.w3.org/TR/klreq/"
+          "url": "https://www.w3.org/TR/klreq/",
+          "supports": "Characters like Hangul, Hanja, or Kana have zero space between characters by default.",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2537,7 +3121,7 @@
       "id": "KO-06",
       "name": "Fake italic on Korean",
       "what": "Italic applied to Hangul, which the browser slants artificially.",
-      "why": "Korean fonts almost never have italics. Carrying the one-italic-word cliche into Korean gives squashed letters.",
+      "why": "When the font has no italic, the browser slants the letters itself. Carrying the one-italic-word cliche into Korean gives squashed letters.",
       "detect": {
         "level": "deterministic",
         "signal": "font-style italic or oblique on an element with Hangul text, with no loaded italic FontFace for any family in its stack.",
@@ -2560,10 +3144,17 @@
       ],
       "severity": "medium",
       "korean": true,
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "That synthetic slanting looks squashed on Hangul is Taster's own reading.",
       "refs": [
         {
-          "label": "MDN: font-style",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/font-style"
+          "label": "MDN, font-style",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-style",
+          "supports": "If neither is available, the style is artificially simulated.",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2571,7 +3162,7 @@
       "id": "KO-07",
       "name": "Translated-sounding generated Korean copy",
       "what": "Literal translations of English marketing lines that sound foreign in Korean.",
-      "why": "Korean readers notice the machine at once. Seen again and again in our own work.",
+      "why": "Korean readers notice the machine at once.",
       "detect": {
         "level": "heuristic",
         "signal": "A list of stock phrases gives candidates, but judging needs meaning. detect.js reports candidates only.",
@@ -2591,13 +3182,17 @@
       ],
       "severity": "medium",
       "korean": true,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": []
     },
     {
       "id": "KO-08",
       "name": "Missing or wrong lang attribute on a Korean page",
       "what": "A page written in Korean that declares lang=\"en\" or no language at all.",
-      "why": "Line breaking, font fallback and screen readers all depend on it. Generated starters ship lang=\"en\".",
+      "why": "Screen readers pick the pronunciation from it, and browsers use it to choose fonts.",
       "detect": {
         "level": "deterministic",
         "signal": "Visible body text is at least 50% Hangul but documentElement.lang does not start with ko.",
@@ -2615,10 +3210,21 @@
       ],
       "severity": "high",
       "korean": true,
+      "basis": [
+        "standard"
+      ],
       "refs": [
         {
-          "label": "MDN: lang attribute",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/lang"
+          "label": "MDN, lang attribute",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/lang",
+          "supports": "allow assistive technologies such as screen readers to invoke the correct pronunciation",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "W3C Internationalization, why use the language attribute",
+          "url": "https://www.w3.org/International/questions/qa-lang-why",
+          "supports": "User-agents can (and do) use language information to select language-appropriate fonts",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2648,13 +3254,23 @@
       ],
       "severity": "low",
       "korean": true,
-      "refs": []
+      "basis": [
+        "external"
+      ],
+      "refs": [
+        {
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "\"Get started\" and \"Learn more\" as labels",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "KO-10",
       "name": "Justified Korean paragraphs",
       "what": "Korean body text aligned to both edges.",
-      "why": "Browsers justify Korean by stretching the gaps between syllables, which leaves uneven rivers of space. Seen again and again in our own work.",
+      "why": "Korean print justifies by default and spreads the slack across the line. Browsers justify Korean by widening only the spaces between words, so a line with few spaces, above all under word-break: keep-all, opens wide gaps.",
       "detect": {
         "level": "deterministic",
         "signal": "Paragraph with at least 50% Hangul and three or more lines whose text-align is justify.",
@@ -2675,10 +3291,23 @@
       ],
       "severity": "medium",
       "korean": true,
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work. Measured in Chromium 156: justified Korean keeps the gap between syllables and widens only word spaces, up to about four times a normal space with keep-all.",
       "refs": [
         {
-          "label": "MDN: text-align",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/text-align"
+          "label": "W3C Requirements for Hangul Text Layout",
+          "url": "https://www.w3.org/TR/klreq/",
+          "supports": "Even space alignment is the default setting in Hangul writing.",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "MDN, text-align",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-align",
+          "supports": "The inconsistent spacing between words created by justified text can be problematic",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2686,7 +3315,7 @@
       "id": "KO-11",
       "name": "Korean body text that is too small",
       "what": "Korean captions and body copy set below 13px.",
-      "why": "Hangul strokes fill in at small sizes much sooner than Latin letters do. Seen again and again in our own work.",
+      "why": "Hangul packs several strokes into each syllable block, so small Korean text loses detail quickly. The 13px floor is Taster's own threshold.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with own Hangul text whose computed font-size is under 13px. Footer and legal text carries lower weight. Only checked on text that is at least half Hangul and at least 10 characters without spaces, so one word navigation labels are skipped.",
@@ -2710,13 +3339,17 @@
       ],
       "severity": "medium",
       "korean": true,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen again and again in our own work.",
       "refs": []
     },
     {
       "id": "RSP-01",
       "name": "Page wider than the screen",
       "what": "The page scrolls sideways because an element sticks out past the right edge of the viewport.",
-      "why": "A card name cut to a single letter at a tablet width shipped once with every check green. Layouts tested at one phone width and one desktop width break in between.",
+      "why": "Layouts tested at one phone width and one desktop width break in between.",
       "detect": {
         "level": "deterministic",
         "signal": "documentElement.scrollWidth is more than 1px wider than clientWidth. The finding is the first element whose right edge passes the viewport while its parent does not, skipping fixed and sticky layers and anything inside a scroll or clip container.",
@@ -2735,13 +3368,25 @@
       ],
       "severity": "high",
       "korean": false,
-      "refs": []
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "A card name cut to a single letter at a tablet width shipped once with every check green.",
+      "refs": [
+        {
+          "label": "WCAG 2.2, 1.4.10 Reflow",
+          "url": "https://www.w3.org/TR/WCAG22/#reflow",
+          "supports": "without requiring scrolling in two dimensions",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "RSP-02",
       "name": "Text cut off by its box",
       "what": "A short label or name cut by overflow or an ellipsis, or a label that spills past the edge of its button.",
-      "why": "A card name cut to a single letter at a tablet width shipped once with every check green. Layouts tested at one phone width and one desktop width break in between.",
+      "why": "Layouts tested at one phone width and one desktop width break in between.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with its own text, overflow-x hidden or clip or text-overflow ellipsis, and scrollWidth more than 1px past clientWidth: reported when the text is 24 characters or fewer or fewer than about 3 characters stay visible. Buttons, inputs and labels whose text rectangle passes their own edge are reported as spill.",
@@ -2759,13 +3404,17 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "A card name cut to a single letter at a tablet width shipped once with every check green.",
       "refs": []
     },
     {
       "id": "RSP-03",
       "name": "Letters stacked one per line",
       "what": "A column so narrow that a word wraps letter by letter down the screen.",
-      "why": "A card name cut to a single letter at a tablet width shipped once with every check green. Layouts tested at one phone width and one desktop width break in between.",
+      "why": "Layouts tested at one phone width and one desktop width break in between.",
       "detect": {
         "level": "deterministic",
         "signal": "A text node with 3 or more characters that renders on 3 or more lines with at most 1.5 characters per line, measured with Range.getClientRects.",
@@ -2783,13 +3432,17 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "A card name cut to a single letter at a tablet width shipped once with every check green.",
       "refs": []
     },
     {
       "id": "RSP-04",
       "name": "Text overlapping text",
       "what": "Two pieces of text drawn on top of each other.",
-      "why": "A card name cut to a single letter at a tablet width shipped once with every check green. Layouts tested at one phone width and one desktop width break in between.",
+      "why": "Layouts tested at one phone width and one desktop width break in between.",
       "detect": {
         "level": "heuristic",
         "signal": "Line fragments of text from different elements that intersect by more than 2px on both axes, after clipping by overflow ancestors. Text in fixed or sticky layers (headers, banners) and hidden or faded text is skipped. Layered hero art can still trigger it on purpose, so treat findings as candidates to look at.",
@@ -2806,6 +3459,10 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "A card name cut to a single letter at a tablet width shipped once with every check green.",
       "refs": []
     },
     {
@@ -2829,13 +3486,17 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "No outside source on file yet; this is Taster's own rule.",
       "refs": []
     },
     {
       "id": "RSP-06",
       "name": "Touch target under 44px",
       "what": "On a phone or tablet width, a button, field or control under 44px high (an icon-only one under 44 by 44px), or a plain text link under 24px high.",
-      "why": "The most frequent failure in our own responsive audits by a wide margin. Controls sized for a mouse are missed by thumbs, and a smaller control on a hand held tablet fails the same way.",
+      "why": "Controls sized for a mouse are missed by thumbs, and a smaller control on a hand held tablet fails the same way. WCAG asks for 24 by 24 CSS pixels at level AA and 44 by 44 at AAA; Taster holds controls to 44px and text links to 24px.",
       "detect": {
         "level": "deterministic",
         "signal": "Runs at viewport widths of 1024px and below. Buttons, inputs, selects, summary, ARIA controls and links styled as buttons under 44px high, or under 44px wide when they have no text. A plain text link is held to the WCAG 2.5.8 minimum of 24px and passes below it when spaced apart (a 24px circle on its center touches no other target). A checkbox, radio or visually hidden input is measured through its label. A link inside a sentence, a disabled control, and anything hidden or off screen are skipped.",
@@ -2860,13 +3521,31 @@
       ],
       "severity": "medium",
       "korean": false,
-      "refs": []
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "A frequent failure in our own responsive audits.",
+      "refs": [
+        {
+          "label": "WCAG 2.2, 2.5.8 Target Size (Minimum)",
+          "url": "https://www.w3.org/TR/WCAG22/#target-size-minimum",
+          "supports": "target for pointer inputs is at least 24 by 24 CSS pixels",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "WCAG 2.2, 2.5.5 Target Size (Enhanced)",
+          "url": "https://www.w3.org/TR/WCAG22/#target-size-enhanced",
+          "supports": "target for pointer inputs is at least 44 by 44 CSS pixels",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "COL-08",
       "name": "Text that does not stand out from its background",
       "what": "Text whose contrast against the surface behind it is under 4.5:1, or under 3:1 for large text.",
-      "why": "Low contrast secondary text on a slightly lighter card came back again and again in our own work. A gray that reads on the page background can fail on the card it is placed in.",
+      "why": "A gray that reads on the page background can fail on the card it is placed in. WCAG asks for 4.5:1, or 3:1 for large text.",
       "detect": {
         "level": "deterministic",
         "signal": "For each element with its own text, the text color (with alpha and ancestor opacity) is blended over the composited background colors of its ancestors and compared with the WCAG contrast formula. Large text is 24px, or 18.66px at weight 700. Text over an image, video, gradient or a positioned layer that is not its ancestor is skipped, because the color under it cannot be read from styles. Disabled, aria-hidden and faded out text is skipped.",
@@ -2884,7 +3563,32 @@
       ],
       "severity": "high",
       "korean": false,
-      "refs": []
+      "basis": [
+        "external",
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "Low contrast secondary text on a slightly lighter card came back again and again in our own work.",
+      "refs": [
+        {
+          "label": "WCAG 2.2, 1.4.3 Contrast (Minimum)",
+          "url": "https://www.w3.org/TR/WCAG22/#contrast-minimum",
+          "supports": "text and images of text has a contrast ratio of at least 4.5:1",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "Paul Bakaus, Impeccable 3.5 launch post",
+          "url": "https://x.com/pbakaus/status/2060208540992880794",
+          "supports": "90%+ failed the contrast floor",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "Adrian Krebs, AI design patterns in Show HN pages",
+          "url": "https://www.adriankrebs.ch/blog/design-slop/",
+          "supports": "Barely passing body-text contrast in dark themes",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "CPY-02",
@@ -2909,13 +3613,17 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "No outside source on file yet; this is Taster's own rule.",
       "refs": []
     },
     {
       "id": "MOT-02",
       "name": "Transition on every property",
       "what": "An element transitions `all` properties instead of naming the ones that should move.",
-      "why": "transition: all animates whatever happens to change, layout included, so a hover or a theme switch can slide boxes around. Generated utility classes reach for it by default.",
+      "why": "transition: all animates whatever happens to change, layout included, so a hover or a theme switch can slide boxes around. Generated cards often carry it.",
       "detect": {
         "level": "deterministic",
         "signal": "Computed transition-property is `all` with a duration above 0.",
@@ -2932,14 +3640,15 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "external"
+      ],
       "refs": [
         {
-          "label": "Apple WWDC 2018, Designing Fluid Interfaces",
-          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
-        },
-        {
-          "label": "MDN, prefers-reduced-motion",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+          "label": "kill-ai-slop",
+          "url": "https://github.com/yetone/kill-ai-slop/blob/main/skill/references/taxonomy.md",
+          "supports": "animating every property is the absence of deciding which one means something",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2947,7 +3656,7 @@
       "id": "MOT-03",
       "name": "Entrance that starts from nothing",
       "what": "An element animates in from scale(0).",
-      "why": "Real objects do not grow out of a point. A popover or a toast that starts at scale(0) flashes through every size; starting near full size reads as arriving.",
+      "why": "Motion should carry a thing from where it was to where it lands. A popover or a toast that starts at scale(0) grows out of a point that is not there and flashes through every size; starting near full size reads as arriving.",
       "detect": {
         "level": "deterministic",
         "signal": "An element whose running CSS animation uses keyframes that start (from or 0%) at scale(0), scale3d(0, 0, 0) or scaleX/Y(0).",
@@ -2964,14 +3673,17 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "The scale(0) check is Taster's own; the talk speaks of continuity between states, not of CSS.",
       "refs": [
         {
           "label": "Apple WWDC 2018, Designing Fluid Interfaces",
-          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
-        },
-        {
-          "label": "MDN, prefers-reduced-motion",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+          "url": "https://developer.apple.com/videos/play/wwdc2018/803/",
+          "supports": "we expect it to emerge from where it came",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -2979,7 +3691,7 @@
       "id": "MOT-04",
       "name": "Slow start on interface motion",
       "what": "A transition or animation under a second uses an ease-in curve, so the first frame, the one people watch, is the slowest.",
-      "why": "Interface motion answers an action. A curve that starts slow makes the answer feel late; ease-out responds at once and settles.",
+      "why": "Interface motion answers an action, and people feel any delay in the answer. A curve that starts slow makes the answer feel late; ease-out responds at once and settles.",
       "detect": {
         "level": "deterministic",
         "signal": "Timing function `ease-in`, or a cubic-bezier whose control points both sit below the diagonal (slow start, no fast end), on a transition or an animation of 1 second or less. ease-in-out and linear are not reported.",
@@ -2997,14 +3709,17 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "The ease-in check is Taster's own; the talk speaks of response time in general, not of easing curves.",
       "refs": [
         {
           "label": "Apple WWDC 2018, Designing Fluid Interfaces",
-          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
-        },
-        {
-          "label": "MDN, prefers-reduced-motion",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+          "url": "https://developer.apple.com/videos/play/wwdc2018/803/",
+          "supports": "Everything needs to respond instantly.",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -3029,14 +3744,22 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "external",
+        "standard"
+      ],
       "refs": [
         {
-          "label": "Apple WWDC 2018, Designing Fluid Interfaces",
-          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
+          "label": "Signs of AI design",
+          "url": "https://github.com/febbhav/signs-of-ai-design",
+          "supports": "layout properties animated with visible jank",
+          "accessed": "2026-11-03"
         },
         {
-          "label": "MDN, prefers-reduced-motion",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+          "label": "MDN, CSS and JavaScript animation performance",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/CSS_JavaScript_animation_performance",
+          "supports": "as long as the properties we want to animate do not trigger reflow/repaint",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -3044,7 +3767,7 @@
       "id": "MOT-06",
       "name": "Slow controls",
       "what": "A button, link or field whose transition lasts longer than 300ms.",
-      "why": "The more often something is used, the shorter its motion should be. A hover or press that takes half a second makes the whole product feel heavy.",
+      "why": "Controls answer an action, and people are sensitive to any delay. The more often something is used, the shorter its motion should be; a hover or press that takes half a second makes the whole product feel heavy.",
       "detect": {
         "level": "deterministic",
         "signal": "Links, buttons, fields, tabs, menu items and switches up to 120px tall with a transition duration above 300ms. Taller clickable cards and panels are skipped: their motion is layout, not press feedback.",
@@ -3061,14 +3784,17 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "The 300ms line is Taster's own threshold.",
       "refs": [
         {
           "label": "Apple WWDC 2018, Designing Fluid Interfaces",
-          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
-        },
-        {
-          "label": "MDN, prefers-reduced-motion",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+          "url": "https://developer.apple.com/videos/play/wwdc2018/803/",
+          "supports": "people are really, really sensitive to latency",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -3093,14 +3819,15 @@
       ],
       "severity": "medium",
       "korean": false,
+      "basis": [
+        "standard"
+      ],
       "refs": [
         {
-          "label": "Apple WWDC 2018, Designing Fluid Interfaces",
-          "url": "https://developer.apple.com/videos/play/wwdc2018/803/"
-        },
-        {
           "label": "MDN, prefers-reduced-motion",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion",
+          "supports": "Such animations can trigger discomfort for those with vestibular motion disorders.",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -3125,10 +3852,28 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "external",
+        "standard"
+      ],
       "refs": [
         {
+          "label": "Anthropic frontend-design skill",
+          "url": "https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md",
+          "supports": "hover transitions on every card are the generic default and read as AI-generated",
+          "accessed": "2026-11-03"
+        },
+        {
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "hover lift on every card",
+          "accessed": "2026-11-03"
+        },
+        {
           "label": "MDN, the hover media feature",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/hover"
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/hover",
+          "supports": "The primary input mechanism cannot hover at all or cannot conveniently hover",
+          "accessed": "2026-11-03"
         }
       ]
     },
@@ -3136,7 +3881,7 @@
       "id": "RSP-07",
       "name": "Control covered by another element",
       "what": "A visible button, link or field whose center is under another element, so a click lands on the wrong thing.",
-      "why": "A layer from a neighbouring block sat over a button on a narrow layout and swallowed every click; the button looked fine. Seen in our own work.",
+      "why": "A control that looks ready to click but sits under another element sends the click somewhere else.",
       "detect": {
         "level": "deterministic",
         "signal": "For each control in the viewport, document.elementFromPoint at its center returns an element that is not the control, inside it, its label, a dialog, or a fixed or sticky layer.",
@@ -3153,13 +3898,17 @@
       ],
       "severity": "high",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen in our own work: a layer from a neighbouring block sat over a button on a narrow layout and swallowed every click while the button looked fine.",
       "refs": []
     },
     {
       "id": "CMP-12",
       "name": "Stretched image",
       "what": "A raster image drawn at a different aspect ratio than its file, with object-fit left at its default.",
-      "why": "A logo stretched sideways by a flex container is the quickest way to look unfinished. The default align-items: stretch does it without anyone choosing it.",
+      "why": "A stretched logo or photo looks unfinished at once. The default align-items: stretch in a flex row does it without anyone choosing it, and object-fit: fill keeps the distortion.",
       "detect": {
         "level": "deterministic",
         "signal": "An <img> (not SVG) whose drawn content box differs from its file's aspect ratio by more than 3% or 2px while object-fit is fill.",
@@ -3177,13 +3926,25 @@
       ],
       "severity": "medium",
       "korean": false,
-      "refs": []
+      "basis": [
+        "standard",
+        "taster-observation"
+      ],
+      "observation": "Written for logos stretched sideways by a flex container.",
+      "refs": [
+        {
+          "label": "MDN, object-fit",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/object-fit",
+          "supports": "then the object will be stretched to fit",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "KO-12",
       "name": "Tight line height on a large Korean heading",
       "what": "A Korean heading above 28px that wraps to two or more lines with a line height under about 1.05.",
-      "why": "Hangul final consonants sit low; with a Latin display line height the lines touch or clip. Fixed in our own work by raising 0.9 to above 1.",
+      "why": "Hangul final consonants sit low; with a Latin display line height the lines touch or clip.",
       "detect": {
         "level": "deterministic",
         "signal": "Element with mostly Hangul text, font size above 28px, two or more rendered lines and line-height divided by font-size under 1.05. KO-03 covers body text up to 28px.",
@@ -3201,6 +3962,10 @@
       ],
       "severity": "medium",
       "korean": true,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Fixed in our own work by raising 0.9 to above 1.",
       "refs": []
     },
     {
@@ -3225,13 +3990,23 @@
       ],
       "severity": "medium",
       "korean": false,
-      "refs": []
+      "basis": [
+        "standard"
+      ],
+      "refs": [
+        {
+          "label": "WCAG 2.2, 1.4.5 Images of Text",
+          "url": "https://www.w3.org/TR/WCAG22/#images-of-text",
+          "supports": "text is used to convey information rather than images of text",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "MOT-09",
       "name": "Content left hidden",
       "what": "Text or images in the first screen still at opacity 0 and shifted after the page has settled: a scroll reveal that never fired.",
-      "why": "A reveal that waits for a scroll event hides the content from people who do not scroll, from crawlers and from screenshots. Seen on rebuilt sites where the first section never appeared.",
+      "why": "A reveal that waits for a scroll event hides the content from people who do not scroll, from crawlers and from screenshots.",
       "detect": {
         "level": "heuristic",
         "signal": "An element in the first viewport with 40 or more characters of text or an image, opacity 0, and a transform or a reveal class or data-aos attribute, outside dialogs, menus, tooltips and fixed layers, after load.",
@@ -3248,7 +4023,19 @@
       ],
       "severity": "high",
       "korean": false,
-      "refs": []
+      "basis": [
+        "external",
+        "taster-observation"
+      ],
+      "observation": "Seen on rebuilt sites where the first section never appeared.",
+      "refs": [
+        {
+          "label": "taste-skill",
+          "url": "https://github.com/Leonxlnx/taste-skill/blob/main/skills/taste-skill/references/tells.md",
+          "supports": "reveals that fail and leave a blank band",
+          "accessed": "2026-11-03"
+        }
+      ]
     },
     {
       "id": "KO-13",
@@ -3271,13 +4058,17 @@
       ],
       "severity": "low",
       "korean": true,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "No outside source on file yet; this is Taster's own rule.",
       "refs": []
     },
     {
       "id": "CPY-03",
       "name": "Machine codes on screen",
       "what": "Status codes, snake_case keys or camelCase field names shown to the reader as words.",
-      "why": "An identifier on screen tells the reader the interface is showing its plumbing. Seen in our own dashboards when a status code leaked into a label.",
+      "why": "An identifier on screen tells the reader the interface is showing its plumbing.",
       "detect": {
         "level": "heuristic",
         "signal": "Visible text outside code, pre, kbd, samp and monospace elements with a SCREAMING_SNAKE token (NO_ANSWER), a snake_case token (created_at) or a camelCase token (userName). Reported as candidates; product names are not judged.",
@@ -3295,6 +4086,10 @@
       ],
       "severity": "low",
       "korean": false,
+      "basis": [
+        "taster-observation"
+      ],
+      "observation": "Seen in our own dashboards when a status code leaked into a label.",
       "refs": []
     }
   ]
