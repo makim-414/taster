@@ -3,16 +3,23 @@ import { cn } from './_cn'
 
 // Sparkline. A small axis-less trend line to sit next to a KPI.
 // Neutral by default, semantic color only when dir is up or down.
+// A screen reader reads it as one image, so it needs a name: label (also the svg title), or aria-label or
+// aria-labelledby. Say what the line is and where it went, for example 'Conversion, up 0.4 points this week'.
 
-export interface SparklineProps extends Omit<React.SVGAttributes<SVGSVGElement>, 'width' | 'height'> {
+type ChartName =
+  | { label: string }
+  | { label?: undefined; 'aria-label': string }
+  | { label?: undefined; 'aria-labelledby': string }
+
+export type SparklineProps = Omit<React.SVGAttributes<SVGSVGElement>, 'width' | 'height'> & {
   data: number[]
   width?: number
   height?: number
   dir?: 'up' | 'down'
-}
+} & ChartName
 
 export const Sparkline = React.forwardRef<SVGSVGElement, SparklineProps>(
-  ({ data, width = 120, height = 32, dir, className, ...props }, ref) => {
+  ({ data, width = 120, height = 32, dir, label, className, ...props }, ref) => {
     const pad = 3
     const plotW = Math.max(width - pad * 2, 1)
     const plotH = Math.max(height - pad * 2, 1)
@@ -41,9 +48,11 @@ export const Sparkline = React.forwardRef<SVGSVGElement, SparklineProps>(
         height={height}
         viewBox={`0 0 ${width} ${height}`}
         role="img"
+        aria-label={label}
         className={cn('block', tone, className)}
         {...props}
       >
+        {label ? <title>{label}</title> : null}
         <polyline
           points={points}
           fill="none"

@@ -58,12 +58,22 @@ export function CommandPalette({ items, onClose, placeholder = 'Search commands'
   const [query, setQuery] = React.useState('')
   const [hi, setHi] = React.useState(0)
   const dialogRef = React.useRef<HTMLDivElement>(null)
+  // The trap puts focus on the input and gives it back to the opener on close.
   useFocusTrap(dialogRef)
+  const listId = React.useId()
+  const optionId = (i: number) => `${listId}-${i}`
 
   const filtered = React.useMemo(() => matchCommands(items, query), [items, query])
 
   const clampedHi = Math.min(hi, Math.max(0, filtered.length - 1))
+  const activeId = filtered.length ? optionId(clampedHi) : undefined
 
+  React.useEffect(() => {
+    if (activeId) document.getElementById(activeId)?.scrollIntoView({ block: 'nearest' })
+  }, [activeId])
+
+  // Focus stays on the input (combobox with aria-activedescendant): the arrows move the highlight and Enter runs
+  // the highlighted command, so what Enter runs is always the row that is shown as chosen.
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
@@ -71,6 +81,9 @@ export function CommandPalette({ items, onClose, placeholder = 'Search commands'
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       setHi((i) => Math.max(0, i - 1))
+    } else if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault()
+      setHi(e.key === 'Home' ? 0 : Math.max(0, filtered.length - 1))
     } else if (e.key === 'Enter') {
       e.preventDefault()
       filtered[clampedHi]?.run()
@@ -93,32 +106,41 @@ export function CommandPalette({ items, onClose, placeholder = 'Search commands'
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="fixed left-1/2 top-[12vh] z-50 w-[min(620px,94vw)] -translate-x-1/2 overflow-hidden rounded-lg border border-border bg-bg-elev shadow-[var(--sh-pop)]"
+        className="fixed left-1/2 top-[12vh] z-50 w-[min(620px,94vw)] -translate-x-1/2 overflow-hidden rounded-lg border border-border bg-bg-popover shadow-[var(--sh-pop)]"
         onKeyDown={onKeyDown}
       >
         <input
-          autoFocus
+          role="combobox"
+          aria-expanded="true"
+          aria-controls={listId}
+          aria-autocomplete="list"
+          aria-activedescendant={activeId}
+          aria-label={placeholder}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value)
             setHi(0)
           }}
           placeholder={placeholder}
-          className="h-12 w-full border-b border-border bg-transparent px-4 text-base text-text outline-none placeholder:text-text-subtle"
+          className="h-12 w-full border-b border-border bg-transparent px-4 text-base text-text outline-none placeholder:text-text-subtle focus-visible:border-ring"
         />
-        <div className="max-h-[52vh] overflow-y-auto py-1">
+        <div id={listId} role="listbox" aria-label="Commands" className="max-h-[52vh] overflow-y-auto py-1">
           {filtered.length === 0 && (
-            <div className="px-4 py-6 text-center text-sm text-text-muted">No results</div>
+            <div role="presentation" className="px-4 py-6 text-center text-sm text-text-muted">No results</div>
           )}
           {filtered.map((it, i) => (
-            <button
+            <div
               key={it.id}
-              type="button"
+              id={optionId(i)}
+              role="option"
+              aria-selected={i === clampedHi}
               onMouseMove={() => setHi(i)}
+              // Keep focus on the input when a row is clicked.
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => it.run()}
               className={cn(
-                'flex w-full items-center gap-3 px-4 py-2 text-left text-sm outline-none',
-                i === clampedHi ? 'bg-bg' : 'hover:bg-bg',
+                'flex w-full cursor-pointer items-center gap-3 px-4 py-2 text-left text-sm',
+                i === clampedHi ? 'bg-bg ring-2 ring-inset ring-ring' : 'hover:bg-bg',
               )}
             >
               <span className="shrink-0 rounded border border-border px-1.5 py-0.5 text-xs text-text-subtle">
@@ -126,7 +148,7 @@ export function CommandPalette({ items, onClose, placeholder = 'Search commands'
               </span>
               <span className="min-w-0 flex-1 truncate text-text">{it.label}</span>
               {it.hint && <span className="shrink-0 text-xs text-text-subtle">{it.hint}</span>}
-            </button>
+            </div>
           ))}
         </div>
       </div>
