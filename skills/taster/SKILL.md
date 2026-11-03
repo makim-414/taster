@@ -40,6 +40,7 @@ Data this skill reads (all inside this folder):
 - [data/rules.json](data/rules.json): the slop rules. `detect.level` says how each is checked: `deterministic` and `heuristic` rules run in the browser through [data/detect.js](data/detect.js); `manual` rules you judge from the capture.
 - [data/taxonomy.json](data/taxonomy.json): families and categories, uses (what the end user is trying to do) and surfaces (landing, dashboard, app, commerce, editorial, auth-onboarding, ai-chat, developer-docs). Every category has a definition, `includes`, `excludes` (each naming the category the excluded thing goes to) and examples. `classify` is the decision key: describe a part with the yes or no `features`, and the first matching step names its one category ([data/classify.mjs](data/classify.mjs) runs it). `axes` are the weighting dials (density, contrast, roundness, type-expression, color-restraint, elevation, motion, stroke), each listing the tokens it drives; `snap` gives their allowed steps, `relevance` says which axes matter per category, and `constraints` are the design principles that keep a setting balanced ([data/axes.mjs](data/axes.mjs) exports `validateAxes` and `balance`). `ruleMap` ties every rule to its categories and axis; `gaps` lists categories that still lack components. Its `iconography` block is the icon slot map: control, explanatory, identity, data marker and no icon, each with when it needs an icon and what to use instead.
 - [data/patterns/INDEX.json](data/patterns/INDEX.json) and `data/patterns/<id>.md`: one reusable design answer per file. Every rule lists its fix patterns in `fix_patterns`.
+- [data/tone-refs.json](data/tone-refs.json): the tone map. Real sites placed on commerce to brand personality and minimal to expressive, with genres and the public posts that praised them. Links only, no screens.
 - [data/registry.json](data/registry.json): token based React components you can copy. Source lives in the repository under `registry/src/`; if this folder was installed alone, fetch the file from `https://raw.githubusercontent.com/makim-414/taster/main/registry/<file>`.
 
 ## If the taster MCP server is connected
@@ -54,6 +55,7 @@ Prefer its tools; they run the same detector in a real browser for you.
 - `system_for_category { system, category }`: the axes that matter for one kind of part, with the tokens they drive.
 - `extract_content { target }`: the page's content in reading order (sections, actions, images, nav, footer, brand color and fonts), for Rebuild.
 - `suggest_swaps { ruleIds }`: the fix patterns and registry components for each rule found.
+- `pick_tone { x, y, like, genre, limit, shots, theme, brand }`: the tone map. The nearest real sites as pictures (opened on request, never written to disk, kept in server memory up to 30 minutes; block pages and cookie banners without a reject button left as links), the eight axes of that spot, its tokens and theme.css, and Taster parts wearing them. See [references/choose.md](references/choose.md).
 - `browse_components { query, category, surface, use, ids, limit, theme, brand }` and `preview_component { id, width, tokens, theme, brand }`: pictures and live links, so the user chooses by eye. See [references/choose.md](references/choose.md).
 - `get_pattern { id }` and `get_component { id }`: the swap recipe and copyable code with its tokens.
 - `list_patterns { surface, use, category, family, rule }` and `taxonomy`: for Build.
@@ -112,8 +114,9 @@ the next one starts. Never build before the yes; never start the next screen bef
 ## Choosing components
 
 Do not pick the look alone. Before you write or swap in anything the visitor will see, follow
-[references/choose.md](references/choose.md): call `browse_components`, show the pictures and the live links, ask which
-number, try the shortlist in their brand with `preview_component`, and write code only after they choose.
+[references/choose.md](references/choose.md): when the tone is open, place it with `pick_tone` first; then call
+`browse_components`, show the pictures and the live links, ask which number, try the shortlist in their brand (and
+tone tokens) with `preview_component`, and write code only after they choose.
 
 ## Icons
 

@@ -17,7 +17,22 @@ export type RuleHit = {
   fix_patterns: string[];
   findings: { width: number; selector: string; text?: string; evidence?: unknown }[];
 };
-export type Summary = { url: string; status?: number | null; diagnosed?: boolean; widths: number[]; measured: number; rulesHit: number; findings: number; rules: RuleHit[]; judgeByEye: string[] };
+// What engine/blocked.mjs classifyLoad says about a page that came back but is not the site.
+export type NotDiagnosed = { reason: 'bot-check' | 'block-page' | 'http-error' | 'sign-in'; status: number | null; title: string; finalUrl: string; message: string };
+export type Summary = {
+  url: string;
+  finalUrl?: string;
+  redirected?: boolean;
+  status?: number | null;
+  diagnosed?: boolean;
+  notDiagnosed?: NotDiagnosed;
+  widths: number[];
+  measured: number;
+  rulesHit: number;
+  findings: number;
+  rules: RuleHit[];
+  judgeByEye: string[];
+};
 type Engine = {
   VIEWPORTS: Viewport[];
   detectOnce: (browser: unknown, url: string, viewport: Viewport, opts: Record<string, unknown>) => Promise<RawRun>;
@@ -56,7 +71,39 @@ const WIDTH_BUDGET_MS = 35000;
 
 export type Diagnosis = { report: Summary; shots: Record<string, string>; missed: number[]; requests: number };
 
-export class PageLoadError extends Error {}
+// The page did not open or did not finish in time. The routes answer 422 with the code.
+export class PageLoadError extends Error {
+  code = 'load';
+}
+
+// A page came back but it is not the site: a bot check, a block or error page, a sign-in page on another host. Nothing
+// was measured, so there is no result for that site; the routes answer 422 not-diagnosed with the reason and status.
+export class NotDiagnosedError extends PageLoadError {
+  code = 'not-diagnosed';
+  notDiagnosed: NotDiagnosed;
+  constructor(notDiagnosed: NotDiagnosed) {
+    super(notDiagnosed.message);
+    this.notDiagnosed = notDiagnosed;
+  }
+}
+
+// The error body /api/diagnose and /api/brand send with a PageLoadError.
+export function loadFailure(err: PageLoadError): { code: string; message: string; reason?: NotDiagnosed['reason']; status?: number | null } {
+  if (err instanceof NotDiagnosedError) return { code: err.code, message: err.message, reason: err.notDiagnosed.reason, status: err.notDiagnosed.status };
+  return { code: err.code, message: err.message };
+}
+
+// Browser errors name the whole address ("net::ERR_FAILED at https://host/path?token=..."). Logs and answers keep
+// only its host, so a path or a query a visitor typed is not written anywhere.
+export function hostsOnly(text: string): string {
+  return text.replace(/https?:\/\/[^\s"'<>]+/gi, (u) => {
+    try {
+      return new URL(u).host;
+    } catch {
+      return '<url>';
+    }
+  });
+}
 
 function safeHostForLog(url: string): string {
   try {
@@ -67,10 +114,10 @@ function safeHostForLog(url: string): string {
 }
 
 function firstLine(err: unknown, max: number): string {
-  return String((err as Error)?.message || err).split('\n')[0].slice(0, max);
+  return hostsOnly(String((err as Error)?.message || err).split('\n')[0]).slice(0, max);
 }
 
-// allowLoopback is for test/fixtures.test.ts only; the API route never passes it.
+// allowLoopback is for test/fence.test.ts and test/not-diagnosed.test.ts only; the API routes never pass it.
 export async function runDiagnosis(url: string, { deadlineMs = 75000, widthBudgetMs = WIDTH_BUDGET_MS, allowLoopback = false } = {}): Promise<Diagnosis> {
   const started = Date.now();
   const engine = await loadEngine();
@@ -136,7 +183,7 @@ export async function runDiagnosis(url: string, { deadlineMs = 75000, widthBudge
           if (budget.blocked) throw new PageLoadError(budget.blocked);
           // A later width that fails still leaves the widths already measured to report.
           if (runs.length) break;
-          throw new PageLoadError(`페이지를 열지 못했습니다. (${firstLine(err, 120)})`);
+          throw new PageLoadError(`could not open the page (${firstLine(err, 120)})`);
         }
         if (runs[runs.length - 1].load?.diagnosed === false) break;
       }
@@ -146,11 +193,12 @@ export async function runDiagnosis(url: string, { deadlineMs = 75000, widthBudge
     work.catch(() => {});
     const outcome = await Promise.race([work, deadline]);
     const measured = runs.slice();
-    if (!measured.length) throw new PageLoadError('시간 안에 페이지를 다 열지 못했습니다.');
+    if (!measured.length) throw new PageLoadError('the page did not finish loading in time');
     if (outcome === 'late') console.error('diagnose out of time', safeHostForLog(url), 'measured', measured.map((r) => r.viewport.width).join(','));
     const report = engine.summarize(url, measured);
-    // A bot check, an error or a sign-in page came back instead of the site: no result for that site at all.
-    if (report.diagnosed === false) throw new PageLoadError(`사이트가 아니라 차단·오류 화면${report.status ? `(HTTP ${report.status})` : ''}을 받았습니다. 우회하지 않으므로 진단하지 않았습니다.`);
+    // A bot check, an error or a sign-in page came back instead of the site: no result for that site at all, and no
+    // picture of someone else's wall either.
+    if (report.diagnosed === false) throw new NotDiagnosedError(report.notDiagnosed as NotDiagnosed);
     const done = new Set(measured.map((r) => r.viewport.width));
     return {
       report,

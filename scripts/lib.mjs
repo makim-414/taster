@@ -57,6 +57,7 @@ export function bundleFiles() {
     ['taxonomy/taxonomy.schema.json', 'skills/taster/data/taxonomy.schema.json'],
     ['taxonomy/axes.mjs', 'skills/taster/data/axes.mjs'],
     ['taxonomy/classify.mjs', 'skills/taster/data/classify.mjs'],
+    ['taxonomy/tone-refs.json', 'skills/taster/data/tone-refs.json'],
     ['rules/rules.json', 'skills/taster/data/rules.json'],
     ['rules/detect.js', 'skills/taster/data/detect.js'],
     ['registry/registry.json', 'skills/taster/data/registry.json'],

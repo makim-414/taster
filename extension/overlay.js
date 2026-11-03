@@ -9,10 +9,23 @@
   var HOST_ID = 'taster-overlay-host';
   var here = (document.currentScript && document.currentScript.src) || '';
   var base = here ? here.slice(0, here.lastIndexOf('/') + 1) : '';
+  // The sha384 of detect.js and rules.js next to this file. web/scripts/copy-fixtures.mjs fills it in on the copies the
+  // web app serves, so the bookmarklet runs only the detector this overlay was built with. The extension's own copy keeps
+  // it empty: the extension hands it both files itself.
+  var INTEGRITY = {};
+  // The detector and the rule names this overlay uses, held here rather than read from window each time.
+  var detect = null;
+  var names = null;
 
-  function load(src) {
+  // No Referer: the address of the page being measured does not go to the server the files come from.
+  function load(src, integrity) {
     return new Promise(function (ok, fail) {
       var s = document.createElement('script');
+      if (integrity) {
+        s.integrity = integrity;
+        s.crossOrigin = 'anonymous';
+      }
+      s.referrerPolicy = 'no-referrer';
       s.src = src;
       s.onload = ok;
       s.onerror = function () { fail(new Error('could not load ' + src)); };
@@ -20,11 +33,33 @@
     });
   }
 
-  // The bookmarklet injects only this file; it fetches the detector and rule names from where it came from.
+  // Loads one file and returns what it put on window. The bookmarklet runs in the page's own world, where the page may
+  // have defined the same name first; a name the file could not replace is refused rather than trusted.
+  function take(file, key) {
+    var before = window[key];
+    return load(base + file, INTEGRITY[file]).then(function () {
+      var value = window[key];
+      if (!value || value === before) throw new Error('the page holds its own ' + key + ', so its result could not be trusted');
+      return value;
+    });
+  }
+
+  // The extension injects detect.js, rules.js and this file into its own isolated world, which the page cannot reach.
+  // The bookmarklet injects only this file, which then fetches the detector and rule names from where it came from,
+  // never reusing whatever window already holds.
   function ready() {
-    if (window.tasterDetect && window.__tasterRules) return Promise.resolve();
-    if (!base) return Promise.reject(new Error('detect.js is not on the page'));
-    return Promise.all([window.tasterDetect ? null : load(base + 'detect.js'), window.__tasterRules ? null : load(base + 'rules.js')]);
+    if (!base) {
+      if (!window.tasterDetect || !window.__tasterRules) return Promise.reject(new Error('detect.js is not on the page'));
+      detect = window.tasterDetect;
+      names = window.__tasterRules;
+      return Promise.resolve();
+    }
+    return take('detect.js', 'tasterDetect').then(function (d) {
+      detect = d;
+      return take('rules.js', '__tasterRules');
+    }).then(function (r) {
+      names = r;
+    });
   }
 
   var CSS = [
@@ -52,7 +87,7 @@
 
   function render(report) {
     remove();
-    var rules = window.__tasterRules || {};
+    var rules = names || {};
     var order = { high: 0, medium: 1, low: 2 };
     var ids = Object.keys(report.counts).sort(function (a, b) {
       var ra = rules[a] || {}, rb = rules[b] || {};
@@ -79,7 +114,7 @@
     again.onclick = function () { scan(); };
     var close = document.createElement('button');
     close.textContent = 'Close';
-    close.onclick = function () { window.tasterDetect({ clear: true }); remove(); };
+    close.onclick = function () { detect({ clear: true }); remove(); };
     h.append(t, again, close);
     var s = document.createElement('div');
     s.className = 's';
@@ -111,7 +146,7 @@
     });
     var f = document.createElement('div');
     f.className = 'f';
-    f.innerHTML = 'Measured in this tab only. Fixes and patterns: <a href="https://taster-six.vercel.app" target="_blank" rel="noopener">taster-six.vercel.app</a>';
+    f.innerHTML = 'Measured in this tab only. Fixes and patterns: <a href="https://taster-six.vercel.app" target="_blank" rel="noopener noreferrer">taster-six.vercel.app</a>';
     p.append(h, s, ul, f);
     root.appendChild(p);
     document.documentElement.appendChild(host);
@@ -120,7 +155,7 @@
 
   function scan() {
     remove();
-    var report = window.tasterDetect({ highlight: true });
+    var report = detect({ highlight: true });
     render(report);
     return report;
   }

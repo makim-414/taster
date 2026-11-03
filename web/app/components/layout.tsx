@@ -11,6 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <nav className="site-nav" aria-label="사이트">
             <Link href="/">진단</Link>
             <Link href="/components">부품</Link>
+            <Link href="/tone">톤 고르기</Link>
           </nav>
         </header>
         <main>{children}</main>

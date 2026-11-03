@@ -13,7 +13,7 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [server] }));
   try {
     const { tools } = await client.listTools();
-    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,browse_components,check_consistency,design_system,diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,plan_next,plan_screens,plan_update,preview_component,suggest_swaps,system_for_category,taxonomy,tune_system');
+    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,browse_components,check_consistency,design_system,diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,pick_tone,plan_next,plan_screens,plan_update,preview_component,suggest_swaps,system_for_category,taxonomy,tune_system');
 
     // The opening question comes from the skill's start guide, so the prompt and the skill say the same thing.
     const { prompts } = await client.listPrompts();
@@ -78,6 +78,29 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
     const fromTheme = await preview({ tokens: { '--brand': '#0a7f3f', '--accent-fg': '#ffffff' } });
     assert.notEqual(fromTheme.content.find((c) => c.type === 'image').data, plain.content.find((c) => c.type === 'image').data);
     assert.ok((await client.callTool({ name: 'preview_component', arguments: { id: 'blocks/nope' } })).isError);
+
+    // The tone step: the nearest references as links (no capture here, so the test stays offline), the axes and tokens
+    // of the spot, a render of a Taster part wearing them, and the tone page link. Two spots render differently.
+    const tone = (args) => client.callTool({ name: 'pick_tone', arguments: { shots: false, theme: 'light', ...args } });
+    const quiet = await tone({ like: 'kinfolk' });
+    assert.ok(!quiet.isError, quiet.content[0].text);
+    const quietText = quiet.content.filter((c) => c.type === 'text').map((c) => c.text).join('\n');
+    assert.match(quietText, /\/tone\?x=0\.8&y=0\.18&theme=light/);
+    assert.match(quietText, /Editorial and luxury/);
+    assert.match(quietText, /1\. Kinfolk \(kinfolk\.com/);
+    assert.match(quietText, /roundness square/);
+    assert.match(quietText, /--radius: 0rem;/);
+    assert.match(quietText, /"density":/);
+    assert.equal(quiet.content.filter((c) => c.type === 'image').length, 1, 'only the parts render when shots is off');
+    const loud = await tone({ x: 0.2, y: 0.9, brand: '#e4002b', genre: 'geek', limit: 3 });
+    assert.ok(!loud.isError, loud.content[0].text);
+    const loudText = loud.content.filter((c) => c.type === 'text').map((c) => c.text).join('\n');
+    assert.match(loudText, /--brand: #e4002b;/);
+    assert.match(loudText, /genre=geek/);
+    assert.match(loudText, /3\. /);
+    assert.doesNotMatch(loudText, /4\. /);
+    assert.notEqual(quiet.content.find((c) => c.type === 'image').data, loud.content.find((c) => c.type === 'image').data);
+    assert.ok((await tone({ like: 'nope' })).isError);
 
     const listed = JSON.parse((await client.callTool({ name: 'list_rules', arguments: {} })).content[0].text);
     assert.equal(listed.length, RULES.length);

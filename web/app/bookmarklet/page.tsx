@@ -1,7 +1,20 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import type { Metadata } from 'next';
 import { BookmarkletLink } from './link';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://taster-six.vercel.app';
+
+// Written by scripts/copy-fixtures.mjs (predev, prebuild): the overlay's version folder and its sha384. Read when the
+// page is built, so a build without it fails here instead of shipping a bookmarklet with no hash.
+function overlayPin(): { version: string; overlay: string } {
+  const file = path.join(process.cwd(), 'public/taster/bookmarklet.json');
+  try {
+    return JSON.parse(readFileSync(file, 'utf8'));
+  } catch {
+    throw new Error(`${file} is missing; run node scripts/copy-fixtures.mjs first`);
+  }
+}
 
 export const metadata: Metadata = {
   title: 'Taster 북마클릿과 확장',
@@ -10,6 +23,7 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  const pin = overlayPin();
   return (
     <main className="page">
       <header className="masthead">
@@ -21,11 +35,16 @@ export default function Page() {
 
       <section className="install" aria-labelledby="bm-title">
         <h1 id="bm-title">북마클릿</h1>
-        <p>아래 링크를 북마크 막대로 끌어다 놓고, 재고 싶은 페이지에서 누르세요. 걸린 곳에 테두리가 생기고, 오른쪽 아래에 규칙 목록이 뜹니다. 잰 결과는 그 탭 안에만 있고 어디로도 보내지 않습니다.</p>
+        <p>아래 링크를 북마크 막대로 끌어다 놓고, 재고 싶은 페이지에서 누르세요. 걸린 곳에 테두리가 생기고, 오른쪽 아래에 규칙 목록이 뜹니다.</p>
         <p>
-          <BookmarkletLink origin={SITE} />
+          측정 결과는 어디로도 보내지 않지만, 누를 때마다 검사 스크립트를 이 사이트에서 받아 그 페이지 권한으로 실행합니다. 은행·관리자 화면에서는 아래 확장을 쓰세요.
         </p>
-        <p className="fineprint">외부 스크립트를 막는 사이트(보안 정책이 엄격한 곳)에서는 동작하지 않습니다. 그때는 아래 확장을 쓰세요.</p>
+        <p>
+          <BookmarkletLink origin={SITE} version={pin.version} integrity={pin.overlay} />
+        </p>
+        <p className="fineprint">
+          스크립트를 받을 때 보고 있는 페이지의 주소는 보내지 않습니다. 북마클릿은 만든 때({pin.version} 판) 스크립트의 해시를 들고 있어서, 이 사이트의 스크립트가 바뀌면 실행하지 않고 새 북마클릿을 받으라고 알립니다. 외부 스크립트를 막는 사이트(보안 정책이 엄격한 곳)에서는 동작하지 않으니, 그때도 아래 확장을 쓰세요.
+        </p>
       </section>
 
       <section className="install" aria-labelledby="ext-title">

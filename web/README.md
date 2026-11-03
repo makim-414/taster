@@ -9,6 +9,15 @@ Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLI
   `rules/detect.js`) in a server Chromium (`@sparticuz/chromium` on Vercel, local Chrome otherwise). There is no
   second detector here.
 
+- `app/tone/`: the tone map. A pad on commerce to brand personality and minimal to expressive, a genre filter, the
+  four nearest reference sites, and three registry parts running in the tokens of the spot (`engine/tone.mjs`, the
+  same rules as the `pick_tone` tool). The address carries the spot, so an agent can hand over a link.
+- `app/api/tone-shot/route.ts`: POST `{ ids }`, up to four ids from `taxonomy/tone-refs.json`, never a typed
+  address. Opens each first screen through the same fence (`lib/tone-shot.ts` with `engine/tone-capture.mjs`):
+  cookie banners are only rejected, a banner without a reject button comes back as `consent` and a bot check or
+  block page as `blocked`, both with no picture. Pictures are never written to disk and are kept in server memory up
+  to 30 minutes. 20 calls per IP per 10 minutes, and a ceiling per minute across all visitors.
+
 ## Safety
 
 - Only http and https on ports 80, 443, 8080 and 8443. No credentials in the URL.
