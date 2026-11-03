@@ -17,7 +17,7 @@ import { safeHref } from './_url'
 // Copyright (c) kedhareswer. Full text in THIRD_PARTY_NOTICES.md.
 //
 // The frosted front is the one place blur has a job here: files move behind it. Keep the page around
-// it opaque (patterns/quiet-section-background.md, CMP-05).
+// it opaque (patterns/plain-section-surface.md, CMP-05).
 
 export type ArtPreset = "aurora" | "ember" | "dusk" | "glacier" | "verdant"
 
