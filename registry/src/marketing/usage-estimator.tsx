@@ -51,12 +51,13 @@ const defaultFormat = (n: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: Number.isInteger(n) ? 0 : 2 }).format(n)
 
 const CSS_RANGE =
-  'h-11 w-full cursor-pointer appearance-none bg-transparent outline-none focus-visible:[&::-webkit-slider-thumb]:ring-2 ' +
+  // The pseudo-element goes first, so the ring lands on :focus-visible::thumb (the other order never matches).
+  'h-11 w-full cursor-pointer appearance-none bg-transparent outline-none [&::-webkit-slider-thumb]:focus-visible:ring-2 [&::-moz-range-thumb]:focus-visible:ring-2 ' +
   '[&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:rounded-pill [&::-webkit-slider-runnable-track]:bg-[color:var(--border)] ' +
   '[&::-webkit-slider-thumb]:-mt-2 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-pill ' +
   '[&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-border [&::-webkit-slider-thumb]:bg-text [&::-webkit-slider-thumb]:ring-ring ' +
   '[&::-moz-range-track]:h-1 [&::-moz-range-track]:rounded-pill [&::-moz-range-track]:bg-[color:var(--border)] ' +
-  '[&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-pill [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-text'
+  '[&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-pill [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-text [&::-moz-range-thumb]:ring-ring'
 
 function clamp(v: number, m: UsageMeter) {
   return Math.min(m.max, Math.max(m.min, v))

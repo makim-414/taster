@@ -3,16 +3,23 @@ import { cn } from './_cn'
 
 // Bar chart. Responsive inline SVG, no chart library.
 // Bars use the neutral lightness ramp (chart tokens) by value rank, never a rainbow.
+// A screen reader reads the chart as one image, so it needs a name: label (also the svg title, with the values as
+// its description), or aria-label or aria-labelledby.
 
 export interface BarDatum {
   label: string
   value: number
 }
 
-export interface BarChartProps extends Omit<React.SVGAttributes<SVGSVGElement>, 'height'> {
+type ChartName =
+  | { label: string }
+  | { label?: undefined; 'aria-label': string }
+  | { label?: undefined; 'aria-labelledby': string }
+
+export type BarChartProps = Omit<React.SVGAttributes<SVGSVGElement>, 'height'> & {
   data: BarDatum[]
   height?: number
-}
+} & ChartName
 
 const RAMP = ['fill-chart-2', 'fill-chart-3', 'fill-chart-4', 'fill-chart-5']
 
@@ -24,7 +31,7 @@ function rankFill(value: number, sorted: number[]): string {
 }
 
 export const BarChart = React.forwardRef<SVGSVGElement, BarChartProps>(
-  ({ data, height = 160, className, ...props }, ref) => {
+  ({ data, height = 160, label, className, ...props }, ref) => {
     // Measure the real width so the viewBox is 1:1 with pixels and the labels never stretch.
     const innerRef = React.useRef<SVGSVGElement | null>(null)
     const [VBW, setVBW] = React.useState(320)
@@ -61,9 +68,12 @@ export const BarChart = React.forwardRef<SVGSVGElement, BarChartProps>(
         width="100%"
         height={height}
         role="img"
+        aria-label={label}
         className={cn('block text-text-subtle', className)}
         {...props}
       >
+        {label ? <title>{label}</title> : null}
+        <desc>{data.map((d) => `${d.label} ${d.value}`).join(', ')}</desc>
         {data.map((d, i) => {
           const h = Math.max((d.value / max) * plotH, 1)
           const x = i * slot + gap
@@ -91,20 +101,22 @@ export const BarChart = React.forwardRef<SVGSVGElement, BarChartProps>(
           className="text-border"
         />
 
-        {data.map((d, i) => {
-          const cx = i * slot + slot / 2
-          return (
-            <text
-              key={i}
-              x={cx}
-              y={height - 6}
-              textAnchor="middle"
-              className="fill-current text-micro text-text-subtle"
-            >
-              {d.label}
-            </text>
-          )
-        })}
+        <g aria-hidden="true">
+          {data.map((d, i) => {
+            const cx = i * slot + slot / 2
+            return (
+              <text
+                key={i}
+                x={cx}
+                y={height - 6}
+                textAnchor="middle"
+                className="fill-current text-micro text-text-subtle"
+              >
+                {d.label}
+              </text>
+            )
+          })}
+        </g>
       </svg>
     )
   },

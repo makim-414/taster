@@ -51,7 +51,8 @@ export function Typewriter({ words, loop = false, typingSpeed = 90, deletingSpee
 
   const shown = reduced ? words[count - 1] || '' : word.slice(0, sub)
   return (
-    <span className={cn('inline-flex items-baseline', className)} aria-label={loop ? words.join(', ') : words[count - 1]} {...props}>
+    <span className={cn('inline-flex items-baseline', className)} {...props}>
+      <span className="sr-only">{loop ? words.join(', ') : words[count - 1]}</span>
       <span aria-hidden>{shown}</span>
       <span
         aria-hidden

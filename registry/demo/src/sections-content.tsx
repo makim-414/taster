@@ -406,7 +406,7 @@ function SignupHero() {
         eyebrow="거래처 정리"
         title="거래처 목록을 올리면 연락이 끊긴 곳부터 정리해 드립니다"
         lead="엑셀 파일 하나면 됩니다. 마지막 거래일과 미수금을 기준으로 다시 연락할 순서를 매깁니다."
-        field={{ label: '업무용 이메일', type: 'email', placeholder: 'name@company.kr' }}
+        field={{ label: '업무용 이메일', type: 'email', placeholder: 'name@example.com' }}
         submitLabel="시작하기"
         helper="입력한 주소로 업로드 링크를 보냅니다. 보통 1분 안에 도착합니다."
         onSubmit={() => wait(600)}
