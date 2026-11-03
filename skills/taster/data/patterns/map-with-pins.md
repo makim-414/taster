@@ -5,7 +5,7 @@ category: map
 uses: [show-relationships]
 surfaces: [app]
 replaces: []
-components: []
+components: [blocks/location-map]
 inspiration: []
 status: draft
 ---

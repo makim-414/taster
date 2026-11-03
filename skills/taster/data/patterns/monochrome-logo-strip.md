@@ -5,7 +5,7 @@ category: testimonial
 uses: [prove-trust]
 surfaces: [landing]
 replaces: [AC-11, CMP-08]
-components: [blocks/badge]
+components: [blocks/badge, marketing/logo-wall]
 inspiration: []
 status: stable
 ---

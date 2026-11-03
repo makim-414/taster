@@ -1,0 +1,17 @@
+{
+  "expect": "UNKNOWN",
+  "why": "A decision step must end in a known category.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "classify",
+        {
+          "category": "3d"
+        },
+        "category"
+      ],
+      "value": "carousel"
+    }
+  ]
+}

@@ -22,6 +22,10 @@
   --bg-sunken: var(--muted);
   --secondary: oklch(0.95 0.002 95);
   --secondary-foreground: oklch(0.22 0.005 280);
+  /* Sidebar: one step below the paper, so the menu column reads light too (the dark core value would stay dark) */
+  --sidebar: var(--muted);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-border: var(--border);
 
   /* Text (ink) */
   --foreground: oklch(0.22 0.006 280);

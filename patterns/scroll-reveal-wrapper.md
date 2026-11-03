@@ -5,7 +5,7 @@ category: motion-particle
 uses: [set-the-mood]
 surfaces: [landing]
 replaces: [MOT-01, MOT-09]
-components: []
+components: [motion/scroll-enter]
 inspiration: []
 status: stable
 ---

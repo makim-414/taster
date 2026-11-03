@@ -5,7 +5,7 @@ category: typography
 uses: [read-long-text]
 surfaces: [landing, editorial, app]
 replaces: [KO-02, KO-03, KO-04, KO-05, KO-06, KO-08, KO-11, KO-12]
-components: []
+components: [content/prose]
 inspiration: []
 status: stable
 ---
@@ -30,6 +30,7 @@ Put these rules in once, at the root, and every component inherits them.
 ## Do
 
 - Give large Korean headings a line height of 1.2 to 1.35 (KO-12). The tight Latin display value (0.9 to 1.0) makes the final consonants of one line touch the next.
+- When Latin and Hangul share a line, set them as a pair: Latin tracking slightly positive and Hangul slightly negative, Latin leading near 120% and Hangul near 150%, Hangul one weight step heavier than the Latin beside it, and a CJK size adjustment (about 120/100/90% for display, body, caption) when the two families' x-heights differ. Raise the Korean UI steps once in the theme, not screen by screen, and leave display headlines at their size. Body 16px (17px per KRDS), paragraphs up to 640px, content up to 1280px on a 12, 8 and 4 column grid.
 - Declare the Latin face first and the Hangul face right after, so Latin glyphs keep the brand design: `'Brand Sans', 'Pretendard', system-ui, sans-serif`.
 - Check that the Hangul font really loaded by rendering a sample and comparing it with the fallback.
 - Scale the UI body up one step for Korean (14px to 15px) because Hangul strokes are denser.

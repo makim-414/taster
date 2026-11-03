@@ -5,7 +5,7 @@ category: tabs-segmented
 uses: [switch-views, filter-and-search]
 surfaces: [app, dashboard, landing]
 replaces: [AC-04, AC-05, COL-06]
-components: [blocks/tabs, blocks/toggle]
+components: [blocks/tabs, blocks/toggle, blocks/underline-tabs]
 inspiration: [https://www.radix-ui.com/primitives/docs/components/tabs]
 status: stable
 ---

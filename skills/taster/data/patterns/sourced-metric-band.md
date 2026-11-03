@@ -5,7 +5,7 @@ category: chart-kpi
 uses: [show-one-number, prove-trust]
 surfaces: [landing, dashboard]
 replaces: [CMP-06, CMP-08, COL-01]
-components: [blocks/kpi]
+components: [blocks/kpi, blocks/stat-strip]
 inspiration: []
 status: stable
 ---

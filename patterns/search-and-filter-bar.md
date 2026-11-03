@@ -5,7 +5,7 @@ category: form-input
 uses: [filter-and-search, jump-anywhere]
 surfaces: [app, dashboard, editorial]
 replaces: []
-components: [blocks/input, blocks/combobox]
+components: [blocks/input, blocks/combobox, blocks/search-field, blocks/filter-chips]
 inspiration: []
 status: stable
 ---

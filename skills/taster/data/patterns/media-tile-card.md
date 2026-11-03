@@ -5,7 +5,7 @@ category: card
 uses: [browse-media, explain-features]
 surfaces: [landing, commerce, app, editorial]
 replaces: [AC-17, CMP-12, LAY-02]
-components: [blocks/card, blocks/badge, blocks/glass-folder, blocks/side-folder, blocks/orbit-illustration]
+components: [blocks/card, blocks/badge, blocks/glass-folder, blocks/side-folder, blocks/orbit-illustration, marketing/case-study-card, commerce/product-card]
 inspiration: []
 status: stable
 ---

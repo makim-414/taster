@@ -5,7 +5,7 @@ category: motion-particle
 uses: [set-the-mood]
 surfaces: [landing, auth-onboarding]
 replaces: [BG-01, COL-01, COL-03]
-components: [motion/mesh-drift, motion/light-beams]
+components: [motion/mesh-drift, motion/point-field, motion/light-beams]
 inspiration: [https://blog.maximeheckel.co/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/]
 status: stable
 ---
@@ -30,6 +30,7 @@ All of them sit in an absolutely positioned layer with `pointer-events: none`, `
 
 ## Do
 
+- Over particles or a moving field, put the copy on a radial readability scrim with a faint text shadow, so it reads at every frame of the motion.
 - Pick a single neutral color from the tokens. Let lightness, not hue, carry depth.
 - Cap the device pixel ratio at 2 and the point count by screen area, fewer on phones.
 - Pause the loop when the canvas is off screen (`IntersectionObserver`) and when the tab is hidden (`document.hidden`).

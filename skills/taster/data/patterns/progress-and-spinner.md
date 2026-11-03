@@ -5,7 +5,7 @@ category: loader-skeleton
 uses: [show-progress]
 surfaces: [app]
 replaces: [AC-07, COL-01]
-components: [blocks/progress]
+components: [blocks/progress, blocks/spinner]
 inspiration: [https://ui.shadcn.com/docs/components/progress]
 status: stable
 ---

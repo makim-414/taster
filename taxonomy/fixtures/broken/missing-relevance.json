@@ -1,0 +1,14 @@
+{
+  "expect": "COVERAGE",
+  "why": "Every category needs a relevance value for every axis.",
+  "patch": [
+    {
+      "op": "delete",
+      "path": [
+        "relevance",
+        "hero",
+        "density"
+      ]
+    }
+  ]
+}

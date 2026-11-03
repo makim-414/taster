@@ -1,0 +1,17 @@
+{
+  "expect": "UNKNOWN",
+  "why": "The rule map may only name known categories.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "ruleMap",
+        "AC-01",
+        "categories"
+      ],
+      "value": [
+        "kicker"
+      ]
+    }
+  ]
+}

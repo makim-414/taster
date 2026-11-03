@@ -3,7 +3,7 @@
 Portable React and TypeScript components with neutral design tokens. There is no package to
 install and no other CLI to set up: `taster add` copies the files a component needs into your app.
 
-64 components, MIT licensed. Every entry is listed in `registry.json` with its file, category,
+143 components and one keyboard hook, MIT licensed. Every entry is listed in `registry.json` with its file, category,
 npm dependencies and credit.
 
 ## Add a component to your app
@@ -39,6 +39,16 @@ changed alone unless you pass `--overwrite`. Without a clone, read from the host
 6. Everything under `motion/`, and `marketing/pricing-cards`, `marketing/reveal-faq` and
    `marketing/step-showcase`, also need `src/motion/_motion.ts` (reduced motion, in-view and
    keyframe helpers, no dependency). Each of them honors `prefers-reduced-motion`.
+7. The page section, content, media, commerce, chat and scene components (`marketing/*` other than
+   the four above, `content/*`, `media/*`, `commerce/*`, `chat/*`, `scene/*`) have no npm
+   dependency and draw their own small line glyphs inline. These also need `src/motion/_motion.ts`:
+   `content/prose`, `content/article` (which also needs `content/prose`), `media/snap-carousel`,
+   `chat/tool-call`, `chat/agent-status`, `scene/point-globe`. `marketing/photo-hero`,
+   `media/before-after` and `media/gallery-lightbox` read `--on-scrim`, `--on-scrim-muted` and
+   `--on-scrim-ink` from `tokens.css`.
+8. Items in lists that can mix languages (feature rows, FAQ, products, cart lines, carousel items,
+   chat messages, case studies) take a `lang` field. Set `lang="ko"` on Korean items so the Korean
+   type rules in `tokens.css` (13px floor, words kept whole) apply to them.
 
 Example for a button and a dialog:
 
@@ -65,6 +75,10 @@ node test-render.mjs  # headless render gate, prints RENDER OK
 
 The demo page renders every registry entry in a `data-registry-id` wrapper. The render test
 fails on any page error, any console error, or any registry id without a rendered element.
+
+### Bringing in a component from elsewhere
+
+Do not install it; redraw it with the tokens. Record each one in a three column table (component, source and author, what we changed) and in `THIRD_PARTY_NOTICES.md` with its own license, checked per component. Replace motion libraries with CSS keyframes, make every control 44px on touch screens, never color a remove action red by default, keep only the structure of a tinted pill (not the tint), and leave out borders with a light running around them (COL-07, BG-01).
 
 ## What is not here yet
 
