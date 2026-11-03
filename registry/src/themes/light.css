@@ -22,10 +22,16 @@
   --bg-sunken: var(--muted);
   --secondary: oklch(0.95 0.002 95);
   --secondary-foreground: oklch(0.22 0.005 280);
-  /* Sidebar: one step below the paper, so the menu column reads light too (the dark core value would stay dark) */
+  /* Sidebar: one step below the paper, so the menu column reads light too (the dark core value would stay dark).
+     All eight are set, because a stock shadcn sidebar reads every one of them. */
   --sidebar: var(--muted);
   --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--accent-fg);
+  --sidebar-accent: var(--secondary);
+  --sidebar-accent-foreground: var(--foreground);
   --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 
   /* Text (ink) */
   --foreground: oklch(0.22 0.006 280);
@@ -46,7 +52,8 @@
   --accent-fg: oklch(0.99 0 0);
   --accent-soft: oklch(0.24 0.006 280 / 7%);
   --highlight: oklch(0.45 0.006 280);
-  --ring: oklch(0.24 0.01 280 / 30%);
+  /* Opaque, so the ring keeps 3:1 on paper, cards, --muted and --secondary alike (WCAG 1.4.11). */
+  --ring: oklch(0.56 0.01 280);
 
   /* Semantic colors tuned for light surfaces */
   --success: oklch(0.52 0.13 160);
