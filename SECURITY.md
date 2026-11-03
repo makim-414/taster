@@ -79,9 +79,12 @@ takes no file paths and writes no files. A way through that fence is in scope.
 
 ## Bookmarklet and extension
 
-Each click on the bookmarklet loads `https://taster-six.vercel.app/taster/overlay.js`, which loads the detector and
-the rule names from the same host, and runs them in the page you are on with that page's permissions, including pages
-where you are signed in. It runs whatever that host serves at the moment of the click.
+Each click on the bookmarklet loads `https://taster-six.vercel.app/taster/<version>/overlay.js` with the sha384 the
+bookmark was made with (Subresource Integrity), and that overlay loads the detector and the rule names from the same
+folder, each pinned to its own sha384, so a changed file does not run. None of these requests carries the address of
+the page you are on. The scripts run in that page with its permissions, including pages where you are signed in, and
+the page itself can interfere with them. A bookmark saved before the versioned folders (`/taster/overlay.js`) still
+runs whatever that host serves at the moment of the click; drag the bookmarklet from `/bookmarklet` again.
 
 The extension carries the same files inside its package, asks only for `activeTab` and `scripting`, and runs only when
 you press its button. Use it on pages you would not hand to a remote script. Neither one sends the findings anywhere.

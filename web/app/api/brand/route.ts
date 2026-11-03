@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { BlockedError, bareHost, parseTarget, resolvePublic } from '../../../lib/net-guard.ts';
 import { clientIp, takeToken, withGate } from '../../../lib/limits.ts';
-import { PageLoadError } from '../../../lib/diagnose.ts';
+import { PageLoadError, hostsOnly, loadFailure } from '../../../lib/diagnose.ts';
 import { runBrand } from '../../../lib/brand.ts';
 
 export const runtime = 'nodejs';
@@ -14,12 +14,12 @@ function fail(status: number, code: string, message: string) {
 
 export async function POST(request: Request) {
   // A JSON content type forces a CORS preflight from other origins, which this route never answers.
-  if (!(request.headers.get('content-type') || '').startsWith('application/json')) return fail(415, 'content-type', '요청 형식이 맞지 않습니다.');
+  if (!(request.headers.get('content-type') || '').startsWith('application/json')) return fail(415, 'content-type', 'send the request as JSON (content-type: application/json)');
   let body: { url?: unknown };
   try {
     body = await request.json();
   } catch {
-    return fail(400, 'invalid', '요청 형식이 맞지 않습니다.');
+    return fail(400, 'invalid', 'the request body is not valid JSON');
   }
   let target: URL;
   try {
@@ -30,14 +30,15 @@ export async function POST(request: Request) {
     throw err;
   }
   const token = takeToken(clientIp(request.headers));
-  if (!token.ok) return fail(429, 'rate-limit', `잠시 뒤에 다시 해 주세요. (${Math.ceil(token.retryAfter / 60)}분 뒤)`);
+  if (!token.ok) return fail(429, 'rate-limit', `too many requests, try again in ${Math.ceil(token.retryAfter / 60)} min`);
   try {
     const result = await withGate(() => runBrand(target.href));
-    if (!result) return fail(503, 'busy', '지금 요청이 몰려 있습니다. 조금 뒤에 다시 해 주세요.');
+    if (!result) return fail(503, 'busy', 'too many requests right now, try again in 20 s');
     return NextResponse.json({ source: result.source, tokens: result.tokens, notes: result.notes }, { headers: { 'cache-control': 'no-store' } });
   } catch (err) {
-    if (err instanceof PageLoadError) return fail(422, 'load', err.message);
-    console.error('brand failed', err);
-    return fail(500, 'internal', '브랜드를 읽지 못했습니다.');
+    // code load, or not-diagnosed when a bot check or an error page came back instead of the site.
+    if (err instanceof PageLoadError) return NextResponse.json({ error: loadFailure(err) }, { status: 422, headers: { 'cache-control': 'no-store' } });
+    console.error('brand failed', hostsOnly(String((err as Error)?.stack || err)));
+    return fail(500, 'internal', 'could not read the brand because of a server error');
   }
 }
