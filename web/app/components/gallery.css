@@ -22,14 +22,18 @@
 
 .lookbar { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); padding: var(--sp-4); border-radius: var(--r-card); background: var(--bg-sunken); }
 .lookbar-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); min-width: 0; }
-.seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); overflow: hidden; }
+/* No overflow: hidden on .seg: it clipped the focus ring of every item. The end items round their own corners instead,
+   one border width inside the group's. */
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); }
 .seg-item { padding: 0 var(--sp-4); border: 0; border-radius: 0; background: none; color: var(--text-muted); }
+.seg-item:first-child { border-start-start-radius: calc(var(--r-md) - 1px); border-end-start-radius: calc(var(--r-md) - 1px); }
+.seg-item:last-child { border-start-end-radius: calc(var(--r-md) - 1px); border-end-end-radius: calc(var(--r-md) - 1px); }
 .seg-item[aria-pressed='true'] { background: var(--text); color: var(--bg); font-weight: var(--w-med); }
 .color-field, .url-field, .select-field { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); min-width: 0; font-size: var(--t-body); color: var(--text-muted); }
 .url-field { flex: 1 1 18rem; flex-wrap: wrap; }
 .url-field span, .color-field span, .select-field span { white-space: nowrap; }
 .color-field input[type='color'] { width: 44px; height: 44px; padding: var(--sp-1); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); cursor: pointer; }
-.gallery-page input[type='text'], .gallery-page input[type='search'], .gallery-page select { min-height: 44px; padding: 0 var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); color: var(--text); font: inherit; font-size: 16px; }
+.gallery-page input[type='text'], .gallery-page input[type='search'], .gallery-page select { min-height: 44px; padding: 0 var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); color: var(--text); font: inherit; font-size: var(--t-input); }
 .color-field input[type='text'] { flex: 1 1 6rem; width: 7.5rem; min-width: 0; }
 .url-field input { flex: 1 1 12rem; min-width: 0; }
 .lookbar-note { margin: 0; font-size: var(--t-sm); color: var(--text-muted); }
@@ -53,10 +57,11 @@
 .card-view { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--r-md); }
 .card-view img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .card-live { display: block; position: absolute; top: 0; left: 0; width: 720px; height: 450px; transform-origin: 0 0; pointer-events: none; }
+.card-live[hidden] { display: none; } /* a paused frame: the still underneath shows instead */
 .live-frame { display: block; width: 100%; height: 100%; border: 0; }
 .card-text { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); padding-top: var(--sp-2); }
-.card-text h3 { margin: 0; font-size: var(--t-title); font-weight: var(--w-med); line-height: var(--lh-snug); }
-.card-text h3 a { text-decoration: none; }
+.card-text h2 { margin: 0; font-size: var(--t-title); font-weight: var(--w-med); line-height: var(--lh-snug); }
+.card-text h2 a { text-decoration: none; }
 .card-kind { margin: var(--sp-1) 0 0; font-size: var(--t-sm); color: var(--text-muted); }
 .pick { flex: none; padding: 0 var(--sp-3); border: 1px solid var(--border); background: var(--bg); color: var(--text); }
 .pick:hover { border-color: var(--text-subtle); }

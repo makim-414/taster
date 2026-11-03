@@ -15,6 +15,7 @@ function GalleryCard({ card, live, look }: { card: Card; live: boolean; look: Lo
   const { picks, togglePick } = useStudio();
   const box = useRef<HTMLSpanElement>(null);
   const [inView, setInView] = useState(false);
+  const [near, setNear] = useState(false);
   const [hover, setHover] = useState(false);
   const [scale, setScale] = useState(0.5);
   const picked = picks.includes(card.id);
@@ -23,15 +24,25 @@ function GalleryCard({ card, live, look }: { card: Card; live: boolean; look: Lo
   useEffect(() => {
     const el = box.current;
     if (!el) return;
-    const seen = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { rootMargin: '120px' });
+    // A fast scroll can queue an enter and a leave for the same card in one callback: the last entry is the current one.
+    const seen = new IntersectionObserver((entries) => setInView(entries[entries.length - 1].isIntersecting), { rootMargin: '120px' });
     seen.observe(el);
+    const close = new IntersectionObserver((entries) => setNear(entries[entries.length - 1].isIntersecting), { rootMargin: '50% 0px' });
+    close.observe(el);
     const sizes = new ResizeObserver(() => setScale(el.clientWidth / STAGE_WIDTH));
     sizes.observe(el);
-    return () => { seen.disconnect(); sizes.disconnect(); };
+    return () => { seen.disconnect(); close.disconnect(); sizes.disconnect(); };
   }, []);
 
-  // The still is always there underneath, so a frame that is still loading never leaves a hole.
+  // The still is always there underneath, so a frame that is still loading never leaves a hole. A frame that has
+  // started is paused by message, not removed, when it leaves the view or the pointer, so coming back needs no reload.
+  // Half a screen further away it is removed, so a long scroll does not keep a frame for every card.
   const running = inView && (live || hover);
+  const [started, setStarted] = useState(false);
+  useEffect(() => {
+    if (running) setStarted(true);
+    else if (!near) setStarted(false);
+  }, [running, near]);
   return (
     <article className="card">
       <Link
@@ -43,16 +54,16 @@ function GalleryCard({ card, live, look }: { card: Card; live: boolean; look: Lo
         <span ref={box} className="card-view">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={previewSrc(card.id, look.theme)} alt={`${card.name} 미리보기`} loading="lazy" width={1080} height={675} />
-          {running && (
-            <span className="card-live" style={{ transform: `scale(${scale})` }}>
-              <LiveFrame id={card.id} look={look} title={`${card.name} 실행 화면`} interactive={false} />
+          {(running || (started && near)) && (
+            <span className="card-live" style={{ transform: `scale(${scale})` }} hidden={!running}>
+              <LiveFrame id={card.id} look={look} title={`${card.name} 실행 화면`} interactive={false} paused={!running} />
             </span>
           )}
         </span>
       </Link>
       <div className="card-text">
         <div>
-          <h3><Link href={`/components/${card.group}/${card.slug}`}>{card.name}</Link></h3>
+          <h2><Link href={`/components/${card.group}/${card.slug}`}>{card.name}</Link></h2>
           <p className="card-kind">{card.categoryName}</p>
         </div>
         <button type="button" className="pick" aria-pressed={picked} disabled={full} onClick={() => togglePick(card.id)} aria-label={`${card.name} ${picked ? '빼기' : '담기'}`}>
