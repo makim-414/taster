@@ -44,6 +44,8 @@ build.
 Some files are generated. Do not edit them by hand; edit the source and run the build:
 
 - `node scripts/build-docs.mjs` writes `rules/RULES.md`, `patterns/README.md`, the taxonomy block in `README.md`,
+  the rules block in both READMEs, the descriptions in `package.json`, `extension/manifest.json`,
+  `distribution/acp-registry/taster/agent.json` and the two plugin manifests (`scripts/check-meta.mjs` lists them),
   `exports/`, `extension/detect.js`, `extension/rules.js`, `registry/src/motion/orb-recipes.ts`,
   `skills/taster/data/`, and the derived fields `fix_patterns` in `rules/rules.json`, `patterns` in
   `registry/registry.json` and `gaps` in `taxonomy/taxonomy.json`.
@@ -57,7 +59,7 @@ Commit the generated files together with the change that caused them.
 Run these before you open a pull request:
 
 ```bash
-node scripts/gates.mjs               # every job below, in order; installs what is missing first
+node scripts/gates.mjs               # every job below, in order (npm test runs the same); installs what is missing first
 node scripts/gates.mjs web           # one job: validate, browser, web or action
 ```
 
