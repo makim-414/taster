@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Noto_Sans_KR } from 'next/font/google';
+import localFont from 'next/font/local';
 import '../../registry/src/tokens.css';
 import '../../registry/src/themes/light.css';
 import './globals.css';
@@ -27,8 +27,18 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title: '이 화면은 얼마나 슬롭일까요', description: DESCRIPTION, images: ['/og.png'] },
 };
 
-// Self-hosted at build time by next/font. globals.css points the --font token at it.
-const sans = Noto_Sans_KR({ weight: ['400', '500', '600'], subsets: ['latin'], variable: '--font-sans', display: 'swap', preload: false });
+// Noto Sans KR, latin slice, kept in app/fonts (OFL, see app/fonts/OFL.txt). The build used to fetch it from
+// Google Fonts, which broke when Google changed its font URLs. globals.css points the --font token at it.
+const sans = localFont({
+  src: [
+    { path: './fonts/noto-sans-kr-latin-400.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/noto-sans-kr-latin-500.woff2', weight: '500', style: 'normal' },
+    { path: './fonts/noto-sans-kr-latin-600.woff2', weight: '600', style: 'normal' },
+  ],
+  variable: '--font-sans',
+  display: 'swap',
+  preload: false,
+});
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
 
