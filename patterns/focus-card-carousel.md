@@ -6,7 +6,7 @@ uses: [browse-media, explain-features]
 surfaces: [landing]
 replaces: [LAY-02]
 components: [blocks/card, blocks/coverflow-carousel, media/snap-carousel]
-inspiration: [https://21st.dev/@cult-ui/components/feature-carousel, https://21st.dev/@aayush-duhan/components/card-fan-carousel]
+inspiration: [https://21st.dev/@cult-ui/components/feature-carousel, https://21st.dev/@aayush-duhan/components/card-fan-carousel, https://21st.dev/@troyjlorents-gh/components/glassy-coverflow-carousel, https://21st.dev/@educalvolpz/components/coverflow-carousel]
 status: draft
 ---
 

@@ -6,7 +6,7 @@ uses: [compare-plans]
 surfaces: [landing]
 replaces: [AC-04, AC-14, CMP-09]
 components: [blocks/card, blocks/badge, blocks/button, blocks/toggle, marketing/pricing-cards, marketing/plan-rows]
-inspiration: [https://21st.dev/@mokshithgujjeti/components/pricing-section]
+inspiration: [https://21st.dev/@mokshithgujjeti/components/pricing-section, https://github.com/shadcnspace/shadcnspace]
 status: stable
 ---
 

@@ -6,7 +6,7 @@ uses: [show-one-number]
 surfaces: [landing, dashboard]
 replaces: [MOT-01]
 components: [blocks/kpi, motion/number-ticker, motion/digit-swap]
-inspiration: [https://magicui.design/docs/components/number-ticker]
+inspiration: [https://magicui.design/docs/components/number-ticker, https://beui.dev/components/motion/number]
 status: stable
 ---
 
