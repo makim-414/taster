@@ -82,7 +82,8 @@ export function applyAppearance(value: Appearance) {
 
 /** Put this in an inline script in <head>, so a stored mode is on the page before the first paint. */
 export function appearanceInitScript(storageKey: string = DEFAULT_KEY) {
-  const key = JSON.stringify(storageKey)
+  // A JSON string is a valid JS string literal. Writing every < as \u003c keeps a key like "</script>" from closing the tag.
+  const key = JSON.stringify(storageKey).replace(/</g, '\\u003c')
   return `(function(){try{var s=localStorage.getItem(${key});var t=s==='light'||s==='dark'?s:matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t)}catch(e){}})()`
 }
 

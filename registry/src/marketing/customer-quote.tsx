@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Customer quote: one person's words, set large, with their name, role and organization, an optional
 // real headshot and an optional measured result above the quote. One quote given room, instead of a row
@@ -57,7 +58,7 @@ export function CustomerQuote({ quote, name, role, org, photo, result, link, siz
       </figcaption>
       {link ? (
         <a
-          href={link.href}
+          href={safeHref(link.href)}
           className="mt-4 inline-flex min-h-11 items-center rounded-sm text-body font-medium text-text underline underline-offset-4 outline-none hover:text-text-muted focus-visible:ring-2 focus-visible:ring-ring desk:min-h-0"
         >
           {link.label}

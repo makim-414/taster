@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Slim footer: one row under a hairline, the copyright on the left and up to three links on the right,
 // wrapping under it on phones. For apps, docs and small sites that do not need columns.
@@ -33,7 +34,7 @@ export function SlimFooter({ copyright, links = [], meta, className, ...props }:
           <ul className="m-0 flex list-none flex-wrap gap-x-6 p-0">
             {links.slice(0, 3).map((l) => (
               <li key={l.href + l.label}>
-                <a href={l.href} className={LINK}>
+                <a href={safeHref(l.href)} className={LINK}>
                   {l.label}
                 </a>
               </li>
