@@ -96,6 +96,7 @@ const cases = {
   'blocks/app-shell': (u) => h(R.AppShell, { brand: 'Brand', nav: [{ label: 'Home', href: u }] }, 'Body'),
   'blocks/spotlight-card': (u) => h(R.SpotlightCard, { href: u }, 'Card'),
   'blocks/liquid-nav': (u) => h(R.LiquidNavbar, { items: [{ label: 'Home', href: u }, { label: 'Two' }] }),
+  'blocks/glass-folder': (u) => h(R.GlassFolder, { label: 'Folder', defaultOpen: true, files: [{ name: 'Brief', href: u }, { name: 'Notes' }] }),
   'blocks/item-list': (u) => h(R.ItemList, { items: [{ id: 'a', name: 'A', href: u }] }),
   'blocks/sidebar-nav': (u) => h(R.SidebarNav, { groups: [{ id: 'g', items: [{ id: 'a', label: 'A', href: u }] }] }),
   'commerce/cart': (u) =>
