@@ -3,7 +3,6 @@
   "note": "taster lint baseline: counts per file and check may only go down",
   "counts": {
     "registry/src/blocks/coverflow-carousel.tsx::SRC-01": 3,
-    "registry/src/blocks/glass-folder.tsx::SRC-01": 57,
     "registry/src/blocks/liquid-nav.tsx::SRC-01": 6,
     "registry/src/blocks/location-map.tsx::SRC-02": 2,
     "registry/src/blocks/side-folder.tsx::SRC-01": 3,
@@ -20,7 +19,6 @@
     "registry/src/marketing/site-footer.tsx::SRC-02": 1,
     "registry/src/marketing/site-header.tsx::SRC-02": 1,
     "registry/src/marketing/split-form-hero.tsx::SRC-02": 2,
-    "registry/src/marketing/workflow-section.tsx::SRC-01": 43,
     "registry/src/motion/_color.ts::SRC-01": 1,
     "registry/src/motion/glass-logo-reveal.tsx::SRC-01": 1,
     "registry/src/motion/light-beams.tsx::SRC-01": 3,
