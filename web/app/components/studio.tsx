@@ -89,17 +89,23 @@ export function useStudio(): Studio {
   return studio;
 }
 
-export const stageSrc = (id: string, look: Look) => `/stage/index.html?only=${encodeURIComponent(id)}&look=${encodeURIComponent(JSON.stringify(look))}`;
+// Which component and which look go after the #, so every frame loads the same document and the browser downloads the
+// stage once, instead of once for each address.
+export const stageSrc = (id: string, look: Look) => `/stage/index.html#only=${encodeURIComponent(id)}&look=${encodeURIComponent(JSON.stringify(look))}`;
 
-/** One component running live in a frame. The look changes without a reload. */
-export function LiveFrame({ id, look, title, interactive = true, onHeight }: { id: string; look: Look; title: string; interactive?: boolean; onHeight?: (height: number) => void }) {
+/** One component running live in a frame. The look changes without a reload, and a paused frame holds still. */
+export function LiveFrame({ id, look, title, interactive = true, paused = false, onHeight }: { id: string; look: Look; title: string; interactive?: boolean; paused?: boolean; onHeight?: (height: number) => void }) {
   const frame = useRef<HTMLIFrameElement>(null);
   // The address is fixed at the first look; later changes go by message, so the component keeps its state.
   const [src] = useState(() => stageSrc(id, look));
   const send = useCallback(() => {
     frame.current?.contentWindow?.postMessage({ type: 'taster-look', look }, location.origin);
   }, [look]);
+  const hold = useCallback(() => {
+    frame.current?.contentWindow?.postMessage({ type: 'taster-pause', paused }, location.origin);
+  }, [paused]);
   useEffect(send, [send]);
+  useEffect(hold, [hold]);
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
       if (event.origin !== location.origin || event.source !== frame.current?.contentWindow || event.data?.type !== 'taster-stage') return;
@@ -114,7 +120,7 @@ export function LiveFrame({ id, look, title, interactive = true, onHeight }: { i
       className="live-frame"
       src={src}
       title={title}
-      onLoad={send}
+      onLoad={() => { send(); hold(); }}
       tabIndex={interactive ? undefined : -1}
       aria-hidden={interactive ? undefined : true}
       style={interactive ? undefined : { pointerEvents: 'none' }}
