@@ -333,7 +333,7 @@ export function createServer({ remote } = {}) {
     {
       title: 'Pick a tone on the map',
       description:
-        `Place the look on the tone map before choosing components: x runs from commerce (0) to brand personality (1), y from minimal (0) to expressive (1), and a genre (${genreIds.join(', ')}) narrows the references. Returns the nearest real sites, numbered, each with its first screen opened now (not stored; a bot check or block page comes back as a link only, and cookie banners are only rejected), what it is and the public post that praised it; the eight axes this spot sets (density, contrast, roundness, type-expression, color-restraint, elevation, motion, stroke) with step names; token overrides and a theme.css block; ` +
+        `Place the look on the tone map before choosing components: x runs from commerce (0) to brand personality (1), y from minimal (0) to expressive (1), and a genre (${genreIds.join(', ')}) narrows the references. Returns the nearest real sites, numbered, each with its first screen opened now (not stored; a bot check or block page comes back as a link only, and cookie banners are only rejected), what it is and the public post that praised it (or, marked as such, only mentioned it); the eight axes this spot sets (density, contrast, roundness, type-expression, color-restraint, elevation, motion, stroke) with step names; token overrides and a theme.css block; ` +
         `${remote ? 'a live link to Taster parts wearing those tokens' : 'a picture of a Taster part wearing those tokens'}; and the tone page where the user can drag the spot. The references set the direction, the parts show what Taster will build. Show every picture and the link, ask which reference is closest or which way to move, and wait.`,
       inputSchema: {
         x: z.number().min(0).max(1).optional().describe('0 commerce to 1 brand personality, default 0.5'),
@@ -373,7 +373,7 @@ export function createServer({ remote } = {}) {
           pictures = await captureRefs(browser, tone.refs);
         }
         tone.refs.forEach((r, i) => {
-          const praise = r.praise ? ` Praised on ${PRAISE_ON[r.praise.on]} (${r.praise.date}): ${r.praise.url}${r.praise.caveat ? ` (${r.praise.caveat.en})` : ''}` : ' Placed by hand; no praise post on file.';
+          const praise = r.praise ? ` ${r.praise.kind === 'mention' ? 'Mentioned' : 'Praised'} on ${PRAISE_ON[r.praise.on]} (${r.praise.date}): ${r.praise.url}${r.praise.caveat ? ` (${r.praise.caveat.en})` : ''}` : ' Placed by hand; no praise or mention post on file.';
           content.push({ type: 'text', text: `${i + 1}. ${r.name} (${hostOf(r.url)}, at ${r.x}, ${r.y}): ${r.note.en}${praise}\n${r.url}` });
           const shot = pictures[r.id];
           if (shot?.status === 'ok') content.push({ type: 'image', mimeType: shot.mimeType, data: shot.data });
