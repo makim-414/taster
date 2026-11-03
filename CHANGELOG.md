@@ -25,6 +25,12 @@ All notable changes to Taster are recorded here. The format follows
 - A second screen in `examples/rebuild/`, built from the same components and checked consistent with the first, and
   the rebuild example now wears the design system made from its original.
 - Guidance from Taster's own screens in eighteen patterns and in the engine and registry READMEs.
+- `THIRD_PARTY_NOTICES.md` at the root lists the third party code in the repository (registry and web) and where each
+  license text lives.
+- `node scripts/gates.mjs` runs every gate CI runs, in the same order, from a clean clone; `CONTRIBUTING.md` lists
+  them one by one.
+- A "Where the rules come from" section in both READMEs, written by `scripts/build-docs.mjs` from each rule's `basis`
+  and refs, and a privacy section for the hosted site.
 
 ### Changed
 
@@ -32,6 +38,19 @@ All notable changes to Taster are recorded here. The format follows
 - A logo face that a system declares as `identity.logoFont` is exempt inside the logo and reported apart.
 - Registry spacing, type sizes and weights read the tokens.
 - The web app carries the Noto Sans KR files it uses, with their OFL license, instead of fetching them at build.
+- MCP results, breaking for a client that parses them: what a page says (the report of `diagnose`, the content of
+  `extract_content`, the page values in `brand_theme`) now comes inside an `<untrusted_page_content>` block, and the
+  first content item is a sentence from Taster. A client that ran `JSON.parse` on the first text item reads the JSON
+  inside the block instead.
+- A page that answers with a bot check, a block or error page, or a sign-in page on another host is reported as not
+  diagnosed, with no findings: an MCP error that starts with `not diagnosed`, exit code 2 from the CLI and the GitHub
+  Action, and a notice in the SARIF.
+- Breaking for code that uses these registry components: `BarChart`, `Sparkline` and `Progress` need a `label`,
+  `aria-label` or `aria-labelledby`, and `PopoverContent` an `aria-label` or `aria-labelledby`; without one,
+  TypeScript reports an error.
+- The hosted MCP server takes one JSON-RPC message per request (a batch gets 400), counts every tool call against a
+  per client minute and answers with an error instead of anything over 4 MB. Its limits, like those of the other
+  hosted routes, are kept by each server instance on its own.
 
 ### Fixed
 
@@ -49,7 +68,13 @@ All notable changes to Taster are recorded here. The format follows
 - A component page's install line works from inside your app (`--from` the hosted site), and its English summary is
   marked as English.
 - The bookmarklet's files live in a folder named after their hash, so the browser can keep them for good without
-  ever running an old copy against a new bookmark.
+  ever running an old copy against a new bookmark. The bookmark holds the overlay's sha384 and the overlay those of
+  the detector and the rule names, so a click runs only the files it was made with, and the requests send no Referer.
+  A bookmarklet saved before this change still loads the unpinned `/taster/overlay.js` and sends that first request
+  with a Referer: drag it from `/bookmarklet` again.
+- The READMEs: working MCP setups for Codex and Cursor, the requirements, what the local tools can reach, the hosted
+  server's tools as they are, and the number of rules the rebuild example breaks, which
+  `engine/scripts/check-rebuild-example.mjs` now checks. The Korean README has every section of the English one.
 - The GitHub Action runs on macOS runners too (it read its targets with `mapfile`, which the bash on macOS lacks),
   pins the actions it uses to a commit, and installs Chromium's system packages only when the runner lacks them.
 
