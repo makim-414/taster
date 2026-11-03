@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, formatText, viewportFor } from './diagnose.mjs';
@@ -8,19 +8,26 @@ import { checkConsistency, formatConsistencyText } from './consistency.mjs';
 import { PLAN_FILE, nextStep, planFromExtract, planRelative, writePlan } from './plan.mjs';
 
 const HELP = `Usage
-  node engine/cli.mjs <url-or-file>... [--out <dir>] [--json] [--widths 1440,390] [--sarif <file>] [--summary <file>] [--fail-on <level>]
-  node engine/cli.mjs <url-or-file> --extract [--out <dir>]
-  node engine/cli.mjs <url-or-file> --brand [--json] [--out <dir>]
-  node engine/cli.mjs --system [brand url or file] [--ref <url or file> ...] [--axis name=value ...] [--surface id] [--scheme dark|light] --out <dir> [--json]
-  node engine/cli.mjs --tune <dir>/taster.system.json name=value ... [--json]
-  node engine/cli.mjs --consistency <screen> <screen> ... [--system <file>]... [--logo-font <family>] [--json] [--out <dir>]
-  node engine/cli.mjs --plan <url-or-file> --out <dir> [--route rebuild] [--system <file>] [--by-part]
-  node engine/cli.mjs --rules
-  node engine/cli.mjs --explain <rule-id>
-  node engine/cli.mjs add <component-id>... [--dir <dir>] [--from <url>] [--overwrite]
-  node engine/cli.mjs add --list
-  node engine/cli.mjs export <agents|claude|cursor|windsurf|cline|copilot|gemini|all> [--dir <project>]
-  node engine/cli.mjs lint [paths...] [--json] [--baseline <file>] [--write-baseline] [--selftest]
+  taster <url-or-file>... [--out <dir>] [--json] [--widths 1440,390] [--sarif <file>] [--summary <file>] [--fail-on <level>]
+  taster <url-or-file> --extract [--out <dir>]
+  taster <url-or-file> --brand [--json] [--out <dir>]
+  taster --system [brand url or file] [--ref <url or file> ...] [--axis name=value ...] [--surface id] [--scheme dark|light] --out <dir> [--json]
+  taster --tune <dir>/taster.system.json name=value ... [--json]
+  taster --consistency <screen> <screen> ... [--system <file>]... [--logo-font <family>] [--json] [--out <dir>]
+  taster --plan <url-or-file> --out <dir> [--route rebuild] [--system <file>] [--by-part]
+  taster --rules
+  taster --explain <rule-id>
+  taster add <component-id>... [--dir <dir>] [--from <url>] [--overwrite]
+  taster add --list
+  taster export <agents|claude|cursor|windsurf|cline|copilot|gemini|all> [--dir <project>]
+  taster lint [paths...] [--json] [--baseline <file>] [--write-baseline] [--selftest]
+  taster mcp                 MCP server on stdio
+  taster acp [--setup]       ACP agent on stdio; --setup prepares the browser in a terminal
+  taster setup               check for a browser, download Chromium if none works
+  taster --version
+
+In a clone of the repository, run node bin/taster.mjs (or node engine/cli.mjs for all but mcp, acp and setup)
+in place of taster.
 
 A target is an http(s) URL, localhost:<port> (opened as http), a bare domain (opened as https), or a local .html,
 .htm, .xhtml or .svg file. Other local files are refused, and a missing file is never guessed into a web address.
@@ -42,6 +49,7 @@ Options
   --fail-on <level> exit 1 only for findings at this severity or above: high, medium, low (default) or none
   --widths <list>   viewport widths, default ${VIEWPORTS.map((v) => v.width).join(',')}
                     'responsive' runs ${RESPONSIVE_WIDTHS.join(',')}
+  --version         print the version
 
 add copies registry components into your app with every helper they import and the token files, no shadcn
 needed. --dir defaults to src/components/taster. --from reads a hosted copy (https://taster-six.vercel.app)
@@ -54,8 +62,10 @@ counts per file and check may only go down. A line passes with a comment taster-
 
 Environment
   TASTER_ROOT=<dir>     open local files only inside <dir>
+  TASTER_WEB_URL=<url>  where the component and board links the MCP server gives point,
+                        default https://taster-six.vercel.app (for a self-hosted copy of the site)
 
-Exit codes: 0 no findings, 1 findings, 2 error`;
+Exit codes: 0 no findings at --fail-on or above, 1 findings, 2 error`;
 
 function viewportsFrom(list) {
   if (!list) return VIEWPORTS;
@@ -136,13 +146,23 @@ async function main() {
       summary: { type: 'string' },
       'fail-on': { type: 'string' },
       help: { type: 'boolean', short: 'h' },
+      version: { type: 'boolean' },
     },
   });
 
-  if (values.help) {
+  if (values.help || (positionals.length === 1 && positionals[0] === 'help')) {
     console.log(HELP);
     return 0;
   }
+  if (values.version) {
+    // The published package's own version (the repository root package.json, next to bin/ and engine/).
+    console.log(JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version);
+    return 0;
+  }
+  // Checked before any page is opened, whichever way the findings are reported.
+  const ranks = { high: 3, medium: 2, low: 1, none: 99 };
+  const failOn = values['fail-on'] || 'low';
+  if (!Object.hasOwn(ranks, failOn)) throw new Error(`Bad --fail-on: ${failOn} (high, medium, low or none)`);
   if (values.rules) {
     for (const r of RULES) console.log(`${r.id.padEnd(7)} ${r.detect.level.padEnd(14)} ${r.severity.padEnd(7)} ${r.name}`);
     return 0;
@@ -176,22 +196,7 @@ async function main() {
     console.error(HELP);
     return 2;
   }
-  if (values.sarif || values.summary || many) {
-    const failOn = values['fail-on'] || 'low';
-    const ranks = { high: 3, medium: 2, low: 1, none: 99 };
-    if (!ranks[failOn]) throw new Error(`Bad --fail-on: ${failOn}`);
-    const { toSarif, toSummary } = await import('./sarif.mjs');
-    const reports = [];
-    for (const target of positionals) {
-      const report = await diagnose(target, { viewports: viewportsFrom(values.widths), outDir: null });
-      reports.push(report);
-      console.log(values.json ? JSON.stringify(report, null, 2) : formatText(report));
-    }
-    if (values.sarif) writeFileSync(values.sarif, `${JSON.stringify(toSarif(reports), null, 2)}\n`);
-    if (values.summary) appendFileSync(values.summary, `${toSummary(reports)}\n`);
-    const worst = Math.max(0, ...reports.flatMap((r) => r.rules.map((h) => ranks[h.severity] || 0)));
-    return worst >= ranks[failOn] ? 1 : 0;
-  }
+  const viewports = viewportsFrom(values.widths);
 
   if (values.out) mkdirSync(values.out, { recursive: true });
   if (values.brand) {
@@ -206,10 +211,21 @@ async function main() {
     console.log(JSON.stringify(content, null, 2));
     return 0;
   }
-  const report = await diagnose(positionals[0], { viewports: viewportsFrom(values.widths), outDir: values.out || null });
-  if (values.out) writeFileSync(join(values.out, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
-  console.log(values.json ? JSON.stringify(report, null, 2) : formatText(report));
-  return report.rulesHit > 0 ? 1 : 0;
+  // --out is refused above for several targets, so with it there is exactly one.
+  const reports = [];
+  for (const target of positionals) {
+    const report = await diagnose(target, { viewports, outDir: values.out || null });
+    if (values.out) writeFileSync(join(values.out, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
+    reports.push(report);
+    console.log(values.json ? JSON.stringify(report, null, 2) : formatText(report));
+  }
+  if (values.sarif || values.summary) {
+    const { toSarif, toSummary } = await import('./sarif.mjs');
+    if (values.sarif) writeFileSync(values.sarif, `${JSON.stringify(toSarif(reports), null, 2)}\n`);
+    if (values.summary) appendFileSync(values.summary, `${toSummary(reports)}\n`);
+  }
+  const worst = Math.max(0, ...reports.flatMap((r) => r.rules.map((h) => ranks[h.severity] || 0)));
+  return worst >= ranks[failOn] ? 1 : 0;
 }
 
 main().then(

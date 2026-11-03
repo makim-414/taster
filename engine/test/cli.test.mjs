@@ -49,6 +49,28 @@ test('exit 2 on a bad target or a bad width', () => {
   assert.equal(run(fixture('clean.html'), '--widths', '12').status, 2);
 });
 
+test('--fail-on counts for one target too, and a bad level is an error before any page opens', { timeout: 90000 }, () => {
+  assert.equal(run(fixture('slop.html'), '--widths', '390', '--fail-on', 'none').status, 0);
+  assert.equal(run(fixture('slop.html'), '--widths', '390', '--fail-on', 'high').status, 1);
+  const bad = run(fixture('slop.html'), '--fail-on', 'bogus');
+  assert.equal(bad.status, 2);
+  assert.match(bad.stderr, /Bad --fail-on: bogus/);
+});
+
+test('--out with --sarif and --summary still writes report.json and the captures', { timeout: 90000 }, () => {
+  const out = mkdtempSync(join(tmpdir(), 'taster-cli-sarif-'));
+  try {
+    const r = run(fixture('slop.html'), '--widths', '390', '--out', join(out, 'o'), '--sarif', join(out, 'r.sarif'), '--summary', join(out, 's.md'));
+    assert.equal(r.status, 1, r.stderr);
+    assert.ok(JSON.parse(readFileSync(join(out, 'o', 'report.json'), 'utf8')).rulesHit > 0);
+    assert.ok(existsSync(join(out, 'o', 'annotated-390.jpg')));
+    assert.ok(JSON.parse(readFileSync(join(out, 'r.sarif'), 'utf8')).runs[0].results.length > 0);
+    assert.match(readFileSync(join(out, 's.md'), 'utf8'), /^## Taster/);
+  } finally {
+    rmSync(out, { recursive: true, force: true });
+  }
+});
+
 test('a long page comes back as JPEG captures under 4 MB each', { timeout: 120000 }, () => {
   const dir = mkdtempSync(join(tmpdir(), 'taster-cli-tall-'));
   try {
@@ -105,6 +127,17 @@ test('targets: local pages only, no guessing a missing file into a web address, 
     else process.env.TASTER_ROOT = root;
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('--version prints the package version, --help names every taster command', () => {
+  const version = run('--version');
+  assert.equal(version.status, 0);
+  assert.equal(version.stdout.trim(), JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')).version);
+  const help = run('--help');
+  for (const line of ['taster <url-or-file>...', 'taster mcp', 'taster acp [--setup]', 'taster setup', 'taster --version', 'TASTER_ROOT', 'TASTER_WEB_URL', '2 error']) {
+    assert.ok(help.stdout.includes(line), `--help is missing ${line}`);
+  }
+  assert.equal(run('help').stdout, help.stdout);
 });
 
 test('--rules lists every rule and --explain prints the fix', () => {
