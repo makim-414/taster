@@ -17,12 +17,13 @@
  *                         --taster-outline (fallback #e5484d). Set it on :root to change it.
  *   clear       boolean   remove the outlines added by an earlier call and return.
  *   maxPerRule  number    cap on reported findings per rule (default 40, totals stay in `counts`).
- *   rules       string[]  only run these rule ids.
+ *   rules       string[]  only report these rule ids. A rule that reads others (COL-05, LAY-04) still runs them.
  *
  * Result:
  *   { url, viewport:{width,height,dpr}, findings:[{ruleId, selector, text, rect, evidence}],
- *     counts:{ruleId:n}, notes:[], errors:[] }
- * rect is in document coordinates (x, y, w, h in CSS pixels).
+ *     counts:{ruleId:n}, thirdParty:[finding + {thirdParty:'consent'}], notes:[], errors:[] }
+ * rect is in document coordinates (x, y, w, h in CSS pixels). thirdParty holds what a consent manager's banner
+ * (vendor ids) would add. It is not in findings or counts: the widget is not the site's design.
  *
  * Rules that need meaning (AC-18, AC-19, CMP-08) are manual and not run. CPY-01 and KO-07
  * report phrase candidates only. Thresholds mirror rules.json detect.css.
@@ -326,36 +327,58 @@
   }
 
   // ---------------------------------------------------------------- main
+  // Consent managers are third-party widgets a site embeds. Vendor ids only: a banner the site builds itself is its own design.
+  // detect.js never presses their buttons.
+  var CONSENT_SEL = '#onetrust-consent-sdk,#CybotCookiebotDialog,#usercentrics-root,.osano-cm-window,#truste-consent-track,' +
+    '[id^="sp_message_container"],.qc-cmp2-container,#didomi-host';
+  // Rules that read other rules' results: asked for alone, they need those to run first.
+  var NEEDS = { 'COL-05': ['COL-01', 'COL-03', 'COL-07'], 'LAY-04': ['LAY-02'] };
+
   function run(options) {
     options = options || {};
     clearHighlights();
     var vw = window.innerWidth, vh = window.innerHeight;
     var viewport = { width: vw, height: vh, dpr: window.devicePixelRatio || 1 };
     if (options.clear) {
-      return { url: location.href, viewport: viewport, page: { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }, cleared: true, findings: [], counts: {}, notes: [], errors: [] };
+      return { url: location.href, viewport: viewport, page: { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }, cleared: true, findings: [], counts: {}, thirdParty: [], notes: [], errors: [] };
     }
     FACES = loadedFaces();
 
     var cap = options.maxPerRule || 40;
     var findings = [], notes = [], errors = [], counts = {}, hits = {}, seen = {}, toHL = [];
+    // Rules run only because a requested rule reads their results: counted while the run lasts, never reported.
+    var silent = {};
+    // What a third-party widget draws is not the site's design: those findings go to thirdParty, outside counts.
+    var thirdParty = [], partyCounts = {};
 
     function add(ruleId, el, evidence) {
       if (!el) return;
       seen[ruleId] = seen[ruleId] || new Set();
       if (seen[ruleId].has(el)) return;
       seen[ruleId].add(el);
+      var party = el.closest && el.closest(CONSENT_SEL) ? 'consent' : null;
+      if (party) {
+        partyCounts[ruleId] = (partyCounts[ruleId] || 0) + 1;
+        if (!silent[ruleId] && partyCounts[ruleId] <= cap) thirdParty.push(finding(ruleId, el, evidence, party));
+        return;
+      }
       counts[ruleId] = (counts[ruleId] || 0) + 1;
       (hits[ruleId] = hits[ruleId] || []).push(el);
-      if (counts[ruleId] > cap) return;
+      if (silent[ruleId] || counts[ruleId] > cap) return;
+      findings.push(finding(ruleId, el, evidence));
+      toHL.push(el);
+    }
+    function finding(ruleId, el, evidence, party) {
       var r = el.getBoundingClientRect();
-      findings.push({
+      var f = {
         ruleId: ruleId,
         selector: sel(el),
         text: norm(el.innerText !== undefined ? el.innerText : el.textContent).slice(0, 60),
         rect: { x: Math.round(r.left + window.scrollX), y: Math.round(r.top + window.scrollY), w: Math.round(r.width), h: Math.round(r.height) },
         evidence: evidence || {}
-      });
-      toHL.push(el);
+      };
+      if (party) f.thirdParty = party;
+      return f;
     }
 
     // ------------------------------------------------ collect elements and text
@@ -389,6 +412,15 @@
         M.set(el, it);
       }
     }
+    // A closed <details> keeps layout boxes for its content, but nobody sees it: only its own summary shows.
+    function folded(el) {
+      for (var d = el.closest && el.closest('details:not([open])'); d; d = d.parentElement && d.parentElement.closest('details:not([open])')) {
+        var s = d.querySelector(':scope > summary');
+        if (!s || !s.contains(el)) return true;
+      }
+      return false;
+    }
+    // Text in a closed <details> is left out here, so every text rule (ownText and TN) skips what nobody can read.
     var OWN = new Map(), TN = [];
     var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
     var n;
@@ -396,7 +428,7 @@
       var v = n.nodeValue;
       if (!v || !v.trim()) continue;
       var p = n.parentElement;
-      if (!p || !M.has(p)) continue;
+      if (!p || !M.has(p) || folded(p)) continue;
       TN.push({ node: n, el: p, text: v });
       OWN.set(p, ((OWN.get(p) || '') + ' ' + v).replace(/\s+/g, ' ').trim());
     }
@@ -433,10 +465,12 @@
     function bgOf(it) {
       return parseColor(it.cs.backgroundColor) || { r: 0, g: 0, b: 0, a: 0 };
     }
+    // Chrome keeps a percentage as written ("-2%"), and a percentage is a share of the font size, so it is already em.
     function letterEm(cs) {
-      if (cs.letterSpacing === 'normal') return 0;
-      var fs = px(cs.fontSize) || 16;
-      return px(cs.letterSpacing) / fs;
+      var v = String(cs.letterSpacing);
+      if (v === 'normal') return 0;
+      if (/%$/.test(v)) return parseFloat(v) / 100 || 0;
+      return px(v) / (px(cs.fontSize) || 16);
     }
     function words(el) {
       var t = norm(el.textContent);
@@ -933,13 +967,22 @@
         if (fs >= 64 && wn >= 8) add('TYP-04', h.el, { fontSizePx: fs, words: wn, viewportWidth: vw });
       });
     };
+    // A wordmark is drawn tight on purpose and AC-18 says to keep it as it is: one or two words in a header or nav
+    // link, or in an element (or its link) named logo or brand. Not a whole section named brand.
+    function wordmark(el) {
+      if (norm(el.textContent).split(' ').length > 2) return false;
+      if (el.closest('header a[href],nav a[href]')) return true;
+      var named = function (e) { return !!e && /logo|brand|wordmark/i.test(e.getAttribute('class') || ''); };
+      return named(el) || named(el.closest('a[href]'));
+    }
     R['TYP-05'] = function () {
       I.forEach(function (it) {
         if (!ownText(it.el)) return;
         var fs = px(it.cs.fontSize);
-        if (fs < 32) return;
+        if (fs < 32 || wordmark(it.el)) return;
         var ls = letterEm(it.cs);
-        if (ls <= -0.04) add('TYP-05', it.el, { fontSizePx: fs, letterSpacingEm: rn(ls) });
+        // One finding per heading or paragraph, even when each word is its own span.
+        if (ls <= -0.04) add('TYP-05', it.el.closest('h1,h2,h3,h4,h5,h6,p') || it.el, { fontSizePx: fs, letterSpacingEm: rn(ls) });
       });
     };
 
@@ -1535,16 +1578,18 @@
     // -------- copy candidates (manual rules, candidates only)
     var AI_COPY = /\b(elevate your|unlock the (power|potential)|supercharge|seamless(ly)?|revolutioni[sz]e|game[- ]changer|next[- ]gen(eration)?|to the next level|reimagine[d]?|build faster,? ship smarter|(build|ship|move|work) (faster|smarter),|not (just|only|merely|simply) (a |an |the )?[^.,;!?]{1,40}?,? but\b|it'?s not (just )?(about )?[^.,;!?]{1,40}?, it'?s\b)/i;
     var KO_COPY = /\uACBD\uD5D8\uD558\uC138\uC694|\uC0C8\uB85C\uC6B4 \uCC28\uC6D0|\uC758 \uBBF8\uB798\uB97C|\uB9CC\uB098\uBCF4\uC138\uC694|\uCC28\uC6D0\uC774 \uB2E4\uB978|\uD55C \uB2E8\uACC4 \uB354 \uC5C5\uADF8\uB808\uC774\uB4DC|\uB2E8\uC21C\uD55C [^.,]{1,20}(\uC774|\uAC00) \uC544\uB2CC/;
+    // Copy is what the page says to its reader: a code listing or a sample of keyboard input is not copy.
+    var NOT_COPY = 'code,pre,kbd,samp';
     R['CPY-01'] = function () {
       I.forEach(function (it) {
         var t = ownText(it.el);
-        if (t && AI_COPY.test(t)) add('CPY-01', it.el, { candidate: true, match: (t.match(AI_COPY) || [])[0] });
+        if (t && AI_COPY.test(t) && !it.el.closest(NOT_COPY)) add('CPY-01', it.el, { candidate: true, match: (t.match(AI_COPY) || [])[0] });
       });
     };
     R['KO-07'] = function () {
       I.forEach(function (it) {
         var t = ownText(it.el);
-        if (t && KO_COPY.test(t)) add('KO-07', it.el, { candidate: true, match: (t.match(KO_COPY) || [])[0] });
+        if (t && KO_COPY.test(t) && !it.el.closest(NOT_COPY)) add('KO-07', it.el, { candidate: true, match: (t.match(KO_COPY) || [])[0] });
       });
     };
 
@@ -1737,10 +1782,7 @@
       return o;
     }
     function hiddenFromReader(el) {
-      // A closed <details> keeps layout boxes for its content, but nobody sees them.
-      var fold = el.closest && el.closest('details:not([open])');
-      if (fold && !el.closest('summary')) return true;
-      return opacityOf(el) < 0.1 || !!el.closest('[aria-hidden="true"],[inert]');
+      return folded(el) || opacityOf(el) < 0.1 || !!el.closest('[aria-hidden="true"],[inert]');
     }
     // Fixed and sticky layers (headers, cookie banners, chat buttons) cover content on purpose.
     function inOverlay(el) {
@@ -2237,20 +2279,27 @@
       'KO-08', 'KO-09', 'KO-10', 'KO-11',
       'RSP-01', 'RSP-02', 'RSP-03', 'RSP-04', 'RSP-05', 'RSP-06', 'RSP-07', 'COL-08', 'CPY-02', 'CPY-03', 'CMP-12', 'LAY-07', 'KO-12', 'KO-13'
     ];
+    var want = options.rules;
+    if (want) {
+      want.forEach(function (id) {
+        (NEEDS[id] || []).forEach(function (d) { if (want.indexOf(d) < 0) silent[d] = true; });
+      });
+    }
     ORDER.forEach(function (id) {
-      if (options.rules && options.rules.indexOf(id) < 0) return;
+      if (want && want.indexOf(id) < 0 && !silent[id]) return;
       try {
         R[id]();
       } catch (e) {
         errors.push({ ruleId: id, message: String((e && e.message) || e) });
       }
     });
+    Object.keys(silent).forEach(function (id) { delete counts[id]; });
     notes.push('Manual rules not run: AC-18, AC-19, CMP-08. CPY-01, KO-07 and RSP-05 report candidates only.');
     if (vw > 1024) notes.push('RSP-06 (touch size) runs at 1024px and below only.');
 
     if (options.highlight) highlight(toHL);
 
-    return { url: location.href, viewport: viewport, page: { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }, version: VERSION, findings: findings, counts: counts, notes: notes, errors: errors };
+    return { url: location.href, viewport: viewport, page: { width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }, version: VERSION, findings: findings, counts: counts, thirdParty: thirdParty, notes: notes, errors: errors };
   }
 
   run.version = VERSION;
