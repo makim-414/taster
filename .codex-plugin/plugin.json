@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "Taster",
     "shortDescription": "Diagnose AI slop in a frontend, swap it, or build without it.",
-    "longDescription": "Slop rules checked in a real browser, a taxonomy of reusable UI patterns organized by what the user is trying to do, and a token based component registry you can copy from.",
+    "longDescription": "88 rules, 85 measured in a real browser, a taxonomy of 122 patterns organized by what the user is trying to do, and a registry of 144 components built on tokens that you copy into your app.",
     "developerName": "makim-414",
     "category": "Design",
     "capabilities": [],
