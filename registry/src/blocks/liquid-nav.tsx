@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { safeHref } from './_url'
 
 // Liquid nav: a pill of water. The active drop stretches toward the item you pick, splits into
 // droplets on long jumps and merges back with a ripple; each icon plays a short scene on tap.
@@ -20,6 +21,7 @@ export type NimbusFx = "plane" | "drop" | "spin" | "glow" | "wave" | "pop" | "no
 
 export type LiquidNavItem = {
   label: string
+  /** http, https or mailto, or a relative path. Any other scheme draws a button instead (blocks/_url.ts). */
   href?: string
   icon?: React.ReactNode
   /** the little scene the icon plays when tapped */
@@ -571,8 +573,9 @@ export function LiquidNavbar({
             <span className="nimbus-label">{it.label}</span>
           </>
         )
-        return it.href ? (
-          <a key={it.label + i} {...(props as any)} href={it.href} aria-label={it.label}>{content}</a>
+        const href = safeHref(it.href)
+        return href ? (
+          <a key={it.label + i} {...(props as any)} href={href} aria-label={it.label}>{content}</a>
         ) : (
           <button key={it.label + i} {...(props as any)} type="button" aria-label={it.label}>{content}</button>
         )

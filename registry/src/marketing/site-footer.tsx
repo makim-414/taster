@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Site footer: the wordmark and one sentence about what the company does, three or four link columns with
 // sentence-case headings, a business block (registered name, registration number where the law asks for
@@ -54,7 +55,7 @@ export function SiteFooter({ brand, tagline, columns, business, copyright, legal
               <ul className="m-0 mt-3 grid list-none gap-0 p-0 desk:gap-1">
                 {c.links.map((l) => (
                   <li key={l.href + l.label}>
-                    <a href={l.href} className={cn(LINK, KEEP)}>
+                    <a href={safeHref(l.href)} className={cn(LINK, KEEP)}>
                       {l.label}
                     </a>
                   </li>
@@ -68,7 +69,7 @@ export function SiteFooter({ brand, tagline, columns, business, copyright, legal
         <p className="text-label text-text-subtle">{copyright}</p>
         <div className="flex flex-wrap items-center gap-x-6">
           {legal.map((l) => (
-            <a key={l.href + l.label} href={l.href} className={cn(LINK, 'text-label')}>
+            <a key={l.href + l.label} href={safeHref(l.href)} className={cn(LINK, 'text-label')}>
               {l.label}
             </a>
           ))}

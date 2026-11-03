@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Plan table: plans as columns, features as grouped rows, so a buyer can check one feature across
 // every plan. Follows patterns/plan-comparison-table: neutral ink only, a line check for included, a
@@ -119,7 +120,7 @@ export function PlanTable({
                 </span>
                 {p.cta ? (
                   <a
-                    href={p.cta.href}
+                    href={safeHref(p.cta.href)}
                     className={cn(
                       'mt-4 inline-flex h-11 w-full items-center justify-center rounded-md px-3 text-body font-medium outline-none transition-[opacity,colors] duration-press ease-out focus-visible:ring-2 focus-visible:ring-ring desk:h-9',
                       p.recommended ? 'bg-accent text-accent-fg hover:opacity-90' : 'border border-border text-text hover:border-text-subtle',
