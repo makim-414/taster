@@ -1,0 +1,80 @@
+name: Bug report
+description: Something in Taster does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A security problem does not go here. Report it privately as [SECURITY.md](https://github.com/makim-414/taster/blob/main/SECURITY.md) explains.
+
+        If the page that shows the problem is not yours, leave out its address and captures. A small HTML file written to show the problem is the best reproduction.
+  - type: dropdown
+    id: part
+    attributes:
+      label: Which part
+      options:
+        - Skill, as run by an agent
+        - Local MCP server
+        - Hosted MCP server (/api/mcp)
+        - Command line (diagnose, extract, brand, system, plan)
+        - lint
+        - add
+        - export
+        - ACP agent in an editor
+        - GitHub Action
+        - Bookmarklet or extension
+        - Hosted site (taster-six.vercel.app)
+        - Registry component
+        - A rule flags the wrong thing or misses one
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reproduce
+      description: The command or tool call, the target (a public address you own, or a small HTML file), and the widths.
+      placeholder: |
+        1. node engine/cli.mjs ./repro.html --widths 1440,390
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: Error text or the part of the report that is wrong. It is shown as code.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: A release such as 0.1.0, or the output of git rev-parse --short HEAD in your clone.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, node -v, the browser (Google Chrome or Playwright Chromium), and the agent or editor.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you send
+      options:
+        - label: I searched the existing issues.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

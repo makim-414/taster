@@ -42,7 +42,14 @@ const CSS = `
 `
 
 export interface ProseProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Rendered HTML as a string, for Markdown or CMS output. Sanitize it before it gets here. */
+  /**
+   * Rendered HTML as a string, for Markdown or CMS output. It is set as markup with no cleaning, so pass only HTML you
+   * trust. Anything a user or another site wrote goes through a sanitizer such as DOMPurify first, or markup in it
+   * (an onerror handler, say) runs script on your page. For text you do not trust and do not need as HTML, pass it as children instead.
+   * @example
+   * import DOMPurify from 'dompurify'
+   * <Prose html={DOMPurify.sanitize(markdownToHtml(post.body))} />
+   */
   html?: string
 }
 
