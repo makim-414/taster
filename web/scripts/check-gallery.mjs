@@ -1,6 +1,7 @@
 // Drives the gallery in a real browser at three widths and fails on any broken step: search, filter, pick, board, brand
 // color reaching a live component, width switch, the text for the agent, no sideways scroll, no page error. It also
-// measures the focus ring (3:1 on the page, drawn on every side of a segment button) and the heading order.
+// measures the focus ring (3:1 on the page, drawn on every side of a segment button), the heading order, and that a
+// gallery with every card running downloads the stage document once and pauses the frames out of sight.
 // Usage: node scripts/check-gallery.mjs [base url]   (default http://localhost:3240)
 import { existsSync, mkdirSync } from 'node:fs';
 import { chromium } from 'playwright-core';
@@ -207,6 +208,55 @@ try {
     await page.screenshot({ path: new URL(`detail-${name}.png`, OUT).pathname });
 
     ok(errors.length === 0, `${name}: no page errors ${errors.join(' | ')}`);
+    await context.close();
+  }
+
+  // Every card running: the frames share one stage address, so the document body comes over the network once (the
+  // browser still revalidates it per frame, a 304 with no body, while the site serves it with max-age=0). A frame that
+  // leaves the view is paused and kept; half a screen further away it is removed, so a long scroll keeps few frames.
+  {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+    const page = await context.newPage();
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('Network.enable');
+    const stage = new Map();
+    cdp.on('Network.requestWillBeSent', (e) => { if (new URL(e.request.url).pathname === '/stage/index.html') stage.set(e.requestId, { url: e.request.url, status: 0 }); });
+    // The status that came over the wire: 200 with the body, or 304 for a revalidation.
+    cdp.on('Network.responseReceivedExtraInfo', (e) => { if (stage.has(e.requestId)) stage.get(e.requestId).status = e.statusCode; });
+    await page.goto(`${BASE}/components`, { waitUntil: 'networkidle' });
+    await page.locator('.check-field input').check();
+    const firstId = (await page.locator('.card h2 a').first().getAttribute('href')).replace('/components/', '');
+    let firstFrame = await stageFrame(page, firstId);
+    // A paused stage holds animation frames itself and hands back a negative id; a running one asks the browser.
+    const held = (frame) => frame.evaluate(() => { const id = requestAnimationFrame(() => {}); cancelAnimationFrame(id); return id < 0; });
+    const ticks = (frame) => frame.evaluate(() => new Promise((done) => {
+      let n = 0;
+      const tick = () => { n++; requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+      setTimeout(() => done(n), 600);
+    }));
+    ok(!(await held(firstFrame)), 'a card frame in sight runs');
+    // Just out of sight: the first card's bottom edge 300px above the screen.
+    await page.evaluate(() => { const r = document.querySelector('.card').getBoundingClientRect(); scrollTo(0, scrollY + r.bottom + 300); });
+    await page.waitForTimeout(800);
+    ok(await held(firstFrame), 'a card frame just out of sight is paused and kept');
+    for (let i = 0; i < 14; i++) { await page.mouse.wheel(0, 900); await page.waitForTimeout(250); }
+    await page.waitForTimeout(800);
+    const kept = await page.locator('.card iframe').count();
+    ok(kept > 0 && kept <= 30, `a long scroll keeps only the frames near the view (${kept})`);
+    for (let i = 0; i < 20; i++) { await page.mouse.wheel(0, -900); await page.waitForTimeout(150); }
+    await page.waitForTimeout(800);
+    firstFrame = await stageFrame(page, firstId);
+    const ticksBack = await ticks(firstFrame);
+    ok(!(await held(firstFrame)) && ticksBack > 5, `the first card runs again when it comes back (${ticksBack} animation frames)`);
+    const list = [...stage.values()];
+    const urls = new Set(list.map((r) => r.url));
+    const bodies = list.filter((r) => r.status === 200).length;
+    ok(urls.size === 1, `every card frame asks for one stage address (${urls.size})`);
+    ok(bodies === 1, `the stage document body downloads once with every card running (${bodies} downloads, ${list.filter((r) => r.status === 304).length} revalidations)`);
+    ok(errors.length === 0, `every card running: no page errors ${errors.join(' | ')}`);
     await context.close();
   }
 
