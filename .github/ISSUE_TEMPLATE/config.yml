@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/makim-414/taster/blob/main/SECURITY.md
+    about: Report it privately, never in a public issue. SECURITY.md explains how.

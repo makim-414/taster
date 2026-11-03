@@ -4,7 +4,7 @@ name: Error and locked state
 category: empty-state
 uses: [handle-no-data, notify-the-user]
 surfaces: [app]
-replaces: []
+replaces: [CPY-03]
 components: [blocks/alert, blocks/button, blocks/empty-state]
 inspiration: []
 status: stable
@@ -35,6 +35,7 @@ Use it at the smallest scope that failed. A single card that cannot load shows t
 
 ## Don't
 
+- Don't print the raw error code as the message (CPY-03). Say what happened and what to do; put the code in a details line for support.
 - Don't write "Something went wrong" with no next step. Name the thing.
 - Don't blame the person: "You entered invalid data."
 - Don't use a blue to purple gradient circle with a lock for permission screens.

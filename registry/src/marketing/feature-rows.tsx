@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Feature rows: one row per feature, text on one side and a real screenshot of that feature on the
 // other, alternating sides on wide screens and stacking text first on phones.
@@ -67,7 +68,7 @@ export function FeatureRows({ rows, startReversed = false, as: Heading = 'h3', c
               ) : null}
               {r.link ? (
                 <a
-                  href={r.link.href}
+                  href={safeHref(r.link.href)}
                   className="mt-5 inline-flex min-h-11 items-center gap-1 rounded-sm text-body font-medium text-text underline underline-offset-4 outline-none hover:text-text-muted focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {r.link.label}

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Section heading: the lockup that opens a page section. "stack" sets an optional sentence-case eyebrow,
 // the title and one supporting line, left aligned. "split" puts the title on the left and the supporting
@@ -48,7 +49,7 @@ export function SectionHeading({
         {link ? (
           <>
             {' '}
-            <a href={link.href} className="rounded-sm font-medium text-text underline underline-offset-4 outline-none hover:text-text-muted focus-visible:ring-2 focus-visible:ring-ring">
+            <a href={safeHref(link.href)} className="rounded-sm font-medium text-text underline underline-offset-4 outline-none hover:text-text-muted focus-visible:ring-2 focus-visible:ring-ring">
               {link.label}
             </a>
           </>

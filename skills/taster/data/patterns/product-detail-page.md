@@ -4,7 +4,7 @@ name: Product detail page
 category: commerce
 uses: [sell-a-product]
 surfaces: [commerce]
-replaces: []
+replaces: [LAY-07]
 components: [blocks/accordion, commerce/product-gallery, commerce/buy-box]
 inspiration: [https://21st.dev/@hedevelope/components/estimated-arrival]
 status: stable
@@ -45,6 +45,7 @@ The delivery estimate is a small row ("Arrives Thu 6 to Mon 10") that opens into
 
 ## Don't
 
+- Don't build the detail section as a single image several screens tall (LAY-07). Headings, claims and numbers belong in text between the photos.
 - Don't use generated pictures on the product surface (gallery, options). They drift from the real color, lace or print; keep them for a staged banner with a disclosure next to it, not only in the footer. Color chips come from the product's real named palette, never a made-up swatch set. Check generated images by eye: they can print text you did not ask for, such as a sun protection rating.
 - Do not use a triple number strip of "98 percent say it works" statistics without a source (CMP-06).
 - Do not set the benefits as three icon cards (LAY-02). Write them as a list the reader can scan.

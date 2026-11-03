@@ -8,6 +8,7 @@ import { Button } from './button'
 // Written for this registry after a 21st.dev session list the owner picked. The original's tiny
 // forced-caps mono labels ("REVOKE", an 8px pill) and accent tinted border were the slop parts
 // (AC-09, the type rules), so the rows were drawn again with the registry list row and button.
+// Its source and license could not be confirmed, so no code was taken.
 
 export interface Session {
   id: string

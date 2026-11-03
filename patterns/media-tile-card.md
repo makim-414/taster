@@ -4,7 +4,7 @@ name: Media tile card
 category: card
 uses: [browse-media, explain-features]
 surfaces: [landing, commerce, app, editorial]
-replaces: [AC-17, LAY-02]
+replaces: [AC-17, CMP-12, LAY-02]
 components: [blocks/card, blocks/badge, blocks/glass-folder, blocks/side-folder, blocks/orbit-illustration, marketing/case-study-card, commerce/product-card]
 inspiration: []
 status: stable
@@ -34,6 +34,7 @@ Hub cards (links to sections of a site) and article cards follow the same shape.
 
 ## Don't
 
+- Don't draw a photo at a different aspect ratio than its file (CMP-12); crop with object-fit: cover instead of stretching.
 - Do not build a fake dashboard out of nested divs and call it an image (AC-17).
 - Do not repeat three identical cards of icon, heading and two lines (LAY-02). A list, a table or a screenshot says it faster.
 - Do not put a colored gradient in place of a missing photo.

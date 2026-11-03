@@ -1,0 +1,60 @@
+version: 2
+updates:
+  # The root package.json is the published command and lists the same dependencies as engine/,
+  # so a version moves in both at once, one pull request per dependency.
+  - package-ecosystem: npm
+    directories:
+      - /
+      - /engine
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      engine:
+        group-by: dependency-name
+    # Major versions change APIs that copied components and their users rely on (React, Tailwind, TypeScript);
+    # they are upgraded by hand, in a change of their own.
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
+  # The registry and the web app: minor and patch updates in one pull request per folder.
+  - package-ecosystem: npm
+    directories:
+      - /registry
+      - /web
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    # Major versions change APIs that copied components and their users rely on (React, Tailwind, TypeScript);
+    # they are upgraded by hand, in a change of their own.
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
+  # Workflows in .github/workflows and the composite action in action.yml.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns:
+          - '*'

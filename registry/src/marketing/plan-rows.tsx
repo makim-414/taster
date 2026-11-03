@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Plan rows: each plan is one full-width row (name and who it is for, price, what is included, one action)
 // under a monthly and yearly switch that updates every price and billing note at once.
@@ -101,7 +102,7 @@ export function PlanRows({
               ))}
             </ul>
             <a
-              href={pl.cta.href}
+              href={safeHref(pl.cta.href)}
               className={cn(
                 'inline-flex h-11 w-full items-center justify-center whitespace-nowrap rounded-md px-5 sm:w-auto lg:w-full text-body font-medium outline-none transition-[opacity,colors,transform] duration-press ease-out active:scale-press focus-visible:ring-2 focus-visible:ring-ring',
                 pl.recommended ? 'bg-accent text-accent-fg hover:opacity-90' : 'border border-border text-text hover:border-text-subtle',

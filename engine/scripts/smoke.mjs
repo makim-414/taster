@@ -1,4 +1,4 @@
-// Runs the CLI on one live URL and checks the report and one annotated PNG per width.
+// Runs the CLI on one live URL and checks the report and one annotated JPEG per width.
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -29,14 +29,14 @@ try {
     console.log(`${report.url}: ${report.rulesHit} rules hit at ${report.widths.join(' and ')}, exit ${run.status}`);
   }
   for (const { width } of VIEWPORTS) {
-    const png = join(out, `annotated-${width}.png`);
-    if (!existsSync(png)) {
-      errors.push(`annotated-${width}.png was not written`);
+    const jpg = join(out, `annotated-${width}.jpg`);
+    if (!existsSync(jpg)) {
+      errors.push(`annotated-${width}.jpg was not written`);
       continue;
     }
-    const data = readFileSync(png);
-    if (data.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') errors.push(`annotated-${width}.png is not a PNG`);
-    if (data.length < 1000) errors.push(`annotated-${width}.png is only ${data.length} bytes`);
+    const data = readFileSync(jpg);
+    if (data.subarray(0, 3).toString('hex') !== 'ffd8ff') errors.push(`annotated-${width}.jpg is not a JPEG`);
+    if (data.length < 1000) errors.push(`annotated-${width}.jpg is only ${data.length} bytes`);
   }
 } finally {
   rmSync(out, { recursive: true, force: true });

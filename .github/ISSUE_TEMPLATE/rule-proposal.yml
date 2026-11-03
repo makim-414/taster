@@ -1,0 +1,91 @@
+name: Rule proposal
+description: Propose a new rule, or a change to what an existing rule flags.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A rule names a pattern precisely enough to measure. It needs a source that says it, a page that should be flagged and a page that should not. A rule describes a pattern, never a person, a product or a company.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Proposal
+      options:
+        - New rule
+        - Change what an existing rule flags
+        - Remove a rule
+    validations:
+      required: true
+  - type: input
+    id: rule-id
+    attributes:
+      label: Rule id
+      description: An existing id such as AC-01, or a proposed one with a family prefix (AC, COL, TYP, LAY, CMP, BG, ICO, MOT, CPY, KO, RSP).
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: A short name in sentence case, such as "All-caps label with wide letter spacing".
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What it flags
+      description: What the page shows, in the words a designer would use.
+    validations:
+      required: true
+  - type: textarea
+    id: measure
+    attributes:
+      label: How it is measured
+      description: The computed styles, DOM or text that decide it, and the thresholds. Say so if it can only be judged by eye.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources and the sentence that says it
+      description: A link to each source and the exact sentence that supports the rule. If it is your own observation, say so plainly.
+    validations:
+      required: true
+  - type: textarea
+    id: positive
+    attributes:
+      label: Should be flagged
+      description: A small HTML example written for this proposal, not copied from a real site.
+      render: html
+    validations:
+      required: true
+  - type: textarea
+    id: negative
+    attributes:
+      label: Should pass
+      description: A small HTML example that looks close but must not be flagged.
+      render: html
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Fix
+      description: What to do instead, and the patterns that fix it if you know them.
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - high
+        - medium
+        - low
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you send
+      options:
+        - label: The examples were written for this proposal, not copied from someone else's site.
+          required: true
+        - label: The proposal describes a pattern, not a person, a product or a company.
+          required: true

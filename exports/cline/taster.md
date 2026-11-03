@@ -1,6 +1,6 @@
 # Taster: UI rules against the generated look
 
-When you build or change a user interface, avoid every pattern below. They are the 80 rules of
+When you build or change a user interface, avoid every pattern below. They are the 88 rules of
 Taster (https://github.com/makim-414/taster), each one a habit that makes a screen read as AI generated. Each line says what to avoid and
 what to do instead. Use the project's design tokens for color, spacing, radius and type, never raw values.
 
@@ -34,6 +34,8 @@ what to do instead. Use the project's design tokens for color, spacing, radius a
 - RSP-03 Letters stacked one per line. Avoid: A column so narrow that a word wraps letter by letter down the screen. Instead: Set a minimum width on the column, drop to one column earlier, or move the label above the value instead of beside it.
 - COL-08 Text that does not stand out from its background. Avoid: Text whose contrast against the surface behind it is under 4.5:1, or under 3:1 for large text. Instead: Raise the text token, not each instance: check the smallest text color against the surface closest to it in lightness, for example a muted card, in both themes.
 - CPY-02 Empty value traces on screen. Avoid: Words like undefined, NaN, null, [object Object] or Invalid Date, or two separators with nothing between them, shown to the reader. Instead: Render a missing value as a middle dot or a short sentence ("Not measured yet"), never as the raw value or a fake zero, and drop the separator when a field is empty.
+- RSP-07 Control covered by another element. Avoid: A visible button, link or field whose center is under another element, so a click lands on the wrong thing. Instead: Find the covering element (its selector is in the evidence) and take it out of the flow at this width, lower its z-index, or give it pointer-events: none if it is decoration.
+- MOT-09 Content left hidden. Avoid: Text or images in the first screen still at opacity 0 and shifted after the page has settled: a scroll reveal that never fired. Instead: Render content visible by default and add the entrance as an enhancement, with a timeout that shows everything if the observer never fires.
 
 ## Medium severity
 
@@ -73,6 +75,9 @@ what to do instead. Use the project's design tokens for color, spacing, radius a
 - RSP-04 Text overlapping text. Avoid: Two pieces of text drawn on top of each other. Instead: Take the element out of absolute positioning or give it its own row at narrow widths; check line-height and negative margins.
 - RSP-06 Touch target under 44px. Avoid: On a phone or tablet width, a button, field or control under 44px high (an icon-only one under 44 by 44px), or a plain text link under 24px high. Instead: Make controls 44px on touch screens and shrink them only for a wide screen without a coarse pointer, for example @media (min-width: 1024px) and (not (pointer: coarse)). Do not key the small size on pointer: fine, which a headless browser does not report.
 - MOT-07 No reduced motion version. Avoid: The page moves things (animations, transform transitions) but has no prefers-reduced-motion rule. Instead: Add @media (prefers-reduced-motion: reduce) that turns position and scale changes off and keeps opacity and color fades.
+- CMP-12 Stretched image. Avoid: A raster image drawn at a different aspect ratio than its file, with object-fit left at its default. Instead: Set one dimension and let the other be auto, or use object-fit: cover (photos) or contain (logos). In a flex column add align-self: flex-start or align-items: flex-start.
+- KO-12 Tight line height on a large Korean heading. Avoid: A Korean heading above 28px that wraps to two or more lines with a line height under about 1.05. Instead: Use 1.2 to 1.35 for Korean display headings; keep the tight Latin value only for Latin headlines.
+- LAY-07 Long content as one image. Avoid: A content image several screens tall with almost no text around it: the page is a picture of text. Instead: Set the headings, copy and numbers as text and keep images for photos. Split a long design into sections with real text between the pictures.
 
 ## Low severity
 
@@ -92,6 +97,9 @@ what to do instead. Use the project's design tokens for color, spacing, radius a
 - MOT-04 Slow start on interface motion. Avoid: A transition or animation under a second uses an ease-in curve, so the first frame, the one people watch, is the slowest. Instead: Use ease-out for things that enter or exit and ease-in-out for things that move from A to B on screen (--ease-out, --ease-in-out).
 - MOT-05 Layout properties animated. Avoid: A transition on width, height, top, left, margin or padding. Instead: Animate transform and opacity. For an accordion, animate grid-template-rows from 0fr to 1fr or let it open without motion.
 - MOT-06 Slow controls. Avoid: A button, link or field whose transition lasts longer than 300ms. Instead: Press feedback about 160ms, tooltips about 125ms, dropdowns about 200ms; keep 400ms for modals and drawers (--dur-press, --dur-tooltip, --dur-dropdown, --dur-modal).
+- MOT-08 Hover that moves the element on every device. Avoid: A :hover rule lifts or slides the element (transform, top, margin) without an @media (hover: hover) guard. Instead: Put hover movement inside @media (hover: hover) and (pointer: fine), or change the border or background instead of moving the element.
+- KO-13 A single syllable alone on a Korean heading's last line. Avoid: A wrapped Korean heading whose last line holds one syllable. Instead: Use text-wrap: balance with word-break: keep-all, set the width in em rather than ch, or rewrite the heading.
+- CPY-03 Machine codes on screen. Avoid: Status codes, snake_case keys or camelCase field names shown to the reader as words. Instead: Write the state as words ("No answer yet"), keep the code in a data attribute or a details panel for support.
 
 ## Check the result
 

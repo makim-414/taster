@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Breadcrumb: the trail from the top of the site to the current page, above the page title. Links in
 // muted ink, a thin slash between them drawn as a line so it is not read aloud, the current page in full
@@ -44,6 +45,7 @@ export function Breadcrumb({ items, label = 'Breadcrumb', foldAfter = 4, expandL
           const last = i === items.length - 1
           // Folded on narrow screens: keep the first item and the last two.
           const middle = i > 0 && i < items.length - 2
+          const href = safeHref(c.href)
           return (
             <React.Fragment key={`${i}-${c.label}`}>
               {fold && i === 1 ? (
@@ -64,8 +66,8 @@ export function Breadcrumb({ items, label = 'Breadcrumb', foldAfter = 4, expandL
                   <span aria-current="page" className={cn('text-label font-medium text-text', KEEP)}>
                     {c.label}
                   </span>
-                ) : c.href ? (
-                  <a href={c.href} className={cn(LINK, KEEP)}>
+                ) : href ? (
+                  <a href={href} className={cn(LINK, KEEP)}>
                     {c.label}
                   </a>
                 ) : (
