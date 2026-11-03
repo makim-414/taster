@@ -6,7 +6,7 @@ uses: [show-progress, ask-the-assistant]
 surfaces: [ai-chat]
 replaces: [AC-07]
 components: [motion/thinking-orb]
-inspiration: [https://libraries.dev/orbs]
+inspiration: [https://libraries.dev/orbs, https://github.com/Jakubantalik/Libraries.dev]
 status: stable
 ---
 
