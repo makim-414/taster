@@ -433,10 +433,12 @@
     function bgOf(it) {
       return parseColor(it.cs.backgroundColor) || { r: 0, g: 0, b: 0, a: 0 };
     }
+    // Chrome keeps a percentage as written ("-2%"), and a percentage is a share of the font size, so it is already em.
     function letterEm(cs) {
-      if (cs.letterSpacing === 'normal') return 0;
-      var fs = px(cs.fontSize) || 16;
-      return px(cs.letterSpacing) / fs;
+      var v = String(cs.letterSpacing);
+      if (v === 'normal') return 0;
+      if (/%$/.test(v)) return parseFloat(v) / 100 || 0;
+      return px(v) / (px(cs.fontSize) || 16);
     }
     function words(el) {
       var t = norm(el.textContent);
@@ -933,13 +935,22 @@
         if (fs >= 64 && wn >= 8) add('TYP-04', h.el, { fontSizePx: fs, words: wn, viewportWidth: vw });
       });
     };
+    // A wordmark is drawn tight on purpose and AC-18 says to keep it as it is: one or two words in a header or nav
+    // link, or in an element (or its link) named logo or brand. Not a whole section named brand.
+    function wordmark(el) {
+      if (norm(el.textContent).split(' ').length > 2) return false;
+      if (el.closest('header a[href],nav a[href]')) return true;
+      var named = function (e) { return !!e && /logo|brand|wordmark/i.test(e.getAttribute('class') || ''); };
+      return named(el) || named(el.closest('a[href]'));
+    }
     R['TYP-05'] = function () {
       I.forEach(function (it) {
         if (!ownText(it.el)) return;
         var fs = px(it.cs.fontSize);
-        if (fs < 32) return;
+        if (fs < 32 || wordmark(it.el)) return;
         var ls = letterEm(it.cs);
-        if (ls <= -0.04) add('TYP-05', it.el, { fontSizePx: fs, letterSpacingEm: rn(ls) });
+        // One finding per heading or paragraph, even when each word is its own span.
+        if (ls <= -0.04) add('TYP-05', it.el.closest('h1,h2,h3,h4,h5,h6,p') || it.el, { fontSizePx: fs, letterSpacingEm: rn(ls) });
       });
     };
 

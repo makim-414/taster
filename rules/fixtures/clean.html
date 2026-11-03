@@ -28,9 +28,11 @@ main { max-width: 960px; margin: 0 auto; }
 section.intro { padding: 96px 48px 72px; }
 section.text { padding: 64px 48px; background: var(--surface-alt); }
 section.pair { padding: 120px 48px 88px; }
-h1 { font-size: 44px; line-height: 1.3; letter-spacing: -0.01em; margin: 0 0 24px; font-weight: 700; }
+/* Percent tracking is a share of the font size: -2% on the headline, -1% on body text, 2% on a small caps label. */
+h1 { font-size: 44px; line-height: 1.3; letter-spacing: -2%; margin: 0 0 24px; font-weight: 700; }
 h2 { font-size: 26px; line-height: 1.35; margin: 0 0 20px; }
-p { margin: 0 0 16px; color: var(--ink-soft); max-width: 36em; }
+p { margin: 0 0 16px; color: var(--ink-soft); max-width: 36em; letter-spacing: -1%; }
+.label { font-size: 12px; text-transform: uppercase; letter-spacing: 2%; margin: 0 0 12px; }
 .btn { display: inline-block; padding: 12px 28px; background: var(--ink); color: #ffffff; text-decoration: none; border-radius: 4px; font-size: 16px; }
 .link { margin-left: 24px; color: var(--ink); }
 .figure { display: block; width: 480px; max-width: 100%; height: auto; margin-top: 40px; }
@@ -59,6 +61,7 @@ footer { padding: 40px 48px; font-size: 14px; color: var(--ink-soft); border-top
     <blockquote>처음 상담에서 범위를 좁혀 준 덕분에 일정이 절반으로 줄었습니다.</blockquote>
   </section>
   <section class="pair">
+    <p class="label">Since 2019</p>
     <h2>진행 단계</h2>
     <dl>
       <dt>분석</dt><dd>요구사항을 정리하고 우선순위를 정합니다.</dd>
