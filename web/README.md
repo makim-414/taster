@@ -1,6 +1,8 @@
 # Taster web
 
-Paste a URL, see which slop rules it hits. The page links from the series ("put your site in here").
+The hosted Taster: paste a public URL and see which rules it hits on captures at desktop and phone width, browse the
+components running live in your brand, compare them side by side on the board, place a look on the tone map, get the
+bookmarklet, and connect an agent to the hosted MCP server. The pages are in Korean for now.
 Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLIC_SITE_URL` when one is added).
 
 - `app/page.tsx`, `app/diagnose.tsx`: one address field, then the result: rules hit with id, name and count
@@ -40,6 +42,22 @@ Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLI
   over 4 MB.
 - Page load 15 s per width (plus the engine's own load and idle waits), 400 requests and 60 MB per run.
 
+## What the site keeps
+
+- No analytics scripts and no cookies. The diagnosis, brand and MCP routes keep neither the address nor the result:
+  the answer goes back and nothing is stored.
+- A page that cannot be opened is logged with its host name only (`hostsOnly` in `lib/diagnose.ts`), never the path
+  or the query.
+- The diagnosis page keeps the address after `#url=`, which the browser does not send, so a reload or a shared link
+  does not put it in a request line or a log. Links made with the older `?url=` still open.
+- The rate limits keep client IP addresses in instance memory (`lib/limits.ts`), gone when the instance restarts.
+- The tone map's reference screens are kept in memory for up to 30 minutes and given to every visitor who asks for the
+  same sites, never written to disk.
+- The gallery keeps the visitor's settings in their browser, under the `localStorage` key `taster-studio`.
+- Vercel keeps its own request logs under its policy.
+
+The home page says the same in Korean, in its footer.
+
 ## Link preview, crawlers and headers
 
 Each page sets its own title, description, canonical address and Open Graph and Twitter card tags through
@@ -54,6 +72,16 @@ stage by this site) and a permissions policy on every response. The bookmarklet'
 every origin; a folder named after their hash is cached for good, the old `/taster/*.js` for five minutes.
 `node scripts/check-metadata.mjs` checks all of it on a running build.
 
+## Bookmarklet
+
+`app/bookmarklet/` makes the bookmarklet from `public/taster/bookmarklet.json`, which `scripts/copy-fixtures.mjs`
+writes on every build: the folder `/taster/<version>-<hash>/` and the overlay's sha384. The bookmark loads the overlay
+from that folder with that sha384 and no Referer, and the overlay loads the detector and the rule names next to it,
+each pinned to its own sha384, so a bookmark runs only the files it was made with. After a build with new files, an old
+bookmark's folder is gone and the bookmarklet asks for the current one. A bookmark saved before the pinned folders
+loads `/taster/overlay.js`, which is not pinned, and sends that one request with a Referer; the fix is to drag the
+bookmarklet from `/bookmarklet` again.
+
 ## Commands
 
 ```bash
@@ -61,11 +89,12 @@ npm ci --prefix web
 npm ci --prefix engine --omit=dev --ignore-scripts
 npm --prefix web run dev          # http://localhost:3240
 npm --prefix web run typecheck
-npm --prefix web run build
 npm --prefix web test             # guard, limits, fenced engine on rules/fixtures
-npm --prefix web run self-check   # detect.js on this app at 1440 and 390, must be 0
-node web/scripts/check-metadata.mjs   # head tags, 404, robots, sitemap, headers, no policy violation (with the server up)
+node scripts/gates.mjs web        # every web gate CI runs: build, traces, tests, then the browser checks on the served build
 ```
+
+The web job's gates one by one (the build, the five browser scripts against a running server and how to pick its
+port) are in `CONTRIBUTING.md`.
 
 The fixture tests serve `rules/fixtures` on loopback and pass a test-only `allowLoopback` argument; no request
 path sets it, and private ranges stay blocked even then.

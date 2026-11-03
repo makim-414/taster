@@ -5,14 +5,15 @@ order, by the owner. Version 0.1.0.
 
 ## Before
 
-- `node scripts/validate.mjs`, `npm --prefix engine test`, `npm --prefix web test` and CI are green on `main`.
+- `node scripts/gates.mjs` passes on `main` (every gate CI runs, in the same order; see `CONTRIBUTING.md`) and CI is
+  green there.
 - `npm pack --dry-run` lists `bin/`, `engine/`, `rules/`, `patterns/`, `taxonomy/`, `registry/`, `skills/`, `exports/`,
   `extension/` and no `node_modules`, `web/` or `.github/`.
-- Run the private name check over the repository and fix every hit before it goes public.
+- Run the private name check over the repository and fix every hit.
 
 ## Release day
 
-1. Make `makim-414/taster` public on GitHub.
+1. Make `makim-414/taster` public on GitHub. Done on 2026-11-02.
 2. npm: in `package.json` remove `"private": true`, then `npm publish --access public` (package `@makim-414/taster`,
    command `taster`). Check `npx @makim-414/taster --rules` from an empty folder. The unscoped name `taster` is taken;
    `taster-cli` and `taster-ui` were free on 2026-10-29 if a short name is wanted later.
@@ -30,5 +31,11 @@ order, by the owner. Version 0.1.0.
 
 ## After
 
-- Update `README.md` install lines from `node engine/cli.mjs` to `npx @makim-414/taster` once step 2 is live.
+- Once step 2 is live, turn the install lines that run the clone's CLI back into npx lines: in `README.md`,
+  `README.ko.md` and `registry/README.md`, `node /path/to/taster/engine/cli.mjs lint ...` and `... add ...` become
+  `npx @makim-414/taster lint ...` and `npx @makim-414/taster add ...`, and the clone and `npm ci` lines that only
+  served them go. Do the same for the install lines on the web (the component pages and the board), and say in the
+  READMEs that the package is published.
+- Once step 6 is live, change the Action example in `README.md` and `README.ko.md` from `makim-414/taster@main` to
+  `makim-414/taster@v0`, and drop the sentence that says there is no release tag yet.
 - The hosted MCP (`https://taster-six.vercel.app/api/mcp`) and `/bookmarklet` are already live from `main`.
