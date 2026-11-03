@@ -218,7 +218,7 @@
       "why": "Generated pages scatter decorative pills everywhere, and once there are many of them no badge means anything.",
       "detect": {
         "level": "deterministic",
-        "signal": "border-radius at least half the height, background a chromatic color with alpha 0.05 to 0.3 or a pale tint (lightness 85% or more), text color within 40 degrees of the background hue, one to three words.",
+        "signal": "border-radius at least half the height, height 12 to 64px and width up to 360px, not a button, background a chromatic tint (alpha 0.04 to 0.3, or alpha 0.5 or more with lightness 85% or more), text color within 40 degrees of the background hue, one to three words.",
         "selectors": [
           "span",
           "div",
@@ -229,7 +229,7 @@
         "css": {
           "radius_min_height_ratio": 0.5,
           "bg_alpha": [
-            0.05,
+            0.04,
             0.3
           ],
           "bg_lightness_min": 0.85,
@@ -315,7 +315,7 @@
         "css": {
           "width_parent_ratio_min": 0.8,
           "bg_alpha": [
-            0.05,
+            0.04,
             0.3
           ],
           "bg_lightness_min": 0.85,
@@ -1291,18 +1291,21 @@
       "why": "Coloring each item looks organized, but color stops meaning anything.",
       "detect": {
         "level": "deterministic",
-        "signal": "Chromatic tinted surfaces (alpha 0.05 to 0.3, or lightness 90% or more) falling in four or more distinct 30 degree hue buckets.",
+        "signal": "Chromatic tinted surfaces from 16 by 16px up to 700 by 500px (alpha 0.04 to 0.3, or alpha 0.5 or more with lightness 85% or more) falling in four or more distinct 30 degree hue buckets.",
         "selectors": [
           "*"
         ],
         "css": {
           "bg_alpha": [
-            0.05,
+            0.04,
             0.3
           ],
-          "bg_lightness_min": 0.9,
+          "bg_lightness_min": 0.85,
           "hue_buckets_min": 4,
-          "bucket_deg": 30
+          "bucket_deg": 30,
+          "size_min_px": 16,
+          "width_max_px": 700,
+          "height_max_px": 500
         }
       },
       "fix": "Neutral surfaces, with color only where it means something (error, success).",
@@ -1631,7 +1634,7 @@
       "why": "A 'designed' look applied by formula. Past a point it hurts reading, and in Korean it collides syllables.",
       "detect": {
         "level": "deterministic",
-        "signal": "Element with font-size of 32px or more and computed letter-spacing of -0.04em or tighter.",
+        "signal": "Element with its own text, font-size of 32px or more and computed letter-spacing of -0.04em or tighter. Logos and wordmarks are skipped: text of one or two words inside a header or nav link, or in an element (or its link) whose class names logo, brand or wordmark. Hits inside one heading or paragraph count once, on that block.",
         "selectors": [
           "h1",
           "h2",
@@ -1752,7 +1755,7 @@
       "why": "The default frame for features. Whatever the content, the shape is the same, so nothing is read.",
       "detect": {
         "level": "deterministic",
-        "signal": "Three or more siblings of nearly equal size under one parent, each with an icon, then a heading, then a paragraph in the same order.",
+        "signal": "Three or more siblings of nearly equal size under one parent (width within 3px and height within 12px of the first), each with an icon, then a heading, then a paragraph in the same order.",
         "selectors": [
           "div",
           "ul",
@@ -1761,7 +1764,8 @@
         "css": {
           "siblings_min": 3,
           "structure": "icon, heading, paragraph",
-          "size_tolerance_px": 3
+          "size_tolerance_px": 3,
+          "height_tolerance_px": 12
         }
       },
       "fix": "A list, a table or a real screenshot, whichever fits the content.",
