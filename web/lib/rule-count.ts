@@ -3,3 +3,5 @@
 import rules from '../../rules/rules.json';
 
 export const RULE_COUNT: number = rules.rules.length;
+// Rules the detector measures in a real browser; the manual ones are judged by eye, so the copy never counts them.
+export const MEASURED_COUNT: number = rules.rules.filter((r) => r.detect.level !== 'manual').length;
