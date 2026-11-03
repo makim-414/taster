@@ -496,7 +496,7 @@ function FieldDemo() {
   return (
     <div className="grid max-w-2xl gap-5 sm:grid-cols-2">
       <Field label="Work email" hint="We send the sign in link here.">
-        <Input type="email" placeholder="name@company.com" />
+        <Input type="email" placeholder="name@example.com" />
       </Field>
       <Field label="Display name" required error={name.trim().length < 2 ? 'Use at least 2 characters.' : undefined}>
         <Input value={name} onChange={(e) => setName(e.target.value)} />
@@ -577,9 +577,9 @@ function initials(n: string) {
 
 function ItemListDemo() {
   const members = [
-    { name: 'Ana Ruiz', email: 'ana@company.com', role: 'Owner' },
-    { name: 'Ben Okafor', email: 'ben@company.com', role: 'Admin' },
-    { name: 'Chloe Martin', email: 'chloe@company.com', role: 'Member' },
+    { name: 'Ana Ruiz', email: 'ana@example.com', role: 'Owner' },
+    { name: 'Ben Okafor', email: 'ben@example.com', role: 'Admin' },
+    { name: 'Chloe Martin', email: 'chloe@example.com', role: 'Member' },
   ]
   return (
     <ItemList
@@ -944,7 +944,7 @@ function WizardDemo() {
           id: 'wz-invite',
           title: 'Invite people',
           description: 'You can skip this and invite later.',
-          content: <TagInput label="Email addresses" value={emails} onValueChange={setEmails} placeholder="name@company.com" />,
+          content: <TagInput label="Email addresses" value={emails} onValueChange={setEmails} placeholder="name@example.com" />,
         },
         {
           id: 'wz-review',

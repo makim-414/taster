@@ -98,11 +98,13 @@ node engine/cli.mjs examples/rebuild/before.html examples/rebuild/after.html --s
 ```
 
 When you change a component or its demo, also run the registry render test, which renders every component at 1440
-and 390 and fails on any page error or console error:
+and 390 and fails on any page error or console error, and the accessibility test, which checks keyboard focus,
+accessible names and reduced motion in the components that need them:
 
 ```bash
 npm --prefix registry run build-demo
 PLAYWRIGHT_CORE_PATH="$PWD/engine/node_modules/playwright-core" node registry/test-render.mjs
+PLAYWRIGHT_CORE_PATH="$PWD/engine/node_modules/playwright-core" node registry/test-a11y.mjs
 ```
 
 It needs Google Chrome in the standard macOS place or `CHROME_PATH`. On Linux, point it at the Chromium installed
