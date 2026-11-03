@@ -116,7 +116,7 @@ export function createServer({ remote } = {}) {
           const viewports = widths ? widths.map(viewportFor) : VIEWPORTS;
           const report = await diagnose(target, { viewports, outDir: dir });
           const content = [json({ ...report, screenshots: undefined })];
-          for (const file of report.screenshots) content.push({ type: 'image', mimeType: 'image/png', data: readFileSync(file).toString('base64') });
+          for (const file of report.screenshots) content.push({ type: 'image', mimeType: file.endsWith('.png') ? 'image/png' : 'image/jpeg', data: readFileSync(file).toString('base64') });
           return { content };
         } catch (err) {
           return { isError: true, content: [{ type: 'text', text: `diagnose failed: ${err.message}` }] };

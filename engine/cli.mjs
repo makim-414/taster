@@ -26,7 +26,8 @@ A target is an http(s) URL, localhost:<port> (opened as http), a bare domain (op
 .htm, .xhtml or .svg file. Other local files are refused, and a missing file is never guessed into a web address.
 
 Options
-  --out <dir>       write report.json and annotated-<width>.png into <dir>
+  --out <dir>       write report.json and annotated-<width>.jpg into <dir> (one target only); a capture taller than
+                    one image allows comes as annotated-<width>-2.jpg and on, 2000px each
   --json            print the report as JSON
   --extract         print the page content (sections, actions, images, brand) for a rebuild
   --brand           read the site's brand (color, typeface, logo) and print a token theme fitted to it

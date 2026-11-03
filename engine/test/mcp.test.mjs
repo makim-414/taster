@@ -93,7 +93,7 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
     assert.ok(report.rulesHit >= 10, `only ${report.rulesHit} rules hit`);
     const images = result.content.filter((c) => c.type === 'image');
     assert.equal(images.length, 2);
-    for (const img of images) assert.equal(Buffer.from(img.data, 'base64').subarray(1, 4).toString(), 'PNG');
+    for (const img of images) assert.ok(img.mimeType === 'image/jpeg' && Buffer.from(img.data, 'base64').subarray(0, 3).toString('hex') === 'ffd8ff');
 
     // Every rule found has at least one fix pattern, and its components resolve to registry files.
     const ids = report.rules.map((g) => g.ruleId);
