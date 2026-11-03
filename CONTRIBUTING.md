@@ -84,11 +84,13 @@ npm --prefix web test
 npm --prefix web start &                           # serves the build on http://localhost:3240
 node web/scripts/self-check.mjs
 node web/scripts/check-gallery.mjs
+node web/scripts/check-tone.mjs
+node web/scripts/check-metadata.mjs
 # then stop the server
 ```
 
-`self-check.mjs` and `check-gallery.mjs` take a base address. If port 3240 is busy, start the build on another port
-with `(cd web && npx next start --port 3250)` and pass `http://localhost:3250` to both.
+The four browser scripts take a base address. If port 3240 is busy, start the build on another port
+with `(cd web && npx next start --port 3250)` and pass `http://localhost:3250` to each.
 
 The fourth job, `action`, runs this repository's GitHub Action on `examples/rebuild/` and only runs in CI. The same
 diagnosis locally:

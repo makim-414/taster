@@ -55,5 +55,6 @@ Offer the board when there are several real options, or when they are on a phone
 
 - A picture is the default look with sample content. Say that the real one will carry their content and brand.
 - Never recommend from the file name. If you recommend a number, say why in one line, in terms of their page.
-- If `preview_component` is not available (the hosted server has no local render), use its still and live link.
+- On the hosted server `preview_component` has no browser to render in: it returns the default still and a live link
+  that opens in their brand. Say the still is the default look and send the link.
 - Skip this loop for changes they fully specified, such as "make this button smaller".

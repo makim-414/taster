@@ -10,7 +10,8 @@
 - [ ] validate: `node scripts/validate.mjs`, `node scripts/check-taxonomy.mjs`, `node --test taxonomy/axes.test.mjs`,
   `node engine/scripts/check-rules.mjs`, registry typecheck, lint selftest and baseline
 - [ ] browser: `node rules/test-detect.mjs`, `npm --prefix engine test`, the rebuild and icon slot examples
-- [ ] web: typecheck, build, `check-traces`, `npm --prefix web test`, `self-check`, `check-gallery`
+- [ ] web: typecheck, build, `check-traces`, `npm --prefix web test`, `self-check`, `check-gallery`, `check-tone`,
+  `check-metadata`
 - [ ] The registry render test, if a component or its demo changed
 - [ ] A line under `Unreleased` in `CHANGELOG.md`, if a user would notice the change
 

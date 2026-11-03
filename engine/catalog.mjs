@@ -98,17 +98,15 @@ export const WEB_URL = (process.env.TASTER_WEB_URL || 'https://taster-six.vercel
 export const stagePath = () => join(REGISTRY_ROOT, 'stage', 'index.html');
 export const previewPath = (id, theme = 'dark') => join(REGISTRY_ROOT, 'previews', `${id.replace(/\//g, '-')}.${theme}.jpg`);
 
-const lookQuery = ({ theme, brand } = {}) => {
-  const q = [];
-  if (brand) q.push(`brand=${String(brand).replace('#', '')}`);
-  if (theme) q.push(`theme=${theme}`);
-  return q;
-};
+// Every value goes through URLSearchParams, so none can add a parameter or end the link. Slashes and commas (component
+// ids, the board's list) are allowed in a query as they are, and stay readable.
+const queryString = (params) => new URLSearchParams(params).toString().replace(/%2F/gi, '/').replace(/%2C/gi, ',');
+const lookParams = ({ theme, brand } = {}) => ({ ...(brand && { brand: String(brand).replace('#', '') }), ...(theme && { theme }) });
 export const componentUrl = (id, look) => {
-  const q = lookQuery(look);
-  return `${WEB_URL}/components/${id}${q.length ? `?${q.join('&')}` : ''}`;
+  const q = queryString(lookParams(look));
+  return `${WEB_URL}/components/${id}${q ? `?${q}` : ''}`;
 };
-export const boardUrl = (ids, look) => `${WEB_URL}/board?${[`ids=${ids.join(',')}`, ...lookQuery(look)].join('&')}`;
+export const boardUrl = (ids, look) => `${WEB_URL}/board?${queryString({ ids: ids.join(','), ...lookParams(look) })}`;
 
 function words(text) {
   return String(text || '').toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean);
@@ -121,8 +119,15 @@ export function browseComponents({ query, category, family, use, surface, ids, l
   const categoryName = new Map(tax.categories.map((c) => [c.id, c.name]));
   if (family && !tax.families.some((f) => f.id === family)) throw new Error(`Unknown family ${family}. Known: ${tax.families.map((f) => f.id).join(', ')}`);
   const familyCategories = family ? tax.families.find((f) => f.id === family).categories : null;
+  // Words for ranking, by id: the patterns of its own category say what it is; a pattern of another category only uses
+  // it as a part (a button inside a hero).
+  const tags = new Map();
   let list = loadRegistry().components.map((c) => {
     const own = patterns.filter((p) => (p.components || []).includes(c.id)).sort((a, b) => Number(b.category === c.category) - Number(a.category === c.category));
+    tags.set(c.id, {
+      own: own.filter((p) => p.category === c.category).flatMap((p) => [p.id, ...(p.uses || []), ...(p.surfaces || [])]),
+      partOf: own.filter((p) => p.category !== c.category).flatMap((p) => [p.id, ...(p.uses || [])]),
+    });
     return {
       id: c.id,
       category: c.category,
@@ -147,15 +152,19 @@ export function browseComponents({ query, category, family, use, surface, ids, l
   if (surface) list = list.filter((c) => c.surfaces.includes(surface));
   const asked = words(query);
   if (asked.length) {
+    // A word in the id or the component's own category and patterns counts most, then its summary. A word only in a
+    // pattern of another category (hero for a button) counts least, so a part comes after what it is part of.
     const scored = list.map((c) => {
       const inId = words(c.id);
-      const inTags = words([c.category, c.categoryName, ...c.patterns, ...c.uses, ...c.surfaces].join(' '));
+      const inTags = words([c.category, c.categoryName, ...tags.get(c.id).own].join(' '));
       const inText = words(c.summary);
+      const inPartOf = words(tags.get(c.id).partOf.join(' '));
       let score = 0;
       for (const w of asked) {
         if (inId.includes(w)) score += 6;
         if (inTags.includes(w)) score += 3;
         if (inText.includes(w)) score += 1;
+        else if (inPartOf.includes(w)) score += 0.5;
       }
       return { c, score };
     }).filter((x) => x.score > 0);

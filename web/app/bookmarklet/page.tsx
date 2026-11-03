@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Metadata } from 'next';
+import { pageMetadata } from '../../lib/page-meta';
 import { BookmarkletLink } from './link';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://taster-six.vercel.app';
@@ -16,11 +17,11 @@ function overlayPin(): { version: string; overlay: string } {
   }
 }
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Taster 북마클릿과 확장',
   description: '보고 있는 페이지에서 바로 Taster 규칙을 재는 북마클릿과 브라우저 확장.',
-  alternates: { canonical: '/bookmarklet' },
-};
+  path: '/bookmarklet',
+});
 
 export default function Page() {
   const pin = overlayPin();
