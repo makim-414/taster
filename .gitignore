@@ -3,3 +3,6 @@ dist/
 .DS_Store
 registry/demo/shots/
 *.log
+.env
+.env.*
+!.env.example
