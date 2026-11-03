@@ -52,7 +52,7 @@ function GalleryCard({ card, live, look }: { card: Card; live: boolean; look: Lo
       </Link>
       <div className="card-text">
         <div>
-          <h3><Link href={`/components/${card.group}/${card.slug}`}>{card.name}</Link></h3>
+          <h2><Link href={`/components/${card.group}/${card.slug}`}>{card.name}</Link></h2>
           <p className="card-kind">{card.categoryName}</p>
         </div>
         <button type="button" className="pick" aria-pressed={picked} disabled={full} onClick={() => togglePick(card.id)} aria-label={`${card.name} ${picked ? '빼기' : '담기'}`}>
