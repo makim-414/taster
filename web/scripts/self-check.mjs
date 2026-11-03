@@ -77,7 +77,12 @@ try {
         return route.fulfill({ json: { shots: Object.fromEntries(ids.map((id, i) => [id, i === 1 ? { status: 'blocked' } : { status: 'ok', image: picture }])) } });
       });
       await page.goto(BASE + path, { waitUntil: 'networkidle' });
-      if (path.startsWith('/tone')) await page.waitForSelector('.ref-shot img');
+      if (path.startsWith('/tone')) {
+        // Sites open only once their cards are on screen.
+        for (const card of await page.locator('.ref-card').all()) await card.scrollIntoViewIfNeeded();
+        await page.waitForSelector('.ref-shot img');
+        await page.evaluate(() => scrollTo(0, 0));
+      }
       await page.evaluate(() => document.querySelectorAll('details').forEach((d) => (d.open = true)));
       await page.addScriptTag({ content: DETECT });
       const report = await page.evaluate(() => window.tasterDetect({ maxPerRule: 10 }));

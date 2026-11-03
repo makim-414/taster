@@ -7,7 +7,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { BlockedError, bareHost, parseTarget, resolvePublic } from '../../../lib/net-guard.ts';
-import { clientIp, takeShotToken, takeToken, withGate } from '../../../lib/limits.ts';
+import { clientIp, takeShotCeiling, takeShotToken, takeToken, withGate } from '../../../lib/limits.ts';
 import { PageLoadError, runDiagnosis, trimReport } from '../../../lib/diagnose.ts';
 import { runBrand } from '../../../lib/brand.ts';
 import { allKept, captureShots, type Shot } from '../../../lib/tone-shot.ts';
@@ -67,7 +67,7 @@ function remoteFor(request: Request): Remote {
     // Reference first screens for pick_tone: catalog ids only, the same fence, window and gate as the tone page.
     async tone(ids: string[]) {
       const targets = ids.filter((id) => TONE_URLS.has(id)).slice(0, 6).map((id) => ({ id, url: TONE_URLS.get(id)! }));
-      if (!allKept(targets) && !takeShotToken(ip).ok) return Object.fromEntries(targets.map((t) => [t.id, { status: 'busy' } as Shot]));
+      if (!allKept(targets) && (!takeShotToken(ip).ok || !takeShotCeiling())) return Object.fromEntries(targets.map((t) => [t.id, { status: 'busy' } as Shot]));
       const shots = allKept(targets) ? await captureShots(targets) : await withGate(() => captureShots(targets));
       return shots || Object.fromEntries(targets.map((t) => [t.id, { status: 'busy' } as Shot]));
     },

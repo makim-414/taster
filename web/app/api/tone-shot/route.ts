@@ -1,8 +1,8 @@
 // The first screens of up to four tone references, for the tone page. Only ids from the catalog are accepted, so
-// this route never opens an address a visitor typed. Pictures go back in the response and are never stored.
+// this route never opens an address a visitor typed. Pictures go back in the response; they are never written to disk, kept in server memory up to 30 minutes.
 import { NextResponse } from 'next/server';
 import catalog from '../../../../taxonomy/tone-refs.json';
-import { clientIp, takeShotToken, withGate } from '../../../lib/limits.ts';
+import { clientIp, takeShotCeiling, takeShotToken, withGate } from '../../../lib/limits.ts';
 import { allKept, captureShots } from '../../../lib/tone-shot.ts';
 
 export const runtime = 'nodejs';
@@ -30,6 +30,7 @@ export async function POST(request: Request) {
   if (!allKept(targets)) {
     const token = takeShotToken(clientIp(request.headers));
     if (!token.ok) return fail(429, 'rate-limit', `화면을 너무 자주 열었습니다. ${Math.ceil(token.retryAfter / 60)}분 뒤에 다시 열립니다.`);
+    if (!takeShotCeiling()) return fail(503, 'busy', '지금 화면을 여는 요청이 많습니다. 1분 뒤에 다시 해 주세요.');
   }
   try {
     const shots = allKept(targets) ? await captureShots(targets) : await withGate(() => captureShots(targets));

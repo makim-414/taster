@@ -24,6 +24,20 @@ export const takeToken = createWindow(6);
 // Reference first screens for the tone page: one call opens up to four sites, and moving the spot asks again.
 export const takeShotToken = createWindow(20);
 
+/** A ceiling across every caller: at most `perMinute` calls in any sixty seconds on this instance. */
+export function createCeiling(perMinute: number) {
+  let recent: number[] = [];
+  return function take(now = Date.now()): boolean {
+    recent = recent.filter((t) => now - t < 60_000);
+    if (recent.length >= perMinute) return false;
+    recent.push(now);
+    return true;
+  };
+}
+
+// However many visitors there are, one instance opens third party sites for at most 12 capture calls a minute.
+export const takeShotCeiling = createCeiling(12);
+
 export function clientIp(headers: Headers): string {
   return headers.get('x-real-ip') || (headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'unknown';
 }
