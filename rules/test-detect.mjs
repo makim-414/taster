@@ -51,13 +51,18 @@ const pw = await loadPlaywright();
 const chromium = pw.chromium;
 const browser = await chromium.launch(CHROME ? { executablePath: CHROME, headless: true } : { headless: true });
 
-async function scan(file, width = 1440) {
+async function open(file, width) {
   const page = await browser.newPage({ viewport: { width, height: width >= 768 ? 900 : 844 } });
   const pageErrors = [];
   page.on('pageerror', (e) => pageErrors.push(String(e)));
   await page.goto(pathToFileURL(path.join(here, 'fixtures', file)).href);
   await page.evaluate(() => document.fonts.ready);
   await page.addScriptTag({ path: detectSrc });
+  return { page, pageErrors };
+}
+
+async function scan(file, width = 1440) {
+  const { page, pageErrors } = await open(file, width);
   const result = await page.evaluate(() => window.tasterDetect({}));
 
   // highlight then clear must leave the DOM as it was
@@ -75,13 +80,15 @@ async function scan(file, width = 1440) {
 }
 
 const out = {};
-for (const f of ['slop.html', 'slop-extra.html', 'clean.html']) out[f] = await scan(f);
+// The clean page runs at both widths and must have zero findings of any level.
+for (const w of [1440, 390]) out[`clean.html@${w}`] = await scan('clean.html', w);
 
 // Render integrity rules: every one fires on slop-render.html at a phone width; the touch rule stays off above 1024.
 const render390 = await scan('slop-render.html', 390);
 const render1440 = await scan('slop-render.html', 1440);
 
-// The engine fixtures from the other detector (feat/diagnose-engine), run at both widths the engine uses.
+// Every other fixture has a list of rules it must hit in expected-engine.json, checked at both widths the engine uses.
+// An empty list means zero findings.
 const expectedEngine = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'expected-engine.json'), 'utf8'));
 const engineOut = {};
 for (const f of Object.keys(expectedEngine)) {
@@ -117,23 +124,24 @@ for (const [f, o] of Object.entries(out)) {
   }
 }
 
-const slop = out['slop.html'].result;
+const slop = engineOut['slop.html@1440'].result;
 const slopIds = ids(slop);
 check(slopIds.length >= 15, `slop.html found only ${slopIds.length} distinct rule ids (need 15)`);
 const slopDet = slopIds.filter((i) => level[i] === 'deterministic');
 console.log(`slop.html deterministic rules: ${slopDet.length}`);
 console.log('slop.html ids: ' + slopIds.join(' '));
 
-const union = new Set([...slopIds, ...ids(out['slop-extra.html'].result), ...Object.values(engineOut).flatMap((o) => ids(o.result))]);
-const detAll = rules.filter((r) => r.detect.level === 'deterministic').map((r) => r.id);
-const heuAll = rules.filter((r) => r.detect.level === 'heuristic').map((r) => r.id);
-console.log('deterministic rules not covered by fixtures: ' + (detAll.filter((i) => !union.has(i)).join(' ') || 'none'));
-console.log('heuristic rules not covered by fixtures: ' + (heuAll.filter((i) => !union.has(i)).join(' ') || 'none'));
+// Every measured rule needs a fixture that makes it fire; turning a rule off must fail this script.
+const union = new Set([render390, render1440, ...Object.values(engineOut)].flatMap((o) => ids(o.result)));
+const measured = rules.filter((r) => r.detect.level !== 'manual').map((r) => r.id);
+const uncovered = measured.filter((i) => !union.has(i));
+check(uncovered.length === 0, `measured rules without a positive fixture: ${uncovered.join(' ')}`);
+console.log(`measured rules with a positive fixture: ${measured.length - uncovered.length} of ${measured.length}`);
 
-const clean = out['clean.html'].result;
-const cleanDet = clean.findings.filter((x) => level[x.ruleId] === 'deterministic');
-check(cleanDet.length === 0, `clean.html has ${cleanDet.length} deterministic findings: ` + cleanDet.map((x) => `${x.ruleId}@${x.selector}`).join(', '));
-if (clean.findings.length) console.log('clean.html non-deterministic findings: ' + clean.findings.map((x) => `${x.ruleId}@${x.selector}`).join(', '));
+for (const w of [1440, 390]) {
+  const clean = out[`clean.html@${w}`].result;
+  check(clean.findings.length === 0, `clean.html at ${w}: expected 0 findings, got ` + clean.findings.map((x) => `${x.ruleId}@${x.selector}`).join(', '));
+}
 
 for (const [key, o] of Object.entries(engineOut)) {
   const [f, w] = key.split('@');
@@ -145,6 +153,15 @@ for (const [key, o] of Object.entries(engineOut)) {
     check(o.result.findings.length === 0, `${f} at ${w}: expected 0 findings, got ${o.result.findings.map((x) => `${x.ruleId}@${x.selector}`).join(', ')}`);
   }
   console.log(`${key}: expected ${want.length}, found ${want.length - missing.length}, total findings ${o.result.findings.length}`);
+}
+
+// Known gaps: these fixtures record what a rule cannot measure yet. When the rule starts to fire, the gap is closed:
+// move the fixture's id into expected-engine.json as a positive one.
+for (const [f, id] of Object.entries({ 'gap-col08-backdrop.html': 'COL-08' })) {
+  for (const w of [1440, 390]) {
+    const hit = engineOut[`${f}@${w}`].result.findings.some((x) => x.ruleId === id);
+    check(!hit, `${f} at ${w}: ${id} now fires here, so this gap is closed; make the fixture a positive one`);
+  }
 }
 
 if (failures.length) {
