@@ -78,6 +78,7 @@ npm install
 npm run typecheck     # tsc, must exit 0
 npm run build-demo    # writes demo/dist/index.html (one self contained file)
 node test-render.mjs  # headless render gate, prints RENDER OK
+node test-a11y.mjs    # keyboard focus, accessible names and reduced motion, prints A11Y OK
 ```
 
 The demo page renders every registry entry in a `data-registry-id` wrapper. The render test
