@@ -16,7 +16,13 @@ updates:
     groups:
       engine:
         group-by: dependency-name
-  # The registry and the web app: minor and patch updates in one pull request per folder, majors on their own.
+    # Major versions change APIs that copied components and their users rely on (React, Tailwind, TypeScript);
+    # they are upgraded by hand, in a change of their own.
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
+  # The registry and the web app: minor and patch updates in one pull request per folder.
   - package-ecosystem: npm
     directories:
       - /registry
@@ -33,6 +39,12 @@ updates:
         update-types:
           - minor
           - patch
+    # Major versions change APIs that copied components and their users rely on (React, Tailwind, TypeScript);
+    # they are upgraded by hand, in a change of their own.
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
   # Workflows in .github/workflows and the composite action in action.yml.
   - package-ecosystem: github-actions
     directory: /
