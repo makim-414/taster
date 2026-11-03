@@ -19,10 +19,13 @@ export function loadRegistry() {
   return JSON.parse(readFileSync(join(REGISTRY_DIR, 'registry.json'), 'utf8'));
 }
 
+// The source without block comments and whole-line comments, so an import shown in a JSDoc example is not read as one.
+const code = (source) => source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+
 // Relative imports in a source file: import ... from './x', export ... from '../y', import './z.css'.
 function relativeImports(source) {
   const out = new Set();
-  for (const m of source.matchAll(/(?:from|import)\s+['"](\.{1,2}\/[^'"]+)['"]/g)) out.add(m[1]);
+  for (const m of code(source).matchAll(/(?:from|import)\s+['"](\.{1,2}\/[^'"]+)['"]/g)) out.add(m[1]);
   return [...out];
 }
 
@@ -70,7 +73,7 @@ export function resolveComponents(ids, { tokens = true } = {}) {
   // React is assumed; everything else a file imports by bare name must be in some component's deps.
   for (const [rel, content] of files) {
     if (!/\.(tsx?|jsx?)$/.test(rel)) continue;
-    for (const m of content.matchAll(/from\s+['"]([^.'"/][^'"]*)['"]/g)) {
+    for (const m of code(content).matchAll(/from\s+['"]([^.'"/][^'"]*)['"]/g)) {
       const pkg = m[1].startsWith('@') ? m[1].split('/').slice(0, 2).join('/') : m[1].split('/')[0];
       if (pkg !== 'react' && pkg !== 'react-dom') npm.add(pkg);
     }
