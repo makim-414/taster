@@ -17,7 +17,7 @@
  *                         --taster-outline (fallback #e5484d). Set it on :root to change it.
  *   clear       boolean   remove the outlines added by an earlier call and return.
  *   maxPerRule  number    cap on reported findings per rule (default 40, totals stay in `counts`).
- *   rules       string[]  only run these rule ids.
+ *   rules       string[]  only report these rule ids. A rule that reads others (COL-05, LAY-04) still runs them.
  *
  * Result:
  *   { url, viewport:{width,height,dpr}, findings:[{ruleId, selector, text, rect, evidence}],
@@ -331,6 +331,8 @@
   // detect.js never presses their buttons.
   var CONSENT_SEL = '#onetrust-consent-sdk,#CybotCookiebotDialog,#usercentrics-root,.osano-cm-window,#truste-consent-track,' +
     '[id^="sp_message_container"],.qc-cmp2-container,#didomi-host';
+  // Rules that read other rules' results: asked for alone, they need those to run first.
+  var NEEDS = { 'COL-05': ['COL-01', 'COL-03', 'COL-07'], 'LAY-04': ['LAY-02'] };
 
   function run(options) {
     options = options || {};
@@ -344,6 +346,8 @@
 
     var cap = options.maxPerRule || 40;
     var findings = [], notes = [], errors = [], counts = {}, hits = {}, seen = {}, toHL = [];
+    // Rules run only because a requested rule reads their results: counted while the run lasts, never reported.
+    var silent = {};
     // What a third-party widget draws is not the site's design: those findings go to thirdParty, outside counts.
     var thirdParty = [], partyCounts = {};
 
@@ -355,12 +359,12 @@
       var party = el.closest && el.closest(CONSENT_SEL) ? 'consent' : null;
       if (party) {
         partyCounts[ruleId] = (partyCounts[ruleId] || 0) + 1;
-        if (partyCounts[ruleId] <= cap) thirdParty.push(finding(ruleId, el, evidence, party));
+        if (!silent[ruleId] && partyCounts[ruleId] <= cap) thirdParty.push(finding(ruleId, el, evidence, party));
         return;
       }
       counts[ruleId] = (counts[ruleId] || 0) + 1;
       (hits[ruleId] = hits[ruleId] || []).push(el);
-      if (counts[ruleId] > cap) return;
+      if (silent[ruleId] || counts[ruleId] > cap) return;
       findings.push(finding(ruleId, el, evidence));
       toHL.push(el);
     }
@@ -2275,14 +2279,21 @@
       'KO-08', 'KO-09', 'KO-10', 'KO-11',
       'RSP-01', 'RSP-02', 'RSP-03', 'RSP-04', 'RSP-05', 'RSP-06', 'RSP-07', 'COL-08', 'CPY-02', 'CPY-03', 'CMP-12', 'LAY-07', 'KO-12', 'KO-13'
     ];
+    var want = options.rules;
+    if (want) {
+      want.forEach(function (id) {
+        (NEEDS[id] || []).forEach(function (d) { if (want.indexOf(d) < 0) silent[d] = true; });
+      });
+    }
     ORDER.forEach(function (id) {
-      if (options.rules && options.rules.indexOf(id) < 0) return;
+      if (want && want.indexOf(id) < 0 && !silent[id]) return;
       try {
         R[id]();
       } catch (e) {
         errors.push({ ruleId: id, message: String((e && e.message) || e) });
       }
     });
+    Object.keys(silent).forEach(function (id) { delete counts[id]; });
     notes.push('Manual rules not run: AC-18, AC-19, CMP-08. CPY-01, KO-07 and RSP-05 report candidates only.');
     if (vw > 1024) notes.push('RSP-06 (touch size) runs at 1024px and below only.');
 

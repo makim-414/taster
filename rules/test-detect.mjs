@@ -79,6 +79,14 @@ async function scan(file, width = 1440) {
   return { result, hl, mutated: before !== after, pageErrors };
 }
 
+// options.rules on its own: a rule that reads other rules' results must still fire when it is the only one asked for.
+async function only(file, list) {
+  const { page } = await open(file, 1440);
+  const result = await page.evaluate((l) => window.tasterDetect({ rules: l }), list);
+  await page.close();
+  return result;
+}
+
 const out = {};
 // The clean page runs at both widths and must have zero findings of any level.
 for (const w of [1440, 390]) out[`clean.html@${w}`] = await scan('clean.html', w);
@@ -93,6 +101,10 @@ const expectedEngine = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'e
 const engineOut = {};
 for (const f of Object.keys(expectedEngine)) {
   for (const w of [1440, 390]) engineOut[`${f}@${w}`] = await scan(f, w);
+}
+const alone = {};
+for (const [id, needs] of Object.entries({ 'COL-05': ['COL-01', 'COL-03', 'COL-07'], 'LAY-04': ['LAY-02'] })) {
+  alone[id] = { needs, result: await only('slop.html', [id]) };
 }
 await browser.close();
 
@@ -181,6 +193,12 @@ for (const [f, id] of Object.entries({ 'gap-col08-backdrop.html': 'COL-08' })) {
     const hit = engineOut[`${f}@${w}`].result.findings.some((x) => x.ruleId === id);
     check(!hit, `${f} at ${w}: ${id} now fires here, so this gap is closed; make the fixture a positive one`);
   }
+}
+
+for (const [id, o] of Object.entries(alone)) {
+  const got = Object.keys(o.result.counts).sort();
+  check(JSON.stringify(got) === JSON.stringify([id]), `slop.html with rules [${id}]: counts ${JSON.stringify(o.result.counts)}, want only ${id} (it reads ${o.needs.join(' ')})`);
+  check(o.result.findings.every((x) => x.ruleId === id), `slop.html with rules [${id}]: reported rules it was not asked for`);
 }
 
 if (failures.length) {
