@@ -50,6 +50,8 @@ All notable changes to Taster are recorded here. The format follows
   marked as English.
 - The bookmarklet's files live in a folder named after their hash, so the browser can keep them for good without
   ever running an old copy against a new bookmark.
+- The GitHub Action runs on macOS runners too (it read its targets with `mapfile`, which the bash on macOS lacks),
+  pins the actions it uses to a commit, and installs Chromium's system packages only when the runner lacks them.
 
 ## [0.1.0] - 2026-11-02
 

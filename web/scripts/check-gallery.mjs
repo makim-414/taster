@@ -2,15 +2,14 @@
 // color reaching a live component, width switch, the text for the agent, no sideways scroll, no page error. It also
 // measures the focus ring (3:1 on the page, drawn on every side of a segment button), the heading order, and that a
 // gallery with every card running downloads the stage document once and pauses the frames out of sight.
-// Usage: node scripts/check-gallery.mjs [base url]   (default http://localhost:3240)
-import { existsSync, mkdirSync } from 'node:fs';
+// Usage: node scripts/check-gallery.mjs [base url]   (default $BASE_URL, else http://localhost:3240)
+import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright-core';
 
-const BASE = process.argv[2] || 'http://localhost:3240';
-const MAC_CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const BASE = process.argv[2] || process.env.BASE_URL || 'http://localhost:3240';
 const OUT = new URL('../shots/', import.meta.url);
 mkdirSync(OUT, { recursive: true });
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || (existsSync(MAC_CHROME) ? MAC_CHROME : undefined) });
+const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
 let failures = 0;
 const ok = (cond, label) => {
   console.log(`${cond ? 'PASS' : 'FAIL'} ${label}`);

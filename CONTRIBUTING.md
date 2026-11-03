@@ -26,8 +26,8 @@ npm ci --prefix web
 npx --prefix engine playwright install chromium    # on Linux, add --with-deps
 ```
 
-The browser checks use Google Chrome when it is installed in the standard macOS place, and otherwise the Chromium
-installed above. Set `CHROME_PATH` to use another build.
+The browser checks use the Chromium installed above, the same build CI uses. Set `CHROME_PATH` to use another
+build.
 
 ## Where things live
 
@@ -54,14 +54,19 @@ Commit the generated files together with the change that caused them.
 
 ## Checks
 
-Run these before you open a pull request, in this order. They are the same steps, in the same order, as the four CI
-jobs in `.github/workflows/validate.yml`, with the build step first.
+Run these before you open a pull request:
 
 ```bash
-# Generated files
-node scripts/build-docs.mjs
+node scripts/gates.mjs               # every job below, in order; installs what is missing first
+node scripts/gates.mjs web           # one job: validate, browser, web or action
+```
 
+They are the same steps, in the same order, as the four CI jobs in `.github/workflows/validate.yml`
+(`scripts/gates.test.mjs` keeps the two in step). One by one:
+
+```bash
 # validate
+node scripts/build-docs.mjs                        # then git status: nothing may change
 node scripts/validate.mjs
 node scripts/check-taxonomy.mjs
 node --test taxonomy/axes.test.mjs
@@ -69,49 +74,43 @@ node engine/scripts/check-rules.mjs
 npm --prefix registry run typecheck
 node engine/lint.mjs --selftest
 node engine/lint.mjs registry/src --baseline registry/lint-baseline.json
+node --test scripts/check-authors.test.mjs scripts/gates.test.mjs
+node scripts/check-authors.mjs                     # the commits on your branch use a GitHub noreply email
 
 # browser
 node rules/test-detect.mjs
 npm --prefix engine test
 node engine/scripts/check-rebuild-example.mjs
 node engine/scripts/check-icon-slots-example.mjs
+npm --prefix registry run test-render              # builds the demo, renders every component at 1440 and 390
+node registry/test-a11y.mjs                        # keyboard focus, accessible names, reduced motion
+node registry/test-injection.mjs
 
 # web
-npm --prefix web run typecheck
-npm --prefix web run build
+npm --prefix web run build                         # type-checks too
 node web/scripts/check-traces.mjs
 npm --prefix web test
-npm --prefix web start &                           # serves the build on http://localhost:3240
+npm --prefix web start &                           # serves the build on http://localhost:3240 ($PORT to change)
 node web/scripts/self-check.mjs
 node web/scripts/check-gallery.mjs
 node web/scripts/check-tone.mjs
 node web/scripts/check-metadata.mjs
+node web/scripts/check-a11y.mjs
 # then stop the server
 ```
 
-The four browser scripts take a base address. If port 3240 is busy, start the build on another port
-with `(cd web && npx next start --port 3250)` and pass `http://localhost:3250` to each.
+The five browser scripts take a base address. If port 3240 is busy, start the build with
+`PORT=3250 npm --prefix web start` and pass `http://localhost:3250` to each (or set `BASE_URL`); `gates.mjs` picks a
+free port itself. `self-check` allows only the findings listed, with a reason, in `web/scripts/self-check-baseline.json`;
+`check-a11y` allows only the counts in `web/scripts/a11y-baseline.json`, which may only go down
+(`node web/scripts/check-a11y.mjs --write-baseline` after a fix).
 
-The fourth job, `action`, runs this repository's GitHub Action on `examples/rebuild/` and only runs in CI. The same
+The fourth job, `action`, runs this repository's GitHub Action on `examples/rebuild/` on Linux and macOS. The same
 diagnosis locally:
 
 ```bash
 node engine/cli.mjs examples/rebuild/before.html examples/rebuild/after.html --sarif taster.sarif --fail-on none
 ```
-
-When you change a component or its demo, also run the registry render test, which renders every component at 1440
-and 390 and fails on any page error or console error, and the accessibility test, which checks keyboard focus,
-accessible names and reduced motion in the components that need them:
-
-```bash
-npm --prefix registry run build-demo
-PLAYWRIGHT_CORE_PATH="$PWD/engine/node_modules/playwright-core" node registry/test-render.mjs
-PLAYWRIGHT_CORE_PATH="$PWD/engine/node_modules/playwright-core" node registry/test-a11y.mjs
-```
-
-It needs Google Chrome in the standard macOS place or `CHROME_PATH`. On Linux, point it at the Chromium installed
-above: `CHROME_PATH="$(node -p "require('./engine/node_modules/playwright').chromium.executablePath()")"`. The
-same two variables apply to `build-stage`.
 
 ## Rules the repository holds itself to
 
