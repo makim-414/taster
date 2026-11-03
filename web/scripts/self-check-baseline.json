@@ -1,12 +1,5 @@
 {
   "version": 1,
   "note": "Findings on Taster's own screens that self-check allows, each up to its count on that screen at every width. Fix the page and remove the entry; never add one without a reason.",
-  "allow": [
-    {
-      "screen": "/components/motion/marquee",
-      "rule": "CPY-01",
-      "count": 2,
-      "reason": "The marquee-band pattern summary in patterns/INDEX.json says seamless (a loop with no visible seam), shown as the page summary and in the pattern list. The fix is a plainer summary, such as one continuous loop."
-    }
-  ]
+  "allow": []
 }
