@@ -15,6 +15,8 @@ test('add pulls in every relative import, the token files and the notices', () =
   assert.deepEqual(resolveComponents(['blocks/select-menu']).npm, ['@radix-ui/react-select']);
   // A dependency on another registry group is a file in the bundle, not an npm package to install.
   assert.deepEqual(resolveComponents(['content/article']).npm, []);
+  // An import written in a doc comment (Prose shows DOMPurify in its JSDoc) is not a dependency.
+  assert.deepEqual(resolveComponents(['content/prose']).npm, []);
 });
 
 test('add refuses unknown ids and keeps files the user changed', () => {
