@@ -6,6 +6,8 @@ import { launch } from '../diagnose.mjs';
 import { loadToneRefs } from '../catalog.mjs';
 import { DEMO_BRAND, TONE_AXES, axesToTokens, nearestRefs, pickTone, quadrantOf, readSpot, toneAxes, toneParts, toneUrl } from '../tone.mjs';
 import { readFirstScreen } from '../tone-capture.mjs';
+import { validateAxes } from '../../taxonomy/axes.mjs';
+import taxonomy from '../../taxonomy/taxonomy.json' with { type: 'json' };
 
 const catalog = loadToneRefs();
 const fixture = (name) => pathToFileURL(new URL(`./fixtures/${name}`, import.meta.url).pathname).href;
@@ -61,6 +63,18 @@ test('every spot sets all eight axes on their snap steps, and readability never 
   }
 });
 
+test('every spot and genre keeps every design constraint, on the same axes and steps as the taxonomy', () => {
+  assert.deepEqual(TONE_AXES.map((a) => a.id), taxonomy.axes.map((a) => a.id));
+  for (const a of TONE_AXES) assert.deepEqual([a.steps, a.names], [taxonomy.snap[a.id].steps, taxonomy.snap[a.id].names], `${a.id} steps drifted`);
+  let spots = 0;
+  for (const x of GRID) for (const y of GRID) for (const genre of [undefined, ...catalog.genres.map((g) => g.id)]) {
+    const broken = validateAxes(toneAxes({ x, y }, genre)).filter((c) => c.code === 'constraint');
+    assert.deepEqual(broken, [], `${x},${y} ${genre || 'no genre'}: ${broken.map((c) => c.constraint).join(', ')}`);
+    spots++;
+  }
+  assert.equal(spots, GRID.length ** 2 * (catalog.genres.length + 1));
+});
+
 test('the map reads the way its labels say', () => {
   const at = (x, y, genre) => toneAxes({ x, y }, genre);
   for (const x of GRID) for (let i = 1; i < GRID.length; i++) {
@@ -88,7 +102,8 @@ test('the map reads the way its labels say', () => {
 test('color comes from the brand, a stand in only when the spot asks for color', () => {
   const quiet = axesToTokens(toneAxes({ x: 0.1, y: 0.1 }));
   assert.equal(quiet['--brand'], undefined);
-  const loud = axesToTokens(toneAxes({ x: 0.2, y: 0.9 }));
+  // Near the launch corner the spot asks for two hues: the data ramp takes a second hue across the wheel.
+  const loud = axesToTokens(toneAxes({ x: 0.1, y: 0.9 }));
   assert.equal(loud['--brand'], DEMO_BRAND);
   assert.match(loud['--chart-2'], /from var\(--brand\)/);
   const branded = axesToTokens(toneAxes({ x: 0.1, y: 0.1 }), { brand: '#e4002b' });
