@@ -25,6 +25,11 @@ function serve(): Promise<{ base: string; close: () => void }> {
     if (url.pathname === '/subresource-private') {
       return res.writeHead(200, { 'content-type': 'text/html' }).end('<!doctype html><html lang="en"><body><img src="http://169.254.169.254/x.png"><p>hi</p></body></html>');
     }
+    // A bot check served with 403, the shape the engine's load check treats as "not the site".
+    if (url.pathname === '/challenge') {
+      const body = await readFile(path.resolve(import.meta.dirname, '../../engine/test/fixtures/load-403-challenge.html'));
+      return res.writeHead(403, { 'content-type': 'text/html; charset=utf-8' }).end(body);
+    }
     if (url.pathname.startsWith('/fixtures/')) {
       try {
         const body = await readFile(path.join(FIXTURES, path.basename(url.pathname)));
@@ -121,6 +126,8 @@ test('engine through the fence: slop.html is hit, clean.html has zero findings',
     assert.deepEqual(short.missed, [390]);
     assert.ok(short.report.rulesHit >= 15, `partial slop.html hit only ${short.report.rulesHit} rules`);
     assert.deepEqual(Object.keys(short.shots), ['1440']);
+    // A bot check is not the site: no report at all, instead of "no rules hit" for someone else's block page.
+    await assert.rejects(runDiagnosis(`${srv.base}/challenge`, { allowLoopback: true }), /차단·오류 화면\(HTTP 403\)/);
     const clean = await runDiagnosis(`${srv.base}/fixtures/clean.html`, { allowLoopback: true });
     assert.equal(clean.report.rulesHit, 0, `clean.html hit ${clean.report.rules.map((r) => r.ruleId).join(' ')}`);
     console.log(`slop.html: ${slop.report.rulesHit} rules, ${slop.report.findings} places; clean.html: ${clean.report.rulesHit}`);
