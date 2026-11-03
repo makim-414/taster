@@ -127,6 +127,7 @@ const mk = readJson('.claude-plugin/marketplace.json');
 const cx = readJson('.codex-plugin/plugin.json');
 if (mk.plugins[0].version !== cx.version) err('plugin versions differ between .claude-plugin and .codex-plugin');
 for (const s of mk.plugins[0].skills) if (!fs.existsSync(path.join(ROOT, s, 'SKILL.md'))) err(`marketplace skill path missing ${s}`);
+for (const e of meta.codexMcpErrors(cx, (rel) => fs.existsSync(path.join(ROOT, rel)))) err(e);
 
 // Package and plugin metadata (scripts/check-meta.mjs): the descriptions and every count stated in prose, versions,
 // dependencies and Node versions, and the files npm would publish.

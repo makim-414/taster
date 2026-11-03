@@ -121,7 +121,8 @@ Claude Code without the plugin:
 claude mcp add taster -- node /path/to/taster/engine/start.mjs
 ```
 
-Codex, in `~/.codex/config.toml` (the repository's `.codex-plugin/plugin.json` brings the skill only):
+Codex, in `~/.codex/config.toml` (installed as a Codex plugin, the repository's `.codex-plugin/plugin.json` brings
+the skill and this server instead):
 
 ```toml
 [mcp_servers.taster]

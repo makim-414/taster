@@ -120,7 +120,8 @@ npm ci --prefix /path/to/taster/engine
 claude mcp add taster -- node /path/to/taster/engine/start.mjs
 ```
 
-Codex 는 `~/.codex/config.toml` 에 넣습니다(리포의 `.codex-plugin/plugin.json` 은 스킬만 넣습니다).
+Codex 는 `~/.codex/config.toml` 에 넣습니다(리포를 Codex 플러그인으로 설치하면 `.codex-plugin/plugin.json` 이 스킬과
+이 서버를 함께 넣습니다).
 
 ```toml
 [mcp_servers.taster]
