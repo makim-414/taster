@@ -11,8 +11,10 @@ import type { AddressInfo } from 'node:net';
 import { fencePage, launchBrowser, type Budget } from '../lib/browser.ts';
 import { loadEngine, runDiagnosis } from '../lib/diagnose.ts';
 import { runBrand } from '../lib/brand.ts';
+import { allKept, captureShots } from '../lib/tone-shot.ts';
 
 const FIXTURES = path.resolve(import.meta.dirname, '../../rules/fixtures');
+const TONE_FIXTURES = path.resolve(import.meta.dirname, '../../engine/test/fixtures');
 
 
 function serve(): Promise<{ base: string; close: () => void }> {
@@ -25,9 +27,17 @@ function serve(): Promise<{ base: string; close: () => void }> {
     if (url.pathname === '/subresource-private') {
       return res.writeHead(200, { 'content-type': 'text/html' }).end('<!doctype html><html lang="en"><body><img src="http://169.254.169.254/x.png"><p>hi</p></body></html>');
     }
+    if (url.pathname.startsWith('/tone-fixtures/')) {
+      try {
+        const body = await readFile(path.join(TONE_FIXTURES, path.basename(url.pathname)));
+        return res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }).end(body);
+      } catch {
+        return res.writeHead(404).end();
+      }
+    }
     // A bot check served with 403, the shape the engine's load check treats as "not the site".
     if (url.pathname === '/challenge') {
-      const body = await readFile(path.resolve(import.meta.dirname, '../../engine/test/fixtures/load-403-challenge.html'));
+      const body = await readFile(path.join(TONE_FIXTURES, 'load-403-challenge.html'));
       return res.writeHead(403, { 'content-type': 'text/html; charset=utf-8' }).end(body);
     }
     if (url.pathname.startsWith('/fixtures/')) {
@@ -127,7 +137,7 @@ test('engine through the fence: slop.html is hit, clean.html has zero findings',
     assert.ok(short.report.rulesHit >= 15, `partial slop.html hit only ${short.report.rulesHit} rules`);
     assert.deepEqual(Object.keys(short.shots), ['1440']);
     // A bot check is not the site: no report at all, instead of "no rules hit" for someone else's block page.
-    await assert.rejects(runDiagnosis(`${srv.base}/challenge`, { allowLoopback: true }), /차단·오류 화면\(HTTP 403\)/);
+    await assert.rejects(runDiagnosis(`${srv.base}/challenge`, { allowLoopback: true }), { code: 'not-diagnosed', message: /^not diagnosed: got a bot check page \(HTTP 403/ });
     const clean = await runDiagnosis(`${srv.base}/fixtures/clean.html`, { allowLoopback: true });
     assert.equal(clean.report.rulesHit, 0, `clean.html hit ${clean.report.rules.map((r) => r.ruleId).join(' ')}`);
     console.log(`slop.html: ${slop.report.rulesHit} rules, ${slop.report.findings} places; clean.html: ${clean.report.rulesHit}`);
@@ -172,4 +182,20 @@ test('brand through the fence: tokens come from the page, and private addresses 
   assert.ok(result.tokens['--success'] && result.tokens['--danger']);
   assert.ok(result.notes.length >= 3);
   await assert.rejects(runBrand(`${srv.base}/to-private`, { allowLoopback: true }));
+});
+
+test('tone shots through the fence: a picture of a page, none of a check page, private addresses fail, kept pictures skip the browser', async (t) => {
+  const srv = await serveOn8080();
+  if (!srv) return t.skip('port 8080 is busy');
+  t.after(() => srv.close());
+  const page = { id: 'page', url: `${srv.base}/tone-fixtures/tone-consent.html` };
+  const shots = await captureShots([page, { id: 'check', url: `${srv.base}/tone-fixtures/tone-blocked.html` }, { id: 'private', url: `${srv.base}/to-private` }], { allowLoopback: true, settleMs: 100 });
+  assert.equal(shots.page.status, 'ok');
+  assert.ok(shots.page.status === 'ok' && shots.page.image.startsWith('data:image/jpeg;base64,'), 'missing the picture');
+  assert.equal(shots.check.status, 'blocked');
+  assert.equal(shots.private.status, 'failed');
+  assert.ok(allKept([page]), 'the picture is kept in memory');
+  assert.ok(!allKept([{ id: 'private', url: `${srv.base}/to-private` }]), 'a failure is not kept');
+  const again = await captureShots([{ id: 'same', url: page.url }], { allowLoopback: true, deadlineMs: 1 });
+  assert.deepEqual(again.same, shots.page);
 });

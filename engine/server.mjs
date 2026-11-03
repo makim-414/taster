@@ -3,6 +3,8 @@
 // Brand tool: brand_theme. System tools: design_system, tune_system, system_for_category. Rebuild tool: extract_content.
 // Swap tools: suggest_swaps, list_patterns, get_pattern, get_component, taxonomy.
 // Choosing tools: browse_components and preview_component answer with pictures and links to the live gallery.
+// Tone tool: pick_tone places the look on the tone map and answers with the nearest real sites, the axes and tokens
+// of that spot, and Taster parts wearing them.
 // Screen by screen tools: check_consistency, plan_screens, plan_next, plan_update.
 // Hosted mode has no local files and opens pages only through the host's fenced browser, so it swaps the local
 // diagnose for `remote.diagnose` (public http(s) URLs only), brand_theme for `remote.brand` when the host gives one,
@@ -16,18 +18,63 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, launch, viewportFor } from './diagnose.mjs';
 import { brandTheme } from './brand.mjs';
-import { boardUrl, browseComponents, componentUrl, getComponent, getPattern, listPatterns, loadTaxonomy, previewPath, stagePath, suggestSwaps } from './catalog.mjs';
+import { WEB_URL, boardUrl, browseComponents, componentUrl, getComponent, getPattern, listPatterns, loadTaxonomy, loadToneRefs, previewPath, stagePath, suggestSwaps } from './catalog.mjs';
 import { checkConsistency, formatConsistencyText } from './consistency.mjs';
 import { applyStep, checkScreen, nextStep, planFromExtract, planPath, planRelative, readPlan, writePlan } from './plan.mjs';
 import * as sys from './system.mjs';
+import { pickTone, toneUrl } from './tone.mjs';
+import { readFirstScreen } from './tone-capture.mjs';
 
 const json = (value) => ({ type: 'text', text: JSON.stringify(value, null, 2) });
 const START_GUIDE = fileURLToPath(new URL('../skills/taster/references/start.md', import.meta.url));
+const PRAISE_ON = { x: 'X', reddit: 'Reddit', hackernews: 'Hacker News' };
+const hostOf = (url) => new URL(url).host.replace(/^www\./, '');
+const MISSING = {
+  blocked: 'the site answered with a bot check or a block page, which Taster does not get around',
+  consent: 'the site showed a cookie banner with no reject button, which Taster neither accepts nor hides',
+  busy: 'too many captures right now, open the tone page a little later',
+  failed: 'the site did not open in time',
+};
+
+// One registry component in the stage, wearing a look, as a JPEG. The browser is the caller's.
+async function renderStage(browser, id, look, width) {
+  const page = await browser.newPage({ viewport: { width, height: Math.round(width * 0.625) }, deviceScaleFactor: 1.5 });
+  try {
+    await page.goto(`${pathToFileURL(stagePath()).href}?only=${encodeURIComponent(id)}&look=${encodeURIComponent(JSON.stringify(look))}`);
+    await page.waitForSelector(`[data-registry-id="${id}"]`, { timeout: 15000 });
+    await page.waitForTimeout(1400);
+    return await page.screenshot({ type: 'jpeg', quality: 80 });
+  } finally {
+    await page.close();
+  }
+}
+
+// First screens of the references, two at a time, each in its own context so no cookie or storage carries over.
+async function captureRefs(browser, refs) {
+  const out = {};
+  const queue = [...refs];
+  const worker = async () => {
+    for (let ref = queue.shift(); ref; ref = queue.shift()) {
+      const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, locale: 'en-US' });
+      try {
+        const shot = await readFirstScreen(await context.newPage(), ref.url);
+        out[ref.id] = shot.status === 'ok' ? { status: 'ok', mimeType: 'image/jpeg', data: shot.image.toString('base64') } : { status: shot.status };
+      } catch {
+        out[ref.id] = { status: 'failed' };
+      } finally {
+        await context.close().catch(() => {});
+      }
+    }
+  };
+  await Promise.all([worker(), worker()]);
+  return out;
+}
 
 /**
  * Build a Taster MCP server.
- * @param {{ remote?: { diagnose: (url: string) => Promise<{ report: unknown, shots?: Record<string, string> }>, brand?: (url: string) => Promise<unknown> } }} [options]
- *   remote: hosted mode; diagnose (and brand, when given) go through these functions instead of a local browser.
+ * @param {{ remote?: { diagnose: (url: string) => Promise<{ report: unknown, shots?: Record<string, string> }>, brand?: (url: string) => Promise<unknown>, tone?: (ids: string[]) => Promise<Record<string, { status: string, image?: string }>> } }} [options]
+ *   remote: hosted mode; diagnose (and brand and tone, when given) go through these functions instead of a local browser.
+ *   tone answers with a data URL per reference it could open, and a status for the ones it could not.
  */
 export function createServer({ remote } = {}) {
   const server = new McpServer({ name: 'taster', version: '0.1.0' });
@@ -267,12 +314,7 @@ export function createServer({ remote } = {}) {
       const all = { ...(tokens || {}), ...(hex ? { '--brand': hex } : {}) };
       const browser = await launch();
       try {
-        const page = await browser.newPage({ viewport: { width, height: Math.round(width * 0.625) }, deviceScaleFactor: 1.5 });
-        const look = encodeURIComponent(JSON.stringify({ theme, tokens: all }));
-        await page.goto(`${pathToFileURL(stagePath()).href}?only=${encodeURIComponent(item.id)}&look=${look}`);
-        await page.waitForSelector(`[data-registry-id="${item.id}"]`, { timeout: 15000 });
-        await page.waitForTimeout(1400);
-        const shot = await page.screenshot({ type: 'jpeg', quality: 80 });
+        const shot = await renderStage(browser, item.id, { theme, tokens: all }, width);
         return {
           content: [
             { type: 'text', text: `${item.id} at ${width} wide, ${theme}${hex ? `, brand ${hex}` : ''}. Live, to click and recolor: ${live}` },
@@ -282,6 +324,82 @@ export function createServer({ remote } = {}) {
       } finally {
         await browser.close();
       }
+    }),
+  );
+
+  const tones = loadToneRefs();
+  const genreIds = tones.genres.map((g) => g.id);
+  server.registerTool(
+    'pick_tone',
+    {
+      title: 'Pick a tone on the map',
+      description:
+        `Place the look on the tone map before choosing components: x runs from commerce (0) to brand personality (1), y from minimal (0) to expressive (1), and a genre (${genreIds.join(', ')}) narrows the references. Returns the nearest real sites, numbered, each with its first screen opened now (never written to disk, kept in server memory up to 30 minutes; a bot check, a block page or a cookie banner without a reject button comes back as a link only, and cookie banners are only rejected), what it is and the public post that praised it (or, marked as such, only mentioned it); the eight axes this spot sets (density, contrast, roundness, type-expression, color-restraint, elevation, motion, stroke) with step names; token overrides and a theme.css block; ` +
+        `${remote ? 'a live link to Taster parts wearing those tokens' : 'a picture of a Taster part wearing those tokens'}; and the tone page where the user can drag the spot. The references set the direction, the parts show what Taster will build. Show every picture and the link, ask which reference is closest or which way to move, and wait.`,
+      inputSchema: {
+        x: z.number().min(0).max(1).optional().describe('0 commerce to 1 brand personality, default 0.5'),
+        y: z.number().min(0).max(1).optional().describe('0 minimal to 1 expressive, default 0.5'),
+        like: z.string().optional().describe(`start from a reference's spot instead of x and y, by id: ${tones.refs.map((r) => r.id).join(', ')}`),
+        genre: z.enum(genreIds).optional().describe(tones.genres.map((g) => `${g.id}: ${g.summary}`).join(' ')),
+        limit: z.number().int().min(1).max(6).optional().describe('how many references, default 4'),
+        shots: z.boolean().optional().describe('open each reference now and return its first screen, default true'),
+        ...lookInput,
+      },
+      annotations: { readOnlyHint: true, openWorldHint: true },
+    },
+    guard(async ({ x, y, like, genre, limit = 4, shots = true, theme = 'dark', brand }) => {
+      let spot = { x, y };
+      if (like) {
+        const ref = tones.refs.find((r) => r.id === like);
+        if (!ref) throw new Error(`Unknown reference ${like}. Known: ${tones.refs.map((r) => r.id).join(', ')}`);
+        spot = { x: ref.x, y: ref.y };
+      }
+      const hex = brand ? `#${brand.replace('#', '')}` : null;
+      const tone = pickTone(tones, { ...spot, genre, theme, brand: hex, limit });
+      const page = toneUrl(WEB_URL, { ...tone.spot, genre: tone.genre?.id, theme, brand: hex });
+      const where = `x ${tone.spot.x} (${tone.spot.x < 0.5 ? 'commerce' : 'brand personality'} side), y ${tone.spot.y} (${tone.spot.y < 0.5 ? 'minimal' : 'expressive'} side): ${tone.quadrant.name}`;
+      const content = [{ type: 'text', text: `Tone spot ${where}${tone.genre ? `, genre ${tone.genre.name}` : ''}. ${tone.refs.length} nearest references below. Tone page, to drag the spot and see the parts live: ${page}` }];
+
+      let pictures = {};
+      let browser = null;
+      try {
+        if (shots && remote?.tone) {
+          const got = await remote.tone(tone.refs.map((r) => r.id)).catch(() => ({}));
+          for (const [id, s] of Object.entries(got || {})) {
+            const m = /^data:(image\/[a-z]+);base64,(.+)$/.exec(String(s.image || ''));
+            pictures[id] = m ? { status: 'ok', mimeType: m[1], data: m[2] } : { status: s.status || 'failed' };
+          }
+        } else if (shots && !remote) {
+          browser = await launch();
+          pictures = await captureRefs(browser, tone.refs);
+        }
+        tone.refs.forEach((r, i) => {
+          const praise = r.praise ? ` ${r.praise.kind === 'mention' ? 'Mentioned' : 'Praised'} on ${PRAISE_ON[r.praise.on]} (${r.praise.date}): ${r.praise.url}${r.praise.caveat ? ` (${r.praise.caveat.en})` : ''}` : ' Placed by hand; no praise or mention post on file.';
+          content.push({ type: 'text', text: `${i + 1}. ${r.name} (${hostOf(r.url)}, at ${r.x}, ${r.y}): ${r.note.en}${praise}\n${r.url}` });
+          const shot = pictures[r.id];
+          if (shot?.status === 'ok') content.push({ type: 'image', mimeType: shot.mimeType, data: shot.data });
+          else if (shot) content.push({ type: 'text', text: `First screen not shown: ${MISSING[shot.status] || MISSING.failed}. Link only.` });
+        });
+
+        content.push({
+          type: 'text',
+          text: `Axes for this spot: ${tone.steps.map((s) => `${s.id} ${s.step}`).join(', ')}.${tone.demoBrand ? ` No brand color was given and this spot uses color, so the parts wear a stand in (${tone.tokens['--brand']}); pass brand to use yours.` : ''}\nAxes as JSON, the shape a design system takes as builder intent: ${JSON.stringify(tone.axes)}\nTokens, for preview_component's tokens or a theme.css after registry/src/tokens.css:\n\`\`\`css\n${tone.css}\`\`\``,
+        });
+        const [part] = tone.parts;
+        if (remote) {
+          content.push({ type: 'text', text: `The parts wearing these tokens, live: ${page}` });
+        } else {
+          if (!existsSync(stagePath())) throw new Error('registry/stage/index.html is missing. Run: npm --prefix registry run build-stage');
+          browser ||= await launch();
+          const shot = await renderStage(browser, part, { theme, tokens: tone.tokens }, 900);
+          content.push({ type: 'text', text: `What Taster builds at this spot: ${part} wearing these tokens, ${theme}. The references above only set the direction.` });
+          content.push({ type: 'image', mimeType: 'image/jpeg', data: shot.toString('base64') });
+        }
+      } finally {
+        if (browser) await browser.close();
+      }
+      content.push({ type: 'text', text: 'Ask the user which reference is closest, or which way to move (more personality, more commercial, calmer, louder). Call pick_tone again with the new spot, or with like set to a reference. Once they agree, carry the tokens into preview_component and the build.' });
+      return { content };
     }),
   );
 

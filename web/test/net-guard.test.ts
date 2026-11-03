@@ -50,3 +50,21 @@ test('names that resolve to private space are refused after DNS', async () => {
     await assert.rejects(resolvePublic(name), BlockedError, name);
   }
 });
+
+test('refusals carry a stable code and an English sentence', async () => {
+  const cases: [string, string, string][] = [
+    ['', 'empty', 'no URL given'],
+    [`https://example.com/${'a'.repeat(2048)}`, 'too-long', 'the URL is longer than 2048 characters'],
+    ['http://', 'invalid', 'not a valid URL'],
+    ['ftp://example.com/', 'scheme', 'only http and https URLs can be opened'],
+    ['http://user:pw@example.com/', 'credentials', 'URLs with a user name or password are refused'],
+    ['http://example.com:22/', 'port', 'only ports 80, 443, 8080 and 8443 can be opened'],
+    ['http://127.0.0.1/', 'private', 'private network addresses are refused'],
+    ['http://localhost/', 'private', 'private network addresses are refused'],
+  ];
+  for (const [input, code, message] of cases) {
+    assert.throws(() => parseTarget(input), (err: unknown) => err instanceof BlockedError && err.code === code && err.message === message, `${input.slice(0, 40)}: ${code}`);
+  }
+  await assert.rejects(resolvePublic('127.0.0.1.nip.io'), { code: 'private', message: 'names that resolve to private network addresses are refused' });
+  await assert.rejects(resolvePublic('no-such-host.invalid'), { code: 'dns', message: 'the host name does not resolve' });
+});

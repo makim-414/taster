@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tight type sample</title>
+<style>
+/* Large headlines squeezed tight: one in percent, one split into a span per word, one two-word heading in a section named brand. */
+@font-face { font-family: "Fixture Sans"; src: local("Helvetica Neue"), local("Arial"), local("Helvetica"), local("DejaVu Sans"); }
+* { box-sizing: border-box; }
+body { margin: 0; background: #ffffff; color: #1a1a1a; font-family: "Fixture Sans", sans-serif; font-size: 17px; line-height: 1.6; }
+main { max-width: 1200px; margin: 0 auto; padding: 72px 24px; }
+h1, h2 { margin: 0 0 24px; line-height: 1.05; font-weight: 700; }
+#t-pct { font-size: clamp(56px, 11vw, 160px); letter-spacing: -5%; }
+#t-split { font-size: 48px; }
+#t-split span { letter-spacing: -0.06em; }
+.brand-story { padding: 48px 0; }
+#t-story { font-size: 56px; letter-spacing: -0.06em; }
+p { margin: 0 0 16px; max-width: 36em; color: #55575a; }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="t-pct">Quiet</h1>
+  <h2 id="t-split"><span>Ship</span> <span>the</span> <span>whole</span> <span>thing</span></h2>
+  <p>Write the plan, share it with the team and keep the notes next to the work they describe.</p>
+  <section class="brand-story">
+    <h2 id="t-story">Our story</h2>
+    <p>Started in a small office with two people and one shared desk.</p>
+  </section>
+</main>
+</body>
+</html>

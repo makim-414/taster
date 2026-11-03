@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Consent fixture</title>
+<style>body{margin:0;font:16px sans-serif}main{padding:40px}#banner{position:fixed;inset:auto 0 0 0;padding:24px;background:#222;color:#fff}</style></head>
+<body>
+<main><h1>Reference fixture</h1><p>A page with a cookie banner that offers both answers.</p></main>
+<div id="banner" role="dialog" aria-label="Cookie choices">
+  <p>We use cookies.</p>
+  <button type="button" onclick="document.body.dataset.consent='accepted';document.getElementById('banner').remove()">Accept all</button>
+  <button type="button" onclick="document.body.dataset.consent='rejected';document.getElementById('banner').remove()">Reject all</button>
+</div>
+</body>
+</html>
