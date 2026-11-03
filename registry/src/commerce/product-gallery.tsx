@@ -22,9 +22,11 @@ export interface ProductGalleryProps extends React.HTMLAttributes<HTMLDivElement
   labels?: { previous?: string; next?: string; of?: string; strip?: string }
 }
 
+// The arrows sit on the photo, where a gray ring can vanish: a text colored ring outside a page colored gap
+// shows on light and dark pictures alike.
 const STEP =
   'absolute top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-pill bg-bg text-text outline-none transition-opacity duration-press ease-out ' +
-  'hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring disabled:hidden'
+  'hover:opacity-90 focus-visible:ring-2 focus-visible:ring-text focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--bg)] disabled:hidden'
 
 export function ProductGallery({ images, labels = {}, className, ...props }: ProductGalleryProps) {
   const L = { previous: 'Previous image', next: 'Next image', of: 'of', strip: 'Product images', ...labels }

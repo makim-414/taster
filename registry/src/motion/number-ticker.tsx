@@ -76,7 +76,8 @@ export function NumberTicker({
   }, [inView, reduced, from, to, delay, duration, format, final])
 
   return (
-    <span ref={wrap} className={cn('inline-grid tabular-nums', className)} aria-label={final} {...props}>
+    <span ref={wrap} className={cn('inline-grid tabular-nums', className)} {...props}>
+      <span className="sr-only">{final}</span>
       <span aria-hidden className="invisible [grid-area:1/1]">
         {widest}
       </span>

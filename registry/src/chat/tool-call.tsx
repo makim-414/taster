@@ -3,11 +3,11 @@ import { cn } from '../blocks/_cn'
 import { useStyleOnce } from '../motion/_motion'
 
 // Tool call: one line in a chat thread for each action the assistant took, closed by default. A status
-// shape at the start (a small spinner while running, a check when done, a crossed circle when it failed,
-// so the state is never told by color alone), a human verb ("Searched the web"), a muted summary on the
-// same line, the elapsed time for calls over two seconds, and a chevron. Open, it shows the arguments and
-// the result in the mono face inside a bounded block with its own scroll. ToolCallGroup folds a run of
-// calls under one "Used 4 tools" line.
+// shape at the start (a small spinner while running, still under reduced motion, a check when done, a
+// crossed circle when it failed, so the state is never told by color alone), a human verb ("Searched the
+// web"), a muted summary on the same line, the elapsed time for calls over two seconds, and a chevron.
+// Open, it shows the arguments and the result in the mono face inside a bounded block with its own
+// scroll. ToolCallGroup folds a run of calls under one "Used 4 tools" line.
 // Built on native <details>, so the summary is a real disclosure button with no dependency.
 // Follows patterns/tool-call-disclosure: no card with an icon tile per call (CMP-03), no pulsing colored
 // dot (AC-08), no tinted status pill (AC-04), mono for arguments only (AC-09).
@@ -32,7 +32,7 @@ export interface ToolCallProps extends Omit<React.HTMLAttributes<HTMLDetailsElem
 const CSS =
   '@keyframes dsg-spin{to{transform:rotate(360deg)}}' +
   '.dsg-spin{animation:dsg-spin 800ms linear infinite}' +
-  '@media (prefers-reduced-motion: reduce){.dsg-spin{animation-duration:2400ms}}' +
+  '@media (prefers-reduced-motion: reduce){.dsg-spin{animation:none}}' +
   '.dsg-tool>summary::-webkit-details-marker{display:none}'
 
 const KEEP = 'break-keep [overflow-wrap:break-word]'
