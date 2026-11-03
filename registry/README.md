@@ -8,15 +8,22 @@ npm dependencies and credit.
 
 ## Add a component to your app
 
+The npm package is not published yet, so the CLI runs from a clone of this repository. Clone it once, then run the
+command from your app folder:
+
 ```bash
-node engine/cli.mjs add blocks/button blocks/dialog --dir src/components/taster
-node engine/cli.mjs add --list
+git clone https://github.com/makim-414/taster.git /path/to/taster   # once
+npm ci --prefix /path/to/taster/engine                              # once
+node /path/to/taster/engine/cli.mjs add blocks/button blocks/dialog --dir src/components/taster
+node /path/to/taster/engine/cli.mjs add --list
 ```
 
 It follows every relative import (helpers such as `_cn.ts`, other components, icons), adds `tokens.css`,
 `tailwind-preset.cjs` and `THIRD_PARTY_NOTICES.md`, prints the npm packages to install, and leaves any file you
-changed alone unless you pass `--overwrite`. Without a clone, read from the hosted copy:
-`--from https://taster-six.vercel.app` (the same files, served at `/r/<id>.json`; `/r/index.json` lists the ids).
+changed alone unless you pass `--overwrite`. `--dir` is relative to the folder you run it in. To read the component
+files from the hosted copy instead of the clone, add `--from https://taster-six.vercel.app` (the same files, served at
+`/r/<id>.json`; `/r/index.json` lists the ids). After the npm release the command becomes
+`npx @makim-414/taster add ...`.
 
 ## Copy a component by hand
 
