@@ -5,7 +5,7 @@ category: footer
 uses: [navigate-the-site]
 surfaces: [editorial, app]
 replaces: [CMP-10]
-components: []
+components: [marketing/slim-footer]
 inspiration: []
 status: stable
 ---
@@ -26,6 +26,7 @@ If visitors regularly look for pricing, contact or returns at the bottom, you ne
 
 ## Do
 
+- Keep required notices (legal, affiliate, generated-image disclosures) in a fixed slot that no optional section owns, and pin it with a test. A notice inside an optional section disappears the day the section is turned off.
 - Use `margin-top: auto` inside a flex column page so the row sits at the bottom of short pages instead of floating in the middle.
 - Keep text at 12px in `--text-subtle`. It is reference information and should be quiet but readable (4.5:1 against the surface).
 - Make links real anchors with visible focus rings. Legal links are the ones someone will tab to.

@@ -1,11 +1,11 @@
 ---
 id: filter-chip
 name: Filter chip
-category: badge-label
+category: form-input
 uses: [filter-and-search]
 surfaces: [app, commerce]
 replaces: [AC-05]
-components: [blocks/badge, blocks/toggle]
+components: [blocks/badge, blocks/toggle, blocks/filter-chips]
 inspiration: []
 status: stable
 ---

@@ -1,0 +1,17 @@
+{
+  "expect": "DRIVES",
+  "why": "An axis may only drive properties that tokens.css defines.",
+  "patch": [
+    {
+      "op": "push",
+      "path": [
+        "axes",
+        {
+          "id": "density"
+        },
+        "drives"
+      ],
+      "value": "--sp-7"
+    }
+  ]
+}

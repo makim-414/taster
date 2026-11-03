@@ -5,7 +5,7 @@ category: table
 uses: [browse-records, filter-and-search]
 surfaces: [dashboard, app]
 replaces: [AC-08, AC-09]
-components: [blocks/datagrid]
+components: [blocks/datagrid, blocks/selectable-table]
 inspiration: [https://ui.shadcn.com/docs/components/data-table, https://tanstack.com/table]
 status: stable
 ---
@@ -27,6 +27,7 @@ A working table where people look things up, reorder, filter and act on rows: a 
 
 ## Do
 
+- Switch to cards when the grid's own container is too narrow for its columns (`@container`), not at a window breakpoint; a sidebar takes the width the breakpoint assumed was there.
 - Sort on the server when the data does; show the loading state as skeleton rows of the same height.
 - Keep the sort indicator quiet until a column is active.
 - Persist column visibility and density per user.

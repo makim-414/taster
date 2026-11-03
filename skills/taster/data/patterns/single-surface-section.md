@@ -5,7 +5,7 @@ category: card
 uses: [organize-the-page]
 surfaces: [dashboard, app]
 replaces: [CMP-02]
-components: [blocks/card, blocks/separator]
+components: [blocks/card, blocks/separator, blocks/description-list]
 inspiration: []
 status: stable
 ---

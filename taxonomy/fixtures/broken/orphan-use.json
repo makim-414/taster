@@ -1,0 +1,32 @@
+{
+  "expect": "ORPHAN",
+  "why": "A use that no pattern serves is a promise with nothing behind it.",
+  "patch": [
+    {
+      "op": "push",
+      "path": [
+        "uses"
+      ],
+      "value": {
+        "id": "admire-the-logo",
+        "name": "Admire the logo",
+        "name_ko": "로고 감상",
+        "question": "Is the logo nice?",
+        "definition": "Look at the logo for a while.",
+        "includes": [
+          "Large logos",
+          "Logo walls"
+        ],
+        "excludes": [
+          {
+            "what": "Real customer logos",
+            "goes_to": "prove-trust"
+          }
+        ],
+        "examples": [
+          "a logo on its own page"
+        ]
+      }
+    }
+  ]
+}

@@ -11,7 +11,9 @@ It ships three things the agent uses together:
   breaks mid word. Most are checked in a real browser by `rules/detect.js`.
 - **A taxonomy of patterns.** Reusable design answers organized by what the visitor is trying to do (show one
   number, compare plans, prove trust, label a state) and where (landing, dashboard, app, store, editorial, sign in,
-  AI chat). Every rule points to the patterns that fix it.
+  AI chat). Every UI part falls in exactly one category through a machine decision key, and eight weighting axes
+  (density, contrast, roundness, type expression, color restraint, elevation, motion, stroke) carry a brand's tone
+  into tokens. Every rule points to the patterns that fix it.
 - **A registry of components.** Token based React components you copy into your app. No package to install, no
   brand to undo.
 
@@ -32,13 +34,37 @@ The answer picks the route. Every route also absorbs the brand: the site's own c
 | Existing site, address only: Diagnose, then Rebuild | a URL (a hosted builder, a template, lost source) | the same words, links and brand on a new page made from patterns, checked clean and shown next to the original |
 | New site: Build | a product, an audience, the kind of screen, your real content | a new screen composed from patterns, checked before you see it |
 
+More than one screen goes one screen, or one part, at a time: the brand and the tokens become the system first,
+then each screen is proposed to the builder, built only after their yes from the components that fit its purpose,
+and checked before the next one starts: zero detector findings, and zero drift in `check_consistency`, which renders
+every screen and reports the same component drawn differently on two screens and any value that is not one of the
+system's tokens. `taster.plan.json` keeps the order and refuses steps out of it
+([screens.md](skills/taster/references/screens.md)).
+
 `examples/rebuild/` is a worked Rebuild: a generated looking landing page (17 rules hit) and its rebuild (0 at both
-widths, every heading, action and nav item kept, brand color kept). `node engine/scripts/check-rebuild-example.mjs`
+widths, every heading, action and nav item kept, brand color kept), plus a second screen built from the same
+components, checked consistent with the first and on the system. `node engine/scripts/check-rebuild-example.mjs`
 proves it.
 
 `examples/icon-slots/` shows five worked variations for each icon slot (control, explanatory, identity, data marker,
 no icon), the same 25 that `taxonomy.json` lists. `node engine/scripts/check-icon-slots-example.mjs` checks that the page
 matches the taxonomy and has 0 findings at both widths.
+## Design system
+
+Before any screen, Taster turns the brand and the builder's intent into one design system. Give it the brand site and
+one or two pages whose tone you like. It measures them in a real browser (radii, spacing and control heights, text
+contrast, type scale, hues, shadows, motion, borders), places each of the eight axes on a named step, and balances
+them against design principles written as constraints, so nothing sits in an ambiguous middle. Move a weight and the
+others follow the least needed, with the principle that moved them quoted. The result is `taster.system.json` and a
+`theme.css` with every token the axes drive, the brand inside, and text at WCAG AA. Every screen and part loads it.
+
+```bash
+node engine/cli.mjs --system https://your-site.example --ref ./a-page-you-like.html --out system
+node engine/cli.mjs --tune system/taster.system.json roundness=1
+```
+
+MCP tools: `design_system`, `tune_system`, `system_for_category`. How each measurement maps to a step and each step
+to tokens: `skills/taster/references/system.md`.
 
 ## Install
 
@@ -74,6 +100,18 @@ node engine/cli.mjs https://example.com --brand      # the site's brand as a tok
 ```
 
 It uses Playwright's Chromium if installed, otherwise your Google Chrome.
+
+### Lint the source
+
+The same rules in their source form, for review and CI, no browser needed:
+
+```bash
+npx @makim-414/taster lint src                                   # tinted pills, transition-all, hard-coded colors ...
+npx @makim-414/taster lint src --baseline taster-baseline.json --write-baseline   # adopt on an old codebase
+npx @makim-414/taster lint src --baseline taster-baseline.json  # then counts may only go down
+```
+
+A line passes with a comment `taster-allow <reason>`; an allow without a reason is reported.
 
 ### Add components to your app
 
@@ -141,7 +179,7 @@ claude mcp add --transport http taster https://taster-six.vercel.app/api/mcp
 ```
 
 In Cursor, `.cursor/mcp.json`: `{ "mcpServers": { "taster": { "url": "https://taster-six.vercel.app/api/mcp" } } }`.
-claude.ai and ChatGPT take the same URL as a custom connector. The hosted server leaves out `extract_content`; `diagnose` and
+claude.ai and ChatGPT take the same URL as a custom connector. The hosted server leaves out `extract_content`, the design system tools and the screen by screen tools; `diagnose` and
 `brand_theme` take public http(s) URLs only and are rate limited per client, `preview_component` answers with a
 still and a live link instead of a render, and `pick_tone` opens the references through the same fence and links to the
 live parts instead of rendering them. For local files and the full tool set, use the plugin above.
@@ -177,26 +215,33 @@ without the AI look", or "Build a pricing page for this product without generic 
 
 ## Taxonomy at a glance
 
+Every category has a one sentence definition, what it includes, what it excludes and where that goes instead, and
+generic examples. A decision key over 33 yes or no features gives every UI part exactly one category, first match
+wins. The weighting axes drive named properties in `registry/src/tokens.css`, snap to fixed steps so a setting never
+sits in an ambiguous middle, and are kept balanced by design principles written as linear constraints (a dense screen
+cannot carry poster type, deep shadows need a restrained palette). `taxonomy/axes.mjs` validates and balances a
+setting. Read [taxonomy/SCHEMA.md](taxonomy/SCHEMA.md).
+
 <!-- taxonomy:start -->
-118 patterns, 74 rules, 65 components, 40 uses, 8 surfaces.
+122 patterns, 80 rules, 144 components, 33 categories in 8 families, 40 uses, 8 surfaces, 8 weighting axes, 10 constraints.
 
 | Family | Categories | Patterns |
 |---|---|---|
-| Page sections | Hero, Feature section, Pricing, Call to action, Testimonial and proof, FAQ | 24 |
-| Navigation | Navigation header, Footer, Sidebar, Command palette, Tabs and segmented control | 7 |
-| Foundations | Layout and shell, Card, Typography, Icon and mark | 29 |
-| Actions and inputs | Button, Form and input | 9 |
-| Feedback and overlays | Badge and label, Toast and alert, Empty and error state, Loader and skeleton, Modal, drawer and menu | 14 |
-| Data display | Chart and KPI, Table, Timeline and stepper, Map | 17 |
-| Media, commerce and AI | Media and gallery, Commerce, Chat and AI | 12 |
-| Motion and effects | Motion and particles, 3D scene | 6 |
+| Page sections | Hero; Feature and content section; Pricing; Call to action; Testimonial, quote and proof; FAQ | 24 |
+| Navigation | Navigation header; Footer; Sidebar; Command palette and shortcuts; Tabs, segmented control and disclosure | 9 |
+| Foundations | Layout and shell; Card and list; Typography; Copy and voice; Icon and mark; Theme and tokens | 31 |
+| Actions and inputs | Button; Form and input | 9 |
+| Feedback and overlays | Badge and label; Toast and alert; Empty and error state; Loader and skeleton; Overlay: dialog, drawer, popover and menu | 13 |
+| Data display | Chart and KPI; Table and data grid; Timeline, stepper and calendar; Map | 16 |
+| Media, commerce and AI | Media and gallery; Commerce; Chat and AI | 12 |
+| Motion and effects | Motion effect and particles; 3D scene | 8 |
 <!-- taxonomy:end -->
 
 ## Repository
 
 ```text
 skills/taster/      the skill (SKILL.md, references, and a generated data/ bundle)
-taxonomy/            families, categories, uses, surfaces
+taxonomy/            categories with their decision key, uses, surfaces, weighting axes and constraints (SCHEMA.md)
 patterns/            one Markdown file per pattern, plus INDEX.json
 rules/               rules.json, detect.js (runs in the page), fixtures and tests
 engine/              runs detect.js at two widths: CLI, MCP server (start prompt, diagnose, extract, swap tools), ACP agent, tests
@@ -204,7 +249,7 @@ examples/rebuild/    a worked Rebuild, before and after, with its own check
 examples/icon-slots/ five variations per icon slot, matched to the taxonomy, with its own check
 commands/            the /taster command for Claude Code
 registry/            React components (taster add copies them into your app), tokens, a demo page and a render test
-scripts/             build-docs.mjs (derives links and the skill bundle), validate.mjs
+scripts/             build-docs.mjs (derives links, gaps and the skill bundle), validate.mjs, check-taxonomy.mjs
 ```
 
 Edit sources, then run:
@@ -212,6 +257,8 @@ Edit sources, then run:
 ```bash
 node scripts/build-docs.mjs
 node scripts/validate.mjs
+node scripts/check-taxonomy.mjs
+node --test taxonomy/axes.test.mjs
 node rules/test-detect.mjs
 npm --prefix engine test
 node engine/scripts/check-rebuild-example.mjs

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Docs whose faces differ by role</title>
+<style>
+  /* The home headline is in a stock face, but most headings use the display face, the body has its own text face,
+     and the wordmark and the tagline in the header and footer are set in a third face. */
+  body { margin: 0; padding: 48px; font-family: 'Fixture Text', serif; color: #1a1a1a; background: #ffffff; }
+  header, footer { display: flex; gap: 16px; padding: 16px 0; }
+  .wordmark { font-family: 'Wordmark Serif', Georgia, serif; font-size: 22px; color: #1a1a1a; text-decoration: none; }
+  h1 { font-family: Arial, sans-serif; }
+  h2, h3 { font-family: 'Fixture Display', serif; }
+  .button { display: inline-block; padding: 8px 16px; background: #1d4ed8; color: #ffffff; text-decoration: none; }
+</style>
+</head>
+<body>
+  <header><a class="wordmark" href="/"><svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6"></circle></svg><span>Ledgerline</span></a><p class="wordmark">The ledger guide</p><nav><a href="#guide">Guide</a></nav></header>
+  <main>
+    <h1>Read the guide</h1>
+    <p>Each chapter starts with a heading in the display face.</p>
+    <a class="button" href="#start">Start reading</a>
+    <h2>Getting started</h2>
+    <p>Install the tool and open the first example.</p>
+    <h3>Your first ledger</h3>
+    <p>Write one entry and read it back.</p>
+    <h2>Going further</h2>
+    <h3>Many ledgers</h3>
+    <p>Split the books by year.</p>
+  </main>
+  <footer><a class="wordmark" href="/">Ledgerline</a></footer>
+</body>
+</html>

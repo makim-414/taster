@@ -4,22 +4,35 @@ import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, formatText, viewportFor } from './diagnose.mjs';
 import { brandTheme } from './brand.mjs';
+import { checkConsistency, formatConsistencyText } from './consistency.mjs';
+import { PLAN_FILE, nextStep, planFromExtract, planRelative, writePlan } from './plan.mjs';
 
 const HELP = `Usage
   node engine/cli.mjs <url-or-file>... [--out <dir>] [--json] [--widths 1440,390] [--sarif <file>] [--summary <file>] [--fail-on <level>]
   node engine/cli.mjs <url-or-file> --extract [--out <dir>]
   node engine/cli.mjs <url-or-file> --brand [--json] [--out <dir>]
+  node engine/cli.mjs --system [brand url or file] [--ref <url or file> ...] [--axis name=value ...] [--surface id] [--scheme dark|light] --out <dir> [--json]
+  node engine/cli.mjs --tune <dir>/taster.system.json name=value ... [--json]
+  node engine/cli.mjs --consistency <screen> <screen> ... [--system <file>]... [--logo-font <family>] [--json] [--out <dir>]
+  node engine/cli.mjs --plan <url-or-file> --out <dir> [--route rebuild] [--system <file>] [--by-part]
   node engine/cli.mjs --rules
   node engine/cli.mjs --explain <rule-id>
   node engine/cli.mjs add <component-id>... [--dir <dir>] [--from <url>] [--overwrite]
   node engine/cli.mjs add --list
   node engine/cli.mjs export <agents|claude|cursor|windsurf|cline|copilot|gemini|all> [--dir <project>]
+  node engine/cli.mjs lint [paths...] [--json] [--baseline <file>] [--write-baseline] [--selftest]
 
 Options
   --out <dir>       write report.json and annotated-<width>.png into <dir>
   --json            print the report as JSON
   --extract         print the page content (sections, actions, images, brand) for a rebuild
   --brand           read the site's brand (color, typeface, logo) and print a token theme fitted to it
+  --consistency     render each screen at 1440 and 390 and report drift between screens and values off the
+                    --system (theme CSS or { tokens } JSON, repeatable: tokens.css then theme.css)
+  --logo-font <f>   the logo wordmark's own face: exempt for font-family inside the logo only, listed as exempt
+                    (taster.system.json can declare it as identity.logoFont)
+  --plan            write ${PLAN_FILE} into --out: the start page and the same-site pages its nav links to,
+                    one screen at a time (--by-part splits each read page into its sections)
   --sarif <file>    also write the findings as SARIF 2.1.0 (GitHub code scanning)
   --summary <file>  also append a Markdown table (for $GITHUB_STEP_SUMMARY)
   --fail-on <level> exit 1 only for findings at this severity or above: high, medium, low (default) or none
@@ -29,6 +42,11 @@ Options
 add copies registry components into your app with every helper they import and the token files, no shadcn
 needed. --dir defaults to src/components/taster. --from reads a hosted copy (https://taster-six.vercel.app)
 instead of this repository. Files you changed are left alone unless --overwrite.
+
+lint reads source files (tsx, jsx, vue, svelte, html, css, md) for the code form of the rules: tinted and outlined
+pills, thick left bars, caps with wide tracking, long dashes, emoji, transition-all, ease-in, hard-coded colors,
+pixel one-offs, stock palette classes and Tailwind screens that drop the defaults. --baseline makes it a ratchet:
+counts per file and check may only go down. A line passes with a comment taster-allow <reason>.
 
 Exit codes: 0 no findings, 1 findings, 2 error`;
 
@@ -86,6 +104,11 @@ async function exportRules(argv) {
 async function main() {
   if (process.argv[2] === 'add') return add(process.argv.slice(3));
   if (process.argv[2] === 'export') return exportRules(process.argv.slice(3));
+  if (process.argv[2] === 'lint') return (await import('./lint.mjs')).lintCommand(process.argv.slice(3));
+  // Design system: brand and references in, balanced axes and every token out (engine/system.mjs).
+  // --system is also the system file flag of --consistency and --plan, so only those two keep it.
+  const own = ['--consistency', '--plan'].some((f) => process.argv.includes(f));
+  if ((process.argv.includes('--system') && !own) || process.argv.includes('--tune')) return (await import('./system.mjs')).runSystemCli(process.argv.slice(2));
   const { values, positionals } = parseArgs({
     allowPositionals: true,
     options: {
@@ -96,6 +119,12 @@ async function main() {
       explain: { type: 'string' },
       extract: { type: 'boolean' },
       brand: { type: 'boolean' },
+      consistency: { type: 'boolean' },
+      system: { type: 'string', multiple: true },
+      'logo-font': { type: 'string' },
+      plan: { type: 'boolean' },
+      route: { type: 'string' },
+      'by-part': { type: 'boolean' },
       sarif: { type: 'string' },
       summary: { type: 'string' },
       'fail-on': { type: 'string' },
@@ -115,6 +144,24 @@ async function main() {
     const r = explainRule(values.explain);
     if (!r) throw new Error(`Unknown rule: ${values.explain}`);
     console.log(values.json ? JSON.stringify(r, null, 2) : `${r.id}  ${r.name}  [${r.severity}, ${r.detect.level}]\n\nWhat: ${r.what}\nWhy: ${r.why}\nHow it is found: ${r.detect.signal}\nFix: ${r.fix}`);
+    return 0;
+  }
+  if (values.consistency) {
+    const report = await checkConsistency(positionals, { system: values.system || null, identity: values['logo-font'] || null, widths: values.widths ? viewportsFrom(values.widths).map((v) => v.width) : undefined });
+    if (values.out) {
+      mkdirSync(values.out, { recursive: true });
+      writeFileSync(join(values.out, 'consistency.json'), `${JSON.stringify(report, null, 2)}\n`);
+    }
+    console.log(values.json ? JSON.stringify(report, null, 2) : formatConsistencyText(report));
+    return report.ok ? 0 : 1;
+  }
+  if (values.plan) {
+    if (positionals.length !== 1 || !values.out) throw new Error('--plan needs one start page and --out <dir>');
+    mkdirSync(values.out, { recursive: true });
+    const system = values.system ? values.system.map((f) => planRelative(values.out, f)) : null;
+    const plan = planFromExtract(await extract(positionals[0]), { route: values.route || 'rebuild', system: system && system.length === 1 ? system[0] : system, byPart: !!values['by-part'], baseDir: values.out });
+    const file = writePlan(values.out, plan);
+    console.log(values.json ? JSON.stringify(plan, null, 2) : `${file}\n${plan.screens.map((s) => `  ${s.id}  ${s.source}  ${s.purpose}${s.parts.length ? ` (${s.parts.length} parts)` : ''}`).join('\n')}\nnext: ${nextStep(plan).say}`);
     return 0;
   }
   const many = positionals.length > 1;

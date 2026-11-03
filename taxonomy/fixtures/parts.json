@@ -1,0 +1,783 @@
+{
+  "about": "Generic UI parts with their features and the category the decision key must give them. Checked by scripts/check-taxonomy.mjs.",
+  "parts": [
+    {
+      "part": "Opening band with a headline beside a real product screenshot",
+      "features": [
+        "is_page_section",
+        "is_first_section"
+      ],
+      "expect": "hero"
+    },
+    {
+      "part": "Opening band whose first action is an address field",
+      "features": [
+        "is_page_section",
+        "is_first_section",
+        "asks_single_action"
+      ],
+      "expect": "hero",
+      "note": "The opening band wins over a single request."
+    },
+    {
+      "part": "Band of feature cards that each open with a measured result",
+      "features": [
+        "is_page_section"
+      ],
+      "expect": "feature-section"
+    },
+    {
+      "part": "Three step how-it-works band on a landing page",
+      "features": [
+        "is_page_section",
+        "orders_in_time"
+      ],
+      "expect": "feature-section",
+      "note": "A sequence shown as a page band stays a section."
+    },
+    {
+      "part": "Team and story band on an about page",
+      "features": [
+        "is_page_section"
+      ],
+      "expect": "feature-section"
+    },
+    {
+      "part": "Band whose tabs swap product screenshots in one frame",
+      "features": [
+        "is_page_section",
+        "switches_in_place"
+      ],
+      "expect": "feature-section"
+    },
+    {
+      "part": "Band of three plan cards",
+      "features": [
+        "is_page_section",
+        "shows_plans"
+      ],
+      "expect": "pricing"
+    },
+    {
+      "part": "Monthly or yearly billing switch above plan cards",
+      "features": [
+        "shows_plans",
+        "switches_in_place"
+      ],
+      "expect": "pricing"
+    },
+    {
+      "part": "Usage slider that shows what a plan will cost",
+      "features": [
+        "shows_plans",
+        "keeps_a_value"
+      ],
+      "expect": "pricing"
+    },
+    {
+      "part": "Plan comparison table with a column per plan",
+      "features": [
+        "shows_plans",
+        "aligns_columns"
+      ],
+      "expect": "pricing",
+      "note": "Plans decide, not the table shape."
+    },
+    {
+      "part": "Closing band with one sentence and one button",
+      "features": [
+        "is_page_section",
+        "asks_single_action"
+      ],
+      "expect": "cta"
+    },
+    {
+      "part": "Two entry cards that send buyers and sellers to their own paths",
+      "features": [
+        "is_page_section",
+        "asks_single_action"
+      ],
+      "expect": "cta"
+    },
+    {
+      "part": "Quote card with a named customer and a measured result",
+      "features": [
+        "attributes_proof",
+        "contains_one_item"
+      ],
+      "expect": "testimonial"
+    },
+    {
+      "part": "Single row of customer logos in one color",
+      "features": [
+        "attributes_proof"
+      ],
+      "expect": "testimonial"
+    },
+    {
+      "part": "Band of customer quotes",
+      "features": [
+        "is_page_section",
+        "attributes_proof"
+      ],
+      "expect": "testimonial"
+    },
+    {
+      "part": "Accordion of common questions",
+      "features": [
+        "answers_questions",
+        "switches_in_place"
+      ],
+      "expect": "faq"
+    },
+    {
+      "part": "Questions band with a title column on the left",
+      "features": [
+        "is_page_section",
+        "answers_questions"
+      ],
+      "expect": "faq"
+    },
+    {
+      "part": "Site header with page links and one action",
+      "features": [
+        "navigates_globally"
+      ],
+      "expect": "nav-header"
+    },
+    {
+      "part": "Bottom tab bar with four app destinations on a phone",
+      "features": [
+        "navigates_globally"
+      ],
+      "expect": "nav-header"
+    },
+    {
+      "part": "Breadcrumb trail above a page title",
+      "features": [
+        "navigates_globally"
+      ],
+      "expect": "nav-header"
+    },
+    {
+      "part": "Mega menu panel that lists site sections from the header",
+      "features": [
+        "navigates_globally",
+        "floats_above_page"
+      ],
+      "expect": "nav-header",
+      "note": "Global destinations win over the layer they open on."
+    },
+    {
+      "part": "Footer with link columns and a legal row",
+      "features": [
+        "is_page_end",
+        "navigates_globally"
+      ],
+      "expect": "footer"
+    },
+    {
+      "part": "Single thin row with copyright and policy links",
+      "features": [
+        "is_page_end"
+      ],
+      "expect": "footer"
+    },
+    {
+      "part": "Grouped app menu docked to the left edge",
+      "features": [
+        "navigates_globally",
+        "is_vertical_rail"
+      ],
+      "expect": "sidebar"
+    },
+    {
+      "part": "The same app menu opened as a drawer on a phone",
+      "features": [
+        "navigates_globally",
+        "is_vertical_rail",
+        "floats_above_page"
+      ],
+      "expect": "sidebar"
+    },
+    {
+      "part": "Palette opened with a shortcut that filters commands and pages",
+      "features": [
+        "keyboard_command_access",
+        "floats_above_page"
+      ],
+      "expect": "command-palette"
+    },
+    {
+      "part": "Sheet that lists keyboard shortcuts by area",
+      "features": [
+        "keyboard_command_access",
+        "floats_above_page"
+      ],
+      "expect": "command-palette"
+    },
+    {
+      "part": "Underline tabs above a settings panel",
+      "features": [
+        "switches_in_place"
+      ],
+      "expect": "tabs-segmented"
+    },
+    {
+      "part": "Two option switch between list and grid view",
+      "features": [
+        "switches_in_place"
+      ],
+      "expect": "tabs-segmented"
+    },
+    {
+      "part": "Page numbers below a list of results",
+      "features": [
+        "switches_in_place"
+      ],
+      "expect": "tabs-segmented"
+    },
+    {
+      "part": "Collapsible details row inside an app screen",
+      "features": [
+        "switches_in_place"
+      ],
+      "expect": "tabs-segmented"
+    },
+    {
+      "part": "App frame that places a sidebar, top bar and content area",
+      "features": [
+        "arranges_regions"
+      ],
+      "expect": "layout-shell"
+    },
+    {
+      "part": "Spacing scale and one pixel dividers between groups",
+      "features": [
+        "arranges_regions"
+      ],
+      "expect": "layout-shell"
+    },
+    {
+      "part": "Solid token surface behind a section",
+      "features": [
+        "arranges_regions"
+      ],
+      "expect": "layout-shell",
+      "note": "A static backdrop is a section surface."
+    },
+    {
+      "part": "Dashboard grid with a figure row above chart panels",
+      "features": [
+        "arranges_regions"
+      ],
+      "expect": "layout-shell"
+    },
+    {
+      "part": "Panel with a one pixel border and a tone step",
+      "features": [
+        "contains_one_item"
+      ],
+      "expect": "card"
+    },
+    {
+      "part": "List row with a title, a short description and a trailing action",
+      "features": [
+        "contains_one_item"
+      ],
+      "expect": "card"
+    },
+    {
+      "part": "Article tile whose image stands for the article",
+      "features": [
+        "contains_one_item"
+      ],
+      "expect": "card",
+      "note": "A thumbnail that stands for content is not media."
+    },
+    {
+      "part": "Option card used as a radio choice",
+      "features": [
+        "contains_one_item",
+        "keeps_a_value"
+      ],
+      "expect": "form-input"
+    },
+    {
+      "part": "Section title with a small sentence-case eyebrow",
+      "features": [
+        "sets_text"
+      ],
+      "expect": "typography"
+    },
+    {
+      "part": "Reading column for a long article",
+      "features": [
+        "sets_text"
+      ],
+      "expect": "typography"
+    },
+    {
+      "part": "Tabular figures in a column of numbers",
+      "features": [
+        "sets_text"
+      ],
+      "expect": "typography"
+    },
+    {
+      "part": "Button label that names the result in the page language",
+      "features": [
+        "governs_wording",
+        "triggers_action"
+      ],
+      "expect": "copy",
+      "note": "Wording rules hold for every part."
+    },
+    {
+      "part": "Wording of an error message",
+      "features": [
+        "governs_wording",
+        "reports_event"
+      ],
+      "expect": "copy"
+    },
+    {
+      "part": "Line icon beside a menu label",
+      "features": [
+        "is_glyph_or_mark"
+      ],
+      "expect": "icon"
+    },
+    {
+      "part": "Round avatar that falls back to initials",
+      "features": [
+        "is_glyph_or_mark"
+      ],
+      "expect": "icon"
+    },
+    {
+      "part": "Supplied logo file in the header",
+      "features": [
+        "is_glyph_or_mark"
+      ],
+      "expect": "icon"
+    },
+    {
+      "part": "Light and dark token sets with one brand variable on top",
+      "features": [
+        "defines_theme_values"
+      ],
+      "expect": "theme-tokens"
+    },
+    {
+      "part": "Radius scale derived from one base value",
+      "features": [
+        "defines_theme_values"
+      ],
+      "expect": "theme-tokens"
+    },
+    {
+      "part": "Solid primary button in the accent token",
+      "features": [
+        "triggers_action"
+      ],
+      "expect": "button"
+    },
+    {
+      "part": "Icon-only close button",
+      "features": [
+        "triggers_action"
+      ],
+      "expect": "button",
+      "note": "The control is the part; the glyph inside it is an icon."
+    },
+    {
+      "part": "Labeled email field with an inline error",
+      "features": [
+        "keeps_a_value"
+      ],
+      "expect": "form-input"
+    },
+    {
+      "part": "Searchable select whose options open in a popover",
+      "features": [
+        "keeps_a_value",
+        "floats_above_page"
+      ],
+      "expect": "form-input"
+    },
+    {
+      "part": "Date field that opens a calendar popover",
+      "features": [
+        "keeps_a_value",
+        "floats_above_page"
+      ],
+      "expect": "form-input"
+    },
+    {
+      "part": "Row of filter chips above a list",
+      "features": [
+        "keeps_a_value"
+      ],
+      "expect": "form-input"
+    },
+    {
+      "part": "Theme switch in the settings page",
+      "features": [
+        "keeps_a_value"
+      ],
+      "expect": "form-input",
+      "note": "The switch keeps a preference; the token sets it chooses are theme-tokens."
+    },
+    {
+      "part": "Sign in form with email and password",
+      "features": [
+        "keeps_a_value"
+      ],
+      "expect": "form-input"
+    },
+    {
+      "part": "Neutral status text with a small flat dot",
+      "features": [
+        "labels_state"
+      ],
+      "expect": "badge-label"
+    },
+    {
+      "part": "Estimated label beside a figure",
+      "features": [
+        "labels_state"
+      ],
+      "expect": "badge-label"
+    },
+    {
+      "part": "Unread count beside a menu item",
+      "features": [
+        "labels_state"
+      ],
+      "expect": "badge-label"
+    },
+    {
+      "part": "Saved toast with an undo action",
+      "features": [
+        "reports_event"
+      ],
+      "expect": "toast-alert"
+    },
+    {
+      "part": "Inline warning callout above a form",
+      "features": [
+        "reports_event"
+      ],
+      "expect": "toast-alert"
+    },
+    {
+      "part": "Banner about scheduled maintenance",
+      "features": [
+        "reports_event"
+      ],
+      "expect": "toast-alert"
+    },
+    {
+      "part": "Blocking dialog raised when a session expires",
+      "features": [
+        "reports_event",
+        "floats_above_page"
+      ],
+      "expect": "modal-drawer",
+      "note": "A layer that blocks the page wins over the message it carries."
+    },
+    {
+      "part": "Empty list with one line and one action",
+      "features": [
+        "shows_absence"
+      ],
+      "expect": "empty-state"
+    },
+    {
+      "part": "Permission view with a request access button",
+      "features": [
+        "shows_absence"
+      ],
+      "expect": "empty-state"
+    },
+    {
+      "part": "No results message under a search field",
+      "features": [
+        "shows_absence"
+      ],
+      "expect": "empty-state"
+    },
+    {
+      "part": "Skeleton shapes shaped like a table",
+      "features": [
+        "indicates_waiting"
+      ],
+      "expect": "loader-skeleton"
+    },
+    {
+      "part": "Thin upload progress bar with a percentage",
+      "features": [
+        "indicates_waiting",
+        "encodes_values"
+      ],
+      "expect": "loader-skeleton",
+      "note": "Progress of a job is not a measurement."
+    },
+    {
+      "part": "Splash that draws the logo once on first visit",
+      "features": [
+        "indicates_waiting"
+      ],
+      "expect": "loader-skeleton"
+    },
+    {
+      "part": "Confirm dialog that names what will be deleted",
+      "features": [
+        "floats_above_page"
+      ],
+      "expect": "modal-drawer"
+    },
+    {
+      "part": "Side sheet with the details of one row",
+      "features": [
+        "floats_above_page"
+      ],
+      "expect": "modal-drawer"
+    },
+    {
+      "part": "Definition tooltip beside a metric",
+      "features": [
+        "floats_above_page"
+      ],
+      "expect": "modal-drawer"
+    },
+    {
+      "part": "Menu of actions opened from a more button",
+      "features": [
+        "floats_above_page",
+        "triggers_action"
+      ],
+      "expect": "modal-drawer"
+    },
+    {
+      "part": "Key figure with label, delta and source",
+      "features": [
+        "encodes_values"
+      ],
+      "expect": "chart-kpi"
+    },
+    {
+      "part": "Bars ranked by value in one hue",
+      "features": [
+        "encodes_values"
+      ],
+      "expect": "chart-kpi"
+    },
+    {
+      "part": "Band of three sourced figures on a landing page",
+      "features": [
+        "is_page_section",
+        "encodes_values"
+      ],
+      "expect": "chart-kpi",
+      "note": "A band of figures is judged as data, not as a section."
+    },
+    {
+      "part": "Storage meter that shows space used",
+      "features": [
+        "encodes_values"
+      ],
+      "expect": "chart-kpi"
+    },
+    {
+      "part": "Data grid with sortable headers and a sticky first column",
+      "features": [
+        "aligns_columns"
+      ],
+      "expect": "table"
+    },
+    {
+      "part": "Read-only table with right aligned figures",
+      "features": [
+        "aligns_columns"
+      ],
+      "expect": "table"
+    },
+    {
+      "part": "Dated change log with a thin spine",
+      "features": [
+        "orders_in_time"
+      ],
+      "expect": "timeline-stepper"
+    },
+    {
+      "part": "Signup wizard with three steps",
+      "features": [
+        "orders_in_time"
+      ],
+      "expect": "timeline-stepper"
+    },
+    {
+      "part": "Month grid with event chips",
+      "features": [
+        "orders_in_time"
+      ],
+      "expect": "timeline-stepper"
+    },
+    {
+      "part": "Live list of running steps with their states",
+      "features": [
+        "orders_in_time",
+        "indicates_waiting"
+      ],
+      "expect": "timeline-stepper",
+      "note": "Named steps outrank a bare waiting signal."
+    },
+    {
+      "part": "Map whose pins filter a list",
+      "features": [
+        "shows_geography"
+      ],
+      "expect": "map"
+    },
+    {
+      "part": "World map shaded by value per region",
+      "features": [
+        "shows_geography",
+        "encodes_values"
+      ],
+      "expect": "map"
+    },
+    {
+      "part": "Thumbnail strip with play overlays",
+      "features": [
+        "leads_with_media"
+      ],
+      "expect": "media-gallery"
+    },
+    {
+      "part": "Draggable divider over an original and an edited image",
+      "features": [
+        "leads_with_media"
+      ],
+      "expect": "media-gallery"
+    },
+    {
+      "part": "Video player with captions",
+      "features": [
+        "leads_with_media"
+      ],
+      "expect": "media-gallery"
+    },
+    {
+      "part": "Product tile with name and price",
+      "features": [
+        "sells_goods",
+        "contains_one_item"
+      ],
+      "expect": "commerce"
+    },
+    {
+      "part": "Option selector for size and color",
+      "features": [
+        "sells_goods",
+        "keeps_a_value"
+      ],
+      "expect": "commerce"
+    },
+    {
+      "part": "Cart with a free shipping line and an order summary",
+      "features": [
+        "sells_goods"
+      ],
+      "expect": "commerce"
+    },
+    {
+      "part": "Agent reply with source chips and an as-of date",
+      "features": [
+        "in_assistant_conversation"
+      ],
+      "expect": "chat-ai"
+    },
+    {
+      "part": "Collapsible line per tool call",
+      "features": [
+        "in_assistant_conversation",
+        "switches_in_place"
+      ],
+      "expect": "chat-ai"
+    },
+    {
+      "part": "Agent status line while it works",
+      "features": [
+        "in_assistant_conversation",
+        "indicates_waiting"
+      ],
+      "expect": "chat-ai"
+    },
+    {
+      "part": "Message composer that grows with the text",
+      "features": [
+        "in_assistant_conversation",
+        "keeps_a_value"
+      ],
+      "expect": "chat-ai"
+    },
+    {
+      "part": "Fade-up reveal on first entry",
+      "features": [
+        "adds_motion_only"
+      ],
+      "expect": "motion-particle"
+    },
+    {
+      "part": "Logo loop that pauses on hover",
+      "features": [
+        "adds_motion_only",
+        "attributes_proof"
+      ],
+      "expect": "motion-particle",
+      "note": "The loop is judged as motion; the logos inside it are proof."
+    },
+    {
+      "part": "Figure that rolls up to its value once",
+      "features": [
+        "adds_motion_only",
+        "encodes_values"
+      ],
+      "expect": "motion-particle"
+    },
+    {
+      "part": "Typing effect on a tagline",
+      "features": [
+        "adds_motion_only",
+        "sets_text"
+      ],
+      "expect": "motion-particle"
+    },
+    {
+      "part": "Slow point field moving behind a headline",
+      "features": [
+        "adds_motion_only"
+      ],
+      "expect": "motion-particle"
+    },
+    {
+      "part": "WebGL globe rising behind a headline",
+      "features": [
+        "renders_3d",
+        "adds_motion_only"
+      ],
+      "expect": "3d"
+    },
+    {
+      "part": "3D graph built from real data",
+      "features": [
+        "renders_3d",
+        "encodes_values"
+      ],
+      "expect": "3d"
+    }
+  ]
+}

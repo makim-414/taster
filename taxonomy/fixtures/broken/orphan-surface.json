@@ -1,0 +1,31 @@
+{
+  "expect": "ORPHAN",
+  "why": "A surface that no pattern targets cannot be built.",
+  "patch": [
+    {
+      "op": "push",
+      "path": [
+        "surfaces"
+      ],
+      "value": {
+        "id": "kiosk",
+        "name": "Kiosk",
+        "name_ko": "키오스크",
+        "definition": "A shared screen in a public place.",
+        "includes": [
+          "Ticket screens",
+          "Check-in screens"
+        ],
+        "excludes": [
+          {
+            "what": "Personal app screens",
+            "goes_to": "app"
+          }
+        ],
+        "examples": [
+          "a ticket screen"
+        ]
+      }
+    }
+  ]
+}

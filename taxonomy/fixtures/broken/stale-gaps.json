@@ -1,0 +1,19 @@
+{
+  "expect": "GAPS",
+  "why": "The gaps list must match the patterns and registry. Hero has patterns and components, so listing it as a gap is stale.",
+  "patch": [
+    {
+      "op": "set",
+      "path": [
+        "gaps"
+      ],
+      "value": [
+        {
+          "category": "hero",
+          "patterns": 0,
+          "components": 0
+        }
+      ]
+    }
+  ]
+}

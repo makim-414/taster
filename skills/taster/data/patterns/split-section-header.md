@@ -1,11 +1,11 @@
 ---
 id: split-section-header
 name: Split section header
-category: feature-section
+category: typography
 uses: [explain-features, emphasize-text]
 surfaces: [landing]
 replaces: [AC-01, LAY-01, TYP-03, TYP-04]
-components: []
+components: [content/section-heading]
 inspiration: []
 status: stable
 ---

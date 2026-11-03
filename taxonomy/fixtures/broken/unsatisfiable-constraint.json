@@ -1,0 +1,25 @@
+{
+  "expect": "UNSAT",
+  "why": "No snapped setting can satisfy the contrast floor and this cap together.",
+  "patch": [
+    {
+      "op": "push",
+      "path": [
+        "constraints"
+      ],
+      "value": {
+        "id": "impossible-cap",
+        "principle": "Contrast and stroke together stay below the contrast floor.",
+        "terms": {
+          "contrast": 1,
+          "stroke": 1
+        },
+        "op": "<=",
+        "bound": 0.2,
+        "prevents": [
+          "COL-08"
+        ]
+      }
+    }
+  ]
+}

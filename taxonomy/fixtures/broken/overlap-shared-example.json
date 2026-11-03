@@ -1,0 +1,17 @@
+{
+  "expect": "OVERLAP",
+  "why": "The same example under two categories means the boundary between them is not drawn.",
+  "patch": [
+    {
+      "op": "push",
+      "path": [
+        "categories",
+        {
+          "id": "feature-section"
+        },
+        "examples"
+      ],
+      "value": "a headline beside a real product screenshot"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ category: typography
 uses: [emphasize-text]
 surfaces: [landing]
 replaces: [AC-01, COL-04, TYP-03, TYP-05]
-components: []
+components: [content/section-heading]
 inspiration: []
 status: stable
 ---

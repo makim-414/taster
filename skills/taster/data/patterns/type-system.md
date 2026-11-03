@@ -27,6 +27,7 @@ Revisit it when a new language or a new surface (print, email, dashboard) joins 
 
 ## Do
 
+- Step a subtitle down from its title by one size and one color step only (for example 15px, 400, muted, line height 1.5, up to 520px, 6px below the title; a card title 18px at 500 with 14px body). Dropping size, color and weight all at once makes the subtitle disappear.
 - Verify the font loaded. Open the Network panel or run `document.fonts.check('600 24px "Brand Sans"')` before declaring done.
 - Keep the scale to six to eight sizes and use only those. A new size needs a reason.
 - Pair by contrast of role, not decoration: a sturdy sans for UI, a serif only if the content is editorial.

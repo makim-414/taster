@@ -74,7 +74,7 @@
 .detail-summary { margin: var(--sp-3) 0 0; max-width: 44rem; line-height: var(--lh-normal); color: var(--text-muted); font-size: var(--t-title); }
 .stage-widths { margin-top: var(--sp-6); }
 .stage-box { margin-top: var(--sp-3); padding: 0; border: 1px solid var(--border); border-radius: var(--r-card); background: var(--bg-sunken); overflow: hidden; }
-.stage-inner { width: 100%; margin: 0 auto; transition: max-width var(--dur-dropdown) var(--ease-out); }
+.stage-inner { width: 100%; margin: 0 auto; } /* the device width switches without motion: animating max-width relays out the page every frame (MOT-05) */
 .stage-hint { margin: var(--sp-2) 0 0; font-size: var(--t-sm); color: var(--text-muted); }
 .install-box { margin-top: var(--sp-8); }
 .install-box h2, .facts h2, .send h2 { margin: 0 0 var(--sp-3); font-size: var(--t-title); font-weight: var(--w-semi); }

@@ -1,10 +1,449 @@
 {
-  "version": "0.1.0",
+  "$schema": "./taxonomy.schema.json",
+  "version": "1.0.0",
+  "about": "Strict taxonomy of UI parts. Read taxonomy/SCHEMA.md. Checked by scripts/check-taxonomy.mjs.",
+  "features": [
+    {
+      "id": "renders_3d",
+      "definition": "Draws a scene with depth and a camera (WebGL or similar), whether it decorates a section or carries content."
+    },
+    {
+      "id": "adds_motion_only",
+      "definition": "Exists to animate content that would be complete without it, or is a moving decorative backdrop with no information."
+    },
+    {
+      "id": "governs_wording",
+      "definition": "Concerns what the words say (voice, labels, punctuation, language), not how the text is set."
+    },
+    {
+      "id": "defines_theme_values",
+      "definition": "Defines named values that other parts read: color roles, light and dark sets, the brand slot, radius and shadow scales."
+    },
+    {
+      "id": "is_glyph_or_mark",
+      "definition": "A small symbolic image standing for an action, object, person or organization: an icon, logo, wordmark or avatar."
+    },
+    {
+      "id": "sets_text",
+      "definition": "Concerns how text is set: typeface, scale, weight, line height, tracking, line breaking, numerals, heading lockups or prose columns."
+    },
+    {
+      "id": "in_assistant_conversation",
+      "definition": "Lives inside a conversation with an AI assistant or agent: a message, composer, tool call line, agent status or agent question."
+    },
+    {
+      "id": "sells_goods",
+      "definition": "Shows goods for sale with a price or moves them toward purchase: product tile, option picker, cart line, order summary or checkout step."
+    },
+    {
+      "id": "shows_plans",
+      "definition": "Presents subscription or service plans with their prices, or estimates what a plan will cost."
+    },
+    {
+      "id": "answers_questions",
+      "definition": "Its content is a set of questions, each paired with its answer."
+    },
+    {
+      "id": "attributes_proof",
+      "definition": "Shows evidence from third parties: words attributed to a named person, customer or partner logos, or certification marks."
+    },
+    {
+      "id": "keyboard_command_access",
+      "definition": "Gives keyboard-first access to commands or places: a palette opened by a shortcut, hotkey bindings or the sheet that lists them."
+    },
+    {
+      "id": "is_page_section",
+      "definition": "A full-width horizontal band of a page that can be moved as one unit and usually carries its own heading."
+    },
+    {
+      "id": "is_first_section",
+      "definition": "The first band of the page, the one a visitor sees before scrolling."
+    },
+    {
+      "id": "asks_single_action",
+      "definition": "Its whole job is to ask for one next step, with at most one alternative."
+    },
+    {
+      "id": "is_page_end",
+      "definition": "Sits at the very end of every page of a site or app, below all content."
+    },
+    {
+      "id": "navigates_globally",
+      "definition": "Lists the top-level destinations of the whole site or app, or shows where the current screen sits among them."
+    },
+    {
+      "id": "is_vertical_rail",
+      "definition": "Laid out as a vertical column docked to the left or right edge of the screen."
+    },
+    {
+      "id": "shows_geography",
+      "definition": "Positions things on a map of real places."
+    },
+    {
+      "id": "orders_in_time",
+      "definition": "Its content is a set of items or steps placed in time order or in a fixed sequence."
+    },
+    {
+      "id": "indicates_waiting",
+      "definition": "Its only job is to say that something is loading or running, and optionally how far along it is."
+    },
+    {
+      "id": "encodes_values",
+      "definition": "Turns measured numbers into marks or figures meant to be read and compared."
+    },
+    {
+      "id": "shows_absence",
+      "definition": "Stands in for content that is not there: nothing yet, no results, a failure or missing permission."
+    },
+    {
+      "id": "keeps_a_value",
+      "definition": "Lets a person enter, pick or toggle a value that the product stores, submits or applies as a filter."
+    },
+    {
+      "id": "floats_above_page",
+      "definition": "Drawn on a layer above the page that the person opens through a trigger (click, hover, focus or shortcut), or that blocks the page until it is dismissed; a toast that appears on its own and blocks nothing does not count."
+    },
+    {
+      "id": "switches_in_place",
+      "definition": "Changes which panel, page or section of the same content is shown in place, without leaving the screen."
+    },
+    {
+      "id": "triggers_action",
+      "definition": "A control that runs one action or follows one link when pressed."
+    },
+    {
+      "id": "reports_event",
+      "definition": "A message about something that happened or a condition that needs attention."
+    },
+    {
+      "id": "labels_state",
+      "definition": "A short non-interactive tag naming a status, type or attribute of something else."
+    },
+    {
+      "id": "aligns_columns",
+      "definition": "Records in rows that share one set of columns with headers."
+    },
+    {
+      "id": "leads_with_media",
+      "definition": "The image, video or audio is itself the thing being looked at, alone or in a collection to browse; a thumbnail that stands for an article or a product does not count."
+    },
+    {
+      "id": "contains_one_item",
+      "definition": "A bounded container for one item or one group of related content, or a list that repeats such containers."
+    },
+    {
+      "id": "arranges_regions",
+      "definition": "Decides where regions sit and how they are separated: page frame, grid, section order, spacing, dividers or section surfaces."
+    }
+  ],
+  "classify": [
+    {
+      "all": [
+        "renders_3d"
+      ],
+      "none": [],
+      "category": "3d",
+      "why": "Depth and a camera need their own runtime and budget, whatever the scene is for."
+    },
+    {
+      "all": [
+        "adds_motion_only"
+      ],
+      "none": [],
+      "category": "motion-particle",
+      "why": "An effect is judged apart from the content it moves, so it is classified before that content."
+    },
+    {
+      "all": [
+        "governs_wording"
+      ],
+      "none": [],
+      "category": "copy",
+      "why": "Wording rules hold for every part, so they are classified before any part kind."
+    },
+    {
+      "all": [
+        "defines_theme_values"
+      ],
+      "none": [],
+      "category": "theme-tokens",
+      "why": "Values read by every part come before the parts that read them."
+    },
+    {
+      "all": [
+        "is_glyph_or_mark"
+      ],
+      "none": [],
+      "category": "icon",
+      "why": "A mark keeps one set of rules wherever it is placed."
+    },
+    {
+      "all": [
+        "sets_text"
+      ],
+      "none": [],
+      "category": "typography",
+      "why": "Type setting holds for every part, so it is classified before any part kind."
+    },
+    {
+      "all": [
+        "in_assistant_conversation"
+      ],
+      "none": [],
+      "category": "chat-ai",
+      "why": "A conversation has its own content model, so its parts go to it before any generic kind."
+    },
+    {
+      "all": [
+        "sells_goods"
+      ],
+      "none": [],
+      "category": "commerce",
+      "why": "Goods with prices have their own content model, so they go to it before any generic kind."
+    },
+    {
+      "all": [
+        "shows_plans"
+      ],
+      "none": [],
+      "category": "pricing",
+      "why": "Plans and prices decide the layout, whatever control shows them."
+    },
+    {
+      "all": [
+        "answers_questions"
+      ],
+      "none": [],
+      "category": "faq",
+      "why": "Questions with answers stay together, whatever control discloses them."
+    },
+    {
+      "all": [
+        "attributes_proof"
+      ],
+      "none": [],
+      "category": "testimonial",
+      "why": "Third party evidence is judged for honesty first, whatever shape it takes."
+    },
+    {
+      "all": [
+        "keyboard_command_access"
+      ],
+      "none": [],
+      "category": "command-palette",
+      "why": "Keyboard command access is a layer of its own, before generic overlays."
+    },
+    {
+      "all": [
+        "is_page_section",
+        "is_first_section"
+      ],
+      "none": [],
+      "category": "hero",
+      "why": "The opening band is judged as a whole, whatever it contains."
+    },
+    {
+      "all": [
+        "is_page_end"
+      ],
+      "none": [],
+      "category": "footer",
+      "why": "The end band repeats on every page, before generic navigation."
+    },
+    {
+      "all": [
+        "navigates_globally",
+        "is_vertical_rail"
+      ],
+      "none": [],
+      "category": "sidebar",
+      "why": "Global navigation docked to a side edge."
+    },
+    {
+      "all": [
+        "navigates_globally"
+      ],
+      "none": [],
+      "category": "nav-header",
+      "why": "Any other global navigation is a bar at a screen edge or the trail under it."
+    },
+    {
+      "all": [
+        "is_page_section",
+        "asks_single_action"
+      ],
+      "none": [],
+      "category": "cta",
+      "why": "A band whose whole job is one request."
+    },
+    {
+      "all": [
+        "shows_geography"
+      ],
+      "none": [],
+      "category": "map",
+      "why": "A map is chosen by the data having places, before any generic chart."
+    },
+    {
+      "all": [
+        "orders_in_time"
+      ],
+      "none": [
+        "is_page_section"
+      ],
+      "category": "timeline-stepper",
+      "why": "Sequence outranks waiting and value encoding; a how-it-works band stays a section."
+    },
+    {
+      "all": [
+        "indicates_waiting"
+      ],
+      "none": [],
+      "category": "loader-skeleton",
+      "why": "A pure waiting signal, before value encoding, because a progress bar is not a measurement."
+    },
+    {
+      "all": [
+        "encodes_values"
+      ],
+      "none": [],
+      "category": "chart-kpi",
+      "why": "Measured values drawn as marks or figures, including a band of figures on a page."
+    },
+    {
+      "all": [
+        "is_page_section"
+      ],
+      "none": [],
+      "category": "feature-section",
+      "why": "Every remaining page band explains the product or the organization."
+    },
+    {
+      "all": [
+        "shows_absence"
+      ],
+      "none": [],
+      "category": "empty-state",
+      "why": "A stand-in for missing content."
+    },
+    {
+      "all": [
+        "keeps_a_value"
+      ],
+      "none": [],
+      "category": "form-input",
+      "why": "A control that keeps a value, before overlays, so a date picker with a popover stays an input."
+    },
+    {
+      "all": [
+        "floats_above_page"
+      ],
+      "none": [],
+      "category": "modal-drawer",
+      "why": "A layer the person opens and dismisses."
+    },
+    {
+      "all": [
+        "switches_in_place"
+      ],
+      "none": [],
+      "category": "tabs-segmented",
+      "why": "In-place switching that keeps no value."
+    },
+    {
+      "all": [
+        "triggers_action"
+      ],
+      "none": [],
+      "category": "button",
+      "why": "A single action control."
+    },
+    {
+      "all": [
+        "reports_event"
+      ],
+      "none": [],
+      "category": "toast-alert",
+      "why": "A message about an event or a condition."
+    },
+    {
+      "all": [
+        "labels_state"
+      ],
+      "none": [],
+      "category": "badge-label",
+      "why": "A short tag that is not a control."
+    },
+    {
+      "all": [
+        "aligns_columns"
+      ],
+      "none": [],
+      "category": "table",
+      "why": "Rows that share columns."
+    },
+    {
+      "all": [
+        "leads_with_media"
+      ],
+      "none": [],
+      "category": "media-gallery",
+      "why": "Media as the content itself."
+    },
+    {
+      "all": [
+        "contains_one_item"
+      ],
+      "none": [],
+      "category": "card",
+      "why": "A container for one item, or a list of them."
+    },
+    {
+      "all": [
+        "arranges_regions"
+      ],
+      "none": [],
+      "category": "layout-shell",
+      "why": "Structure that places and separates regions."
+    },
+    {
+      "all": [],
+      "none": [],
+      "category": "layout-shell",
+      "fallback": true,
+      "why": "Keeps the function total; a fixture that reaches this step fails the check, so it never decides a real part."
+    }
+  ],
   "families": [
     {
       "id": "sections",
       "name": "Page sections",
-      "summary": "Marketing page blocks: the parts a landing page is made of.",
+      "name_ko": "페이지 섹션",
+      "definition": "Full-width bands that make up a marketing or editorial page, each answering one question for a visitor.",
+      "includes": [
+        "Bands that can be reordered on a page as one unit",
+        "The opening band and the closing request",
+        "Bands for plans, proof and common questions"
+      ],
+      "excludes": [
+        {
+          "what": "Bars and rails that repeat on every page for moving around",
+          "goes_to": "navigation"
+        },
+        {
+          "what": "The page frame, grid and spacing between bands",
+          "goes_to": "foundations"
+        },
+        {
+          "what": "Charts and figures, even inside a band",
+          "goes_to": "data"
+        }
+      ],
+      "examples": [
+        "the opening band of a landing page",
+        "a band of plan cards",
+        "a closing band with one button"
+      ],
       "categories": [
         "hero",
         "feature-section",
@@ -17,7 +456,29 @@
     {
       "id": "navigation",
       "name": "Navigation",
-      "summary": "Ways to move around a site or an app.",
+      "name_ko": "내비게이션",
+      "definition": "Parts whose job is moving a person between places of a site or app, or between views of the same content.",
+      "includes": [
+        "Global bars and rails that list destinations",
+        "The end band with secondary links",
+        "Keyboard access to commands and places",
+        "In-place switching between views"
+      ],
+      "excludes": [
+        {
+          "what": "Controls that run an action instead of moving",
+          "goes_to": "controls"
+        },
+        {
+          "what": "Menus and panels opened on a layer above the page",
+          "goes_to": "feedback"
+        }
+      ],
+      "examples": [
+        "a top bar with page links",
+        "a vertical app menu",
+        "tabs above a panel"
+      ],
       "categories": [
         "nav-header",
         "footer",
@@ -29,18 +490,62 @@
     {
       "id": "foundations",
       "name": "Foundations",
-      "summary": "Layout, type, icons, tokens and the base surfaces everything sits on.",
+      "name_ko": "기반",
+      "definition": "The shared materials every other part is built from: page frame, item containers, type, wording, marks and theme values.",
+      "includes": [
+        "Page structure and spacing",
+        "Containers for one item",
+        "How text is set and what it says",
+        "Icons, logos and avatars",
+        "Color, radius and shadow values"
+      ],
+      "excludes": [
+        {
+          "what": "Effects that animate content that is complete without them",
+          "goes_to": "motion"
+        },
+        {
+          "what": "Parts with one job such as asking for an action or showing data",
+          "goes_to": "sections"
+        }
+      ],
+      "examples": [
+        "a spacing scale",
+        "a type scale",
+        "a token theme with light and dark sets"
+      ],
       "categories": [
         "layout-shell",
         "card",
         "typography",
-        "icon"
+        "copy",
+        "icon",
+        "theme-tokens"
       ]
     },
     {
       "id": "controls",
       "name": "Actions and inputs",
-      "summary": "Buttons and every way a person types, picks or submits something.",
+      "name_ko": "액션과 입력",
+      "definition": "Controls a person presses to act, or uses to enter and pick values.",
+      "includes": [
+        "Buttons and button groups",
+        "Fields, selects, toggles, pickers and the forms that group them"
+      ],
+      "excludes": [
+        {
+          "what": "Controls that switch views or move between places",
+          "goes_to": "navigation"
+        },
+        {
+          "what": "Menus that open on a layer above the page",
+          "goes_to": "feedback"
+        }
+      ],
+      "examples": [
+        "a primary button",
+        "an email field with a label"
+      ],
       "categories": [
         "button",
         "form-input"
@@ -49,7 +554,30 @@
     {
       "id": "feedback",
       "name": "Feedback and overlays",
-      "summary": "Status, alerts, waiting, empty results and layers above the page.",
+      "name_ko": "피드백과 오버레이",
+      "definition": "Parts that report state, waiting, absence or events, and the layers a person opens above the page.",
+      "includes": [
+        "Status tags",
+        "Messages about events",
+        "Empty and error stand-ins",
+        "Loading indicators",
+        "Dialogs, drawers, popovers, tooltips and menus"
+      ],
+      "excludes": [
+        {
+          "what": "Ordered steps with states",
+          "goes_to": "data"
+        },
+        {
+          "what": "A conversation with an assistant",
+          "goes_to": "media"
+        }
+      ],
+      "examples": [
+        "a status label",
+        "a saved toast",
+        "a confirm dialog"
+      ],
       "categories": [
         "badge-label",
         "toast-alert",
@@ -61,7 +589,29 @@
     {
       "id": "data",
       "name": "Data display",
-      "summary": "Numbers, charts, tables, steps and places.",
+      "name_ko": "데이터 표시",
+      "definition": "Parts that present measured values, records, sequences in time and places.",
+      "includes": [
+        "Charts and key figures",
+        "Tables and data grids",
+        "Timelines, steppers and calendars",
+        "Maps"
+      ],
+      "excludes": [
+        {
+          "what": "Loading indicators, even when they show a percentage",
+          "goes_to": "feedback"
+        },
+        {
+          "what": "A grid that places cards on a page",
+          "goes_to": "foundations"
+        }
+      ],
+      "examples": [
+        "a line chart of weekly revenue",
+        "a sortable table",
+        "a dated change log"
+      ],
       "categories": [
         "chart-kpi",
         "table",
@@ -72,7 +622,28 @@
     {
       "id": "media",
       "name": "Media, commerce and AI",
-      "summary": "Galleries, storefront pages and assistant interfaces.",
+      "name_ko": "미디어, 커머스, AI",
+      "definition": "Parts whose content model belongs to one domain: media to look at, goods to buy, or a conversation with an assistant.",
+      "includes": [
+        "Galleries, players and comparison sliders",
+        "Product tiles, carts and checkout",
+        "Message threads, tool calls and agent status"
+      ],
+      "excludes": [
+        {
+          "what": "Subscription plans and prices",
+          "goes_to": "sections"
+        },
+        {
+          "what": "A generic card for one item",
+          "goes_to": "foundations"
+        }
+      ],
+      "examples": [
+        "a thumbnail strip",
+        "a cart with an order summary",
+        "an agent reply with sources"
+      ],
       "categories": [
         "media-gallery",
         "commerce",
@@ -82,7 +653,27 @@
     {
       "id": "motion",
       "name": "Motion and effects",
-      "summary": "Backgrounds, particles and 3D that set a mood.",
+      "name_ko": "모션과 효과",
+      "definition": "Effects that add movement or depth to content that is complete without them, and three-dimensional scenes.",
+      "includes": [
+        "Scroll reveals, marquees, number roll-ups and text effects",
+        "Moving backdrops",
+        "Three-dimensional scenes"
+      ],
+      "excludes": [
+        {
+          "what": "A static section background",
+          "goes_to": "foundations"
+        },
+        {
+          "what": "A loading indicator",
+          "goes_to": "feedback"
+        }
+      ],
+      "examples": [
+        "a fade-up on first entry",
+        "a 3D globe behind a headline"
+      ],
       "categories": [
         "motion-particle",
         "3d"
@@ -93,395 +684,3328 @@
     {
       "id": "hero",
       "name": "Hero",
-      "family": "sections"
+      "name_ko": "히어로",
+      "family": "sections",
+      "definition": "The first section of a page, which says what the page offers and gives the first action.",
+      "includes": [
+        "The band a visitor sees before scrolling",
+        "Headline, one supporting sentence and the first action",
+        "A real product screen, photo or input placed in that band"
+      ],
+      "excludes": [
+        {
+          "what": "A closing band that asks for the action again",
+          "goes_to": "cta"
+        },
+        {
+          "what": "A three-dimensional scene drawn behind the headline",
+          "goes_to": "3d"
+        },
+        {
+          "what": "Heading and eyebrow type rules shared across sections",
+          "goes_to": "typography"
+        }
+      ],
+      "examples": [
+        "a headline beside a real product screenshot",
+        "a full-bleed photo with a short headline",
+        "an address field inside the opening band"
+      ]
     },
     {
       "id": "feature-section",
-      "name": "Feature section",
-      "family": "sections"
+      "name": "Feature and content section",
+      "name_ko": "기능·콘텐츠 섹션",
+      "family": "sections",
+      "definition": "A body section of a page that explains what the product or organization does, how it works or who it serves.",
+      "includes": [
+        "Feature explanations and use cases",
+        "How-it-works steps shown as a page band",
+        "Integration and capability diagrams",
+        "Story, team and about bands",
+        "Showcases that swap one frame between product screens"
+      ],
+      "excludes": [
+        {
+          "what": "Plans and prices",
+          "goes_to": "pricing"
+        },
+        {
+          "what": "Quotes and customer logos",
+          "goes_to": "testimonial"
+        },
+        {
+          "what": "A band of measured figures",
+          "goes_to": "chart-kpi"
+        },
+        {
+          "what": "Ordered steps inside an app flow",
+          "goes_to": "timeline-stepper"
+        }
+      ],
+      "examples": [
+        "cards that each open with a measured result",
+        "a three step how-it-works band",
+        "tabs that swap product screenshots in one frame"
+      ]
     },
     {
       "id": "pricing",
       "name": "Pricing",
-      "family": "sections"
+      "name_ko": "요금제",
+      "family": "sections",
+      "definition": "Parts that present subscription or service plans with their prices so a person can choose one.",
+      "includes": [
+        "Plan cards with aligned price and feature slots",
+        "Plan comparison tables",
+        "Billing period switches for the plans",
+        "Usage cost estimators"
+      ],
+      "excludes": [
+        {
+          "what": "Prices of goods that go into a cart",
+          "goes_to": "commerce"
+        },
+        {
+          "what": "Tables of records that are not plans",
+          "goes_to": "table"
+        }
+      ],
+      "examples": [
+        "three plan cards with a yearly toggle",
+        "a feature by plan comparison grid",
+        "a usage slider that shows the monthly cost"
+      ]
     },
     {
       "id": "cta",
       "name": "Call to action",
-      "family": "sections"
+      "name_ko": "행동 유도",
+      "family": "sections",
+      "definition": "A section whose whole job is to ask for one next step, with at most one alternative.",
+      "includes": [
+        "Closing bands with one sentence and one primary action",
+        "Entry splits that send each audience to its own path",
+        "A final contact link"
+      ],
+      "excludes": [
+        {
+          "what": "The opening band of the page",
+          "goes_to": "hero"
+        },
+        {
+          "what": "The button on its own",
+          "goes_to": "button"
+        },
+        {
+          "what": "A form with fields",
+          "goes_to": "form-input"
+        }
+      ],
+      "examples": [
+        "a closing band with one button",
+        "two entry cards for buyers and sellers",
+        "a last line that links to contact"
+      ]
     },
     {
       "id": "testimonial",
-      "name": "Testimonial and proof",
-      "family": "sections"
+      "name": "Testimonial, quote and proof",
+      "name_ko": "후기·인용·증거",
+      "family": "sections",
+      "definition": "Evidence from third parties: quoted words attributed to a person, and marks of who uses or certifies the product.",
+      "includes": [
+        "Customer quotes with name and role",
+        "Pull quotes with attribution",
+        "Customer, partner and integration logo strips",
+        "Certification marks"
+      ],
+      "excludes": [
+        {
+          "what": "The looping motion of a logo marquee",
+          "goes_to": "motion-particle"
+        },
+        {
+          "what": "Measured figures with a source",
+          "goes_to": "chart-kpi"
+        },
+        {
+          "what": "The product's own logo",
+          "goes_to": "icon"
+        }
+      ],
+      "examples": [
+        "a quote card that leads with a measured result",
+        "a single row of customer logos in one color",
+        "a pull quote with a large opening mark"
+      ]
     },
     {
       "id": "faq",
       "name": "FAQ",
-      "family": "sections"
+      "name_ko": "자주 묻는 질문",
+      "family": "sections",
+      "definition": "A set of questions people ask, each paired with its answer.",
+      "includes": [
+        "Question and answer lists",
+        "Accordions of questions",
+        "A title column beside a question list"
+      ],
+      "excludes": [
+        {
+          "what": "An accordion of content that is not questions",
+          "goes_to": "tabs-segmented"
+        },
+        {
+          "what": "An assistant answering inside a conversation",
+          "goes_to": "chat-ai"
+        }
+      ],
+      "examples": [
+        "questions separated by hairlines with one open answer",
+        "a title on the left and questions on the right"
+      ]
     },
     {
       "id": "nav-header",
       "name": "Navigation header",
-      "family": "navigation"
+      "name_ko": "헤더 내비게이션",
+      "family": "navigation",
+      "definition": "A bar at the top or bottom edge of the screen that lists global destinations, together with the location trail under it.",
+      "includes": [
+        "Site headers with links and one action",
+        "App top bars with title and page actions",
+        "Bottom tab bars on phones",
+        "Breadcrumb trails",
+        "Mega menu panels that list global destinations from the header"
+      ],
+      "excludes": [
+        {
+          "what": "A vertical menu docked to a side edge",
+          "goes_to": "sidebar"
+        },
+        {
+          "what": "The band at the end of every page",
+          "goes_to": "footer"
+        },
+        {
+          "what": "Tabs that switch views inside one screen",
+          "goes_to": "tabs-segmented"
+        },
+        {
+          "what": "A dropdown of actions opened from the bar",
+          "goes_to": "modal-drawer"
+        }
+      ],
+      "examples": [
+        "a transparent header that turns solid on scroll",
+        "an app top bar with a sidebar toggle",
+        "a bottom tab bar with four destinations",
+        "a breadcrumb trail above a page title"
+      ]
     },
     {
       "id": "footer",
       "name": "Footer",
-      "family": "navigation"
+      "name_ko": "푸터",
+      "family": "navigation",
+      "definition": "The band at the very end of every page that holds secondary links, legal text and contact.",
+      "includes": [
+        "Link columns",
+        "Legal and business information",
+        "Copyright rows"
+      ],
+      "excludes": [
+        {
+          "what": "A closing band that asks for an action above the footer",
+          "goes_to": "cta"
+        },
+        {
+          "what": "A subscribe form",
+          "goes_to": "form-input"
+        }
+      ],
+      "examples": [
+        "brand and link columns with a legal row",
+        "one thin row with copyright and policy links"
+      ]
     },
     {
       "id": "sidebar",
       "name": "Sidebar",
-      "family": "navigation"
+      "name_ko": "사이드바",
+      "family": "navigation",
+      "definition": "A vertical column docked to a screen edge that lists the global destinations of an app.",
+      "includes": [
+        "Grouped app menus",
+        "Collapsed icon rails",
+        "The drawer form of the same menu on phones",
+        "Workspace switchers at the top of the menu"
+      ],
+      "excludes": [
+        {
+          "what": "A side panel with the details of one item",
+          "goes_to": "modal-drawer"
+        },
+        {
+          "what": "The frame that places the menu beside the content",
+          "goes_to": "layout-shell"
+        },
+        {
+          "what": "A table of contents for one document",
+          "goes_to": "tabs-segmented"
+        }
+      ],
+      "examples": [
+        "a grouped app menu with a collapsed icon rail",
+        "a workspace switcher above menu groups"
+      ]
     },
     {
       "id": "command-palette",
-      "name": "Command palette",
-      "family": "navigation"
+      "name": "Command palette and shortcuts",
+      "name_ko": "커맨드 팔레트·단축키",
+      "family": "navigation",
+      "definition": "Keyboard-first access to commands and places: a palette opened by a shortcut, the hotkey bindings, and the sheet that lists them.",
+      "includes": [
+        "Command palettes with grouped results",
+        "Keyboard shortcut sheets",
+        "Hotkey bindings"
+      ],
+      "excludes": [
+        {
+          "what": "A search field that filters a list on the page",
+          "goes_to": "form-input"
+        },
+        {
+          "what": "A dialog opened by a button",
+          "goes_to": "modal-drawer"
+        }
+      ],
+      "examples": [
+        "a palette opened with a shortcut that filters commands and pages",
+        "a sheet listing keyboard shortcuts by area"
+      ]
     },
     {
       "id": "tabs-segmented",
-      "name": "Tabs and segmented control",
-      "family": "navigation"
+      "name": "Tabs, segmented control and disclosure",
+      "name_ko": "탭·세그먼트·펼침",
+      "family": "navigation",
+      "definition": "A control that changes which panel, page or section of the same content is shown in place, without leaving the screen.",
+      "includes": [
+        "Tabs and underline tabs",
+        "Segmented controls that switch views",
+        "Accordions and disclosure toggles outside question lists",
+        "Pagination",
+        "In-page tables of contents"
+      ],
+      "excludes": [
+        {
+          "what": "A control that stores, submits or filters by a value",
+          "goes_to": "form-input"
+        },
+        {
+          "what": "Question and answer accordions",
+          "goes_to": "faq"
+        },
+        {
+          "what": "Global destinations of the site or app",
+          "goes_to": "nav-header"
+        }
+      ],
+      "examples": [
+        "three underline tabs above a settings panel",
+        "a two option switch between list and grid view",
+        "page numbers below a list",
+        "a collapsible details row"
+      ]
     },
     {
       "id": "layout-shell",
       "name": "Layout and shell",
-      "family": "foundations"
+      "name_ko": "레이아웃·셸",
+      "family": "foundations",
+      "definition": "The structure that decides where regions sit and how they are separated: page frame, grid, section order, spacing, dividers and section surfaces.",
+      "includes": [
+        "App shells that place a sidebar, top bar and content",
+        "Dashboard zones and grids",
+        "Section order of a page",
+        "The spacing scale and dividers",
+        "Static section backgrounds",
+        "Layout rules that keep text readable at every width"
+      ],
+      "excludes": [
+        {
+          "what": "The container for one item",
+          "goes_to": "card"
+        },
+        {
+          "what": "Color, radius and shadow values",
+          "goes_to": "theme-tokens"
+        },
+        {
+          "what": "A moving decorative backdrop",
+          "goes_to": "motion-particle"
+        }
+      ],
+      "examples": [
+        "a figure row above chart panels on a dashboard",
+        "a form column beside a calm image on a sign in page",
+        "a print-like sheet layout for a report"
+      ]
     },
     {
       "id": "card",
-      "name": "Card",
-      "family": "foundations"
+      "name": "Card and list",
+      "name_ko": "카드·리스트",
+      "family": "foundations",
+      "definition": "A bounded container that presents one item or one group of related content, and the lists that repeat such containers.",
+      "includes": [
+        "Cards and panels",
+        "List rows with leading media and a trailing action",
+        "Nested lists and list groups",
+        "Tiles whose image stands for one article or result"
+      ],
+      "excludes": [
+        {
+          "what": "Option cards that select a value",
+          "goes_to": "form-input"
+        },
+        {
+          "what": "Rows that share one set of column headers",
+          "goes_to": "table"
+        },
+        {
+          "what": "Collections of images or video to browse",
+          "goes_to": "media-gallery"
+        },
+        {
+          "what": "The grid that places many cards",
+          "goes_to": "layout-shell"
+        },
+        {
+          "what": "A product tile with a price",
+          "goes_to": "commerce"
+        }
+      ],
+      "examples": [
+        "a panel with a one pixel border and a tone step",
+        "a single-line row with a title and a trailing action",
+        "an article tile with an image and a thin caption"
+      ]
     },
     {
       "id": "typography",
       "name": "Typography",
-      "family": "foundations"
+      "name_ko": "타이포그래피",
+      "family": "foundations",
+      "definition": "How text is set: typefaces, scale, weight, line height, tracking, line breaking, numerals and heading lockups.",
+      "includes": [
+        "Type scale and face choice",
+        "Heading and eyebrow lockups for sections",
+        "Long reading columns",
+        "Korean type setup and line breaking",
+        "Tabular figures",
+        "Code and preformatted text"
+      ],
+      "excludes": [
+        {
+          "what": "What the words say",
+          "goes_to": "copy"
+        },
+        {
+          "what": "Animated text effects",
+          "goes_to": "motion-particle"
+        },
+        {
+          "what": "Page grid and column placement",
+          "goes_to": "layout-shell"
+        }
+      ],
+      "examples": [
+        "a fixed scale of title, subtitle and body sizes",
+        "a reading column with a comfortable measure",
+        "a section title with a small sentence-case eyebrow"
+      ]
+    },
+    {
+      "id": "copy",
+      "name": "Copy and voice",
+      "name_ko": "카피·문체",
+      "family": "foundations",
+      "definition": "What the words on a screen say: voice, labels, punctuation and language, independent of how they are set.",
+      "includes": [
+        "Headline and body wording",
+        "Button and link labels",
+        "Punctuation conventions",
+        "Natural Korean copy",
+        "Empty value traces that leak into text"
+      ],
+      "excludes": [
+        {
+          "what": "Typeface, size and line breaking",
+          "goes_to": "typography"
+        },
+        {
+          "what": "Icons that stand in for words",
+          "goes_to": "icon"
+        }
+      ],
+      "examples": [
+        "a button label that names the result",
+        "a headline built on one concrete fact",
+        "commas or colons used instead of long dashes"
+      ]
     },
     {
       "id": "icon",
       "name": "Icon and mark",
-      "family": "foundations"
+      "name_ko": "아이콘·마크",
+      "family": "foundations",
+      "definition": "Small symbolic images that stand for an action, object, person or organization: icons, logos, wordmarks and avatars.",
+      "includes": [
+        "Icon sets, sizes and stroke",
+        "Icon placement by slot",
+        "Logos and wordmarks as supplied files",
+        "Avatars with an initials fallback"
+      ],
+      "excludes": [
+        {
+          "what": "Photos and illustrations that are content",
+          "goes_to": "media-gallery"
+        },
+        {
+          "what": "A row of customer logos shown as proof",
+          "goes_to": "testimonial"
+        },
+        {
+          "what": "Status dots that label a state",
+          "goes_to": "badge-label"
+        }
+      ],
+      "examples": [
+        "a line icon beside a menu label",
+        "a round avatar that falls back to initials",
+        "the supplied logo file in the header"
+      ]
+    },
+    {
+      "id": "theme-tokens",
+      "name": "Theme and tokens",
+      "name_ko": "테마·토큰",
+      "family": "foundations",
+      "definition": "The named values every part reads: color roles, light and dark sets, the brand slot, radius and shadow scales.",
+      "includes": [
+        "Raw, role and component token layers",
+        "Light and dark token sets",
+        "The brand color slot",
+        "Radius and shadow scales",
+        "Chart color ramps"
+      ],
+      "excludes": [
+        {
+          "what": "The spacing scale",
+          "goes_to": "layout-shell"
+        },
+        {
+          "what": "Type scale and faces",
+          "goes_to": "typography"
+        },
+        {
+          "what": "The switch a person uses to change the theme",
+          "goes_to": "form-input"
+        }
+      ],
+      "examples": [
+        "one brand variable on top of neutral roles",
+        "light and dark defined as token sets",
+        "a radius scale derived from one base value"
+      ]
     },
     {
       "id": "button",
       "name": "Button",
-      "family": "controls"
+      "name_ko": "버튼",
+      "family": "controls",
+      "definition": "A control that runs one action or follows one link when pressed.",
+      "includes": [
+        "Primary, secondary and tertiary buttons",
+        "Icon-only buttons with an accessible name",
+        "Button groups that share one border"
+      ],
+      "excludes": [
+        {
+          "what": "What the button label says",
+          "goes_to": "copy"
+        },
+        {
+          "what": "A control that keeps a value",
+          "goes_to": "form-input"
+        },
+        {
+          "what": "A menu of several actions",
+          "goes_to": "modal-drawer"
+        }
+      ],
+      "examples": [
+        "a solid primary button in the accent token",
+        "an outline secondary button",
+        "an icon-only close button"
+      ]
     },
     {
       "id": "form-input",
       "name": "Form and input",
-      "family": "controls"
+      "name_ko": "폼·입력",
+      "family": "controls",
+      "definition": "Controls that let a person enter, pick or toggle a value the product keeps, submits or filters by, and the forms that group them.",
+      "includes": [
+        "Text fields and text areas",
+        "Selects, comboboxes and date pickers",
+        "Checkboxes, radios, switches and sliders",
+        "Option cards that act as radio choices",
+        "Filter chips and search fields",
+        "Sign in, sign up and contact forms"
+      ],
+      "excludes": [
+        {
+          "what": "View switches that keep no value",
+          "goes_to": "tabs-segmented"
+        },
+        {
+          "what": "Keyboard command palettes",
+          "goes_to": "command-palette"
+        },
+        {
+          "what": "The submit action on its own",
+          "goes_to": "button"
+        }
+      ],
+      "examples": [
+        "a labeled email field with an inline error",
+        "a searchable select with grouped options",
+        "a row of filter chips above a list",
+        "a date field that opens a calendar"
+      ]
     },
     {
       "id": "badge-label",
       "name": "Badge and label",
-      "family": "feedback"
+      "name_ko": "배지·라벨",
+      "family": "feedback",
+      "definition": "A short non-interactive tag that names a status, type or attribute of something else.",
+      "includes": [
+        "Status labels",
+        "Counts on a tab or a menu item",
+        "Data honesty labels such as measured or estimated",
+        "Type tags on a record"
+      ],
+      "excludes": [
+        {
+          "what": "Chips that filter a list",
+          "goes_to": "form-input"
+        },
+        {
+          "what": "Avatars",
+          "goes_to": "icon"
+        },
+        {
+          "what": "A message about an event",
+          "goes_to": "toast-alert"
+        }
+      ],
+      "examples": [
+        "a neutral status text with a small flat dot",
+        "an estimated label beside a figure",
+        "an unread count beside a menu item"
+      ]
     },
     {
       "id": "toast-alert",
       "name": "Toast and alert",
-      "family": "feedback"
+      "name_ko": "토스트·알림",
+      "family": "feedback",
+      "definition": "A message about something that happened or a condition that needs attention.",
+      "includes": [
+        "Toasts after an action",
+        "Inline alerts and callouts",
+        "Page-level banners",
+        "Items of a notification list"
+      ],
+      "excludes": [
+        {
+          "what": "A dialog that blocks the page",
+          "goes_to": "modal-drawer"
+        },
+        {
+          "what": "A view that replaces missing content",
+          "goes_to": "empty-state"
+        },
+        {
+          "what": "A short status tag",
+          "goes_to": "badge-label"
+        }
+      ],
+      "examples": [
+        "a saved toast with an undo action",
+        "an inline warning above a form",
+        "a banner about scheduled maintenance"
+      ]
     },
     {
       "id": "empty-state",
       "name": "Empty and error state",
-      "family": "feedback"
+      "name_ko": "빈 상태·오류",
+      "family": "feedback",
+      "definition": "Content that stands in for what is not there: nothing yet, no results, a failure or missing permission.",
+      "includes": [
+        "First-use empty views",
+        "No results views",
+        "Error and permission views",
+        "Dashes in value cells while headers and axes stay"
+      ],
+      "excludes": [
+        {
+          "what": "Placeholders shown while data loads",
+          "goes_to": "loader-skeleton"
+        },
+        {
+          "what": "A short message after an action",
+          "goes_to": "toast-alert"
+        }
+      ],
+      "examples": [
+        "one line explaining an empty list and one action",
+        "a permission view with a request access button",
+        "a no results message under a search field"
+      ]
     },
     {
       "id": "loader-skeleton",
       "name": "Loader and skeleton",
-      "family": "feedback"
+      "name_ko": "로더·스켈레톤",
+      "family": "feedback",
+      "definition": "An indicator whose only job is to say that something is loading or running, and optionally how far along it is.",
+      "includes": [
+        "Skeleton shapes that mirror the layout",
+        "Spinners and progress bars",
+        "Background job indicators",
+        "First-visit splash loaders"
+      ],
+      "excludes": [
+        {
+          "what": "A list of named steps with states",
+          "goes_to": "timeline-stepper"
+        },
+        {
+          "what": "A meter showing a measured quantity",
+          "goes_to": "chart-kpi"
+        },
+        {
+          "what": "An agent describing its current action in a conversation",
+          "goes_to": "chat-ai"
+        }
+      ],
+      "examples": [
+        "pulse shapes shaped like a table",
+        "a thin upload progress bar",
+        "a small ring beside pending text"
+      ]
     },
     {
       "id": "modal-drawer",
-      "name": "Modal, drawer and menu",
-      "family": "feedback"
+      "name": "Overlay: dialog, drawer, popover and menu",
+      "name_ko": "오버레이",
+      "family": "feedback",
+      "definition": "A layer above the page that a person opens through a trigger and dismisses: dialogs, drawers, sheets, popovers, tooltips and menus.",
+      "includes": [
+        "Centered dialogs and confirmation dialogs",
+        "Blocking dialogs the system raises",
+        "Side drawers and bottom sheets",
+        "Popovers and tooltips",
+        "Dropdown and context menus of actions",
+        "Lightboxes"
+      ],
+      "excludes": [
+        {
+          "what": "Toasts that appear on their own and block nothing",
+          "goes_to": "toast-alert"
+        },
+        {
+          "what": "Mega menus that list global destinations",
+          "goes_to": "nav-header"
+        },
+        {
+          "what": "A keyboard command palette",
+          "goes_to": "command-palette"
+        },
+        {
+          "what": "A select or date field whose options open in a popover",
+          "goes_to": "form-input"
+        }
+      ],
+      "examples": [
+        "a confirm dialog that says what will be deleted",
+        "a sheet sliding in with row details",
+        "a definition tooltip beside a metric",
+        "a menu of actions from a more button"
+      ]
     },
     {
       "id": "chart-kpi",
       "name": "Chart and KPI",
-      "family": "data"
+      "name_ko": "차트·KPI",
+      "family": "data",
+      "definition": "Parts that turn measured numbers into marks or figures to read: charts, key figures, gauges and meters.",
+      "includes": [
+        "Line, bar, donut and funnel charts",
+        "Key figure tiles with a delta",
+        "Bands of sourced figures",
+        "Gauges, meters and rating displays",
+        "Heatmaps and relationship charts drawn from data"
+      ],
+      "excludes": [
+        {
+          "what": "Progress of a running job",
+          "goes_to": "loader-skeleton"
+        },
+        {
+          "what": "Rows of records with columns",
+          "goes_to": "table"
+        },
+        {
+          "what": "Values placed on a map",
+          "goes_to": "map"
+        },
+        {
+          "what": "A number that rolls up as an effect",
+          "goes_to": "motion-particle"
+        }
+      ],
+      "examples": [
+        "a figure with label, delta and source",
+        "bars ranked by value in one hue",
+        "a donut with the key value in the center"
+      ]
     },
     {
       "id": "table",
-      "name": "Table",
-      "family": "data"
+      "name": "Table and data grid",
+      "name_ko": "표·데이터 그리드",
+      "family": "data",
+      "definition": "Records in rows that share one set of columns with headers.",
+      "includes": [
+        "Read-only data tables",
+        "Sortable and filterable data grids",
+        "Tree tables",
+        "Comparison tables of records"
+      ],
+      "excludes": [
+        {
+          "what": "Plan comparison tables",
+          "goes_to": "pricing"
+        },
+        {
+          "what": "List rows that share no columns",
+          "goes_to": "card"
+        },
+        {
+          "what": "Charts",
+          "goes_to": "chart-kpi"
+        }
+      ],
+      "examples": [
+        "a table with right aligned figures and hairline rows",
+        "a grid with sortable headers and a sticky first column"
+      ]
     },
     {
       "id": "timeline-stepper",
-      "name": "Timeline and stepper",
-      "family": "data"
+      "name": "Timeline, stepper and calendar",
+      "name_ko": "타임라인·단계·캘린더",
+      "family": "data",
+      "definition": "Items or steps placed in time order or in a fixed sequence: timelines, steppers, wizards and calendars.",
+      "includes": [
+        "Dated event timelines and change logs",
+        "Steppers and stage progress",
+        "Multi-step wizards",
+        "Month and week calendars with events",
+        "Live step lists of a running process"
+      ],
+      "excludes": [
+        {
+          "what": "A how-it-works band on a page",
+          "goes_to": "feature-section"
+        },
+        {
+          "what": "A date field that picks one value",
+          "goes_to": "form-input"
+        },
+        {
+          "what": "A single loading indicator",
+          "goes_to": "loader-skeleton"
+        }
+      ],
+      "examples": [
+        "a dated change log with a thin spine",
+        "a row of stage dots",
+        "a month grid with event chips",
+        "a three step signup wizard"
+      ]
     },
     {
       "id": "map",
       "name": "Map",
-      "family": "data"
+      "name_ko": "지도",
+      "family": "data",
+      "definition": "Things positioned on a map of real places.",
+      "includes": [
+        "Maps with pins linked to a list",
+        "Regions shaded by value on a map",
+        "Location finders"
+      ],
+      "excludes": [
+        {
+          "what": "Diagrams of how parts connect",
+          "goes_to": "feature-section"
+        },
+        {
+          "what": "Charts without geography",
+          "goes_to": "chart-kpi"
+        }
+      ],
+      "examples": [
+        "a map whose pins filter a list",
+        "a world map shaded by region"
+      ]
     },
     {
       "id": "media-gallery",
       "name": "Media and gallery",
-      "family": "media"
+      "name_ko": "미디어·갤러리",
+      "family": "media",
+      "definition": "Images, video or audio that are the content, alone or as a collection to browse.",
+      "includes": [
+        "Image galleries and thumbnail strips",
+        "Carousels of media",
+        "Video and audio players",
+        "Before and after comparison sliders",
+        "Two versions of a text side by side"
+      ],
+      "excludes": [
+        {
+          "what": "A single item card with a caption",
+          "goes_to": "card"
+        },
+        {
+          "what": "Goods with prices",
+          "goes_to": "commerce"
+        },
+        {
+          "what": "A moving decorative backdrop",
+          "goes_to": "motion-particle"
+        }
+      ],
+      "examples": [
+        "a strip of thumbnails with a play overlay",
+        "a draggable divider over an original and an edit",
+        "a carousel where the center card is enlarged"
+      ]
     },
     {
       "id": "commerce",
       "name": "Commerce",
-      "family": "media"
+      "name_ko": "커머스",
+      "family": "media",
+      "definition": "Parts that show goods for sale or move them toward purchase.",
+      "includes": [
+        "Product tiles with a price",
+        "Product detail pages and option selectors",
+        "Carts, order summaries and checkout steps",
+        "Storefront home bands"
+      ],
+      "excludes": [
+        {
+          "what": "Subscription and service plans",
+          "goes_to": "pricing"
+        },
+        {
+          "what": "Media galleries without prices",
+          "goes_to": "media-gallery"
+        }
+      ],
+      "examples": [
+        "a product tile with name and price",
+        "an option selector for size and color",
+        "a cart with a free shipping line"
+      ]
     },
     {
       "id": "chat-ai",
       "name": "Chat and AI",
-      "family": "media"
+      "name_ko": "채팅·AI",
+      "family": "media",
+      "definition": "Parts that live inside a conversation with an AI assistant or agent.",
+      "includes": [
+        "Message threads and composers",
+        "Tool call lines",
+        "Agent status lines",
+        "Approval and question steps raised by the agent",
+        "Answers with sources"
+      ],
+      "excludes": [
+        {
+          "what": "A support contact form",
+          "goes_to": "form-input"
+        },
+        {
+          "what": "A generic loading spinner",
+          "goes_to": "loader-skeleton"
+        },
+        {
+          "what": "A keyboard command palette",
+          "goes_to": "command-palette"
+        }
+      ],
+      "examples": [
+        "a thread with agent replies as plain text",
+        "a collapsible line per tool call",
+        "an approval card the agent pauses on"
+      ]
     },
     {
       "id": "motion-particle",
-      "name": "Motion and particles",
-      "family": "motion"
+      "name": "Motion effect and particles",
+      "name_ko": "모션 효과·파티클",
+      "family": "motion",
+      "definition": "An effect that animates content which would be complete without it, or a moving decorative backdrop.",
+      "includes": [
+        "Scroll reveals",
+        "Marquee loops",
+        "Number roll-ups",
+        "Text effects such as typing, scrambling or word cycling",
+        "Moving point and line fields behind content"
+      ],
+      "excludes": [
+        {
+          "what": "Three-dimensional scenes",
+          "goes_to": "3d"
+        },
+        {
+          "what": "A loading indicator",
+          "goes_to": "loader-skeleton"
+        },
+        {
+          "what": "A static section background",
+          "goes_to": "layout-shell"
+        }
+      ],
+      "examples": [
+        "a fade-up on first entry",
+        "a seamless logo loop that pauses on hover",
+        "a figure that rolls to its value once"
+      ]
     },
     {
       "id": "3d",
       "name": "3D scene",
-      "family": "motion"
+      "name_ko": "3D 장면",
+      "family": "motion",
+      "definition": "A scene drawn with depth and a camera, whether it decorates a section or carries content.",
+      "includes": [
+        "WebGL scenes behind a hero",
+        "Globes and 3D graphs built from real data",
+        "3D product viewers"
+      ],
+      "excludes": [
+        {
+          "what": "Flat moving point fields",
+          "goes_to": "motion-particle"
+        },
+        {
+          "what": "Product photos",
+          "goes_to": "media-gallery"
+        }
+      ],
+      "examples": [
+        "a half globe rising from a container edge",
+        "a 3D graph built from real data"
+      ]
     }
   ],
   "uses": [
     {
       "id": "introduce-the-product",
       "name": "Introduce the product",
-      "question": "What is this and why should I care?"
+      "name_ko": "제품 소개",
+      "question": "What is this and why should I care?",
+      "definition": "Tell a first-time visitor what the product is and why it matters.",
+      "includes": [
+        "A headline with one supporting sentence",
+        "A first look at the real product"
+      ],
+      "excludes": [
+        {
+          "what": "Detail on one capability at a time",
+          "goes_to": "explain-features"
+        }
+      ],
+      "examples": [
+        "the opening headline of a landing page"
+      ]
     },
     {
       "id": "explain-features",
       "name": "Explain what it does",
-      "question": "What can it do for me?"
+      "name_ko": "기능 설명",
+      "question": "What can it do for me?",
+      "definition": "Show what the product can do, one capability at a time.",
+      "includes": [
+        "Capability explanations",
+        "Product screens per capability"
+      ],
+      "excludes": [
+        {
+          "what": "Differences between plans",
+          "goes_to": "compare-plans"
+        }
+      ],
+      "examples": [
+        "tabs that swap one frame between capabilities"
+      ]
     },
     {
       "id": "show-one-number",
       "name": "Show one number",
-      "question": "How big or how good is it right now?"
+      "name_ko": "숫자 하나 보이기",
+      "question": "How big or how good is it right now?",
+      "definition": "Make one current figure readable at a glance.",
+      "includes": [
+        "A key figure with label and delta",
+        "A figure with its source"
+      ],
+      "excludes": [
+        {
+          "what": "How a value changes over time",
+          "goes_to": "show-a-trend"
+        }
+      ],
+      "examples": [
+        "a monthly revenue figure with a delta"
+      ]
     },
     {
       "id": "show-a-trend",
       "name": "Show a trend",
-      "question": "How is it changing over time?"
+      "name_ko": "추세 보이기",
+      "question": "How is it changing over time?",
+      "definition": "Show how a value changes over time.",
+      "includes": [
+        "Line and area series",
+        "Sparklines"
+      ],
+      "excludes": [
+        {
+          "what": "A sequence of events",
+          "goes_to": "show-when-things-happen"
+        }
+      ],
+      "examples": [
+        "a weekly line chart"
+      ]
     },
     {
       "id": "compare-values",
       "name": "Compare values",
-      "question": "Which one is larger or better?"
+      "name_ko": "값 비교",
+      "question": "Which one is larger or better?",
+      "definition": "Show which of several items is larger or better.",
+      "includes": [
+        "Ranked bars",
+        "Values against a target"
+      ],
+      "excludes": [
+        {
+          "what": "Parts of one whole",
+          "goes_to": "show-composition"
+        }
+      ],
+      "examples": [
+        "bars ranked by value"
+      ]
     },
     {
       "id": "show-composition",
       "name": "Show what it is made of",
-      "question": "How does the whole split into parts?"
+      "name_ko": "구성 보이기",
+      "question": "How does the whole split into parts?",
+      "definition": "Show how a whole splits into parts.",
+      "includes": [
+        "Donuts and stacked bars",
+        "Treemaps and flows"
+      ],
+      "excludes": [
+        {
+          "what": "A ranking of separate items",
+          "goes_to": "compare-values"
+        }
+      ],
+      "examples": [
+        "a donut of traffic sources"
+      ]
     },
     {
       "id": "show-drop-off",
       "name": "Show where people drop off",
-      "question": "Where do people leave the process?"
+      "name_ko": "이탈 지점 보이기",
+      "question": "Where do people leave the process?",
+      "definition": "Show where people leave a multi-stage process.",
+      "includes": [
+        "Funnels",
+        "Stage by stage conversion"
+      ],
+      "excludes": [
+        {
+          "what": "Leading a person through steps",
+          "goes_to": "guide-through-steps"
+        }
+      ],
+      "examples": [
+        "a funnel from visit to purchase"
+      ]
     },
     {
       "id": "show-relationships",
       "name": "Show how things relate",
-      "question": "How are these things connected, or where are they?"
+      "name_ko": "관계 보이기",
+      "question": "How are these things connected, or where are they?",
+      "definition": "Show how things connect to each other or where they are.",
+      "includes": [
+        "Node diagrams",
+        "Maps and scatter plots"
+      ],
+      "excludes": [
+        {
+          "what": "A ranking of values",
+          "goes_to": "compare-values"
+        }
+      ],
+      "examples": [
+        "pins on a map",
+        "a node diagram of integrations"
+      ]
     },
     {
       "id": "compare-plans",
       "name": "Compare plans",
-      "question": "Which plan fits me?"
+      "name_ko": "요금제 비교",
+      "question": "Which plan fits me?",
+      "definition": "Help a person choose one plan.",
+      "includes": [
+        "Plan cards",
+        "Plan comparison tables"
+      ],
+      "excludes": [
+        {
+          "what": "Comparing records or values",
+          "goes_to": "compare-values"
+        }
+      ],
+      "examples": [
+        "plan cards with a yearly toggle"
+      ]
     },
     {
       "id": "compare-versions",
       "name": "Compare versions",
-      "question": "What changed between these two?"
+      "name_ko": "버전 비교",
+      "question": "What changed between these two?",
+      "definition": "Show what changed between two versions of the same thing.",
+      "includes": [
+        "Before and after sliders",
+        "Text diffs"
+      ],
+      "excludes": [
+        {
+          "what": "Choosing between plans",
+          "goes_to": "compare-plans"
+        }
+      ],
+      "examples": [
+        "a slider over an original and an edit"
+      ]
     },
     {
       "id": "prove-trust",
       "name": "Prove trust",
-      "question": "Why should I believe this?"
+      "name_ko": "신뢰 증명",
+      "question": "Why should I believe this?",
+      "definition": "Give evidence that the claims on the page are true.",
+      "includes": [
+        "Attributed quotes",
+        "Real customer logos and sourced figures"
+      ],
+      "excludes": [
+        {
+          "what": "Explaining what the product does",
+          "goes_to": "explain-features"
+        }
+      ],
+      "examples": [
+        "a quote with a named person and a measured result"
+      ]
     },
     {
       "id": "answer-questions",
       "name": "Answer common questions",
-      "question": "What do people usually ask?"
+      "name_ko": "자주 묻는 질문 답하기",
+      "question": "What do people usually ask?",
+      "definition": "Answer the questions people usually ask before they decide.",
+      "includes": [
+        "Question lists",
+        "Accordions of answers"
+      ],
+      "excludes": [
+        {
+          "what": "Explaining one term in place",
+          "goes_to": "explain-on-demand"
+        }
+      ],
+      "examples": [
+        "an accordion of questions"
+      ]
     },
     {
       "id": "ask-for-action",
       "name": "Ask for the next step",
-      "question": "What should I do next?"
+      "name_ko": "다음 행동 요청",
+      "question": "What should I do next?",
+      "definition": "Ask for the next step.",
+      "includes": [
+        "Closing bands",
+        "Entry splits by audience"
+      ],
+      "excludes": [
+        {
+          "what": "Collecting contact details",
+          "goes_to": "capture-contact"
+        }
+      ],
+      "examples": [
+        "a closing band with one button"
+      ]
     },
     {
       "id": "capture-contact",
       "name": "Capture contact details",
-      "question": "How do I get in touch or sign up for updates?"
+      "name_ko": "연락처 받기",
+      "question": "How do I get in touch or sign up for updates?",
+      "definition": "Collect contact details to follow up or send updates.",
+      "includes": [
+        "Email capture",
+        "Short contact forms"
+      ],
+      "excludes": [
+        {
+          "what": "Getting into an account",
+          "goes_to": "sign-in-or-sign-up"
+        }
+      ],
+      "examples": [
+        "one email field and one button"
+      ]
     },
     {
       "id": "sign-in-or-sign-up",
       "name": "Sign in or sign up",
-      "question": "How do I get into my account?"
+      "name_ko": "로그인·가입",
+      "question": "How do I get into my account?",
+      "definition": "Let a person get into an account or create one.",
+      "includes": [
+        "Sign in forms",
+        "Sign up forms"
+      ],
+      "excludes": [
+        {
+          "what": "Collecting a lead",
+          "goes_to": "capture-contact"
+        }
+      ],
+      "examples": [
+        "email and password fields with a provider button"
+      ]
     },
     {
       "id": "guide-through-steps",
       "name": "Guide through steps",
-      "question": "What are the steps and where am I?"
+      "name_ko": "단계 안내",
+      "question": "What are the steps and where am I?",
+      "definition": "Lead a person through ordered steps and show where they are.",
+      "includes": [
+        "Wizards",
+        "Steppers"
+      ],
+      "excludes": [
+        {
+          "what": "Waiting on a running job",
+          "goes_to": "show-progress"
+        }
+      ],
+      "examples": [
+        "a signup wizard with a step row"
+      ]
     },
     {
       "id": "show-progress",
       "name": "Show progress",
-      "question": "Is it working, and how far along is it?"
+      "name_ko": "진행 표시",
+      "question": "Is it working, and how far along is it?",
+      "definition": "Show that work is running and how far along it is.",
+      "includes": [
+        "Progress bars and spinners",
+        "Live step lists"
+      ],
+      "excludes": [
+        {
+          "what": "Ordered steps the person completes",
+          "goes_to": "guide-through-steps"
+        }
+      ],
+      "examples": [
+        "an upload progress bar"
+      ]
     },
     {
       "id": "label-a-state",
       "name": "Label a state",
-      "question": "What is the status of this thing?"
+      "name_ko": "상태 표시",
+      "question": "What is the status of this thing?",
+      "definition": "Name the status of an item.",
+      "includes": [
+        "Status labels",
+        "Data honesty labels"
+      ],
+      "excludes": [
+        {
+          "what": "Telling about an event",
+          "goes_to": "notify-the-user"
+        }
+      ],
+      "examples": [
+        "a status label on a row"
+      ]
     },
     {
       "id": "notify-the-user",
       "name": "Notify the user",
-      "question": "What just happened, or what needs my attention?"
+      "name_ko": "알리기",
+      "question": "What just happened, or what needs my attention?",
+      "definition": "Tell a person what just happened or what needs attention.",
+      "includes": [
+        "Toasts",
+        "Alerts and banners"
+      ],
+      "excludes": [
+        {
+          "what": "A persistent status of an item",
+          "goes_to": "label-a-state"
+        }
+      ],
+      "examples": [
+        "a saved toast with undo"
+      ]
     },
     {
       "id": "confirm-an-action",
       "name": "Confirm an action",
-      "question": "Am I sure I want to do this?"
+      "name_ko": "행동 확인",
+      "question": "Am I sure I want to do this?",
+      "definition": "Make a person confirm an action before it runs.",
+      "includes": [
+        "Confirmation dialogs",
+        "Approval steps"
+      ],
+      "excludes": [
+        {
+          "what": "Starting the action itself",
+          "goes_to": "start-an-action"
+        }
+      ],
+      "examples": [
+        "a delete dialog that asks for the name"
+      ]
     },
     {
       "id": "explain-on-demand",
       "name": "Explain on demand",
-      "question": "What does this term or number mean?"
+      "name_ko": "필요할 때 설명",
+      "question": "What does this term or number mean?",
+      "definition": "Explain a term, figure or control when the person asks.",
+      "includes": [
+        "Tooltips",
+        "Definition popovers"
+      ],
+      "excludes": [
+        {
+          "what": "Showing a whole item in more detail",
+          "goes_to": "show-details-on-demand"
+        }
+      ],
+      "examples": [
+        "an info tooltip beside a metric"
+      ]
     },
     {
       "id": "show-details-on-demand",
       "name": "Show details on demand",
-      "question": "Show me more about this item."
+      "name_ko": "필요할 때 상세 보기",
+      "question": "Show me more about this item.",
+      "definition": "Open more about one item without leaving the screen.",
+      "includes": [
+        "Side sheets",
+        "Dialogs and lightboxes"
+      ],
+      "excludes": [
+        {
+          "what": "Defining one term",
+          "goes_to": "explain-on-demand"
+        }
+      ],
+      "examples": [
+        "a side sheet with row details"
+      ]
     },
     {
       "id": "navigate-the-site",
       "name": "Navigate the site",
-      "question": "Where can I go on this site?"
+      "name_ko": "사이트 이동",
+      "question": "Where can I go on this site?",
+      "definition": "Move between pages of a website.",
+      "includes": [
+        "Site headers",
+        "Footers"
+      ],
+      "excludes": [
+        {
+          "what": "Moving between areas of an app",
+          "goes_to": "navigate-the-app"
+        }
+      ],
+      "examples": [
+        "a header with page links"
+      ]
     },
     {
       "id": "navigate-the-app",
       "name": "Navigate the app",
-      "question": "Where am I in the product and where else can I go?"
+      "name_ko": "앱 이동",
+      "question": "Where am I in the product and where else can I go?",
+      "definition": "Move between areas of a product and know where you are.",
+      "includes": [
+        "Sidebars and app bars",
+        "Bottom tab bars"
+      ],
+      "excludes": [
+        {
+          "what": "Pages of a website",
+          "goes_to": "navigate-the-site"
+        }
+      ],
+      "examples": [
+        "a grouped sidebar menu"
+      ]
     },
     {
       "id": "jump-anywhere",
       "name": "Jump anywhere fast",
-      "question": "Take me straight to that place or command."
+      "name_ko": "바로 이동",
+      "question": "Take me straight to that place or command.",
+      "definition": "Go straight to a place or command by typing.",
+      "includes": [
+        "Command palettes",
+        "Search with jump results"
+      ],
+      "excludes": [
+        {
+          "what": "Narrowing a list in place",
+          "goes_to": "filter-and-search"
+        }
+      ],
+      "examples": [
+        "a command palette"
+      ]
     },
     {
       "id": "switch-views",
       "name": "Switch views",
-      "question": "Show me another view or setting of the same thing."
+      "name_ko": "보기 전환",
+      "question": "Show me another view or setting of the same thing.",
+      "definition": "Show another view or setting of the same content.",
+      "includes": [
+        "Tabs and segmented controls",
+        "Theme switches"
+      ],
+      "excludes": [
+        {
+          "what": "Going to another place",
+          "goes_to": "navigate-the-app"
+        }
+      ],
+      "examples": [
+        "tabs above a panel"
+      ]
     },
     {
       "id": "browse-records",
       "name": "Browse many records",
-      "question": "How do I scan, sort and page through rows?"
+      "name_ko": "레코드 탐색",
+      "question": "How do I scan, sort and page through rows?",
+      "definition": "Scan, sort and page through many records.",
+      "includes": [
+        "Tables and data grids",
+        "List rows"
+      ],
+      "excludes": [
+        {
+          "what": "Narrowing records down",
+          "goes_to": "filter-and-search"
+        }
+      ],
+      "examples": [
+        "a sortable table"
+      ]
     },
     {
       "id": "filter-and-search",
       "name": "Filter and search",
-      "question": "How do I narrow this down?"
+      "name_ko": "필터·검색",
+      "question": "How do I narrow this down?",
+      "definition": "Narrow a set of items down to the ones that matter.",
+      "includes": [
+        "Filter chips and selects",
+        "Search fields"
+      ],
+      "excludes": [
+        {
+          "what": "Going to a place by name",
+          "goes_to": "jump-anywhere"
+        }
+      ],
+      "examples": [
+        "filter chips above a list"
+      ]
     },
     {
       "id": "enter-data",
       "name": "Enter or pick a value",
-      "question": "Where do I type or choose something?"
+      "name_ko": "값 입력",
+      "question": "Where do I type or choose something?",
+      "definition": "Type or pick a value.",
+      "includes": [
+        "Fields and selects",
+        "Pickers and toggles"
+      ],
+      "excludes": [
+        {
+          "what": "Running an action",
+          "goes_to": "start-an-action"
+        }
+      ],
+      "examples": [
+        "a date field"
+      ]
     },
     {
       "id": "start-an-action",
       "name": "Start an action",
-      "question": "How do I do the thing?"
+      "name_ko": "행동 시작",
+      "question": "How do I do the thing?",
+      "definition": "Run the thing the screen is for.",
+      "includes": [
+        "Buttons",
+        "Action menus"
+      ],
+      "excludes": [
+        {
+          "what": "Confirming a risky action",
+          "goes_to": "confirm-an-action"
+        }
+      ],
+      "examples": [
+        "a primary button"
+      ]
     },
     {
       "id": "handle-no-data",
       "name": "Handle nothing to show",
-      "question": "What if there is no data, or something failed?"
+      "name_ko": "데이터 없음 처리",
+      "question": "What if there is no data, or something failed?",
+      "definition": "Say what to do when there is nothing to show or something failed.",
+      "includes": [
+        "Empty states",
+        "Error states"
+      ],
+      "excludes": [
+        {
+          "what": "Waiting for data to arrive",
+          "goes_to": "show-progress"
+        }
+      ],
+      "examples": [
+        "an empty list with one action"
+      ]
     },
     {
       "id": "browse-media",
       "name": "Browse media",
-      "question": "How do I look through images, video or results?"
+      "name_ko": "미디어 탐색",
+      "question": "How do I look through images, video or results?",
+      "definition": "Look through images, video or results.",
+      "includes": [
+        "Galleries and strips",
+        "Carousels"
+      ],
+      "excludes": [
+        {
+          "what": "Browsing records with fields",
+          "goes_to": "browse-records"
+        }
+      ],
+      "examples": [
+        "a thumbnail strip"
+      ]
     },
     {
       "id": "sell-a-product",
       "name": "Sell a product",
-      "question": "How do I see a product and buy it?"
+      "name_ko": "상품 판매",
+      "question": "How do I see a product and buy it?",
+      "definition": "Show a product and let a person buy it.",
+      "includes": [
+        "Storefront and product pages",
+        "Carts and checkout"
+      ],
+      "excludes": [
+        {
+          "what": "Choosing a subscription plan",
+          "goes_to": "compare-plans"
+        }
+      ],
+      "examples": [
+        "a product detail page"
+      ]
     },
     {
       "id": "ask-the-assistant",
       "name": "Ask the assistant",
-      "question": "How do I talk to the AI and read its answer?"
+      "name_ko": "AI에게 묻기",
+      "question": "How do I talk to the AI and read its answer?",
+      "definition": "Talk to an AI assistant and read its answer.",
+      "includes": [
+        "Chat threads",
+        "Answers with sources"
+      ],
+      "excludes": [
+        {
+          "what": "Searching a list",
+          "goes_to": "filter-and-search"
+        }
+      ],
+      "examples": [
+        "a chat thread with a composer"
+      ]
     },
     {
       "id": "set-the-mood",
       "name": "Set the mood",
-      "question": "How do I give the page atmosphere without clutter?"
+      "name_ko": "분위기 만들기",
+      "question": "How do I give the page atmosphere without clutter?",
+      "definition": "Give a page atmosphere without adding information.",
+      "includes": [
+        "Calm backdrops",
+        "Restrained motion"
+      ],
+      "excludes": [
+        {
+          "what": "Making one line land",
+          "goes_to": "emphasize-text"
+        }
+      ],
+      "examples": [
+        "a slow moving point field"
+      ]
     },
     {
       "id": "emphasize-text",
       "name": "Make a phrase land",
-      "question": "How do I draw attention to a line of text?"
+      "name_ko": "문장 강조",
+      "question": "How do I draw attention to a line of text?",
+      "definition": "Make one line of text land.",
+      "includes": [
+        "Headline lockups",
+        "Pull quotes"
+      ],
+      "excludes": [
+        {
+          "what": "Atmosphere for the whole page",
+          "goes_to": "set-the-mood"
+        }
+      ],
+      "examples": [
+        "a pull quote"
+      ]
     },
     {
       "id": "organize-the-page",
       "name": "Organize the page",
-      "question": "How is the page laid out and its content grouped?"
+      "name_ko": "페이지 구성",
+      "question": "How is the page laid out and its content grouped?",
+      "definition": "Lay out the page and group its content.",
+      "includes": [
+        "Shells, zones and section order",
+        "Spacing and dividers"
+      ],
+      "excludes": [
+        {
+          "what": "Values shared by every part",
+          "goes_to": "set-the-visual-foundation"
+        }
+      ],
+      "examples": [
+        "wider spacing between unrelated groups"
+      ]
     },
     {
       "id": "read-long-text",
       "name": "Read long text",
-      "question": "How do I read an article or a policy comfortably?"
+      "name_ko": "긴 글 읽기",
+      "question": "How do I read an article or a policy comfortably?",
+      "definition": "Read an article or a policy comfortably.",
+      "includes": [
+        "Reading columns",
+        "Line breaking and line height"
+      ],
+      "excludes": [
+        {
+          "what": "Making one line land",
+          "goes_to": "emphasize-text"
+        }
+      ],
+      "examples": [
+        "a reading column"
+      ]
     },
     {
       "id": "set-the-visual-foundation",
       "name": "Set the visual foundation",
-      "question": "Which tokens, type, icons and marks does everything share?"
+      "name_ko": "시각 기반 정하기",
+      "question": "Which tokens, type, icons and marks does everything share?",
+      "definition": "Choose the tokens, type, icons and marks everything shares.",
+      "includes": [
+        "Token themes",
+        "Icon sets and logos"
+      ],
+      "excludes": [
+        {
+          "what": "Placing regions on the page",
+          "goes_to": "organize-the-page"
+        }
+      ],
+      "examples": [
+        "a token theme with light and dark sets"
+      ]
     },
     {
       "id": "show-when-things-happen",
       "name": "Show when things happen",
-      "question": "What happened or is scheduled, and in what order?"
+      "name_ko": "시점 보이기",
+      "question": "What happened or is scheduled, and in what order?",
+      "definition": "Show what happened or is scheduled, in order.",
+      "includes": [
+        "Timelines and change logs",
+        "Calendars"
+      ],
+      "excludes": [
+        {
+          "what": "How a value changes over time",
+          "goes_to": "show-a-trend"
+        }
+      ],
+      "examples": [
+        "a change log"
+      ]
     }
   ],
   "surfaces": [
     {
       "id": "landing",
-      "name": "Marketing landing page"
+      "name": "Marketing landing page",
+      "name_ko": "마케팅 랜딩",
+      "definition": "A public page that introduces a product or offer to a visitor and asks for one action.",
+      "includes": [
+        "Home and product pages",
+        "Campaign and launch pages",
+        "Pricing pages"
+      ],
+      "excludes": [
+        {
+          "what": "Pages that sell goods with a cart",
+          "goes_to": "commerce"
+        },
+        {
+          "what": "Long articles and documents",
+          "goes_to": "editorial"
+        }
+      ],
+      "examples": [
+        "a product home page",
+        "a launch page for one feature"
+      ]
     },
     {
       "id": "dashboard",
-      "name": "Dashboard and analytics"
+      "name": "Dashboard and analytics",
+      "name_ko": "대시보드",
+      "definition": "A screen that monitors figures and trends for a person who returns to it often.",
+      "includes": [
+        "Analytics overviews",
+        "Monitoring and report screens"
+      ],
+      "excludes": [
+        {
+          "what": "Screens for doing tasks on records",
+          "goes_to": "app"
+        }
+      ],
+      "examples": [
+        "a weekly metrics overview"
+      ]
     },
     {
       "id": "app",
-      "name": "Product app and tools"
+      "name": "Product app and tools",
+      "name_ko": "제품 앱",
+      "definition": "A signed-in product screen where a person creates, edits or manages things.",
+      "includes": [
+        "Lists, editors and settings",
+        "Tools and admin screens"
+      ],
+      "excludes": [
+        {
+          "what": "Screens that mostly watch figures",
+          "goes_to": "dashboard"
+        },
+        {
+          "what": "A conversation with an assistant",
+          "goes_to": "ai-chat"
+        }
+      ],
+      "examples": [
+        "a project list with row actions",
+        "a settings page"
+      ]
     },
     {
       "id": "commerce",
-      "name": "Store and product pages"
+      "name": "Store and product pages",
+      "name_ko": "스토어·상품",
+      "definition": "Pages that show goods for sale and take an order.",
+      "includes": [
+        "Storefront homes",
+        "Product detail pages",
+        "Cart and checkout"
+      ],
+      "excludes": [
+        {
+          "what": "Subscription pricing for software",
+          "goes_to": "landing"
+        }
+      ],
+      "examples": [
+        "a product detail page with options"
+      ]
     },
     {
       "id": "editorial",
-      "name": "Articles, documents and papers"
+      "name": "Articles, documents and papers",
+      "name_ko": "아티클·문서",
+      "definition": "Pages made to be read: articles, documents, reports and policies.",
+      "includes": [
+        "Articles and blog posts",
+        "Reports and papers",
+        "Policy pages"
+      ],
+      "excludes": [
+        {
+          "what": "Pages that ask for one action",
+          "goes_to": "landing"
+        }
+      ],
+      "examples": [
+        "a long article",
+        "a printed report sheet"
+      ]
     },
     {
       "id": "auth-onboarding",
-      "name": "Sign in and onboarding"
+      "name": "Sign in and onboarding",
+      "name_ko": "로그인·온보딩",
+      "definition": "Screens that get a person into an account and through their first steps.",
+      "includes": [
+        "Sign in and sign up",
+        "Onboarding wizards"
+      ],
+      "excludes": [
+        {
+          "what": "The product screens after onboarding",
+          "goes_to": "app"
+        }
+      ],
+      "examples": [
+        "a sign in page",
+        "a three step setup wizard"
+      ]
     },
     {
       "id": "ai-chat",
-      "name": "AI chat and agent"
+      "name": "AI chat and agent",
+      "name_ko": "AI 채팅·에이전트",
+      "definition": "Screens where a person works with an AI assistant or agent in a conversation.",
+      "includes": [
+        "Chat threads",
+        "Agent runs with tool calls and approvals"
+      ],
+      "excludes": [
+        {
+          "what": "Product screens without a conversation",
+          "goes_to": "app"
+        }
+      ],
+      "examples": [
+        "an agent thread with tool calls"
+      ]
     },
     {
       "id": "developer-docs",
-      "name": "Language and developer tool site"
+      "name": "Language and developer tool site",
+      "name_ko": "언어·개발 도구 사이트",
+      "definition": "Sites for a programming language, library or developer tool, where a visitor moves between the landing page, guides, the reference and a playground in one sitting.",
+      "includes": [
+        "Language and library home pages",
+        "Guides and API reference",
+        "In-browser playgrounds"
+      ],
+      "excludes": [
+        {
+          "what": "One article or report read on its own",
+          "goes_to": "editorial"
+        },
+        {
+          "what": "A signed-in developer console with projects and settings",
+          "goes_to": "app"
+        }
+      ],
+      "examples": [
+        "a language site with a playground",
+        "an API reference page"
+      ]
     }
   ],
+  "axes": [
+    {
+      "id": "density",
+      "name": "Density",
+      "name_ko": "밀도",
+      "definition": "How much fits in one view: spacing between and inside groups, control height and body line height.",
+      "anchors": {
+        "0": "Spacious: wide gaps between sections and inside cards, tall controls, relaxed line height.",
+        "1": "Compact: tight gaps, 32px controls on wide screens, body line height near 1.4; data screens only.",
+        "0.5": "Regular: the shipped 4px grid, 36px controls, body line height 1.5."
+      },
+      "drives": [
+        "--sp-1",
+        "--sp-2",
+        "--sp-3",
+        "--sp-4",
+        "--sp-5",
+        "--sp-6",
+        "--sp-8",
+        "--sp-12",
+        "--sp-16",
+        "--control-sm",
+        "--control-md",
+        "--lh-normal",
+        "--lh-snug"
+      ],
+      "default": 0.5,
+      "rationale": "The first thing a builder decides between a marketing page and a data screen. --control-touch is not driven, so touch targets stay 44px (RSP-06)."
+    },
+    {
+      "id": "contrast",
+      "name": "Contrast",
+      "name_ko": "대비",
+      "definition": "How far text, muted text and surfaces step apart in lightness.",
+      "anchors": {
+        "0": "Washed out: muted text under 4.5:1 and surfaces barely step. Never allowed, see the contrast floor.",
+        "1": "Maximum: muted text close to body text, surfaces and sunken areas clearly stepped.",
+        "0.5": "Standard: muted text well above 4.5:1, surfaces step by a small tone."
+      },
+      "drives": [
+        "--muted-foreground",
+        "--text-subtle",
+        "--muted",
+        "--secondary"
+      ],
+      "default": 0.5,
+      "rationale": "Separation by tone is the alternative to borders and shadows, and its floor is an accessibility line, not a taste."
+    },
+    {
+      "id": "roundness",
+      "name": "Roundness",
+      "name_ko": "둥글기",
+      "definition": "Corner radius of containers and controls, from one base value scaled by element size.",
+      "anchors": {
+        "0": "Square corners on every container and control.",
+        "1": "Pillow: about 20px or more on cards; full pills only on small controls.",
+        "0.5": "Soft: about 8 to 10px on cards, smaller on controls."
+      },
+      "drives": [
+        "--radius",
+        "--r-sm",
+        "--r-md",
+        "--r-card",
+        "--r-xl",
+        "--r-2xl",
+        "--r-3xl",
+        "--r-4xl"
+      ],
+      "default": 0.5,
+      "rationale": "Radius is the most visible single value of a brand tone. --r-pill is not driven, pills stay pills."
+    },
+    {
+      "id": "type-expression",
+      "name": "Type expression",
+      "name_ko": "타입 표현",
+      "definition": "How loud the type is: the heading face and how far display sizes rise above body text.",
+      "anchors": {
+        "0": "Quiet: one neutral face, display about 1.6 times body, small weight steps.",
+        "1": "Poster: an expressive display face, display four times body or more, tight leading on headlines.",
+        "0.5": "Branded: a chosen face for headings, display about 2.5 times body."
+      },
+      "drives": [
+        "--font",
+        "--t-display",
+        "--t-h1",
+        "--t-h2",
+        "--t-title",
+        "--lh-tight",
+        "--w-semi"
+      ],
+      "default": 0.5,
+      "rationale": "Body and small sizes (--t-body, --t-sm, --t-xs, --t-micro) are not driven: they are readability floors (KO-11), not tone."
+    },
+    {
+      "id": "color-restraint",
+      "name": "Color restraint",
+      "name_ko": "색 절제",
+      "definition": "How few hues the interface uses outside real outcomes; higher means more restraint.",
+      "anchors": {
+        "0": "Rainbow: every box, badge and series in its own hue. Never allowed, see the restraint floor.",
+        "1": "Achromatic: neutral surfaces and one brand slot, semantic colors only for real outcomes.",
+        "0.5": "Two hues: the brand hue plus one secondary highlight, semantic colors for outcomes."
+      },
+      "drives": [
+        "--brand",
+        "--highlight",
+        "--accent-soft",
+        "--chart-1",
+        "--chart-2",
+        "--chart-3",
+        "--chart-4",
+        "--chart-5",
+        "--chart-6",
+        "--success-soft",
+        "--warning-soft",
+        "--danger-soft"
+      ],
+      "default": 1,
+      "rationale": "Named as restraint, not saturation, because the slop tell is the count of hues, not their strength."
+    },
+    {
+      "id": "elevation",
+      "name": "Elevation",
+      "name_ko": "깊이",
+      "definition": "How much surfaces rise above the page: shadow depth, raised surface tone and the scrim behind overlays.",
+      "anchors": {
+        "0": "Flat: surfaces separated by tone and borders only, no shadow.",
+        "1": "Layered: clear shadows on every raised surface and a dense scrim behind overlays.",
+        "0.5": "Raised: a small shadow on cards and a larger one on floating layers."
+      },
+      "drives": [
+        "--sh-card",
+        "--sh-pop",
+        "--card",
+        "--popover",
+        "--scrim"
+      ],
+      "default": 0.25,
+      "rationale": "Depth is how a surface claims attention; it is coupled to radius, borders and hue below."
+    },
+    {
+      "id": "motion",
+      "name": "Motion",
+      "name_ko": "모션",
+      "definition": "How much and how long things move: durations, entrance offset and scale, stagger and crossfade blur.",
+      "anchors": {
+        "0": "Still: state changes are instant, only opacity and color fade.",
+        "1": "Expressive: entrance and scroll-linked motion on landing bands, overlays near 400ms.",
+        "0.5": "Standard: UI feedback under 300ms with ease-out, no entrance animation on blocks."
+      },
+      "drives": [
+        "--dur-press",
+        "--dur-tooltip",
+        "--dur-dropdown",
+        "--dur-modal",
+        "--stagger-step",
+        "--press-scale",
+        "--enter-scale",
+        "--enter-offset",
+        "--blur-mask"
+      ],
+      "default": 0.5,
+      "rationale": "Easing curves are not driven: their shapes are fixed by the motion rules, only amount and length move. prefers-reduced-motion still overrides every value."
+    },
+    {
+      "id": "stroke",
+      "name": "Stroke",
+      "name_ko": "선 굵기",
+      "definition": "How visible lines are: border opacity and weight on containers and fields, and the icon stroke.",
+      "anchors": {
+        "0": "None: no borders, surfaces separated by tone steps; icons at 1.5 units.",
+        "1": "Heavy: clearly visible borders and icons at 2 units.",
+        "0.5": "Light: one pixel borders at low opacity on containers and fields."
+      },
+      "drives": [
+        "--border",
+        "--border-soft",
+        "--input",
+        "--icon-stroke"
+      ],
+      "default": 0.25,
+      "rationale": "Replaces the suggested ornament axis. Ornament has no token in tokens.css, and Taster treats decoration (blobs, glows, gradient text) as a rule to pass, not a dial to turn: a dial for it would make slop a setting. Line weight is the real, token-backed part of a decorative tone."
+    }
+  ],
+  "snap": {
+    "density": {
+      "steps": [
+        0,
+        0.25,
+        0.5,
+        0.75,
+        1
+      ],
+      "names": [
+        "spacious",
+        "airy",
+        "regular",
+        "snug",
+        "compact"
+      ]
+    },
+    "contrast": {
+      "steps": [
+        0.25,
+        0.5,
+        0.75,
+        1
+      ],
+      "names": [
+        "minimum",
+        "standard",
+        "crisp",
+        "maximum"
+      ]
+    },
+    "roundness": {
+      "steps": [
+        0,
+        0.25,
+        0.5,
+        0.75,
+        1
+      ],
+      "names": [
+        "square",
+        "crisp",
+        "soft",
+        "round",
+        "pillow"
+      ]
+    },
+    "type-expression": {
+      "steps": [
+        0,
+        0.25,
+        0.5,
+        0.75,
+        1
+      ],
+      "names": [
+        "quiet",
+        "plain",
+        "branded",
+        "display",
+        "poster"
+      ]
+    },
+    "color-restraint": {
+      "steps": [
+        0.5,
+        0.75,
+        1
+      ],
+      "names": [
+        "two-hue",
+        "one-hue",
+        "achromatic"
+      ]
+    },
+    "elevation": {
+      "steps": [
+        0,
+        0.25,
+        0.5,
+        0.75,
+        1
+      ],
+      "names": [
+        "flat",
+        "lifted",
+        "raised",
+        "floating",
+        "layered"
+      ]
+    },
+    "motion": {
+      "steps": [
+        0,
+        0.25,
+        0.5,
+        0.75,
+        1
+      ],
+      "names": [
+        "still",
+        "minimal",
+        "standard",
+        "lively",
+        "expressive"
+      ]
+    },
+    "stroke": {
+      "steps": [
+        0,
+        0.25,
+        0.5,
+        0.75,
+        1
+      ],
+      "names": [
+        "none",
+        "hairline",
+        "light",
+        "medium",
+        "heavy"
+      ]
+    }
+  },
+  "relevance": {
+    "hero": {
+      "density": 0.25,
+      "contrast": 0.75,
+      "roundness": 0.5,
+      "type-expression": 1,
+      "color-restraint": 0.75,
+      "elevation": 0.25,
+      "motion": 0.75,
+      "stroke": 0.25
+    },
+    "feature-section": {
+      "density": 0.5,
+      "contrast": 0.5,
+      "roundness": 0.5,
+      "type-expression": 0.75,
+      "color-restraint": 0.5,
+      "elevation": 0.25,
+      "motion": 0.5,
+      "stroke": 0.5
+    },
+    "pricing": {
+      "density": 0.5,
+      "contrast": 0.75,
+      "roundness": 0.5,
+      "type-expression": 0.5,
+      "color-restraint": 0.75,
+      "elevation": 0.5,
+      "motion": 0.25,
+      "stroke": 0.75
+    },
+    "cta": {
+      "density": 0.25,
+      "contrast": 0.75,
+      "roundness": 0.5,
+      "type-expression": 0.75,
+      "color-restraint": 0.75,
+      "elevation": 0.25,
+      "motion": 0.25,
+      "stroke": 0.25
+    },
+    "testimonial": {
+      "density": 0.25,
+      "contrast": 0.5,
+      "roundness": 0.25,
+      "type-expression": 0.75,
+      "color-restraint": 0.5,
+      "elevation": 0.25,
+      "motion": 0.25,
+      "stroke": 0.25
+    },
+    "faq": {
+      "density": 0.5,
+      "contrast": 0.5,
+      "roundness": 0.25,
+      "type-expression": 0.25,
+      "color-restraint": 0.25,
+      "elevation": 0,
+      "motion": 0.5,
+      "stroke": 0.75
+    },
+    "nav-header": {
+      "density": 0.75,
+      "contrast": 0.5,
+      "roundness": 0.25,
+      "type-expression": 0.25,
+      "color-restraint": 0.5,
+      "elevation": 0.5,
+      "motion": 0.25,
+      "stroke": 0.75
+    },
+    "footer": {
+      "density": 0.5,
+      "contrast": 0.5,
+      "roundness": 0,
+      "type-expression": 0.25,
+      "color-restraint": 0.25,
+      "elevation": 0,
+      "motion": 0,
+      "stroke": 0.5
+    },
+    "sidebar": {
+      "density": 1,
+      "contrast": 0.75,
+      "roundness": 0.5,
+      "type-expression": 0.25,
+      "color-restraint": 0.5,
+      "elevation": 0.25,
+      "motion": 0.5,
+      "stroke": 0.5
+    },
+    "command-palette": {
+      "density": 0.75,
+      "contrast": 0.75,
+      "roundness": 0.75,
+      "type-expression": 0.25,
+      "color-restraint": 0.25,
+      "elevation": 1,
+      "motion": 0.75,
+      "stroke": 0.5
+    },
+    "tabs-segmented": {
+      "density": 0.75,
+      "contrast": 0.75,
+      "roundness": 0.75,
+      "type-expression": 0.25,
+      "color-restraint": 0.5,
+      "elevation": 0.25,
+      "motion": 0.75,
+      "stroke": 0.5
+    },
+    "layout-shell": {
+      "density": 1,
+      "contrast": 0.5,
+      "roundness": 0.25,
+      "type-expression": 0.25,
+      "color-restraint": 0.25,
+      "elevation": 0.25,
+      "motion": 0.25,
+      "stroke": 0.75
+    },
+    "card": {
+      "density": 0.75,
+      "contrast": 0.75,
+      "roundness": 1,
+      "type-expression": 0.25,
+      "color-restraint": 0.5,
+      "elevation": 1,
+      "motion": 0.25,
+      "stroke": 1
+    },
+    "typography": {
+      "density": 0.75,
+      "contrast": 1,
+      "roundness": 0,
+      "type-expression": 1,
+      "color-restraint": 0.5,
+      "elevation": 0,
+      "motion": 0.25,
+      "stroke": 0
+    },
+    "copy": {
+      "density": 0,
+      "contrast": 0,
+      "roundness": 0,
+      "type-expression": 0,
+      "color-restraint": 0,
+      "elevation": 0,
+      "motion": 0,
+      "stroke": 0
+    },
+    "icon": {
+      "density": 0.5,
+      "contrast": 0.5,
+      "roundness": 0.25,
+      "type-expression": 0,
+      "color-restraint": 0.75,
+      "elevation": 0,
+      "motion": 0.25,
+      "stroke": 1
+    },
+    "theme-tokens": {
+      "density": 0.5,
+      "contrast": 1,
+      "roundness": 1,
+      "type-expression": 0.5,
+      "color-restraint": 1,
+      "elevation": 1,
+      "motion": 0.5,
+      "stroke": 1
+    },
+    "button": {
+      "density": 0.75,
+      "contrast": 1,
+      "roundness": 1,
+      "type-expression": 0.25,
+      "color-restraint": 0.75,
+      "elevation": 0.75,
+      "motion": 0.75,
+      "stroke": 0.75
+    },
+    "form-input": {
+      "density": 1,
+      "contrast": 1,
+      "roundness": 0.75,
+      "type-expression": 0.25,
+      "color-restraint": 0.5,
+      "elevation": 0.25,
+      "motion": 0.5,
+      "stroke": 1
+    },
+    "badge-label": {
+      "density": 0.5,
+      "contrast": 0.75,
+      "roundness": 0.75,
+      "type-expression": 0.25,
+      "color-restraint": 1,
+      "elevation": 0,
+      "motion": 0,
+      "stroke": 0.5
+    },
+    "toast-alert": {
+      "density": 0.5,
+      "contrast": 0.75,
+      "roundness": 0.5,
+      "type-expression": 0.25,
+      "color-restraint": 1,
+      "elevation": 0.75,
+      "motion": 0.75,
+      "stroke": 0.5
+    },
+    "empty-state": {
+      "density": 0.25,
+      "contrast": 0.5,
+      "roundness": 0.25,
+      "type-expression": 0.5,
+      "color-restraint": 0.5,
+      "elevation": 0,
+      "motion": 0.25,
+      "stroke": 0.25
+    },
+    "loader-skeleton": {
+      "density": 0.25,
+      "contrast": 0.5,
+      "roundness": 0.5,
+      "type-expression": 0,
+      "color-restraint": 0.5,
+      "elevation": 0,
+      "motion": 1,
+      "stroke": 0.25
+    },
+    "modal-drawer": {
+      "density": 0.5,
+      "contrast": 0.75,
+      "roundness": 0.75,
+      "type-expression": 0.25,
+      "color-restraint": 0.25,
+      "elevation": 1,
+      "motion": 1,
+      "stroke": 0.5
+    },
+    "chart-kpi": {
+      "density": 1,
+      "contrast": 1,
+      "roundness": 0.25,
+      "type-expression": 0.5,
+      "color-restraint": 1,
+      "elevation": 0.25,
+      "motion": 0.5,
+      "stroke": 0.75
+    },
+    "table": {
+      "density": 1,
+      "contrast": 1,
+      "roundness": 0.25,
+      "type-expression": 0.25,
+      "color-restraint": 0.5,
+      "elevation": 0,
+      "motion": 0.25,
+      "stroke": 1
+    },
+    "timeline-stepper": {
+      "density": 0.75,
+      "contrast": 0.75,
+      "roundness": 0.5,
+      "type-expression": 0.25,
+      "color-restraint": 0.5,
+      "elevation": 0.25,
+      "motion": 0.5,
+      "stroke": 0.75
+    },
+    "map": {
+      "density": 0.5,
+      "contrast": 0.75,
+      "roundness": 0.25,
+      "type-expression": 0,
+      "color-restraint": 1,
+      "elevation": 0.5,
+      "motion": 0.5,
+      "stroke": 0.5
+    },
+    "media-gallery": {
+      "density": 0.5,
+      "contrast": 0.5,
+      "roundness": 0.75,
+      "type-expression": 0.25,
+      "color-restraint": 0.25,
+      "elevation": 0.5,
+      "motion": 0.75,
+      "stroke": 0.25
+    },
+    "commerce": {
+      "density": 0.75,
+      "contrast": 0.75,
+      "roundness": 0.5,
+      "type-expression": 0.75,
+      "color-restraint": 0.5,
+      "elevation": 0.25,
+      "motion": 0.5,
+      "stroke": 0.5
+    },
+    "chat-ai": {
+      "density": 0.75,
+      "contrast": 0.75,
+      "roundness": 0.75,
+      "type-expression": 0.25,
+      "color-restraint": 0.5,
+      "elevation": 0.25,
+      "motion": 0.75,
+      "stroke": 0.5
+    },
+    "motion-particle": {
+      "density": 0,
+      "contrast": 0.5,
+      "roundness": 0,
+      "type-expression": 0.25,
+      "color-restraint": 0.75,
+      "elevation": 0,
+      "motion": 1,
+      "stroke": 0
+    },
+    "3d": {
+      "density": 0,
+      "contrast": 0.5,
+      "roundness": 0.25,
+      "type-expression": 0,
+      "color-restraint": 0.75,
+      "elevation": 0.75,
+      "motion": 1,
+      "stroke": 0
+    }
+  },
+  "constraints": [
+    {
+      "id": "contrast-aa-floor",
+      "principle": "Muted and small text keep at least 4.5:1 against every surface, so contrast never drops to the washed-out end.",
+      "terms": {
+        "contrast": 1
+      },
+      "op": ">=",
+      "bound": 0.25,
+      "prevents": [
+        "COL-08"
+      ]
+    },
+    {
+      "id": "restraint-floor",
+      "principle": "Hue is reserved for the brand and for real outcomes; below this floor every box, badge and series gets its own tint.",
+      "terms": {
+        "color-restraint": 1
+      },
+      "op": ">=",
+      "bound": 0.5,
+      "prevents": [
+        "COL-06",
+        "AC-13"
+      ]
+    },
+    {
+      "id": "dense-screens-quiet-type",
+      "principle": "The more a screen holds, the quieter its type: a compact data screen cannot carry poster headlines.",
+      "terms": {
+        "density": 1,
+        "type-expression": 1
+      },
+      "op": "<=",
+      "bound": 1.25,
+      "prevents": [
+        "TYP-04",
+        "TYP-05"
+      ]
+    },
+    {
+      "id": "dense-screens-move-less",
+      "principle": "The more a screen holds, the less of it moves: dense screens animate feedback, not entrances.",
+      "terms": {
+        "density": 1,
+        "motion": 1
+      },
+      "op": "<=",
+      "bound": 1.25,
+      "prevents": [
+        "MOT-01"
+      ]
+    },
+    {
+      "id": "one-edge-per-surface",
+      "principle": "A surface is separated by a border or by a shadow; heavy borders plus deep shadows double every edge and turn nesting into boxes in boxes.",
+      "terms": {
+        "stroke": 1,
+        "elevation": 1
+      },
+      "op": "<=",
+      "bound": 1.25,
+      "prevents": [
+        "CMP-02"
+      ]
+    },
+    {
+      "id": "no-pillow-default",
+      "principle": "Large radius and deep soft shadow together are the default generated card; one of the two carries the softness.",
+      "terms": {
+        "roundness": 1,
+        "elevation": 1
+      },
+      "op": "<=",
+      "bound": 1.5,
+      "prevents": [
+        "CMP-04"
+      ]
+    },
+    {
+      "id": "material-band-depth",
+      "principle": "Radius and depth describe one material: shadows may not run more than two steps ahead of the corner radius.",
+      "terms": {
+        "elevation": 1,
+        "roundness": -1
+      },
+      "op": "<=",
+      "bound": 0.5,
+      "prevents": [
+        "CMP-04"
+      ]
+    },
+    {
+      "id": "material-band-radius",
+      "principle": "Radius and depth describe one material: the corner radius may not run more than two steps ahead of the shadows.",
+      "terms": {
+        "roundness": 1,
+        "elevation": -1
+      },
+      "op": "<=",
+      "bound": 0.5,
+      "prevents": [
+        "CMP-04"
+      ]
+    },
+    {
+      "id": "neutral-depth",
+      "principle": "Deep shadows only on a restrained palette, because depth plus free hue is how colored glows and neon halos appear.",
+      "terms": {
+        "elevation": 1,
+        "color-restraint": -1
+      },
+      "op": "<=",
+      "bound": 0.25,
+      "prevents": [
+        "COL-07",
+        "COL-03"
+      ]
+    },
+    {
+      "id": "loud-type-quiet-color",
+      "principle": "Type and color do not both shout: the louder the type, the fewer hues around it.",
+      "terms": {
+        "type-expression": 1,
+        "color-restraint": -1
+      },
+      "op": "<=",
+      "bound": 0,
+      "prevents": [
+        "COL-04",
+        "TYP-03"
+      ]
+    }
+  ],
+  "ruleMap": {
+    "AC-01": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "AC-02": {
+      "categories": [
+        "copy"
+      ],
+      "axis": null
+    },
+    "AC-03": {
+      "categories": [
+        "icon"
+      ],
+      "axis": null
+    },
+    "AC-04": {
+      "categories": [
+        "badge-label"
+      ],
+      "axis": "color-restraint"
+    },
+    "AC-05": {
+      "categories": [
+        "badge-label"
+      ],
+      "axis": "color-restraint"
+    },
+    "AC-06": {
+      "categories": [
+        "toast-alert"
+      ],
+      "axis": "color-restraint"
+    },
+    "AC-07": {
+      "categories": [
+        "loader-skeleton",
+        "badge-label"
+      ],
+      "axis": "color-restraint"
+    },
+    "AC-08": {
+      "categories": [
+        "badge-label"
+      ],
+      "axis": "color-restraint"
+    },
+    "AC-09": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "AC-10": {
+      "categories": [
+        "card",
+        "toast-alert"
+      ],
+      "axis": "stroke"
+    },
+    "AC-11": {
+      "categories": [
+        "icon"
+      ],
+      "axis": null
+    },
+    "AC-12": {
+      "categories": [
+        "form-input",
+        "cta"
+      ],
+      "axis": null
+    },
+    "AC-13": {
+      "categories": [
+        "chart-kpi"
+      ],
+      "axis": "color-restraint"
+    },
+    "AC-14": {
+      "categories": [
+        "card"
+      ],
+      "axis": "stroke"
+    },
+    "AC-15": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "AC-16": {
+      "categories": [
+        "button"
+      ],
+      "axis": null
+    },
+    "AC-17": {
+      "categories": [
+        "hero",
+        "feature-section",
+        "media-gallery"
+      ],
+      "axis": null
+    },
+    "AC-18": {
+      "categories": [
+        "icon"
+      ],
+      "axis": null
+    },
+    "AC-19": {
+      "categories": [
+        "media-gallery",
+        "hero"
+      ],
+      "axis": null
+    },
+    "COL-01": {
+      "categories": [
+        "theme-tokens",
+        "hero",
+        "button"
+      ],
+      "axis": "color-restraint"
+    },
+    "COL-02": {
+      "categories": [
+        "theme-tokens"
+      ],
+      "axis": null
+    },
+    "COL-03": {
+      "categories": [
+        "theme-tokens"
+      ],
+      "axis": "elevation"
+    },
+    "COL-04": {
+      "categories": [
+        "typography"
+      ],
+      "axis": "color-restraint"
+    },
+    "COL-05": {
+      "categories": [
+        "theme-tokens"
+      ],
+      "axis": null
+    },
+    "COL-06": {
+      "categories": [
+        "card",
+        "badge-label",
+        "icon"
+      ],
+      "axis": "color-restraint"
+    },
+    "COL-07": {
+      "categories": [
+        "button",
+        "card"
+      ],
+      "axis": "elevation"
+    },
+    "COL-08": {
+      "categories": [
+        "typography",
+        "theme-tokens"
+      ],
+      "axis": "contrast"
+    },
+    "TYP-01": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "TYP-02": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "TYP-03": {
+      "categories": [
+        "typography",
+        "hero"
+      ],
+      "axis": "type-expression"
+    },
+    "TYP-04": {
+      "categories": [
+        "typography",
+        "hero"
+      ],
+      "axis": "type-expression"
+    },
+    "TYP-05": {
+      "categories": [
+        "typography"
+      ],
+      "axis": "type-expression"
+    },
+    "LAY-01": {
+      "categories": [
+        "hero"
+      ],
+      "axis": null
+    },
+    "LAY-02": {
+      "categories": [
+        "feature-section",
+        "card"
+      ],
+      "axis": null
+    },
+    "LAY-03": {
+      "categories": [
+        "feature-section"
+      ],
+      "axis": null
+    },
+    "LAY-04": {
+      "categories": [
+        "layout-shell"
+      ],
+      "axis": null
+    },
+    "LAY-05": {
+      "categories": [
+        "layout-shell",
+        "feature-section"
+      ],
+      "axis": null
+    },
+    "LAY-06": {
+      "categories": [
+        "layout-shell"
+      ],
+      "axis": "density"
+    },
+    "CMP-01": {
+      "categories": [
+        "hero",
+        "badge-label"
+      ],
+      "axis": null
+    },
+    "CMP-02": {
+      "categories": [
+        "card"
+      ],
+      "axis": "stroke"
+    },
+    "CMP-03": {
+      "categories": [
+        "icon",
+        "feature-section"
+      ],
+      "axis": null
+    },
+    "CMP-04": {
+      "categories": [
+        "card",
+        "theme-tokens"
+      ],
+      "axis": "roundness"
+    },
+    "CMP-05": {
+      "categories": [
+        "card",
+        "layout-shell"
+      ],
+      "axis": "elevation"
+    },
+    "CMP-06": {
+      "categories": [
+        "chart-kpi",
+        "hero"
+      ],
+      "axis": null
+    },
+    "CMP-07": {
+      "categories": [
+        "hero",
+        "feature-section"
+      ],
+      "axis": null
+    },
+    "CMP-08": {
+      "categories": [
+        "testimonial"
+      ],
+      "axis": null
+    },
+    "CMP-09": {
+      "categories": [
+        "pricing"
+      ],
+      "axis": "elevation"
+    },
+    "CMP-10": {
+      "categories": [
+        "form-input",
+        "footer",
+        "cta"
+      ],
+      "axis": null
+    },
+    "CMP-11": {
+      "categories": [
+        "theme-tokens"
+      ],
+      "axis": null
+    },
+    "BG-01": {
+      "categories": [
+        "layout-shell",
+        "motion-particle"
+      ],
+      "axis": "color-restraint"
+    },
+    "ICO-01": {
+      "categories": [
+        "icon"
+      ],
+      "axis": null
+    },
+    "ICO-02": {
+      "categories": [
+        "icon"
+      ],
+      "axis": null
+    },
+    "ICO-03": {
+      "categories": [
+        "icon"
+      ],
+      "axis": "stroke"
+    },
+    "ICO-04": {
+      "categories": [
+        "icon",
+        "card"
+      ],
+      "axis": null
+    },
+    "MOT-01": {
+      "categories": [
+        "motion-particle"
+      ],
+      "axis": "motion"
+    },
+    "MOT-02": {
+      "categories": [
+        "motion-particle"
+      ],
+      "axis": null
+    },
+    "MOT-03": {
+      "categories": [
+        "motion-particle",
+        "modal-drawer"
+      ],
+      "axis": null
+    },
+    "MOT-04": {
+      "categories": [
+        "motion-particle"
+      ],
+      "axis": null
+    },
+    "MOT-05": {
+      "categories": [
+        "motion-particle",
+        "tabs-segmented"
+      ],
+      "axis": null
+    },
+    "MOT-06": {
+      "categories": [
+        "button",
+        "form-input"
+      ],
+      "axis": null
+    },
+    "MOT-07": {
+      "categories": [
+        "motion-particle"
+      ],
+      "axis": null
+    },
+    "CPY-01": {
+      "categories": [
+        "copy"
+      ],
+      "axis": null
+    },
+    "CPY-02": {
+      "categories": [
+        "copy",
+        "table",
+        "chart-kpi"
+      ],
+      "axis": null
+    },
+    "KO-01": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "KO-02": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "KO-03": {
+      "categories": [
+        "typography"
+      ],
+      "axis": "density"
+    },
+    "KO-04": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "KO-05": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "KO-06": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "KO-07": {
+      "categories": [
+        "copy"
+      ],
+      "axis": null
+    },
+    "KO-08": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "KO-09": {
+      "categories": [
+        "copy",
+        "button"
+      ],
+      "axis": null
+    },
+    "KO-10": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "KO-11": {
+      "categories": [
+        "typography"
+      ],
+      "axis": null
+    },
+    "RSP-01": {
+      "categories": [
+        "layout-shell"
+      ],
+      "axis": null
+    },
+    "RSP-02": {
+      "categories": [
+        "layout-shell",
+        "button",
+        "card"
+      ],
+      "axis": null
+    },
+    "RSP-03": {
+      "categories": [
+        "layout-shell"
+      ],
+      "axis": null
+    },
+    "RSP-04": {
+      "categories": [
+        "layout-shell"
+      ],
+      "axis": null
+    },
+    "RSP-05": {
+      "categories": [
+        "layout-shell",
+        "table"
+      ],
+      "axis": null
+    },
+    "RSP-06": {
+      "categories": [
+        "button",
+        "form-input",
+        "nav-header"
+      ],
+      "axis": "density"
+    }
+  },
+  "gaps": [],
   "iconography": {
     "summary": "Where an icon belongs and what it must look like. Decide the slot first, then whether the slot needs an icon at all, then draw it from the one set. Pattern: icon-placement. Five worked variations per slot are rendered in examples/icon-slots/.",
     "set": {
