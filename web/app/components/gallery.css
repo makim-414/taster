@@ -57,6 +57,7 @@
 .card-view { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--r-md); }
 .card-view img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .card-live { display: block; position: absolute; top: 0; left: 0; width: 720px; height: 450px; transform-origin: 0 0; pointer-events: none; }
+.card-live[hidden] { display: none; } /* a paused frame: the still underneath shows instead */
 .live-frame { display: block; width: 100%; height: 100%; border: 0; }
 .card-text { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); padding-top: var(--sp-2); }
 .card-text h2 { margin: 0; font-size: var(--t-title); font-weight: var(--w-med); line-height: var(--lh-snug); }
