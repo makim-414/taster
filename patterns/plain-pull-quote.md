@@ -6,7 +6,7 @@ uses: [prove-trust, emphasize-text]
 surfaces: [landing, editorial]
 replaces: [AC-10, TYP-03]
 components: [marketing/customer-quote, content/pull-quote]
-inspiration: [https://21st.dev/@designali-in/components/dot-pattern-1]
+inspiration: [https://21st.dev/@designali-in/components/dot-pattern]
 status: stable
 ---
 
