@@ -47,7 +47,9 @@ test('a slop component is reported with rule ids, a clean one and node_modules a
   const { files, findings } = lintPaths(['.'], dir);
   assert.equal(files, 3);
   const bad = new Set(findings.filter((f) => f.file === 'src/Bad.tsx').map((f) => f.rule));
-  for (const id of ['AC-06', 'SRC-03', 'MOT-02', 'AC-04', 'AC-01', 'AC-02', 'SRC-02', 'SRC-01']) assert.ok(bad.has(id), `missing ${id}`);
+  for (const id of ['AC-10', 'SRC-03', 'MOT-02', 'AC-04', 'AC-01', 'AC-02', 'SRC-02', 'SRC-01']) assert.ok(bad.has(id), `missing ${id}`);
+  // A thick left bar is the accent bar rule, not the tinted notice band.
+  assert.ok(!bad.has('AC-06'));
   assert.equal(findings.filter((f) => f.file === 'src/Good.tsx').length, 0);
   assert.ok(findings.some((f) => f.file === 'tailwind.config.js' && f.rule === 'SRC-04'));
   assert.ok(!findings.some((f) => f.file.startsWith('node_modules')));
