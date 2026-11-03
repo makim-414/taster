@@ -3,12 +3,6 @@
   "note": "Findings on Taster's own screens that self-check allows, each up to its count on that screen at every width. Fix the page and remove the entry; never add one without a reason.",
   "allow": [
     {
-      "screen": "/components/blocks/command-palette",
-      "rule": "KO-02",
-      "count": 1,
-      "reason": "The source view shows the component's comment about Hangul initials in --font-mono, whose families are all Latin. The fix is a Korean-capable family after the code font in the source view's stack (web/app/components/gallery.css)."
-    },
-    {
       "screen": "/components/motion/marquee",
       "rule": "CPY-01",
       "count": 2,
