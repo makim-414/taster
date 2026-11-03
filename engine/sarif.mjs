@@ -8,6 +8,7 @@ import { relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { RULES } from './diagnose.mjs';
 
+const VERSION = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version;
 const LEVEL = { high: 'error', medium: 'warning', low: 'note' };
 const HELP_BASE = 'https://github.com/makim-414/taster/blob/main/patterns/';
 
@@ -117,7 +118,7 @@ export function toSarif(reports, { cwd = process.cwd() } = {}) {
     version: '2.1.0',
     runs: [
       {
-        tool: { driver: { name: 'Taster', informationUri: 'https://github.com/makim-414/taster', version: '0.1.0', rules } },
+        tool: { driver: { name: 'Taster', informationUri: 'https://github.com/makim-414/taster', version: VERSION, rules } },
         invocations: [{ executionSuccessful: notifications.length === 0, toolExecutionNotifications: notifications }],
         results,
       },

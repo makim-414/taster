@@ -120,7 +120,8 @@ npm ci --prefix /path/to/taster/engine
 claude mcp add taster -- node /path/to/taster/engine/start.mjs
 ```
 
-Codex 는 `~/.codex/config.toml` 에 넣습니다(리포의 `.codex-plugin/plugin.json` 은 스킬만 넣습니다).
+Codex 는 `~/.codex/config.toml` 에 넣습니다(리포를 Codex 플러그인으로 설치하면 `.codex-plugin/plugin.json` 이 스킬과
+이 서버를 함께 넣습니다).
 
 ```toml
 [mcp_servers.taster]
@@ -361,7 +362,7 @@ action.yml           GitHub Action
 소스를 고친 뒤 CI 가 돌리는 모든 검사를 같은 순서로 돌립니다.
 
 ```bash
-node scripts/gates.mjs           # 네 작업 전부, 빠진 것은 먼저 설치
+node scripts/gates.mjs           # 네 작업 전부(npm test 도 같음), 빠진 것은 먼저 설치
 node scripts/gates.mjs browser   # 작업 하나: validate, browser, web, action
 ```
 

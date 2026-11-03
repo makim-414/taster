@@ -2,7 +2,7 @@
   "id": "taster",
   "name": "Taster",
   "version": "0.1.0",
-  "description": "Checks a page for the AI generated look (80 rules measured in a real browser) and answers with findings, fixes and patterns. No model inside.",
+  "description": "Checks a page for the AI generated look (88 rules, 85 measured in a real browser) and answers with findings, fixes and patterns. No model inside.",
   "repository": "https://github.com/makim-414/taster",
   "website": "https://taster-six.vercel.app",
   "authors": ["makim-414"],
