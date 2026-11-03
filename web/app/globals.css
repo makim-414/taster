@@ -1,7 +1,7 @@
 /* Only registry/src/tokens.css and themes/light.css values, read through var().
-   One token is rebound: --font. Its registry default starts with Geist, which TYP-02 flags, and
-   when Geist is missing the detector judges the declared family anyway. A system stack alone
-   would trip AC-15 instead, so the page names a real face: Noto Sans KR, self-hosted. */
+   One token is rebound: --font. The registry default is IBM Plex Sans with IBM Plex Sans KR;
+   this site sets Korean body text in Noto Sans KR instead, self-hosted from app/fonts (see
+   layout.tsx). The stack leads with a named face, since a system stack alone trips AC-15. */
 :root {
   --font: var(--font-sans), 'Apple SD Gothic Neo', sans-serif;
 }
@@ -121,10 +121,13 @@ h2 {
   border: 1px solid var(--input);
   border-radius: var(--r-md);
 }
+/* --ring is opaque in themes/light.css, so the ring keeps 3:1 on the page and on sunken panels. A pre that scrolls
+   takes focus (tabIndex 0) and shows the same ring. */
 .probe input:focus-visible,
 button:focus-visible,
 summary:focus-visible,
-a:focus-visible {
+a:focus-visible,
+pre:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }

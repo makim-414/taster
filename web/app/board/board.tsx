@@ -5,8 +5,13 @@ import { useEffect, useState } from 'react';
 import { CopyButton } from '../components/copy-button';
 import { LookBar } from '../components/look-bar';
 import { LiveFrame, useStudio } from '../components/studio';
+import { SITE } from '../../lib/page-meta';
 
 type Item = { id: string; name: string; group: string; slug: string; categoryName: string };
+
+// Until the CLI is on npm, the add command runs from a clone of the repository (engine installed once with
+// npm ci --prefix engine) and reads the files from this site, so it works from inside the visitor's own app.
+const installLine = (id: string) => `node /path/to/taster/engine/cli.mjs add ${id} --from ${SITE} --dir src/components/taster`;
 
 function Slot({ item, number, chosen, onChoose }: { item: Item; number: number; chosen: boolean; onChoose: () => void }) {
   const { look, ready } = useStudio();
@@ -29,6 +34,9 @@ export function Board({ items }: { items: Item[] }) {
   const [ids, setIds] = useState<string[]>([]);
   const [chosen, setChosen] = useState<string[]>([]);
   const [href, setHref] = useState('');
+  // The text goes to the visitor's agent, so it follows the browser's language: Korean for Korean, English otherwise.
+  const [korean, setKorean] = useState(true);
+  useEffect(() => setKorean(/^ko\b/i.test(navigator.language)), []);
 
   // The address decides what is on the board, so an agent can hand over a link. Without one, it shows what was picked.
   useEffect(() => {
@@ -47,9 +55,11 @@ export function Board({ items }: { items: Item[] }) {
 
   const shown = ids.map((id) => items.find((i) => i.id === id)!).filter(Boolean);
   const toggle = (id: string) => setChosen((c) => (c.includes(id) ? c.filter((x) => x !== id) : [...c, id]));
-  const message = chosen.length
-    ? `Taster 비교 보드에서 ${chosen.map((id) => `${ids.indexOf(id) + 1}번 ${id}`).join(', ')} 를 골랐어. ${look.theme === 'dark' ? '어두운' : '밝은'} 테마${brand ? `, 브랜드 색 ${brand}` : ''}${source ? ` (${source} 에서 읽음)` : ''}. 이걸로 넣어 줘.`
-    : '';
+  const message = !chosen.length
+    ? ''
+    : korean
+      ? `Taster 비교 보드에서 ${chosen.map((id) => `${ids.indexOf(id) + 1}번 ${id}`).join(', ')} 를 골랐어. ${look.theme === 'dark' ? '어두운' : '밝은'} 테마${brand ? `, 브랜드 색 ${brand}` : ''}${source ? ` (${source} 에서 읽음)` : ''}. 이걸로 넣어 줘.`
+      : `I picked ${chosen.map((id) => `#${ids.indexOf(id) + 1} ${id}`).join(', ')} on the Taster board. ${look.theme === 'dark' ? 'Dark' : 'Light'} theme${brand ? `, brand color ${brand}` : ''}${source ? ` (read from ${source})` : ''}. Put ${chosen.length > 1 ? 'them' : 'it'} in.`;
 
   return (
     <div className="page gallery-page board-page">
@@ -79,10 +89,10 @@ export function Board({ items }: { items: Item[] }) {
             <h2 id="send-title">에이전트에게 알려 주기</h2>
             {message ? (
               <>
-                <p className="send-text">{message}</p>
+                <p className="send-text" lang={korean ? undefined : 'en'}>{message}</p>
                 <div className="send-tools">
                   <CopyButton text={message} label="이 글 복사" className="button" />
-                  <CopyButton text={chosen.map((id) => `node engine/cli.mjs add ${id} --dir src/components/taster`).join('\n')} label="설치 명령 복사" />
+                  <CopyButton text={chosen.map(installLine).join('\n')} label="설치 명령 복사" />
                 </div>
               </>
             ) : (
