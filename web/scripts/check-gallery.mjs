@@ -91,8 +91,9 @@ const stageFrame = async (page, id) => {
 };
 
 try {
-  for (const [name, width, height, touch] of [['phone', 390, 844, true], ['tablet', 768, 1024, true], ['desktop', 1440, 900, false]]) {
-    const context = await browser.newContext({ viewport: { width, height }, hasTouch: touch, isMobile: touch, deviceScaleFactor: 1 });
+  // The agent text follows the browser language, so one width runs in a Korean browser and the others in English.
+  for (const [name, width, height, touch, locale] of [['phone', 390, 844, true, 'ko-KR'], ['tablet', 768, 1024, true, 'en-US'], ['desktop', 1440, 900, false, 'en-US']]) {
+    const context = await browser.newContext({ viewport: { width, height }, hasTouch: touch, isMobile: touch, deviceScaleFactor: 1, locale });
     await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
     const page = await context.newPage();
     const errors = [];
@@ -171,7 +172,9 @@ try {
     // Choosing writes the text for the agent.
     await page.getByRole('button', { name: /2번 Card 고르기/ }).click();
     const text = await page.locator('.send-text').innerText();
-    ok(text.includes('2번 blocks/card') && text.includes('#e4002b'), `${name}: agent text names the pick and brand`);
+    const korean = locale.startsWith('ko');
+    ok(text.includes(korean ? '2번 blocks/card' : 'I picked #2 blocks/card') && text.includes('#e4002b'), `${name}: agent text names the pick and brand in ${locale} (${text})`);
+    ok((await page.locator('.send-text').getAttribute('lang')) === (korean ? null : 'en'), `${name}: agent text carries its language`);
     await page.screenshot({ path: new URL(`board-${name}.png`, OUT).pathname, fullPage: true });
 
     // A shared link rebuilds the same board on a clean browser.
