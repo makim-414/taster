@@ -6,7 +6,7 @@ uses: [organize-the-page]
 surfaces: [landing]
 replaces: [COL-07]
 components: [blocks/card, blocks/spotlight-card]
-inspiration: []
+inspiration: [https://21st.dev/@jahed/components/spotlight-card]
 status: draft
 ---
 

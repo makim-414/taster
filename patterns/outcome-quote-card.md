@@ -55,7 +55,7 @@ Slop version: stars, stock avatar, invented person and a vague compliment.
   <div className="text-yellow-400">★★★★★</div>
   <p>"This product completely transformed our workflow. Highly recommend!"</p>
   <div className="mt-4 flex items-center gap-3">
-    <img src="https://i.pravatar.cc/80?img=12" className="size-10 rounded-full" />
+    <img src="/stock/avatar-12.jpg" className="size-10 rounded-full" />
     <div><b>Sarah Johnson</b><div className="text-sm opacity-60">CEO, TechCorp</div></div>
   </div>
 </div>

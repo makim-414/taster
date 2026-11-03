@@ -6,7 +6,7 @@ uses: [answer-questions, explain-features]
 surfaces: [landing]
 replaces: [TYP-04]
 components: [blocks/accordion, marketing/reveal-faq]
-inspiration: []
+inspiration: [https://21st.dev/@ruixen.ui/components/text-reveal-faqs]
 status: draft
 ---
 

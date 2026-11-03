@@ -6,7 +6,7 @@ uses: [set-the-visual-foundation, switch-views]
 surfaces: [app, dashboard]
 replaces: [CMP-11]
 components: [blocks/appearance-picker]
-inspiration: []
+inspiration: [https://github.com/campsite/campsite]
 status: stable
 ---
 

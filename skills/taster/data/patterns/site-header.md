@@ -6,7 +6,7 @@ uses: [navigate-the-site]
 surfaces: [landing, commerce, editorial, developer-docs]
 replaces: [AC-01, CMP-05, ICO-01, LAY-06]
 components: [blocks/dropdown, blocks/button, blocks/liquid-nav, marketing/site-header, marketing/breadcrumb]
-inspiration: []
+inspiration: [https://21st.dev/@gughigug/components/liquid-glass-navbar]
 status: stable
 ---
 
