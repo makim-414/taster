@@ -21,7 +21,8 @@ export function TextReveal({ text, as: Tag = 'p', delay = 0, className, ...props
   const shown = useInViewOnce(ref)
   const words = text.split(' ').filter(Boolean)
   return (
-    <Tag ref={ref as never} className={className} aria-label={text} {...props}>
+    <Tag ref={ref as never} className={className} {...props}>
+      <span className="sr-only">{text}</span>
       {words.map((w, i) => (
         <React.Fragment key={i}>
           <span
