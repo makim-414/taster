@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { cn } from './_cn'
+import { safeHref } from './_url'
 
 // SidebarNav. The app menu column: a header slot (workspace switcher or product name), grouped destinations with
 // optional collapsible groups and counts, and a footer slot for the account. It collapses to a 56px icon rail:
@@ -105,8 +106,9 @@ function Item({ item, collapsed }: { item: SidebarNavItem; collapsed: boolean })
     'aria-label': collapsed ? name : undefined,
     title: collapsed ? name : undefined,
   }
-  return item.href ? (
-    <a href={item.href} {...common}>
+  const href = safeHref(item.href)
+  return href ? (
+    <a href={href} {...common}>
       {inner}
     </a>
   ) : (

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Feature grid: short features as text, a title and a sentence each, divided by hairlines instead of
 // framed in cards. The answer to "three icon cards in a row" when the features are all words.
@@ -39,7 +40,7 @@ export function FeatureGrid({ items, layout = 'grid', columns = 3, as: Heading =
             <div>
               <p className={cn('max-w-[60ch] text-body leading-[var(--lh-normal)] text-text-muted', KEEP)}>{it.body}</p>
               {it.link ? (
-                <a href={it.link.href} className={LINK}>
+                <a href={safeHref(it.link.href)} className={LINK}>
                   {it.link.label}
                 </a>
               ) : null}
@@ -59,7 +60,7 @@ export function FeatureGrid({ items, layout = 'grid', columns = 3, as: Heading =
           <Heading className={cn('text-title font-semibold leading-[var(--lh-snug)] text-text', KEEP)}>{it.title}</Heading>
           <p className={cn('mt-2 text-body leading-[var(--lh-normal)] text-text-muted', KEEP)}>{it.body}</p>
           {it.link ? (
-            <a href={it.link.href} className={LINK}>
+            <a href={safeHref(it.link.href)} className={LINK}>
               {it.link.label}
             </a>
           ) : null}

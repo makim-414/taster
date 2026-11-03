@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '../blocks/_cn'
+import { safeHref } from '../blocks/_url'
 
 // Split form hero: the headline on one side and a single field with its button on the same side, a
 // visual on the other. The field is the first action, so the hero asks for one value, not a form.
@@ -55,7 +56,7 @@ export function SplitFormHero({
   submitLabel,
   helper,
   onSubmit,
-  action,
+  action: rawAction,
   doneMessage = () => 'Done. Check your inbox for the next step.',
   errorMessage = 'That did not go through. Check the value and try again.',
   aside,
@@ -70,6 +71,8 @@ export function SplitFormHero({
   const [value, setValue] = React.useState('')
   const [status, setStatus] = React.useState<SplitFormStatus>('idle')
   const statusRef = React.useRef<HTMLParagraphElement>(null)
+  // A refused URL (blocks/_url.ts) counts as no action, so the form stays unwired instead of posting to this page.
+  const action = safeHref(rawAction)
   const wired = !!onSubmit || !!action
 
   async function handle(e: React.FormEvent<HTMLFormElement>) {

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { safeHref } from './_url'
 
 // Liquid nav: a pill of water. The active drop stretches toward the item you pick, splits into
 // droplets on long jumps and merges back with a ripple; each icon plays a short scene on tap.
@@ -16,14 +17,17 @@ import * as React from 'react'
 // part of the impression. Inside a signed-in app use AppShell instead (patterns/app-bars.md): a
 // blurred pill floating over content is CMP-05 there.
 
-export type NimbusFx = "plane" | "drop" | "spin" | "glow" | "wave" | "pop" | "none"
+export type LiquidNavFx = "plane" | "drop" | "spin" | "glow" | "wave" | "pop" | "none"
+/** @deprecated Use LiquidNavFx. The old name stays for one version. */
+export type NimbusFx = LiquidNavFx
 
 export type LiquidNavItem = {
   label: string
+  /** http, https or mailto, or a relative path. Any other scheme draws a button instead (blocks/_url.ts). */
   href?: string
   icon?: React.ReactNode
   /** the little scene the icon plays when tapped */
-  fx?: NimbusFx
+  fx?: LiquidNavFx
 }
 
 export type LiquidNavbarProps = {
@@ -49,25 +53,27 @@ const I = (d: React.ReactNode) => (
     {d}
   </svg>
 )
-export const NimbusIcons = {
+export const LiquidNavIcons = {
   home: I(<><path d="M3.5 11.2 12 4l8.5 7.2" /><path d="M6 9.6V20h12V9.6" /><path className="nv-door" d="M10 20v-5h4v5Z" /></>),
   globe: I(<><circle cx="12" cy="12" r="8.5" /><path d="M3.5 12h17M12 3.5c2.6 2.4 2.6 14.6 0 17M12 3.5c-2.6 2.4-2.6 14.6 0 17" /></>),
   plane: I(<path d="M21 12.2 3.6 5.4l2.7 6.8-2.7 6.4L21 12.2Zm-14.7 0H13" />),
   drop: I(<path d="M12 3.5s6 6.4 6 10.6a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5Z" />),
   user: I(<><circle cx="12" cy="8.5" r="3.8" /><path d="M4.8 20c1.2-3.4 4-5 7.2-5s6 1.6 7.2 5" /></>),
 }
+/** @deprecated Use LiquidNavIcons. The old name stays for one version. */
+export const NimbusIcons = LiquidNavIcons
 
 const DEFAULT_ITEMS: LiquidNavItem[] = [
-  { label: "Home", icon: NimbusIcons.home, fx: "glow" },
-  { label: "Explore", icon: NimbusIcons.globe, fx: "spin" },
-  { label: "Send", icon: NimbusIcons.plane, fx: "plane" },
-  { label: "Profile", icon: NimbusIcons.user, fx: "wave" },
+  { label: "Home", icon: LiquidNavIcons.home, fx: "glow" },
+  { label: "Explore", icon: LiquidNavIcons.globe, fx: "spin" },
+  { label: "Send", icon: LiquidNavIcons.plane, fx: "plane" },
+  { label: "Profile", icon: LiquidNavIcons.user, fx: "wave" },
 ]
 
 const PAD = 14 // canvas bleed around the pill, for shadows and ripples
 
 /* ---------- styles ---------- */
-const NIMBUS_CSS = `
+const LIQUID_NAV_CSS = `
 .nimbus-nav{--n-tint:rgba(255,255,255,.14);--n-fg:var(--text);--n-fg-soft:var(--text-muted);--n-rim:rgba(255,255,255,.7);
   position:relative;display:inline-flex;align-items:center;gap:2px;padding:6px;border-radius:999px;isolation:isolate;
   font-family:inherit;-webkit-font-smoothing:antialiased;user-select:none;-webkit-tap-highlight-color:transparent}
@@ -541,7 +547,7 @@ export function LiquidNavbar({
       onPointerDown={(e) => { const p = local(e.clientX, e.clientY); ripple(p.x, p.y, 0.8) }}
       style={style}
     >
-      <style dangerouslySetInnerHTML={{ __html: NIMBUS_CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: LIQUID_NAV_CSS }} />
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
         <filter id="nimbus-refract" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
           <feTurbulence type="fractalNoise" baseFrequency="0.006 0.02" numOctaves="2" seed="7" result="noise" />
@@ -571,8 +577,9 @@ export function LiquidNavbar({
             <span className="nimbus-label">{it.label}</span>
           </>
         )
-        return it.href ? (
-          <a key={it.label + i} {...(props as any)} href={it.href} aria-label={it.label}>{content}</a>
+        const href = safeHref(it.href)
+        return href ? (
+          <a key={it.label + i} {...(props as any)} href={href} aria-label={it.label}>{content}</a>
         ) : (
           <button key={it.label + i} {...(props as any)} type="button" aria-label={it.label}>{content}</button>
         )
