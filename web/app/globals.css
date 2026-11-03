@@ -329,7 +329,9 @@ code {
   overflow-wrap: anywhere;
 }
 .hit-evidence {
+  /* Evidence is the detector's own data (selectors, property names), so it is code, in the page's own face. */
   display: block;
+  font: inherit;
   color: var(--text-subtle);
 }
 
