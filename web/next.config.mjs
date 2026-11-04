@@ -1,11 +1,16 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.join(here, '..');
+// The gallery asks for /stage/index.html?v=<this>, so each stage build has its own address the browser can keep for good.
+const stageVersion = createHash('sha256').update(readFileSync(path.join(repo, 'registry/stage/index.html'))).digest('hex').slice(0, 12);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  env: { STAGE_VERSION: stageVersion },
   // The app reads ../engine, ../rules and ../registry, so tracing and Turbopack start at the repo root.
   outputFileTracingRoot: repo,
   turbopack: { root: repo },
@@ -81,6 +86,13 @@ const nextConfig = {
           { key: 'Content-Security-Policy', value: csp("'none'") },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()' },
         ],
+      },
+      {
+        // The gallery's stage address carries its build's hash, so a frame made again after a scroll reads the cached
+        // copy instead of asking again. A request cut off mid-way while frames come and go no longer throws it away.
+        source: '/stage/index.html',
+        has: [{ type: 'query', key: 'v' }],
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
         // The gallery runs each component in a frame on this same site. Later rules win, so this one must stay last.
