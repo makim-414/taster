@@ -90,8 +90,9 @@ export function useStudio(): Studio {
 }
 
 // Which component and which look go after the #, so every frame loads the same document and the browser downloads the
-// stage once, instead of once for each address.
-export const stageSrc = (id: string, look: Look) => `/stage/index.html#only=${encodeURIComponent(id)}&look=${encodeURIComponent(JSON.stringify(look))}`;
+// stage once, instead of once for each address. ?v= is the stage build's hash (next.config.mjs), served immutable.
+export const stageSrc = (id: string, look: Look) =>
+  `/stage/index.html?v=${process.env.STAGE_VERSION}#only=${encodeURIComponent(id)}&look=${encodeURIComponent(JSON.stringify(look))}`;
 
 /** One component running live in a frame. The look changes without a reload, and a paused frame holds still. */
 export function LiveFrame({ id, look, title, interactive = true, paused = false, onHeight }: { id: string; look: Look; title: string; interactive?: boolean; paused?: boolean; onHeight?: (height: number) => void }) {

@@ -210,9 +210,9 @@ try {
     await context.close();
   }
 
-  // Every card running: the frames share one stage address, so the document body comes over the network once (the
-  // browser still revalidates it per frame, a 304 with no body, while the site serves it with max-age=0). A frame that
-  // leaves the view is paused and kept; half a screen further away it is removed, so a long scroll keeps few frames.
+  // Every card running: the frames share one stage address, pinned to the stage build's hash and served immutable, so
+  // the document body comes over the network once and a frame made again after a scroll reads the cached copy. A frame
+  // that leaves the view is paused and kept; half a screen further away it is removed, so a long scroll keeps few frames.
   {
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
     const page = await context.newPage();
@@ -254,9 +254,13 @@ try {
     const urls = new Set(list.map((r) => r.url));
     const bodies = list.filter((r) => r.status === 200).length;
     ok(urls.size === 1, `every card frame asks for one stage address (${urls.size})`);
-    // Frames that start in the same moment can each fetch the body before the first answer is cached, so a few
-    // downloads are fine. One per card (one URL per frame, 144 and more) is what this guards against.
-    ok(bodies <= 3, `the stage document body downloads a few times at most with every card running (${bodies} downloads, ${list.filter((r) => r.status === 304).length} revalidations)`);
+    // Two frames that start in the same moment can both fetch the body before the first answer is cached. More than
+    // that means frames made again after a scroll went back to the network (a request cut off mid-way throws a
+    // revalidated copy away, so with max-age=0 a real network saw 7 to 9).
+    ok(bodies <= 2, `the stage document body downloads once with every card running (${bodies} downloads, ${list.filter((r) => r.status === 304).length} revalidations)`);
+    ok([...urls].every((u) => /[?&]v=[0-9a-f]{12}(#|$)/.test(u)), `the stage address carries the stage build's hash (${[...urls][0]})`);
+    const pinned = await fetch(new URL([...urls][0], BASE));
+    ok(/immutable/.test(pinned.headers.get('cache-control') || ''), `the hashed stage address is cached for good (${pinned.headers.get('cache-control')})`);
     ok(errors.length === 0, `every card running: no page errors ${errors.join(' | ')}`);
     await context.close();
   }
