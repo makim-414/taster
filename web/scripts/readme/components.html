@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en" data-theme="/*THEME*/">
+<head>
+<meta charset="utf-8">
+<title>Taster components</title>
+<style>/*TOKENS*/</style>
+<style>
+  /* Two rows of stills fill the height; each keeps the stills' own 1080 by 675 frame, so nothing is cropped. */
+  :root { --tile-h: calc((1000px - var(--sp-8) * 2 - var(--sp-6)) / 2); }
+  html, body { margin: 0; width: 2400px; height: 1000px; background: var(--bg); }
+  .grid { box-sizing: border-box; width: 2400px; height: 1000px; padding: var(--sp-8); display: grid; grid-template-columns: repeat(3, max-content); gap: var(--sp-6); justify-content: center; align-content: center; }
+  img { display: block; box-sizing: border-box; height: var(--tile-h); width: auto; aspect-ratio: 1080 / 675; border: 1px solid var(--border); border-radius: var(--r-xl); }
+</style>
+</head>
+<body>
+  <main class="grid"><!--TILES--></main>
+</body>
+</html>
