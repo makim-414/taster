@@ -177,7 +177,7 @@ node /path/to/taster/engine/cli.mjs lint src --baseline taster-baseline.json  # 
 ```
 
 `taster-allow <이유>` 주석을 단 줄은 통과하고, 이유 없는 허용은 따로 보고합니다. npm 패키지가 게시되면 클론 대신
-그것을 씁니다([RELEASE.md](RELEASE.md)).
+그것을 씁니다([RELEASING.md](RELEASING.md)).
 
 ### 내 앱에 부품 넣기
 

@@ -179,7 +179,7 @@ node /path/to/taster/engine/cli.mjs lint src --baseline taster-baseline.json  # 
 ```
 
 A line passes with a comment `taster-allow <reason>`; an allow without a reason is reported. The npm package will
-replace the clone once it is published ([RELEASE.md](RELEASE.md)).
+replace the clone once it is published ([RELEASING.md](RELEASING.md)).
 
 ### Add components to your app
 

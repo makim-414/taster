@@ -1,4 +1,4 @@
-# Release
+# Releasing
 
 Everything below is prepared in the repository and checked; the steps that publish happen on release day, in this
 order, by the owner. Version 0.1.0.
