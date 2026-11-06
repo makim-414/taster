@@ -2,23 +2,48 @@
 
 [English](README.md) | 한국어
 
-프론트엔드에서 AI 티가 나는 곳(슬롭)을 찾고, 그 자리를 같은 일을 더 잘하는 패턴으로 갈아 끼우거나, 처음부터
-슬롭 없이 화면을 짓습니다.
+프론트엔드에서 AI 티가 나는 곳(슬롭)을 찾고, 그 자리를 같은 일을 더 잘하는 패턴으로 갈아 끼우거나, 처음부터 슬롭 없이 화면을 짓습니다.
 
-Taster 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 읽는 모든 도구)에 넣어 쓰는 스킬이자
-플러그인입니다. 에이전트는 세 가지를 함께 씁니다.
+[사이트](https://taster-six.vercel.app) | [부품](https://taster-six.vercel.app/components) | [규칙](rules/RULES.md) | [패턴](patterns/README.md) | [변경 기록](CHANGELOG.md) | [기여 안내](CONTRIBUTING.md)
 
-- **규칙.** AI 가 자주 남기는 흔적과 화면 품질 문제를 잴 수 있을 만큼 정확하게 적은 목록입니다. 대문자에 넓은 자간을
-  준 라벨, 색을 옅게 깐 알약 배지, 카드 왼쪽의 두꺼운 색 띠, 이모지 불릿, 똑같은 아이콘 카드 세 장, 단어 중간에서
-  끊기는 한글 줄바꿈 같은 것들입니다. 규칙 88개, 그중 85개는 `rules/detect.js` 가 실제 브라우저에서 잽니다. 나머지는
-  캡처를 보고 눈으로 판단합니다. 걸렸다는 것은 그 페이지에 그 흔적이 있다는 뜻이지, 누가 무엇으로 만들었는지를
-  말하지 않습니다([규칙의 근거](#규칙의-근거)).
-- **패턴 분류 체계.** 패턴 122개. 방문자가 하려는 일(숫자 하나 보기, 요금제 비교, 믿을 근거 확인, 상태 표시)과
-  화면 종류(랜딩, 대시보드, 앱, 쇼핑, 읽을거리, 로그인, AI 대화)로 정리한 재사용 디자인 답안입니다. 화면의 모든
-  부품은 기계로 판정하는 결정 키를 거쳐 분류 하나에 정확히 들어가고, 밀도, 대비, 둥글기, 타입 표현, 색 절제, 깊이,
-  모션, 선 굵기의 여덟 가중치 축이 브랜드의 톤을 토큰으로 옮깁니다. 규칙마다 그것을 고치는 패턴이 연결돼 있습니다.
-- **컴포넌트 모음.** 부품 144개. 토큰으로 만든 React 컴포넌트입니다. 설치할 패키지 없이 필요한 파일만 복사해 쓰고,
-  지워야 할 남의 브랜드도 없습니다.
+| 고치기 전 | 고친 뒤 |
+|---|---|
+| ![고치기 전의 Acme Ledger: 보라색 그라데이션 히어로와 흐린 분홍 빛 번짐, 이모지를 단 알약 배지, 넓은 자간의 대문자 머리글, 제목 속 그라데이션 단어와 기울인 세리프 단어, 글 속 이모지, 색을 옅게 깐 알약 배지를 단 똑같은 아이콘 카드 세 장. 걸린 곳마다 Taster 가 테두리를 쳤음](web/public/compare/before-780.jpg) | ![고친 뒤의 Acme Ledger: 장식 없는 어두운 바탕에 같은 제목, 글, 버튼. 문장형 라벨, 강조색 버튼 하나와 글자 링크, 카드 대신 목록으로 쓴 기능 설명](web/public/compare/after-780.jpg) |
+
+고치기 전: 지어낸 랜딩 페이지 Acme Ledger(18개 규칙에 걸림). 걸린 곳마다 Taster 가 테두리를 쳤습니다. 고친 뒤: 같은 내용을 규칙에 맞게 다시 지어 1440 과 390 폭 모두 0건입니다. 두 페이지와 이를 증명하는 검사는 [`examples/rebuild/`](examples/rebuild/) 에 있습니다.
+
+## <a id="스킬"></a>설치
+
+```bash
+npx skills add https://github.com/makim-414/taster --skill taster
+```
+
+스킬은 `SKILL.md` 를 읽는 모든 에이전트(Claude Code, Codex, Cursor 등)에서 돕니다.
+
+<a id="claude-code-플러그인"></a>Claude Code 에서는 플러그인이 스킬, `/taster` 명령, 로컬 MCP 서버를 함께 넣습니다.
+
+```text
+/plugin marketplace add makim-414/taster
+/plugin install taster@taster
+```
+
+서버를 처음 켤 때 엔진 의존성을 설치하는데, Claude Code 가 서버 연결을 기다리는 시간보다 길어질 수 있습니다.
+`/mcp` 에서 `taster` 가 실패로 보이면 설치가 끝난 뒤 그 화면에서 다시 연결하세요.
+
+필요한 것, 다른 MCP 클라이언트, 처음 할 말은 [자세한 설치](#자세한-설치) 에 있습니다. 명령줄, 소스 린트, GitHub
+Action, 원격 MCP 서버, 확장은 [쓰기](#쓰기) 에 있습니다.
+
+## 들어 있는 것
+
+- **규칙.** 규칙 88개, 그중 85개는 `rules/detect.js` 가 실제 브라우저에서 재고 나머지는 캡처를 보고 눈으로 판단합니다. 대문자에 넓은 자간을 준 라벨, 색을 옅게 깐 알약 배지, 카드 왼쪽의 두꺼운 색 띠, 이모지 불릿, 단어 중간에서 끊기는 한글 줄바꿈 같은 것들입니다. 걸렸다는 것은 그 페이지에 그 흔적이 있다는 뜻이지, 누가 무엇으로 만들었는지를 말하지 않습니다([규칙의 근거](#규칙의-근거)).
+- **패턴.** 패턴 122개. 방문자가 하려는 일(요금제 비교, 믿을 근거 확인, 상태 표시)과 화면 종류(랜딩, 대시보드, 쇼핑, AI 대화 등)로 정리했습니다. 규칙마다 그것을 고치는 패턴이 연결돼 있습니다.
+- **부품.** 부품 144개. 토큰으로 만든 React 컴포넌트입니다. 설치할 패키지 없이 필요한 파일만 복사해 쓰고, 지워야 할 남의 브랜드도 없습니다.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/components.dark.jpg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/components.light.jpg">
+  <img alt="registry 의 Taster 부품 여섯 개를 3열 2줄로 놓은 그림: 요금제 표, 활동 기록, 대화 스레드, 장바구니, 설정 섹션, 아코디언" src="assets/components.light.jpg">
+</picture>
 
 설치 없이 써 보기: https://taster-six.vercel.app 에 주소를 넣으면 데스크톱과 폰 폭 캡처 위에 걸린 규칙을
 표시해 줍니다.
@@ -26,8 +51,6 @@ Taster 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 읽
 **[부품 갤러리 보기](https://taster-six.vercel.app/components).** 모든 부품이 실제로 돌아갑니다. 눌러 보고, 내 브랜드 색을 입혀 보고,
 내 사이트에서 브랜드를 읽어 오고, 몇 개를 나란히 놓고 비교할 수 있습니다. 호스팅 화면은 지금 한국어로만 나오고,
 비교 화면이 에이전트에게 넘길 글은 브라우저 언어를 따릅니다.
-
-![갤러리: 방문자가 고른 브랜드 색으로 부품이 실제로 돌아가는 화면](assets/gallery.jpg)
 
 ## 하는 일
 
@@ -50,10 +73,10 @@ Taster 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 읽
 시스템 토큰이 아닌 값을 알려 줍니다. 순서는 `taster.plan.json` 이 지키고, 순서를 건너뛰는 단계는 거부합니다
 ([screens.md](skills/taster/references/screens.md)).
 
-`examples/rebuild/` 에 다시 짓기 예시가 있습니다. AI 티 나는 랜딩(18개 규칙에 걸림)을 다시 지어 두 폭 모두 0건,
+`examples/rebuild/` 에 맨 위 그림의 다시 짓기 예시가 있습니다. AI 티 나는 랜딩을 다시 지어 두 폭 모두 0건,
 제목·버튼·메뉴는 하나도 빠지지 않고 브랜드 색도 그대로입니다. 같은 부품으로 지은 두 번째 화면도 있고, 첫 화면과
-어긋나지 않고 시스템 안에 있는지 확인합니다. `node engine/scripts/check-rebuild-example.mjs` 가 이 숫자까지 모두
-확인합니다.
+어긋나지 않고 시스템 안에 있는지 확인합니다. `node engine/scripts/check-rebuild-example.mjs` 가 그림 아래 적은 규칙
+수까지 모두 확인합니다.
 
 `examples/icon-slots/` 에는 아이콘 자리(조작, 설명용, 식별 마크, 데이터 표식, 아이콘 없음)마다 변형 5개씩, `taxonomy.json` 에
 적힌 25개가 그대로 있습니다. `node engine/scripts/check-icon-slots-example.mjs` 가 분류 체계와 맞는지, 두 폭 모두 0건인지
@@ -76,7 +99,7 @@ node engine/cli.mjs --tune system/taster.system.json roundness=1
 MCP 도구: `design_system`, `tune_system`, `system_for_category`. 측정값이 단계로, 단계가 토큰으로 바뀌는 방식은
 `skills/taster/references/system.md` 에 있습니다.
 
-## 설치
+## 자세한 설치
 
 ### 필요한 것
 
@@ -85,25 +108,6 @@ MCP 도구: `design_system`, `tune_system`, `system_for_category`. 측정값이 
 - 페이지를 여는 기능에는 브라우저가 필요합니다. Playwright 의 Chromium 이 있으면 그것을, 없으면 설치된 Google
   Chrome 을 씁니다. 클론에서 `node engine/setup.mjs` 를 실행하면 둘 중 하나가 뜨는지 확인하고, 둘 다 안 될 때만
   Chromium 을 받습니다. 소스 린트에는 브라우저가 필요 없습니다.
-
-### 스킬
-
-스킬을 지원하는 에이전트:
-
-```bash
-npx skills add https://github.com/makim-414/taster --skill taster
-```
-
-### Claude Code 플러그인
-
-```text
-/plugin marketplace add makim-414/taster
-/plugin install taster@taster
-```
-
-플러그인에는 스킬, `/taster` 명령, 로컬 MCP 서버가 함께 들어 있습니다. 서버를 처음 켤 때 엔진 의존성을 설치하는데,
-Claude Code 가 서버 연결을 기다리는 시간보다 길어질 수 있습니다. `/mcp` 에서 `taster` 가 실패로 보이면 설치가 끝난
-뒤 그 화면에서 다시 연결하세요.
 
 ### 다른 클라이언트에서 MCP 서버 쓰기
 
@@ -337,26 +341,7 @@ JetBrains IDE 는 같은 `agent_servers` 모양(`type` 없이)을 `~/.jetbrains/
 
 ## 리포 구성
 
-```text
-skills/taster/       스킬(SKILL.md, references, 생성되는 data/ 묶음)
-taxonomy/            분류와 결정 키, 용도, 화면 종류, 가중치 축, 제약(SCHEMA.md)
-patterns/            패턴마다 마크다운 파일 하나, 그리고 INDEX.json
-rules/               rules.json, detect.js(페이지 안에서 실행), 픽스처와 테스트
-engine/              detect.js 를 두 폭에서 실행: CLI, MCP 서버(시작 프롬프트, 진단, 추출, 교체 도구), ACP 에이전트, 테스트
-bin/                 taster.mjs, npm 패키지의 명령 하나(진단, add, export, lint, mcp, acp, setup)
-registry/            React 부품(add 가 내 앱에 복사), 토큰, 데모 페이지, 정지 화면과 그 테스트
-examples/rebuild/    다시 짓기 예시, 전과 후, 자체 검사
-examples/icon-slots/ 아이콘 자리마다 변형 다섯 개, 분류 체계와 대조, 자체 검사
-exports/             MCP 없는 에이전트용 규칙 지침 파일(생성)
-extension/           크롬·엣지 확장. 안의 detect.js 와 rules.js 는 생성
-web/                 호스팅 사이트: 진단, 갤러리, 비교 화면, 톤 지도, 북마클릿, 원격 MCP 서버
-commands/            Claude Code 의 /taster 명령
-.github/             CI, 이슈 양식, 행동 강령, 릴리스 날 보내는 ACP 레지스트리 항목
-assets/              이 README 의 그림
-scripts/             build-docs.mjs(링크, 빈 분류, README 블록, 스킬 묶음 생성), validate.mjs, gates.mjs
-action.yml           GitHub Action
-AGENTS.md            코딩 에이전트용 짧은 안내: 리포 지도, 옮기면 안 되는 경로, 검사
-```
+폴더마다 무엇이 있는지, 옮기면 안 되는 경로, 생성 파일은 [AGENTS.md](AGENTS.md)(영어) 에 있습니다.
 
 ## 개발
 
