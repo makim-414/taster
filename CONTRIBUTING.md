@@ -52,7 +52,9 @@ Some files are generated. Do not edit them by hand; edit the source and run the 
 - `npm --prefix registry run build-stage` writes `registry/stage/` and `registry/previews/`. Run it after changing a
   component or its demo; `node scripts/validate.mjs` fails until you do.
 
-Commit the generated files together with the change that caused them.
+Commit the generated files together with the change that caused them. `.gitattributes` marks the generated paths
+`linguist-generated`, so GitHub folds them in pull request diffs and leaves them out of the language bar; add a line
+there when a build starts writing a new file.
 
 ## Checks
 
