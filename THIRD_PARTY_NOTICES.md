@@ -11,7 +11,7 @@ keep their own license files in `node_modules` and are not repeated here.
 | The home page's before/after slider | `web/app/compare-reveal.tsx`, `web/app/compare-spring.ts` | Motiq, below |
 | Noto Sans KR, latin slice | `web/app/fonts/` | SIL Open Font License 1.1, [`web/app/fonts/OFL.txt`](web/app/fonts/OFL.txt) |
 | The home page comparison pictures | `web/public/compare/` | Taster's own example, below |
-| Code of conduct | `CODE_OF_CONDUCT.md` | Adapted from the Contributor Covenant 2.1, credited in the file |
+| Code of conduct | `.github/CODE_OF_CONDUCT.md` | Adapted from the Contributor Covenant 2.1, credited in the file |
 
 ## Motiq
 
