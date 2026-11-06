@@ -51,6 +51,10 @@ All notable changes to Taster are recorded here. The format follows
 - The hosted MCP server takes one JSON-RPC message per request (a batch gets 400), counts every tool call against a
   per client minute and answers with an error instead of anything over 4 MB. Its limits, like those of the other
   hosted routes, are kept by each server instance on its own.
+- Repository layout: the code of conduct is now `.github/CODE_OF_CONDUCT.md`, `RELEASE.md` is `RELEASING.md`, the
+  ACP registry entry is in `.github/acp-registry/taster/` (`distribution/` is gone) and the README pictures are in
+  `assets/` (`docs/` is gone). Old links to `CODE_OF_CONDUCT.md` and `RELEASE.md` at the root now return 404. A new
+  `AGENTS.md` tells coding agents which paths not to move.
 
 ### Fixed
 
