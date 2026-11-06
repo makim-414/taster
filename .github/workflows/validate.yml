@@ -80,13 +80,23 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: ms-playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      # Ubuntu runners have no Korean, Japanese, Chinese or Thai fonts, and the apt mirror can take minutes for each
+      # font package. The font files install-deps adds are kept here, so a cache hit skips apt.
+      - name: Korean, Japanese, Chinese and Thai fonts from the cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.local/share/fonts/ci
+          key: ci-fonts-${{ runner.os }}-v1
       - name: Chromium, and its system libraries and fonts only when the runner lacks them
-        timeout-minutes: 8
+        timeout-minutes: 12
         run: |
+          fc-cache -f > /dev/null 2>&1 || true
           npx --prefix engine playwright install chromium
           npx --prefix registry playwright-core install chromium
           if ! (node -e "require('./engine/node_modules/playwright').chromium.launch().then((b) => b.close())" && for l in ko ja zh th; do fc-list ":lang=$l" | grep -q . || exit 1; done); then
             npx --prefix engine playwright install-deps chromium
+            mkdir -p ~/.local/share/fonts/ci
+            for p in fonts-ipafont-gothic fonts-wqy-zenhei fonts-tlwg-loma-otf fonts-freefont-ttf fonts-unifont; do dpkg -L "$p" 2>/dev/null; done | grep -E '\.(ttf|otf|ttc)$' | xargs -r cp -t ~/.local/share/fonts/ci/
           fi
       - name: Detector fixtures
         run: node rules/test-detect.mjs
@@ -127,12 +137,22 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: ms-playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      # Ubuntu runners have no Korean, Japanese, Chinese or Thai fonts, and the apt mirror can take minutes for each
+      # font package. The font files install-deps adds are kept here, so a cache hit skips apt.
+      - name: Korean, Japanese, Chinese and Thai fonts from the cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.local/share/fonts/ci
+          key: ci-fonts-${{ runner.os }}-v1
       - name: Chromium, and its system libraries and fonts only when the runner lacks them
-        timeout-minutes: 8
+        timeout-minutes: 12
         run: |
+          fc-cache -f > /dev/null 2>&1 || true
           npx --prefix web playwright-core install chromium
           if ! (node -e "require('./web/node_modules/playwright-core').chromium.launch().then((b) => b.close())" && for l in ko ja zh th; do fc-list ":lang=$l" | grep -q . || exit 1; done); then
             npx --prefix web playwright-core install-deps chromium
+            mkdir -p ~/.local/share/fonts/ci
+            for p in fonts-ipafont-gothic fonts-wqy-zenhei fonts-tlwg-loma-otf fonts-freefont-ttf fonts-unifont; do dpkg -L "$p" 2>/dev/null; done | grep -E '\.(ttf|otf|ttc)$' | xargs -r cp -t ~/.local/share/fonts/ci/
           fi
       - name: Next.js build cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
