@@ -1,4 +1,4 @@
-# Release
+# Releasing
 
 Everything below is prepared in the repository and checked; the steps that publish happen on release day, in this
 order, by the owner. Version 0.1.0.
@@ -17,9 +17,14 @@ order, by the owner. Version 0.1.0.
 2. npm: in `package.json` remove `"private": true`, then `npm publish --access public` (package `@makim-414/taster`,
    command `taster`). Check `npx @makim-414/taster --rules` from an empty folder. The unscoped name `taster` is taken;
    `taster-cli` and `taster-ui` were free on 2026-10-29 if a short name is wanted later.
-3. ACP registry: fork https://github.com/agentclientprotocol/registry, copy `distribution/acp-registry/taster/` to the
+3. ACP registry: fork https://github.com/agentclientprotocol/registry, copy `.github/acp-registry/taster/` to the
    fork's root, open a pull request. Its CI launches `npx @makim-414/taster@0.1.0 acp` and checks the handshake, so this
    step comes after step 2.
+   - The folder holds an `agent.json`, checked against that repository's `agent.schema.json`, and a 16 px
+     `currentColor` icon. Nothing in it is published by this repository itself. `node scripts/build-docs.mjs` writes
+     its description and `node scripts/validate.mjs` checks its version and npx package against `package.json`.
+   - The registry lists agents with Agent or Terminal auth. Taster has no account, so its terminal method is the
+     one-time browser setup (`taster acp --setup`), which nothing requires before use.
 4. Chrome Web Store: zip `extension/` (manifest, background, overlay, generated detector and rule names, icons) and
    submit. Permissions to explain: `activeTab` and `scripting`, used only when the button is clicked. No data leaves
    the tab. Edge Add-ons takes the same zip.
