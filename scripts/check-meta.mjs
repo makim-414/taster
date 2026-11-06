@@ -1,6 +1,8 @@
 // The package and plugin metadata: descriptions written from the repository's counts, and the checks validate.mjs
 // runs on what we tell people (counts in prose, versions, dependencies, the files npm would publish, pattern links,
-// credits). build-docs.mjs writes DESCRIPTIONS; validate.mjs gathers the files and calls the checks. No dependencies.
+// relative links and pictures in Markdown, credits). build-docs.mjs writes DESCRIPTIONS; validate.mjs gathers the
+// files and calls the checks. No dependencies.
+import path from 'node:path';
 
 // The counts every description and README states. measured leaves out the manual rules, which are judged by eye.
 export function metaCounts({ rules, patterns, components }) {
@@ -172,6 +174,85 @@ export function patternLinkErrors(file, text, ids) {
     for (const m of text.matchAll(/\]\(([A-Za-z0-9_-]+)\.md(?:#[^)]*)?\)/g)) if (bad(m[1])) errors.push(`${file} links ${m[1]}.md, which is not in patterns/INDEX.json`);
   }
   return errors;
+}
+
+// Relative links and pictures in a Markdown file point at a file or folder that exists, so moving a file cannot leave
+// a README with a broken picture. Read: [text](path), ![alt](path), [label]: path, and the src, srcset and href of
+// <img>, <source> and <a>. A path is resolved from the Markdown file's folder (a leading / from the repository root),
+// without its #anchor and ?query. Not read: addresses with a scheme (https:, mailto:), links to an anchor in the same
+// file, and anything in a code block, in inline code or in an HTML comment, which GitHub does not show as a link.
+// Whether an anchor exists is not checked. exists(rel) says whether a path relative to the repository root is there.
+export function markdownLinkErrors(file, text, exists) {
+  const errors = [];
+  const prose = markdownProse(text);
+  const lineOf = (i) => prose.slice(0, i).split('\n').length;
+  for (const { at, target } of markdownTargets(prose)) {
+    const rel = repoPath(file, target);
+    if (rel === null) continue;
+    if (rel === '..' || rel.startsWith('../')) errors.push(`${file}:${lineOf(at)} ${target} points outside the repository`);
+    else if (!exists(rel)) errors.push(`${file}:${lineOf(at)} ${target} (no file or folder at ${rel})`);
+  }
+  return errors;
+}
+
+// The text with code blocks, inline code and HTML comments blanked to spaces. Newlines stay, so an offset in the
+// result is on the same line as in the file.
+const blank = (s) => s.replace(/[^\n]/g, ' ');
+function markdownProse(text) {
+  let fence = null;
+  const lines = text.split('\n').map((line) => {
+    const t = line.trim();
+    if (fence) {
+      if (t.length >= fence.length && [...t].every((c) => c === fence[0])) fence = null;
+      return blank(line);
+    }
+    const open = t.match(/^(`{3,}|~{3,})(.*)$/);
+    if (open && !(open[1][0] === '`' && open[2].includes('`'))) {
+      fence = open[1];
+      return blank(line);
+    }
+    return line;
+  });
+  return lines
+    .join('\n')
+    .replace(/(?<!`)(`+)(?!`)(?:(?!\n[ \t]*\n)[\s\S])*?(?<!`)\1(?!`)/g, blank)
+    .replace(/<!--[\s\S]*?-->/g, blank);
+}
+
+// Every link target in the prose, as written, with its offset.
+function markdownTargets(prose) {
+  const found = [];
+  for (const m of prose.matchAll(/\]\(\s*(<[^<>\n]*>|(?:[^\s()]|\([^\s()]*\))*)(?:\s+(?:"[^"]*"|'[^']*'|\([^()]*\)))?\s*\)/g)) {
+    found.push({ at: m.index + m[0].indexOf(m[1]), target: m[1] });
+  }
+  for (const m of prose.matchAll(/^ {0,3}\[(?!\^)[^\]\n]+\]:[ \t]*(<[^<>\n]*>|\S+)/gm)) {
+    found.push({ at: m.index + m[0].length - m[1].length, target: m[1] });
+  }
+  for (const tag of prose.matchAll(/<(?:img|source|a)\b[^>]*>/gi)) {
+    for (const a of tag[0].matchAll(/\s(src|srcset|href)\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)) {
+      const value = a[2] ?? a[3];
+      const at = tag.index + a.index + a[0].indexOf(value);
+      const targets = a[1].toLowerCase() === 'srcset' ? value.split(',').map((c) => c.trim().split(/\s+/)[0]) : [value];
+      for (const target of targets) if (target) found.push({ at, target });
+    }
+  }
+  return found.sort((a, b) => a.at - b.at);
+}
+
+// A link target as a path relative to the repository root, or null when it is not a path in the repository.
+function repoPath(file, target) {
+  let t = target.trim();
+  if (t.startsWith('<') && t.endsWith('>')) t = t.slice(1, -1).trim();
+  if (!t || t.startsWith('#') || t.startsWith('//') || /^[a-z][a-z0-9+.-]*:/i.test(t)) return null;
+  t = t.replace(/[?#].*$/, '');
+  if (!t) return null;
+  try {
+    t = decodeURI(t);
+  } catch {
+    // a stray % stays as written
+  }
+  const rel = t.startsWith('/') ? path.posix.normalize(t.slice(1) || '.') : path.posix.join(path.posix.dirname(file), t);
+  return rel.replace(/(.)\/+$/, '$1');
 }
 
 // A component built after a 21st.dev listing credits it in registry.json, and one of its patterns keeps the same link

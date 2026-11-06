@@ -11,6 +11,7 @@ import {
   countErrors,
   creditErrors,
   getAt,
+  markdownLinkErrors,
   metaCounts,
   npxErrors,
   packErrors,
@@ -146,6 +147,46 @@ test('links to patterns name patterns that exist', () => {
   ]);
   assert.equal(patternLinkErrors('patterns/hairline-card.md', 'See [x](no-such-pattern.md) and [y](hairline-card.md#do).', ids).length, 1);
   assert.deepEqual(patternLinkErrors('docs/a.md', 'See [x](no-such-page.md).', ids), [], 'relative links are read only inside patterns/');
+});
+
+test('relative links and pictures in every Markdown file git tracks point at files that exist', () => {
+  const ls = spawnSync('git', ['ls-files', '-z', '--', '*.md'], { cwd: ROOT, encoding: 'utf8' });
+  assert.equal(ls.status, 0, ls.stderr);
+  const tracked = ls.stdout.split('\0').filter((f) => f && !/(^|\/)node_modules\//.test(f) && existsSync(join(ROOT, f)));
+  assert.ok(tracked.includes('README.md') && tracked.includes('skills/taster/SKILL.md'), 'git ls-files lists the Markdown files');
+  for (const f of tracked) assert.deepEqual(markdownLinkErrors(f, read(f), (rel) => existsSync(join(ROOT, rel))), [], f);
+});
+
+test('a missing link or picture fails with its line; addresses, anchors and code are not read', () => {
+  const have = new Set(['.', 'docs', 'docs/board.jpg', 'docs/guide.md', 'README.md', 'LICENSE']);
+  const page = [
+    '# Title',
+    '![Board](board.jpg) and [guide](guide.md#setup "Setup")',
+    '![Gone](gallery.jpg?raw=1)',
+    '[Back](../README.md) [License](/LICENSE) [up](..) [folder](./) [![badge](board.jpg)](<guide.md>)',
+    '<picture><source srcset="dark.jpg 1x, board.jpg 2x"><img alt="" src="light.jpg"></picture>',
+    '[top](#title) [site](https://example.com/x.png) [mail](mailto:hello@example.com) [file](board.jpg#top)',
+    'Inline `[x](nope.md)` and ``![y](nope.png)`` are code.',
+    '```md',
+    '![in a block](nope.png)',
+    '```',
+    '<!-- [hidden](nope.md) -->',
+    '[label]: missing.md',
+    '[^1]: A footnote, not a link.',
+    '[out](../../outside.md)',
+  ].join('\n');
+  assert.deepEqual(markdownLinkErrors('docs/page.md', page, (rel) => have.has(rel)), [
+    'docs/page.md:3 gallery.jpg?raw=1 (no file or folder at docs/gallery.jpg)',
+    'docs/page.md:5 dark.jpg (no file or folder at docs/dark.jpg)',
+    'docs/page.md:5 light.jpg (no file or folder at docs/light.jpg)',
+    'docs/page.md:12 missing.md (no file or folder at docs/missing.md)',
+    'docs/page.md:14 ../../outside.md points outside the repository',
+  ]);
+  // A fence that is never closed runs to the end of the file, as GitHub shows it.
+  assert.deepEqual(markdownLinkErrors('README.md', '~~~\n![x](nope.png)\n', () => false), []);
+  const spaced = 'See [x](<a b.md>) and [y](a%20b.md).';
+  assert.deepEqual(markdownLinkErrors('README.md', spaced, (rel) => rel === 'a b.md'), []);
+  assert.equal(markdownLinkErrors('README.md', spaced, () => false).length, 2);
 });
 
 test('a 21st.dev credit keeps its link in one of the component\'s patterns', () => {
