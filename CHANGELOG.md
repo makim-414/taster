@@ -6,6 +6,10 @@ All notable changes to Taster are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-06
+
+The first tagged release (`v0.2.0`, and `v0` for the GitHub Action).
+
 ### Added
 
 - A strict taxonomy (`taxonomy/`, [SCHEMA.md](taxonomy/SCHEMA.md)): 33 categories in 8 families, a decision key over
@@ -66,7 +70,6 @@ All notable changes to Taster are recorded here. The format follows
   change.
 - The README install lines work before the npm package is published: the lint and component lines run the clone's
   CLI by its path from the app folder, so `--dir` lands inside the app.
-
 - AC-09 skips text inside form fields and code editors.
 - The light theme has its own sidebar surface.
 - The engine reads a transparent page background as the canvas instead of black, reads the heading face across h1 to
@@ -90,7 +93,7 @@ All notable changes to Taster are recorded here. The format follows
 
 ## [0.1.0] - 2026-11-02
 
-The first public version. It has no tag yet and covers everything merged up to this date.
+The first public version, never tagged. It covers everything merged up to this date.
 
 ### Added
 

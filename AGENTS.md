@@ -29,7 +29,7 @@ Tools and settings outside this repository read these by path; moving or renamin
 - `.claude-plugin/`, `.codex-plugin/`, `.mcp.json`: the plugin manifests Claude Code and Codex read at the root.
 - `skills/taster/`: skill installers copy the folder whole, and `SKILL.md` links into its own `data/`.
 - `action.yml`, `.nvmrc`, `engine/package-lock.json`: an action lives at the root, installs the engine from that
-  lockfile on the Node in `.nvmrc`, and users' workflows call it as `makim-414/taster@main`.
+  lockfile on the Node in `.nvmrc`, and users' workflows call it as `makim-414/taster@v0` or `@main`.
 - `web/`: Vercel builds the site from this folder; `web/vercel.json` installs `../engine`.
 - `patterns/<id>.md`: SARIF results (`engine/sarif.mjs`) and the site link to `blob/main/patterns/<id>.md`, links that
   already sit in users' code scanning alerts.

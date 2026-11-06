@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Taster",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Outline the habits that make a page look AI generated: 88 rules, 85 measured on the page you are viewing.",
   "action": {
     "default_title": "Check this page with Taster",

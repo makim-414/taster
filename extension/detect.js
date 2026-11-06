@@ -31,7 +31,7 @@
 (function () {
   'use strict';
 
-  var VERSION = '0.1.0';
+  var VERSION = '0.2.0';
   var STATE_KEY = '__tasterHighlights';
   // Long dashes are built from char codes so this file stays free of the characters themselves.
   var EM = String.fromCharCode(8212);

@@ -225,7 +225,7 @@ permissions:
   security-events: write
 steps:
   - uses: actions/checkout@v4
-  - uses: makim-414/taster@main
+  - uses: makim-414/taster@v0
     with:
       targets: |
         dist/index.html
@@ -235,7 +235,7 @@ steps:
 
 결과를 작업 요약과 SARIF 로 남기고, SARIF 를 코드 스캔에 올려 바뀐 파일 위에 표시하며, `fail-on`(기본 high) 이상이면
 단계를 실패시킵니다. 코드 스캔이 없으면 `upload-sarif: 'false'`. 로컬에서는 `node engine/cli.mjs <대상...> --sarif taster.sarif`.
-아직 릴리스 태그가 없어서 예시는 `main` 을 따릅니다. 바뀐 내용을 하나하나 보고 쓰려면 커밋 SHA 전체로 고정하세요.
+`v0` 은 가장 최근 0.x 릴리스를 따릅니다. 바뀐 내용을 하나하나 보고 쓰려면 커밋 SHA 전체로 고정하세요.
 
 봇 확인, 오류 화면, 로그인 화면이 돌아온 대상은 진단하지 않습니다. 단계는 종료 코드 2 로 실패하고, 작업 요약과
 SARIF 에 이유를 적으며 발견은 없습니다. 배포 보호가 켜진 프리뷰는 401 을 돌려주므로 여기에 해당합니다. Taster 는
