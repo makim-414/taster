@@ -24,7 +24,7 @@ It follows every relative import (helpers such as `_cn.ts` and `_url.ts`, other 
 `--overwrite`. `--dir` is relative to the folder you run it in. To read the component files from the hosted copy
 instead of the clone, add `--from https://taster-six.vercel.app` (the same files, served at `/r/<id>.json`;
 `/r/index.json` lists the ids); the command itself still runs from the clone. The npm package will replace the clone
-once it is published (`RELEASE.md`).
+once it is published (`RELEASING.md`).
 
 ## Copy a component by hand
 

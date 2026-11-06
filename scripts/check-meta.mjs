@@ -30,7 +30,7 @@ export const DESCRIPTIONS = [
     text: (c) => `Outline the habits that make a page look AI generated: ${c.rules} rules, ${c.measured} measured on the page you are viewing.`,
   },
   {
-    file: 'distribution/acp-registry/taster/agent.json',
+    file: '.github/acp-registry/taster/agent.json',
     at: ['description'],
     text: (c) =>
       `Checks a page for the AI generated look (${c.rules} rules, ${c.measured} measured in a real browser) and answers with findings, fixes and patterns. No model inside.`,
@@ -110,7 +110,7 @@ export function versionErrors(json, sources) {
   const stated = [
     ['engine/package.json', ['version']],
     ['extension/manifest.json', ['version']],
-    ['distribution/acp-registry/taster/agent.json', ['version']],
+    ['.github/acp-registry/taster/agent.json', ['version']],
     ['.claude-plugin/marketplace.json', ['plugins', 0, 'version']],
     ['.codex-plugin/plugin.json', ['version']],
   ];
@@ -118,7 +118,7 @@ export function versionErrors(json, sources) {
     const v = getAt(json[file], at);
     if (v !== version) errors.push(`${file} ${at.join('.')} is ${v}, package.json is ${version}`);
   }
-  const npx = getAt(json['distribution/acp-registry/taster/agent.json'], ['distribution', 'npx', 'package']);
+  const npx = getAt(json['.github/acp-registry/taster/agent.json'], ['distribution', 'npx', 'package']);
   if (npx !== `${json['package.json'].name}@${version}`) errors.push(`agent.json distribution.npx.package is ${npx}, expected ${json['package.json'].name}@${version}`);
   for (const [file, text] of Object.entries(sources)) {
     if (!text.includes("new URL('./package.json', import.meta.url)")) errors.push(`${file} does not read its version from package.json`);

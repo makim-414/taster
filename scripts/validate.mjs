@@ -196,8 +196,8 @@ const docs = {};
     if (dash.test(t)) err(`dash character in ${rel}`);
     if (emoji.test(t)) err(`emoji in ${rel}`);
     for (const e of meta.patternLinkErrors(rel, t, patternIds)) err(e);
-    // RELEASE.md says how to publish, CHANGELOG.md what was; the other pages say what to run today.
-    if (rel.endsWith('.md') && !['RELEASE.md', 'CHANGELOG.md'].includes(rel)) docs[rel] = t;
+    // RELEASING.md says how to publish, CHANGELOG.md what was; the other pages say what to run today.
+    if (rel.endsWith('.md') && !['RELEASING.md', 'CHANGELOG.md'].includes(rel)) docs[rel] = t;
   }
 })(ROOT);
 for (const e of meta.npxErrors(readJson('package.json'), docs)) err(e);

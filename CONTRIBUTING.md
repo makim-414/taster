@@ -2,7 +2,8 @@
 
 Thanks for helping. This guide covers setup, the checks every change passes before it is merged, and the rules for
 code and pictures that come from somewhere else. Everyone taking part follows the
-[Code of Conduct](CODE_OF_CONDUCT.md). Security problems go through [SECURITY.md](SECURITY.md), never a public issue.
+[Code of Conduct](.github/CODE_OF_CONDUCT.md). Security problems go through [SECURITY.md](SECURITY.md), never a
+public issue.
 
 ## Before you start
 
@@ -45,7 +46,7 @@ Some files are generated. Do not edit them by hand; edit the source and run the 
 
 - `node scripts/build-docs.mjs` writes `rules/RULES.md`, `patterns/README.md`, the taxonomy block in `README.md`,
   the rules block in both READMEs, the descriptions in `package.json`, `extension/manifest.json`,
-  `distribution/acp-registry/taster/agent.json` and the two plugin manifests (`scripts/check-meta.mjs` lists them),
+  `.github/acp-registry/taster/agent.json` and the two plugin manifests (`scripts/check-meta.mjs` lists them),
   `exports/`, `extension/detect.js`, `extension/rules.js`, `registry/src/motion/orb-recipes.ts`,
   `skills/taster/data/`, and the derived fields `fix_patterns` in `rules/rules.json`, `patterns` in
   `registry/registry.json` and `gaps` in `taxonomy/taxonomy.json`.
