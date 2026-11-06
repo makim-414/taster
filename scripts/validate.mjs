@@ -202,6 +202,31 @@ const docs = {};
 })(ROOT);
 for (const e of meta.npxErrors(readJson('package.json'), docs)) err(e);
 
+// Relative links and pictures in every Markdown file git tracks point at a file or folder that exists
+// (scripts/check-meta.mjs). Names are matched letter for letter, as Linux CI and GitHub read them, also on a Mac.
+{
+  const ls = spawnSync('git', ['ls-files', '-z', '--', '*.md'], { cwd: ROOT, encoding: 'utf8' });
+  if (ls.status !== 0) err(`git ls-files failed, so Markdown links were not checked: ${(ls.stderr || ls.error?.message || '').trim()}`);
+  else {
+    const listings = new Map();
+    const names = (dir) => {
+      if (!listings.has(dir)) {
+        try {
+          listings.set(dir, new Set(fs.readdirSync(path.join(ROOT, dir))));
+        } catch {
+          listings.set(dir, null);
+        }
+      }
+      return listings.get(dir);
+    };
+    const exists = (rel) => rel.split('/').filter((p) => p && p !== '.').every((p, i, parts) => names(parts.slice(0, i).join('/'))?.has(p));
+    for (const rel of ls.stdout.split('\0').filter((f) => f && !/(^|\/)node_modules\//.test(f))) {
+      if (!fs.existsSync(path.join(ROOT, rel))) continue; // deleted in the working tree and not yet committed
+      for (const e of meta.markdownLinkErrors(rel, fs.readFileSync(path.join(ROOT, rel), 'utf8'), exists)) err(e);
+    }
+  }
+}
+
 // exports/ must match what build-docs would write from the current rules.json.
 {
   const { renderAll } = await import('../engine/exports.mjs');
