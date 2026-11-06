@@ -56,7 +56,9 @@ Some files are generated. Do not edit them by hand; edit the source and run the 
   `assets/components.light.jpg`. Run it after changing the card's sentence or one of the six component stills it
   reads from `registry/previews/` (the list is in the script).
 
-Commit the generated files together with the change that caused them.
+Commit the generated files together with the change that caused them. `.gitattributes` marks the generated paths
+`linguist-generated`, so GitHub folds them in pull request diffs and leaves them out of the language bar; add a line
+there when a build starts writing a new file.
 
 ## Checks
 
