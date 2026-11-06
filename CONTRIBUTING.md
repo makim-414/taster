@@ -51,6 +51,10 @@ Some files are generated. Do not edit them by hand; edit the source and run the 
   `registry/registry.json` and `gaps` in `taxonomy/taxonomy.json`.
 - `npm --prefix registry run build-stage` writes `registry/stage/` and `registry/previews/`. Run it after changing a
   component or its demo; `node scripts/validate.mjs` fails until you do.
+- `node web/scripts/readme/render.mjs` writes the pictures for the repository page: `assets/social-preview.png`
+  (uploaded by hand under Settings, Social preview) and `assets/components.dark.jpg` and
+  `assets/components.light.jpg`. Run it after changing the card's sentence or one of the six component stills it
+  reads from `registry/previews/` (the list is in the script).
 
 Commit the generated files together with the change that caused them.
 
