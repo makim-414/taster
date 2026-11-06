@@ -355,6 +355,7 @@ commands/            Claude Code 의 /taster 명령
 assets/              이 README 의 그림
 scripts/             build-docs.mjs(링크, 빈 분류, README 블록, 스킬 묶음 생성), validate.mjs, gates.mjs
 action.yml           GitHub Action
+AGENTS.md            코딩 에이전트용 짧은 안내: 리포 지도, 옮기면 안 되는 경로, 검사
 ```
 
 ## 개발
