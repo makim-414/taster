@@ -1,9 +1,9 @@
-name: Taster
+name: Taster Slop Check
 description: Check pages for the generated UI look in a real browser and report the findings on the pull request.
 author: makim-414
 branding:
   icon: eye
-  color: gray
+  color: gray-dark
 inputs:
   targets:
     description: URLs or HTML file paths to check, one per line. Paths are relative to the repository root.
