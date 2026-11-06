@@ -27,7 +27,7 @@ Taster 는 코딩 에이전트(Claude Code, Codex, Cursor 등 `SKILL.md` 를 읽
 내 사이트에서 브랜드를 읽어 오고, 몇 개를 나란히 놓고 비교할 수 있습니다. 호스팅 화면은 지금 한국어로만 나오고,
 비교 화면이 에이전트에게 넘길 글은 브라우저 언어를 따릅니다.
 
-![갤러리: 방문자가 고른 브랜드 색으로 부품이 실제로 돌아가는 화면](docs/gallery.jpg)
+![갤러리: 방문자가 고른 브랜드 색으로 부품이 실제로 돌아가는 화면](assets/gallery.jpg)
 
 ## 하는 일
 
@@ -204,7 +204,7 @@ MIT 라이선스도 옆에 둡니다. shadcn 같은 다른 CLI 는 필요 없습
 단추가 없는 쿠키 창은 링크만), 그 위치의 8개 축과 토큰, 그 토큰을 입은 Taster 부품을 보여 줍니다. 레퍼런스는 방향이고,
 부품이 실제로 받게 될 화면입니다. [톤 고르기](https://taster-six.vercel.app/tone) 화면에서 직접 점을 옮겨 볼 수 있습니다.
 
-![비교 화면: 후보 두 개가 나란히 실제로 돌아가고 하나를 고른 화면](docs/board.jpg)
+![비교 화면: 후보 두 개가 나란히 실제로 돌아가고 하나를 고른 화면](assets/board.jpg)
 
 ### MCP 없는 에이전트용 규칙 파일
 
@@ -352,7 +352,7 @@ extension/           크롬·엣지 확장. 안의 detect.js 와 rules.js 는 �
 web/                 호스팅 사이트: 진단, 갤러리, 비교 화면, 톤 지도, 북마클릿, 원격 MCP 서버
 commands/            Claude Code 의 /taster 명령
 .github/             CI, 이슈 양식, 행동 강령, 릴리스 날 보내는 ACP 레지스트리 항목
-docs/                이 README 의 그림
+assets/              이 README 의 그림
 scripts/             build-docs.mjs(링크, 빈 분류, README 블록, 스킬 묶음 생성), validate.mjs, gates.mjs
 action.yml           GitHub Action
 ```
