@@ -370,7 +370,7 @@ exports/             the rules as instruction files for agents without MCP (gene
 extension/           the Chrome and Edge extension; its detect.js and rules.js are generated
 web/                 the hosted site: diagnosis, gallery, board, tone map, the bookmarklet and the hosted MCP server
 commands/            the /taster command for Claude Code
-distribution/        the ACP registry entry, sent on release day
+.github/             CI, issue templates, the code of conduct, and the ACP registry entry sent on release day
 docs/                the pictures in this README
 scripts/             build-docs.mjs (derives links, gaps, the README blocks and the skill bundle), validate.mjs, gates.mjs
 action.yml           the GitHub Action

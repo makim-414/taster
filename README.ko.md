@@ -351,7 +351,7 @@ exports/             MCP 없는 에이전트용 규칙 지침 파일(생성)
 extension/           크롬·엣지 확장. 안의 detect.js 와 rules.js 는 생성
 web/                 호스팅 사이트: 진단, 갤러리, 비교 화면, 톤 지도, 북마클릿, 원격 MCP 서버
 commands/            Claude Code 의 /taster 명령
-distribution/        ACP 레지스트리 항목, 릴리스 날 보냄
+.github/             CI, 이슈 양식, 행동 강령, 릴리스 날 보내는 ACP 레지스트리 항목
 docs/                이 README 의 그림
 scripts/             build-docs.mjs(링크, 빈 분류, README 블록, 스킬 묶음 생성), validate.mjs, gates.mjs
 action.yml           GitHub Action
