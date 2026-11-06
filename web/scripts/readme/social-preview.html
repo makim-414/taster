@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Taster social preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600&display=block" rel="stylesheet">
+<style>/*TOKENS*/</style>
+<style>
+  :root { --font: 'Noto Sans KR', sans-serif; }
+  html, body { margin: 0; width: 1280px; height: 640px; background: var(--bg); color: var(--text); font-family: var(--font); }
+  .card { box-sizing: border-box; width: 1280px; height: 640px; padding: var(--sp-8) var(--sp-16); display: flex; flex-direction: column; }
+  .top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-6); }
+  h1 { margin: 0; font-size: calc(var(--t-display) * 1.5); line-height: var(--lh-tight); font-weight: var(--w-semi); }
+  .url { font-size: var(--t-h2); color: var(--text-subtle); }
+  p { margin: var(--sp-3) 0 0; font-size: var(--t-h1); line-height: var(--lh-snug); color: var(--text-muted); }
+  .pair { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-8); }
+  figure { margin: 0; }
+  img { display: block; box-sizing: border-box; width: 100%; height: auto; aspect-ratio: 780 / 523; border: 1px solid var(--border); border-radius: var(--r-xl); }
+  figcaption { margin-top: var(--sp-3); font-size: var(--t-h2); line-height: var(--lh-snug); color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="top"><h1>Taster</h1><span class="url">github.com/makim-414/taster</span></div>
+    <p>Find the AI slop in a frontend and swap it for a better pattern.</p>
+    <div class="pair">
+      <figure>
+        <img src="/*BEFORE*/" alt="The example landing page before, with the detector's outlines on each finding">
+        <figcaption>Before</figcaption>
+      </figure>
+      <figure>
+        <img src="/*AFTER*/" alt="The same page rebuilt to the rules">
+        <figcaption>After</figcaption>
+      </figure>
+    </div>
+  </main>
+</body>
+</html>
