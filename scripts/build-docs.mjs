@@ -5,7 +5,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, SKILL_DATA, readJson, writeJson, loadPatterns, bundleFiles } from './lib.mjs';
 import { computeGaps } from './check-taxonomy.mjs';
-import { renderAll } from '../engine/exports.mjs';
 import { extensionRules, orbRecipesModule } from './lib.mjs';
 import { DESCRIPTIONS, getAt, setAt } from './check-meta.mjs';
 
@@ -119,13 +118,6 @@ for (const d of DESCRIPTIONS) {
     setAt(doc, d.at, text);
     writeJson(d.file, doc);
   }
-}
-
-// exports/: the rules as instruction files for agents without MCP (AGENTS.md, Cursor, Windsurf, Cline, Copilot,
-// Gemini, Claude). Rendered after rules.json is rewritten above, so the fix lines stay current.
-for (const [rel, content] of Object.entries(renderAll())) {
-  fs.mkdirSync(path.dirname(path.join(ROOT, rel)), { recursive: true });
-  fs.writeFileSync(path.join(ROOT, rel), content);
 }
 
 // extension/: the detector and the rule names next to the overlay, so the extension and the bookmarklet

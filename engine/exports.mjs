@@ -1,6 +1,6 @@
 // Taster's rules as instruction files for coding agents that do not speak MCP: AGENTS.md, Cursor, Windsurf, Cline,
 // GitHub Copilot, Gemini CLI and Claude Code. One body, rendered from rules/rules.json, wrapped per tool.
-// scripts/build-docs.mjs writes them to exports/ in this repository; `cli.mjs export` writes one into a project.
+// `cli.mjs export` writes one into a project; scripts/build-exports.mjs writes all of them for a release.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
@@ -91,7 +91,7 @@ export function writeTarget(target, projectDir) {
   return file;
 }
 
-/** Every target as repository files under exports/, for build-docs and the freshness check in validate. */
+/** Every target as a file under exports/<target>/, for the release folder scripts/build-exports.mjs writes. */
 export function renderAll() {
   const body = renderBody();
   return Object.fromEntries(Object.entries(TARGETS).map(([name, t]) => [join('exports', name, t.file.split('/').pop()), renderTarget(name, body)]));

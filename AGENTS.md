@@ -16,7 +16,6 @@ This is the short guide for coding agents and contributors; [CONTRIBUTING.md](CO
 - `bin/`: the one command of the npm package
 - `commands/`: the `/taster` command for Claude Code
 - `examples/`: a worked rebuild and the icon slot variations, each with its own check
-- `exports/`: the rules as instruction files for agents without MCP (generated)
 - `scripts/`: build-docs, validate, gates and the metadata checks
 - `assets/`: the pictures in the README
 - `.github/`: CI, issue templates, the code of conduct and the ACP registry entry

@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { TARGETS, renderBody, renderTarget, writeTarget } from '../exports.mjs';
+import { TARGETS, renderAll, renderBody, renderTarget, writeTarget } from '../exports.mjs';
 
 test('every rule is in the body, high severity first, no dash characters', () => {
   const rules = JSON.parse(readFileSync(new URL('../../rules/rules.json', import.meta.url), 'utf8')).rules;
@@ -24,4 +24,10 @@ test('shared files keep the user text and get one Taster block', () => {
   assert.ok(out.startsWith('# Mine\n'));
   assert.equal(out.split('<!-- taster:start -->').length, 2);
   assert.throws(() => renderTarget('vim'), /Unknown target vim/);
+});
+
+test('the release folder has one file per tool', () => {
+  const files = Object.keys(renderAll());
+  assert.equal(files.length, Object.keys(TARGETS).length);
+  for (const [name, t] of Object.entries(TARGETS)) assert.ok(files.includes(join('exports', name, t.file.split('/').pop())), name);
 });

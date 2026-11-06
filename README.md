@@ -215,9 +215,10 @@ references set the direction; the parts show what Taster builds.
 
 ### Rules for agents without MCP
 
-`exports/` holds the rules as instruction files for AGENTS.md readers, Claude Code, Cursor, Windsurf, Cline,
-GitHub Copilot and Gemini CLI, generated from `rules/rules.json`. `node engine/cli.mjs export all --dir <your app>`
-puts each one where its tool reads it and keeps your own text in shared files. See `exports/README.md`.
+`node engine/cli.mjs export all --dir <your app>` writes the rules, from `rules/rules.json`, as instruction files for
+AGENTS.md readers, Claude Code, Cursor, Windsurf, Cline, GitHub Copilot and Gemini CLI, each where its tool reads it,
+and keeps your own text in shared files. Each [release](https://github.com/makim-414/taster/releases) also attaches
+the seven files as `taster-exports-<version>.zip`.
 
 ### Check pull requests (GitHub Action)
 

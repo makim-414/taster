@@ -212,9 +212,10 @@ MIT 라이선스도 옆에 둡니다. shadcn 같은 다른 CLI 는 필요 없습
 
 ### MCP 없는 에이전트용 규칙 파일
 
-`exports/` 에 규칙을 AGENTS.md, Claude Code, Cursor, Windsurf, Cline, GitHub Copilot, Gemini CLI 용 지침 파일로
-뽑아 두었습니다(`rules/rules.json` 에서 생성). `node engine/cli.mjs export all --dir <내 앱>` 은 각 도구가 읽는 자리에
-파일을 넣고, 같이 쓰는 파일에서는 내 글을 그대로 둡니다. 자세한 내용은 `exports/README.md`.
+`node engine/cli.mjs export all --dir <내 앱>` 은 규칙을 AGENTS.md, Claude Code, Cursor, Windsurf, Cline, GitHub Copilot,
+Gemini CLI 용 지침 파일로 만들어(`rules/rules.json` 에서 생성) 각 도구가 읽는 자리에 넣고, 같이 쓰는 파일에서는 내 글을
+그대로 둡니다. [릴리스](https://github.com/makim-414/taster/releases)마다 같은 파일 7개를 `taster-exports-<버전>.zip` 으로도
+붙입니다.
 
 ### PR 검사 (GitHub Action)
 
