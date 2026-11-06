@@ -41,7 +41,7 @@ Tools and settings outside this repository read these by path; moving or renamin
 
 Generated files are never edited by hand ([CONTRIBUTING.md](CONTRIBUTING.md#where-things-live) lists them): edit the
 source, run `node scripts/build-docs.mjs` (and `npm --prefix registry run build-stage` after a component or demo
-change), and commit the output with the change.
+change), and commit the output with the change. A new generated path also gets a line in `.gitattributes`.
 
 ```bash
 npm test                          # node scripts/gates.mjs: every CI job, in CI order
