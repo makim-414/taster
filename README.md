@@ -2,30 +2,52 @@
 
 English | [한국어](README.ko.md)
 
-Find the AI slop in a frontend, swap each spot for a pattern that does the same job better, or build a new screen
-without it.
+Find the AI slop in a frontend, swap each spot for a pattern that does the same job better, or build a new screen without it.
 
-Taster is a skill and plugin for coding agents (Claude Code, Codex, Cursor and anything that reads `SKILL.md`).
-It ships three things the agent uses together:
+[Live site](https://taster-six.vercel.app) | [Components](https://taster-six.vercel.app/components) | [Rules](rules/RULES.md) | [Patterns](patterns/README.md) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md)
 
-- **Rules.** Traits that generated pages often leave, and screen quality problems, written down precisely enough to
-  measure: all caps labels with wide letter spacing, tinted pill badges, thick colored left borders, emoji bullets,
-  three identical icon cards in a row, Korean text that breaks mid word. 88 rules, 85 measured in a real browser by
-  `rules/detect.js`; the others are judged by eye from the captures. A finding says a page shows that trait, not who
-  or what made it ([where the rules come from](#where-the-rules-come-from)).
-- **A taxonomy of patterns.** 122 patterns: reusable design answers organized by what the visitor is trying to do
-  (show one number, compare plans, prove trust, label a state) and where (landing, dashboard, app, store, editorial,
-  sign in, AI chat). Every UI part falls in exactly one category through a machine decision key, and eight weighting
-  axes (density, contrast, roundness, type expression, color restraint, elevation, motion, stroke) carry a brand's
-  tone into tokens. Every rule points to the patterns that fix it.
-- **A registry of components.** 144 components: token based React components you copy into your app. No package to
-  install, no brand to undo.
+| Before | After |
+|---|---|
+| ![Acme Ledger before: a purple gradient hero with a blurred pink glow, a pill badge with an emoji, an all caps eyebrow with wide letter spacing, a gradient word and an italic serif word in the headline, emoji in the text, and three identical icon cards with tinted pill badges, each finding outlined by Taster](web/public/compare/before-780.jpg) | ![Acme Ledger after: the same headline, text and actions on a plain dark page, a sentence case label, one accent button next to a text link, and the features as a list instead of cards](web/public/compare/after-780.jpg) |
+
+Before: Acme Ledger, a made-up landing page that breaks 18 of the rules, each finding outlined by Taster. After: the same content rebuilt to the rules, with 0 findings at 1440 and 390 pixels wide. Both pages and the check that proves it are in [`examples/rebuild/`](examples/rebuild/).
+
+## <a id="skill"></a>Install
+
+```bash
+npx skills add https://github.com/makim-414/taster --skill taster
+```
+
+The skill works in any agent that reads `SKILL.md`: Claude Code, Codex, Cursor and others.
+
+<a id="claude-code-plugin"></a>In Claude Code, the plugin brings the skill, the `/taster` command and the local MCP server:
+
+```text
+/plugin marketplace add makim-414/taster
+/plugin install taster@taster
+```
+
+The server's first start installs the engine's dependencies, which can take longer than Claude Code waits for a server
+to connect; if `taster` shows as failed in `/mcp`, reconnect it there once the install is done.
+
+Requirements, other MCP clients and the first thing to ask: [Install in detail](#install-in-detail). The command line,
+source lint, the GitHub Action, the hosted MCP server and the extension: [Use](#use).
+
+## What you get
+
+- **Rules.** 88 rules, 85 measured in a real browser by `rules/detect.js` and the rest judged by eye from the captures: all caps labels with wide letter spacing, tinted pill badges, thick colored left borders, emoji bullets, Korean text that breaks mid word. A finding says a page shows a trait, not who or what made it ([where the rules come from](#where-the-rules-come-from)).
+- **Patterns.** 122 patterns, sorted by what the visitor is trying to do (compare plans, prove trust, label a state) and where (landing, dashboard, store, AI chat and more). Every rule points to the patterns that fix it.
+- **Components.** 144 components: token based React components you copy into your app. No package to install, no brand to undo.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/components.dark.jpg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/components.light.jpg">
+  <img alt="Six Taster components from the registry in three columns and two rows: a plan table, an activity feed, a chat thread, a cart, a settings section and an accordion" src="assets/components.light.jpg">
+</picture>
 
 **[Browse the components](https://taster-six.vercel.app/components).** Every one runs live: click it, recolor it with your
 brand or read the brand from your site, and put a few side by side. The hosted pages are in Korean for now; the
 sentence the board writes for your agent follows your browser's language.
-
-![The gallery: components running live in the brand color the visitor picked](assets/gallery.jpg)
 
 ## What it does
 
@@ -51,10 +73,10 @@ every screen and reports the same component drawn differently on two screens and
 system's tokens. `taster.plan.json` keeps the order and refuses steps out of it
 ([screens.md](skills/taster/references/screens.md)).
 
-`examples/rebuild/` is a worked Rebuild: a generated looking landing page that breaks 18 of the rules, and its rebuild
-(0 at both widths, every heading, action and nav item kept, brand color kept), plus a second screen built from the
-same components, checked consistent with the first and on the system. `node engine/scripts/check-rebuild-example.mjs`
-proves all of it, this count included.
+`examples/rebuild/` is the worked Rebuild in the pictures at the top: the generated looking landing page and its
+rebuild (0 at both widths, every heading, action and nav item kept, brand color kept), plus a second screen built from
+the same components, checked consistent with the first and on the system.
+`node engine/scripts/check-rebuild-example.mjs` proves all of it, the rule count under the pictures included.
 
 `examples/icon-slots/` shows five worked variations for each icon slot (control, explanatory, identity, data marker,
 no icon), the same 25 that `taxonomy.json` lists. `node engine/scripts/check-icon-slots-example.mjs` checks that the page
@@ -77,7 +99,7 @@ node engine/cli.mjs --tune system/taster.system.json roundness=1
 MCP tools: `design_system`, `tune_system`, `system_for_category`. How each measurement maps to a step and each step
 to tokens: `skills/taster/references/system.md`.
 
-## Install
+## Install in detail
 
 ### Requirements
 
@@ -86,25 +108,6 @@ to tokens: `skills/taster/references/system.md`.
 - A browser for anything that opens a page: Playwright's Chromium if it is installed, otherwise your Google Chrome.
   `node engine/setup.mjs` in the clone checks for one and downloads Chromium only when neither starts. Source lint
   needs no browser.
-
-### Skill
-
-Any agent that supports skills:
-
-```bash
-npx skills add https://github.com/makim-414/taster --skill taster
-```
-
-### Claude Code plugin
-
-```text
-/plugin marketplace add makim-414/taster
-/plugin install taster@taster
-```
-
-The plugin brings the skill, the `/taster` command and the local MCP server. The server's first start installs the
-engine's dependencies, which can take longer than Claude Code waits for a server to connect; if `taster` shows as
-failed in `/mcp`, reconnect it there once the install is done.
 
 ### MCP server in other clients
 
@@ -356,26 +359,7 @@ whoever made the page, and a page made by hand can hit any of the others too.
 
 ## Repository
 
-```text
-skills/taster/       the skill (SKILL.md, references, and a generated data/ bundle)
-taxonomy/            categories with their decision key, uses, surfaces, weighting axes and constraints (SCHEMA.md)
-patterns/            one Markdown file per pattern, plus INDEX.json
-rules/               rules.json, detect.js (runs in the page), fixtures and tests
-engine/              runs detect.js at two widths: CLI, MCP server (start prompt, diagnose, extract, swap tools), ACP agent, tests
-bin/                 taster.mjs, the one command of the npm package (diagnose, add, export, lint, mcp, acp, setup)
-registry/            React components (add copies them into your app), tokens, a demo page, stills and its tests
-examples/rebuild/    a worked Rebuild, before and after, with its own check
-examples/icon-slots/ five variations per icon slot, matched to the taxonomy, with its own check
-exports/             the rules as instruction files for agents without MCP (generated)
-extension/           the Chrome and Edge extension; its detect.js and rules.js are generated
-web/                 the hosted site: diagnosis, gallery, board, tone map, the bookmarklet and the hosted MCP server
-commands/            the /taster command for Claude Code
-.github/             CI, issue templates, the code of conduct, and the ACP registry entry sent on release day
-assets/              the pictures in this README
-scripts/             build-docs.mjs (derives links, gaps, the README blocks and the skill bundle), validate.mjs, gates.mjs
-action.yml           the GitHub Action
-AGENTS.md            the short guide for coding agents: the map, the paths not to move, the checks
-```
+What each folder holds, the paths that must not move and the generated files: [AGENTS.md](AGENTS.md).
 
 ## Develop
 
