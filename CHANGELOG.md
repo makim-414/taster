@@ -55,6 +55,9 @@ All notable changes to Taster are recorded here. The format follows
   ACP registry entry is in `.github/acp-registry/taster/` (`distribution/` is gone) and the README pictures are in
   `assets/` (`docs/` is gone). Old links to `CODE_OF_CONDUCT.md` and `RELEASE.md` at the root now return 404. A new
   `AGENTS.md` tells coding agents which paths not to move.
+- `exports/` is no longer committed. `taster export` writes the instruction files into a project as before, and each
+  release attaches all seven as `taster-exports-<version>.zip` (`node scripts/build-exports.mjs` writes the folder).
+  Raw links to files under `exports/` on `main` now return 404.
 
 ### Fixed
 

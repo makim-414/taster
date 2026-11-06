@@ -227,16 +227,6 @@ for (const e of meta.npxErrors(readJson('package.json'), docs)) err(e);
   }
 }
 
-// exports/ must match what build-docs would write from the current rules.json.
-{
-  const { renderAll } = await import('../engine/exports.mjs');
-  for (const [rel, content] of Object.entries(renderAll())) {
-    const file = path.join(ROOT, rel);
-    if (!fs.existsSync(file)) err(`${rel} missing (run node scripts/build-docs.mjs)`);
-    else if (fs.readFileSync(file, 'utf8') !== content) err(`${rel} is stale (run node scripts/build-docs.mjs)`);
-  }
-}
-
 // extension/ carries a copy of the detector and generated rule names; both must match the sources.
 {
   const { extensionRules } = await import('./lib.mjs');

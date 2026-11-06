@@ -1,5 +1,6 @@
 node_modules/
 dist/
+exports/
 .DS_Store
 registry/demo/shots/
 *.log
