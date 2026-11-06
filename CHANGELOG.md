@@ -58,6 +58,9 @@ All notable changes to Taster are recorded here. The format follows
 
 ### Fixed
 
+- The GitHub Action's branding color is `gray-dark` (`gray` is not one GitHub accepts), and its Marketplace name is
+  `Taster Slop Check`, because a name equal to an existing GitHub account cannot be listed. `uses:` lines do not
+  change.
 - The README install lines work before the npm package is published: the lint and component lines run the clone's
   CLI by its path from the app folder, so `--dir` lands inside the app.
 
