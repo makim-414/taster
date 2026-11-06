@@ -2,7 +2,8 @@
 
 Thanks for helping. This guide covers setup, the checks every change passes before it is merged, and the rules for
 code and pictures that come from somewhere else. Everyone taking part follows the
-[Code of Conduct](CODE_OF_CONDUCT.md). Security problems go through [SECURITY.md](SECURITY.md), never a public issue.
+[Code of Conduct](.github/CODE_OF_CONDUCT.md). Security problems go through [SECURITY.md](SECURITY.md), never a
+public issue.
 
 ## Before you start
 
