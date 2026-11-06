@@ -120,6 +120,8 @@ Taster checks its own pages and text, so a change has to pass the rules it ships
 
 - No long dashes and no emoji in any Markdown, JSON, code, CSS, HTML or YAML file. `node scripts/validate.mjs`
   rejects both.
+- A relative link or picture in Markdown points at a file or folder that exists, in the same letter case. When you
+  move a file, `node scripts/validate.mjs` names every page and line that still links the old path.
 - Colors, spacing, radii and type come from the tokens in `registry/src/tokens.css`, never hard-coded values.
 - No labels in capitals with wide letter spacing, no tinted pill badges, no rows of three identical icon cards: the
   detector flags them in our own pages too (`node web/scripts/self-check.mjs`).
