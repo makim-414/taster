@@ -374,6 +374,7 @@ commands/            the /taster command for Claude Code
 assets/              the pictures in this README
 scripts/             build-docs.mjs (derives links, gaps, the README blocks and the skill bundle), validate.mjs, gates.mjs
 action.yml           the GitHub Action
+AGENTS.md            the short guide for coding agents: the map, the paths not to move, the checks
 ```
 
 ## Develop
