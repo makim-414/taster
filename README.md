@@ -25,7 +25,7 @@ It ships three things the agent uses together:
 brand or read the brand from your site, and put a few side by side. The hosted pages are in Korean for now; the
 sentence the board writes for your agent follows your browser's language.
 
-![The gallery: components running live in the brand color the visitor picked](docs/gallery.jpg)
+![The gallery: components running live in the brand color the visitor picked](assets/gallery.jpg)
 
 ## What it does
 
@@ -208,7 +208,7 @@ reject button leaves a link only), the eight axes and tokens of that spot, and T
 references set the direction; the parts show what Taster builds.
 [taster-six.vercel.app/tone](https://taster-six.vercel.app/tone) is the same map to drag by hand.
 
-![The board: two candidates running live side by side, one picked](docs/board.jpg)
+![The board: two candidates running live side by side, one picked](assets/board.jpg)
 
 ### Rules for agents without MCP
 
@@ -371,7 +371,7 @@ extension/           the Chrome and Edge extension; its detect.js and rules.js a
 web/                 the hosted site: diagnosis, gallery, board, tone map, the bookmarklet and the hosted MCP server
 commands/            the /taster command for Claude Code
 .github/             CI, issue templates, the code of conduct, and the ACP registry entry sent on release day
-docs/                the pictures in this README
+assets/              the pictures in this README
 scripts/             build-docs.mjs (derives links, gaps, the README blocks and the skill bundle), validate.mjs, gates.mjs
 action.yml           the GitHub Action
 ```
