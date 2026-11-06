@@ -228,7 +228,7 @@ permissions:
   security-events: write
 steps:
   - uses: actions/checkout@v4
-  - uses: makim-414/taster@main
+  - uses: makim-414/taster@v0
     with:
       targets: |
         dist/index.html
@@ -239,8 +239,8 @@ steps:
 It writes the findings to the job summary and as SARIF, uploads the SARIF to code scanning so they show on the
 changed files, and fails the step for findings at `fail-on` or worse. Without code scanning, set
 `upload-sarif: 'false'`. The CLI does the same locally: `node engine/cli.mjs <targets...> --sarif taster.sarif`.
-There is no release tag yet, so the example follows `main`; pin a full commit SHA to review each change before it
-runs in your workflows.
+`v0` follows the latest 0.x release; pin a full commit SHA to review each change before it runs in your
+workflows.
 
 A target that answers with a bot check, an error or a sign-in page is not diagnosed: the step fails with exit code 2,
 and the job summary and the SARIF say why, with no findings. A preview behind deployment protection answers 401 and

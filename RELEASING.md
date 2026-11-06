@@ -1,7 +1,7 @@
 # Releasing
 
 Everything below is prepared in the repository and checked; the steps that publish happen on release day, in this
-order, by the owner. Version 0.1.0.
+order, by the owner. Version 0.2.0.
 
 ## Before
 
@@ -18,7 +18,7 @@ order, by the owner. Version 0.1.0.
    command `taster`). Check `npx @makim-414/taster --rules` from an empty folder. The unscoped name `taster` is taken;
    `taster-cli` and `taster-ui` were free on 2026-10-29 if a short name is wanted later.
 3. ACP registry: fork https://github.com/agentclientprotocol/registry, copy `.github/acp-registry/taster/` to the
-   fork's root, open a pull request. Its CI launches `npx @makim-414/taster@0.1.0 acp` and checks the handshake, so this
+   fork's root, open a pull request. Its CI launches `npx @makim-414/taster@0.2.0 acp` and checks the handshake, so this
    step comes after step 2.
    - The folder holds an `agent.json`, checked against that repository's `agent.schema.json`, and a 16 px
      `currentColor` icon. Nothing in it is published by this repository itself. `node scripts/build-docs.mjs` writes
@@ -31,8 +31,11 @@ order, by the owner. Version 0.1.0.
 5. Agent skill directories: the skill is `skills/taster/SKILL.md` (name and description frontmatter). The Claude Code
    marketplace entry is `.claude-plugin/marketplace.json` (`/plugin marketplace add makim-414/taster`); the Codex entry
    is `.codex-plugin/plugin.json`.
-6. GitHub Action: tag `v0.1.0` and `v0` so users can pin `makim-414/taster@v0`, and list it on the Marketplace from the
-   release page (action.yml has name, description and branding).
+6. GitHub release: tag the merge commit `v0.2.0` and move `v0` to it, so users can pin `makim-414/taster@v0`. Run
+   `node scripts/build-exports.mjs` and `zip -r taster-exports-0.2.0.zip exports`, then publish the release with the
+   CHANGELOG section as notes and the zip attached. Done for 0.2.0 on 2026-11-06. Listing the action on the
+   Marketplace (action.yml has name, description and branding) is a checkbox on the release page that needs the
+   owner to accept the Marketplace agreement.
 
 ## After
 
@@ -41,6 +44,4 @@ order, by the owner. Version 0.1.0.
   `npx @makim-414/taster lint ...` and `npx @makim-414/taster add ...`, and the clone and `npm ci` lines that only
   served them go. Do the same for the install lines on the web (the component pages and the board), and say in the
   READMEs that the package is published.
-- Once step 6 is live, change the Action example in `README.md` and `README.ko.md` from `makim-414/taster@main` to
-  `makim-414/taster@v0`, and drop the sentence that says there is no release tag yet.
 - The hosted MCP (`https://taster-six.vercel.app/api/mcp`) and `/bookmarklet` are already live from `main`.

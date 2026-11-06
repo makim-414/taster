@@ -1,7 +1,7 @@
 {
   "id": "taster",
   "name": "Taster",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Checks a page for the AI generated look (88 rules, 85 measured in a real browser) and answers with findings, fixes and patterns. No model inside.",
   "repository": "https://github.com/makim-414/taster",
   "website": "https://taster-six.vercel.app",
@@ -10,7 +10,7 @@
   "license_url": "https://github.com/makim-414/taster/blob/main/LICENSE",
   "distribution": {
     "npx": {
-      "package": "@makim-414/taster@0.1.0",
+      "package": "@makim-414/taster@0.2.0",
       "args": ["acp"]
     }
   }

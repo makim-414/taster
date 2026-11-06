@@ -1,6 +1,6 @@
 {
   "name": "taster",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Find the AI slop in a frontend, swap each spot for a better pattern, or build a new screen from a taxonomy of patterns.",
   "author": {
     "name": "makim-414",
