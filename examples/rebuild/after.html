@@ -8,7 +8,7 @@
 <!-- The design system made from before.html (brand plus tone): node packages/engine/cli.mjs --system examples/rebuild/before.html --out examples/rebuild -->
 <link rel="stylesheet" href="theme.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <!-- Every screen shares one stylesheet built only from the tokens above. -->
 <link rel="stylesheet" href="site.css">
 </head>
@@ -21,27 +21,29 @@
   </header>
 
   <main>
-    <section class="hero">
+    <section class="hero" aria-labelledby="title">
       <div class="wrap">
-        <p class="kicker">The future of finance</p>
-        <h1>Close your books 10x faster with effortless clarity</h1>
-        <p class="lead">The all-in-one platform for modern finance teams: automate, reconcile and report in one place.</p>
-        <div class="actions">
-          <a class="primary" href="#">Get started</a>
-          <a class="text-link" href="#">Book a demo</a>
+        <div class="copy">
+          <p class="kicker">The future of finance</p>
+          <h1 id="title">Close your books 10x faster <span class="soft">with effortless clarity</span></h1>
+          <p class="lead">The all-in-one platform for modern finance teams: automate, reconcile and report in one place.</p>
+          <div class="actions">
+            <a class="primary" href="#">Get started</a>
+            <a class="text-link" href="#">Book a demo</a>
+          </div>
+          <p class="note">New: AI-powered insights.</p>
         </div>
-        <p class="note">New: AI-powered insights.</p>
-      </div>
-    </section>
 
-    <section class="features">
-      <div class="wrap">
-        <h2>What it does</h2>
-        <div class="rows">
-          <div class="row"><h3>Lightning fast</h3><p>Reconcile thousands of transactions in seconds with smart matching.</p><span class="state">Live</span></div>
-          <div class="row"><h3>Bank-grade security</h3><p>Your data is protected with enterprise encryption at every step.</p><span class="state">Secure</span></div>
-          <div class="row"><h3>AI insights</h3><p>Spot anomalies and trends before they become problems.</p><span class="state">Beta</span></div>
-        </div>
+        <section class="panel" aria-labelledby="what">
+          <h2 id="what">What it does</h2>
+          <p class="sub">Every entry runs through all three, from the bank line to the report.</p>
+          <p class="cap">Where each part stands today</p>
+          <ul class="rows">
+            <li class="row"><h3>Lightning fast</h3><p>Reconcile thousands of transactions in seconds with smart matching.</p><span class="state">Live</span></li>
+            <li class="row"><h3>Bank-grade security</h3><p>Your data is protected with enterprise encryption at every step.</p><span class="state">Secure</span></li>
+            <li class="row"><h3>AI insights</h3><p>Spot anomalies and trends before they become problems.</p><span class="state">Beta</span></li>
+          </ul>
+        </section>
       </div>
     </section>
   </main>

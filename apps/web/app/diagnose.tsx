@@ -140,7 +140,7 @@ export function Diagnose({ ruleCount }: { ruleCount: number }) {
           <CompareReveal
             label="Taster 재구성 예시의 고치기 전과 다시 지은 판 비교"
             before={{ src: '/compare/before.jpg', alt: 'Acme Ledger 예시 페이지의 첫 화면. 보라 그라디언트 바탕, 이모지가 든 알약 공지, 대문자 넓은 자간 머리말, 그라디언트 글자와 이탤릭 세리프 한 단어가 섞인 제목, 엠대시 문장, 빛 번짐 버튼, 이모지 타일 카드 세 장과 틴트 알약 배지. 걸린 요소마다 빨간 테두리' }}
-            after={{ src: '/compare/after.jpg', alt: '같은 내용을 다시 지은 첫 화면. 어두운 바탕에 왼쪽 정렬 제목과 설명, 버튼 하나와 글자 링크, 아이콘 카드 대신 선으로 나눈 기능 목록' }}
+            after={{ src: '/compare/after.jpg', alt: '같은 내용을 다시 지은 첫 화면. 어두운 바탕의 두 단 구성으로, 왼쪽에 뒷구절을 회색으로 둔 제목과 설명, 버튼 하나와 글자 링크, 오른쪽에 아이콘 카드 대신 기능을 행으로 담은 얇은 테두리 패널 하나' }}
           />
           <div className="sample-captions">
             <p>고치기 전, before.html</p>
