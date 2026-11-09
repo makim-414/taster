@@ -6,6 +6,27 @@ All notable changes to Taster are recorded here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** a new repository layout, the `apps/` and `packages/` shape most JavaScript monorepos use. The engine
+  (CLI, MCP server, ACP agent) moved from `engine/` to `packages/engine/`, and `bin/taster.mjs` is now
+  `packages/engine/taster.mjs`. The registry moved from `registry/` to `packages/registry/`, the site and the extension
+  from `web/` and `extension/` to `apps/web/` and `apps/extension/`, the rules, patterns and taxonomy from `rules/`,
+  `patterns/` and `taxonomy/` to `data/rules/`, `data/patterns/` and `data/taxonomy/`, and the README pictures from
+  `assets/` to `.github/assets/`. The engine, the registry and the site are still three npm packages with their own
+  lockfiles. What to change on your side:
+  - An MCP or ACP client that starts `/path/to/taster/engine/start.mjs` now starts
+    `/path/to/taster/packages/engine/start.mjs`, and `npm ci --prefix /path/to/taster/engine` is
+    `npm ci --prefix /path/to/taster/packages/engine`. The Claude Code and Codex plugins start the new path themselves.
+  - The command line in a clone is `node packages/engine/cli.mjs` (or `node packages/engine/taster.mjs`).
+  - An extension loaded unpacked from `extension/` is loaded again from `apps/extension/`.
+  - Pattern help links in SARIF results written before this change point at `blob/main/patterns/<id>.md`, which is
+    gone; new results link to `blob/main/data/patterns/<id>.md`.
+  - Workflows on the GitHub Action need no change. `makim-414/taster@v0` points at the 0.2.0 tree until the next
+    release moves the tag to the new layout, and `@main` runs the new layout once this is merged; the inputs are the
+    same.
+- The npm package no longer lists the extension in its files; it is installed unpacked or from the store.
+
 ## [0.2.0] - 2026-11-06
 
 The first tagged release (`v0.2.0`, and `v0` for the GitHub Action).

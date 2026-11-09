@@ -64,7 +64,7 @@ Prefer its tools; they run the same detector in a real browser for you.
 - `check_consistency { screens, system, widths, logoFont }`: drift between screens and values off the system, at 1440 and 390.
 - The hosted server (added by its URL, nothing installed) opens public http(s) addresses only. Its `diagnose` takes `target` alone and measures 1440 and 390, and its `preview_component` returns the default still with a live link in the brand. It has no `extract_content`, `design_system`, `tune_system`, `system_for_category`, `check_consistency`, `plan_screens`, `plan_next` or `plan_update`, since those open pages in a local browser or read and write local files; use the local server for them.
 
-Without the server, follow the steps below with any browser tool, or run `node engine/cli.mjs <url>` from the repository.
+Without the server, follow the steps below with any browser tool, or run `node packages/engine/cli.mjs <url>` from the repository.
 
 ## Diagnose
 
@@ -133,7 +133,7 @@ identity slot and stay as the original files.
 
 ## Always
 
-- Tokens only for color, spacing, radius and type. Start from `registry/src/tokens.css` and the system's `theme.css`, or the user's existing tokens.
+- Tokens only for color, spacing, radius and type. Start from `packages/registry/src/tokens.css` and the system's `theme.css`, or the user's existing tokens.
 - Sentence case labels. No all caps with wide letter spacing (navigation labels are the one exception).
 - Icons only where their slot needs one, from one set at one stroke weight. No emoji as icons or bullets, no long dashes in UI copy, no tinted pill badges, no thick colored left borders on cards, no purple gradient text, no glow on everything. The full list is the rules file; these are the ones people notice first.
 - Real content beats placeholder: real product names, real numbers with a source, real images the user owns.

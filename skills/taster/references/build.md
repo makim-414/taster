@@ -36,7 +36,7 @@ before you write it.
 
 ## 4. Compose
 
-- Tokens first (`registry/src/tokens.css`, then the system's `theme.css`), then layout, then components, then copy.
+- Tokens first (`packages/registry/src/tokens.css`, then the system's `theme.css`), then layout, then components, then copy.
 - Each part reads the alias tokens only. `system_for_category { system, category }` lists, per part, the axes that
   matter most and the tokens they drive.
 - One accent color at most. Neutral surfaces. Hierarchy from size, weight and space, not from color.

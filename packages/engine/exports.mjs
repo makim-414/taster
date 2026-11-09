@@ -46,7 +46,7 @@ export function renderBody(rules = JSON.parse(readFileSync(RULES_FILE, 'utf8')).
     '## Check the result',
     '',
     `- With the Taster MCP server connected (local plugin, or hosted at ${HOSTED}/api/mcp), call \`diagnose\` on the page and fix every finding.`,
-    `- Without it, open ${HOSTED} and paste the page address, or run \`node engine/cli.mjs <url or file>\` in a Taster clone.`,
+    `- Without it, open ${HOSTED} and paste the page address, or run \`node packages/engine/cli.mjs <url or file>\` in a Taster clone.`,
     '- Rules marked by eye in the report (manual) need a look at the screen; the others are measured in a real browser.',
     '',
   );

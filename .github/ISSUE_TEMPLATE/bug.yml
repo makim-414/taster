@@ -47,7 +47,7 @@ body:
       label: How to reproduce
       description: The command or tool call, the target (a public address you own, or a small HTML file), and the widths.
       placeholder: |
-        1. node engine/cli.mjs ./repro.html --widths 1440,390
+        1. node packages/engine/cli.mjs ./repro.html --widths 1440,390
         2. ...
     validations:
       required: true

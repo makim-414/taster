@@ -90,4 +90,4 @@ import { Icon } from './icons'
 
 ## Tokens
 
-Sizes `--icon-sm` (16px), `--icon-md` (20px) and `--icon-lg` (24px), stroke `--icon-stroke`. Spacing `--sp-2` between icon and label. Color comes from the parent's text token through `currentColor`; no background token is used behind an icon. The registry `Icon` component (`registry/src/icons/index.tsx`) applies these and the `IconLabel` wrapper handles first line alignment.
+Sizes `--icon-sm` (16px), `--icon-md` (20px) and `--icon-lg` (24px), stroke `--icon-stroke`. Spacing `--sp-2` between icon and label. Color comes from the parent's text token through `currentColor`; no background token is used behind an icon. The registry `Icon` component (`packages/registry/src/icons/index.tsx`) applies these and the `IconLabel` wrapper handles first line alignment.

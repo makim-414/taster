@@ -13,9 +13,9 @@ command from your app folder:
 
 ```bash
 git clone https://github.com/makim-414/taster.git /path/to/taster   # once
-npm ci --prefix /path/to/taster/engine                              # once
-node /path/to/taster/engine/cli.mjs add blocks/button blocks/dialog --dir src/components/taster
-node /path/to/taster/engine/cli.mjs add --list
+npm ci --prefix /path/to/taster/packages/engine                              # once
+node /path/to/taster/packages/engine/cli.mjs add blocks/button blocks/dialog --dir src/components/taster
+node /path/to/taster/packages/engine/cli.mjs add --list
 ```
 
 It follows every relative import (helpers such as `_cn.ts` and `_url.ts`, other components, icons), adds

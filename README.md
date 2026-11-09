@@ -35,7 +35,7 @@ source lint, the GitHub Action, the hosted MCP server and the extension: [Use](#
 
 ## What you get
 
-- **Rules.** 88 rules, 85 measured in a real browser by `rules/detect.js` and the rest judged by eye from the captures: all caps labels with wide letter spacing, tinted pill badges, thick colored left borders, emoji bullets, Korean text that breaks mid word. A finding says a page shows a trait, not who or what made it ([where the rules come from](#where-the-rules-come-from)).
+- **Rules.** 88 rules, 85 measured in a real browser by `data/rules/detect.js` and the rest judged by eye from the captures: all caps labels with wide letter spacing, tinted pill badges, thick colored left borders, emoji bullets, Korean text that breaks mid word. A finding says a page shows a trait, not who or what made it ([where the rules come from](#where-the-rules-come-from)).
 - **Patterns.** 122 patterns, sorted by what the visitor is trying to do (compare plans, prove trust, label a state) and where (landing, dashboard, store, AI chat and more). Every rule points to the patterns that fix it.
 - **Components.** 144 components: token based React components you copy into your app. No package to install, no brand to undo.
 
@@ -76,10 +76,10 @@ system's tokens. `taster.plan.json` keeps the order and refuses steps out of it
 `examples/rebuild/` is the worked Rebuild in the pictures at the top: the generated looking landing page and its
 rebuild (0 at both widths, every heading, action and nav item kept, brand color kept), plus a second screen built from
 the same components, checked consistent with the first and on the system.
-`node engine/scripts/check-rebuild-example.mjs` proves all of it, the rule count under the pictures included.
+`node packages/engine/scripts/check-rebuild-example.mjs` proves all of it, the rule count under the pictures included.
 
 `examples/icon-slots/` shows five worked variations for each icon slot (control, explanatory, identity, data marker,
-no icon), the same 25 that `taxonomy.json` lists. `node engine/scripts/check-icon-slots-example.mjs` checks that the page
+no icon), the same 25 that `taxonomy.json` lists. `node packages/engine/scripts/check-icon-slots-example.mjs` checks that the page
 matches the taxonomy and has 0 findings at both widths.
 
 ## Design system
@@ -92,8 +92,8 @@ others follow the least needed, with the principle that moved them quoted. The r
 `theme.css` with every token the axes drive, the brand inside, and text at WCAG AA. Every screen and part loads it.
 
 ```bash
-node engine/cli.mjs --system https://your-site.example --ref ./a-page-you-like.html --out system
-node engine/cli.mjs --tune system/taster.system.json roundness=1
+node packages/engine/cli.mjs --system https://your-site.example --ref ./a-page-you-like.html --out system
+node packages/engine/cli.mjs --tune system/taster.system.json roundness=1
 ```
 
 MCP tools: `design_system`, `tune_system`, `system_for_category`. How each measurement maps to a step and each step
@@ -106,22 +106,22 @@ to tokens: `skills/taster/references/system.md`.
 - Node.js 22 or later (the version in `.nvmrc`) and git. The MCP server, the command line and `add` run from a clone
   of this repository; the npm package is not published yet.
 - A browser for anything that opens a page: Playwright's Chromium if it is installed, otherwise your Google Chrome.
-  `node engine/setup.mjs` in the clone checks for one and downloads Chromium only when neither starts. Source lint
+  `node packages/engine/setup.mjs` in the clone checks for one and downloads Chromium only when neither starts. Source lint
   needs no browser.
 
 ### MCP server in other clients
 
-Clone the repository and install the engine once, then point the client at `engine/start.mjs`:
+Clone the repository and install the engine once, then point the client at `packages/engine/start.mjs`:
 
 ```bash
 git clone https://github.com/makim-414/taster.git /path/to/taster
-npm ci --prefix /path/to/taster/engine
+npm ci --prefix /path/to/taster/packages/engine
 ```
 
 Claude Code without the plugin:
 
 ```bash
-claude mcp add taster -- node /path/to/taster/engine/start.mjs
+claude mcp add taster -- node /path/to/taster/packages/engine/start.mjs
 ```
 
 Codex, in `~/.codex/config.toml` (installed as a Codex plugin, the repository's `.codex-plugin/plugin.json` brings
@@ -130,13 +130,13 @@ the skill and this server instead):
 ```toml
 [mcp_servers.taster]
 command = "node"
-args = ["/path/to/taster/engine/start.mjs"]
+args = ["/path/to/taster/packages/engine/start.mjs"]
 ```
 
 Cursor, in `.cursor/mcp.json` in your project, or `~/.cursor/mcp.json` for every project:
 
 ```json
-{ "mcpServers": { "taster": { "command": "node", "args": ["/path/to/taster/engine/start.mjs"] } } }
+{ "mcpServers": { "taster": { "command": "node", "args": ["/path/to/taster/packages/engine/start.mjs"] } } }
 ```
 
 The local server runs with your user's permissions. It opens any http or https address it is given, private ones
@@ -159,10 +159,10 @@ site builder, without the AI look", or "Build a pricing page for this product wi
 In the clone:
 
 ```bash
-npm ci --prefix engine
-node engine/cli.mjs https://example.com --out ./taster-report
-node engine/cli.mjs https://example.com --extract    # the page's content, for a rebuild
-node engine/cli.mjs https://example.com --brand      # the site's brand as a token theme
+npm ci --prefix packages/engine
+node packages/engine/cli.mjs https://example.com --out ./taster-report
+node packages/engine/cli.mjs https://example.com --extract    # the page's content, for a rebuild
+node packages/engine/cli.mjs https://example.com --brand      # the site's brand as a token theme
 ```
 
 A page that answers with a bot check, a block or error page, or a sign-in page on another host is reported as not
@@ -175,10 +175,10 @@ clone this repository once and run its CLI from your app folder:
 
 ```bash
 git clone https://github.com/makim-414/taster.git /path/to/taster   # once
-npm ci --prefix /path/to/taster/engine                              # once
-node /path/to/taster/engine/cli.mjs lint src                                  # tinted pills, transition-all, hard-coded colors ...
-node /path/to/taster/engine/cli.mjs lint src --baseline taster-baseline.json --write-baseline   # adopt on an old codebase
-node /path/to/taster/engine/cli.mjs lint src --baseline taster-baseline.json  # then counts may only go down
+npm ci --prefix /path/to/taster/packages/engine                              # once
+node /path/to/taster/packages/engine/cli.mjs lint src                                  # tinted pills, transition-all, hard-coded colors ...
+node /path/to/taster/packages/engine/cli.mjs lint src --baseline taster-baseline.json --write-baseline   # adopt on an old codebase
+node /path/to/taster/packages/engine/cli.mjs lint src --baseline taster-baseline.json  # then counts may only go down
 ```
 
 A line passes with a comment `taster-allow <reason>`; an allow without a reason is reported. The npm package will
@@ -189,7 +189,7 @@ replace the clone once it is published ([RELEASING.md](RELEASING.md)).
 From your app folder, with the clone from the step above:
 
 ```bash
-node /path/to/taster/engine/cli.mjs add blocks/button blocks/citations --dir src/components/taster
+node /path/to/taster/packages/engine/cli.mjs add blocks/button blocks/citations --dir src/components/taster
 ```
 
 Copies each component with every file it imports and the token files into `--dir`, relative to the folder you run it
@@ -215,7 +215,7 @@ references set the direction; the parts show what Taster builds.
 
 ### Rules for agents without MCP
 
-`node engine/cli.mjs export all --dir <your app>` writes the rules, from `rules/rules.json`, as instruction files for
+`node packages/engine/cli.mjs export all --dir <your app>` writes the rules, from `data/rules/rules.json`, as instruction files for
 AGENTS.md readers, Claude Code, Cursor, Windsurf, Cline, GitHub Copilot and Gemini CLI, each where its tool reads it,
 and keeps your own text in shared files. Each [release](https://github.com/makim-414/taster/releases) also attaches
 the seven files as `taster-exports-<version>.zip`.
@@ -238,7 +238,7 @@ steps:
 
 It writes the findings to the job summary and as SARIF, uploads the SARIF to code scanning so they show on the
 changed files, and fails the step for findings at `fail-on` or worse. Without code scanning, set
-`upload-sarif: 'false'`. The CLI does the same locally: `node engine/cli.mjs <targets...> --sarif taster.sarif`.
+`upload-sarif: 'false'`. The CLI does the same locally: `node packages/engine/cli.mjs <targets...> --sarif taster.sarif`.
 `v0` follows the latest 0.x release; pin a full commit SHA to review each change before it runs in your
 workflows.
 
@@ -258,7 +258,7 @@ its permissions, so on banking or admin screens use the extension. A bookmarklet
 loads `/taster/overlay.js`, runs whatever the site serves there, and sends that first request with a Referer: drag
 the bookmarklet from `/bookmarklet` again.
 
-For those screens, and for sites that block injected scripts, load `extension/` as an unpacked extension in Chrome or
+For those screens, and for sites that block injected scripts, load `apps/extension/` as an unpacked extension in Chrome or
 Edge. It carries the same files inside, asks only for `activeTab` and `scripting`, and runs only when you press its
 button.
 
@@ -281,11 +281,11 @@ and an answer over 4 MB comes back as an error instead. For local files and the 
 
 ### Use from an editor (ACP)
 
-`engine/acp.mjs` speaks the [Agent Client Protocol](https://agentclientprotocol.com), so editors with an agent
+`packages/engine/acp.mjs` speaks the [Agent Client Protocol](https://agentclientprotocol.com), so editors with an agent
 panel can run Taster directly. It has no model inside: it answers slash commands with the engine's results
 (`/start`, `/diagnose <url or file>`, `/extract <url>`, `/brand <url>`, `/explain <rule id>`, `/rules`, `/help`).
 For swaps and rebuilds, use the skill inside an agent that speaks MCP. Point the editor at
-`engine/start.mjs acp`, which installs the engine's dependencies on first start. In Zed's `settings.json`:
+`packages/engine/start.mjs acp`, which installs the engine's dependencies on first start. In Zed's `settings.json`:
 
 ```json
 {
@@ -293,7 +293,7 @@ For swaps and rebuilds, use the skill inside an agent that speaks MCP. Point the
     "Taster": {
       "type": "custom",
       "command": "node",
-      "args": ["/path/to/taster/engine/start.mjs", "acp"],
+      "args": ["/path/to/taster/packages/engine/start.mjs", "acp"],
       "env": {}
     }
   }
@@ -321,9 +321,9 @@ The local tools, the bookmarklet and the extension send the findings nowhere and
 
 Every category has a one sentence definition, what it includes, what it excludes and where that goes instead, and
 generic examples. A decision key over 33 yes or no features gives every UI part exactly one category, first match
-wins. The weighting axes drive named properties in `registry/src/tokens.css`, snap to fixed steps so a setting never
+wins. The weighting axes drive named properties in `packages/registry/src/tokens.css`, snap to fixed steps so a setting never
 sits in an ambiguous middle, and are kept balanced by design principles written as linear constraints (a dense screen
-cannot carry poster type, deep shadows need a restrained palette). `taxonomy/axes.mjs` validates and balances a
+cannot carry poster type, deep shadows need a restrained palette). `data/taxonomy/axes.mjs` validates and balances a
 setting. Read [data/taxonomy/SCHEMA.md](data/taxonomy/SCHEMA.md).
 
 <!-- taxonomy:start -->
@@ -353,7 +353,7 @@ An outside source or a standard is a ref with its link, the date it was read and
 a quote of 15 words or fewer, or one line in Taster's words marked as a summary. A ref that repeats another write-up
 names it in `derived_from`. The sources keep their own licenses; Taster links to them and copies neither their text
 nor their code. An observation says, in the rule's `observation` field, what Taster saw.
-`node engine/scripts/check-rules.mjs` checks every rule's basis and refs.
+`node packages/engine/scripts/check-rules.mjs` checks every rule's basis and refs.
 
 Hitting a rule does not mean a page was made by AI. The rules that rest on a standard are about screen quality,
 whoever made the page, and a page made by hand can hit any of the others too.

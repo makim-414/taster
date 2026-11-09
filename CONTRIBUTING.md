@@ -21,10 +21,10 @@ Node 22 (CI runs 22; the web app needs 22.17.0 or later) and git.
 ```bash
 git clone https://github.com/makim-414/taster.git
 cd taster
-npm ci --prefix engine
-npm ci --prefix registry
-npm ci --prefix web
-npx --prefix engine playwright install chromium    # on Linux, add --with-deps
+npm ci --prefix packages/engine
+npm ci --prefix packages/registry
+npm ci --prefix apps/web
+npx --prefix packages/engine playwright install chromium    # on Linux, add --with-deps
 ```
 
 The browser checks use the Chromium installed above, the same build CI uses. Set `CHROME_PATH` to use another
@@ -44,18 +44,18 @@ build.
 
 Some files are generated. Do not edit them by hand; edit the source and run the build:
 
-- `node scripts/build-docs.mjs` writes `rules/RULES.md`, `patterns/README.md`, the taxonomy block in `README.md`,
-  the rules block in both READMEs, the descriptions in `package.json`, `extension/manifest.json`,
+- `node scripts/build-docs.mjs` writes `data/rules/RULES.md`, `data/patterns/README.md`, the taxonomy block in `README.md`,
+  the rules block in both READMEs, the descriptions in `package.json`, `apps/extension/manifest.json`,
   `.github/acp-registry/taster/agent.json` and the two plugin manifests (`scripts/check-meta.mjs` lists them),
-  `extension/detect.js`, `extension/rules.js`, `registry/src/motion/orb-recipes.ts`,
-  `skills/taster/data/`, and the derived fields `fix_patterns` in `rules/rules.json`, `patterns` in
-  `registry/registry.json` and `gaps` in `taxonomy/taxonomy.json`.
-- `npm --prefix registry run build-stage` writes `registry/stage/` and `registry/previews/`. Run it after changing a
+  `apps/extension/detect.js`, `apps/extension/rules.js`, `packages/registry/src/motion/orb-recipes.ts`,
+  `skills/taster/data/`, and the derived fields `fix_patterns` in `data/rules/rules.json`, `patterns` in
+  `packages/registry/registry.json` and `gaps` in `data/taxonomy/taxonomy.json`.
+- `npm --prefix packages/registry run build-stage` writes `packages/registry/stage/` and `packages/registry/previews/`. Run it after changing a
   component or its demo; `node scripts/validate.mjs` fails until you do.
-- `node web/scripts/readme/render.mjs` writes the pictures for the repository page: `assets/social-preview.png`
-  (uploaded by hand under Settings, Social preview) and `assets/components.dark.jpg` and
-  `assets/components.light.jpg`. Run it after changing the card's sentence or one of the six component stills it
-  reads from `registry/previews/` (the list is in the script).
+- `node apps/web/scripts/readme/render.mjs` writes the pictures for the repository page: `.github/assets/social-preview.png`
+  (uploaded by hand under Settings, Social preview) and `.github/assets/components.dark.jpg` and
+  `.github/assets/components.light.jpg`. Run it after changing the card's sentence or one of the six component stills it
+  reads from `packages/registry/previews/` (the list is in the script).
 
 Commit the generated files together with the change that caused them. `.gitattributes` marks the generated paths
 `linguist-generated`, so GitHub folds them in pull request diffs and leaves them out of the language bar; add a line
@@ -78,47 +78,47 @@ They are the same steps, in the same order, as the four CI jobs in `.github/work
 node scripts/build-docs.mjs                        # then git status: nothing may change
 node scripts/validate.mjs
 node scripts/check-taxonomy.mjs
-node --test taxonomy/axes.test.mjs
-node engine/scripts/check-rules.mjs
-npm --prefix registry run typecheck
-node engine/lint.mjs --selftest
-node engine/lint.mjs registry/src --baseline registry/lint-baseline.json
+node --test data/taxonomy/axes.test.mjs
+node packages/engine/scripts/check-rules.mjs
+npm --prefix packages/registry run typecheck
+node packages/engine/lint.mjs --selftest
+node packages/engine/lint.mjs packages/registry/src --baseline packages/registry/lint-baseline.json
 node --test scripts/check-authors.test.mjs scripts/gates.test.mjs
 node scripts/check-authors.mjs                     # the commits on your branch use a GitHub noreply email
 
 # browser
-node rules/test-detect.mjs
-npm --prefix engine test
-node engine/scripts/check-rebuild-example.mjs
-node engine/scripts/check-icon-slots-example.mjs
-npm --prefix registry run test-render              # builds the demo, renders every component at 1440 and 390
-node registry/test-a11y.mjs                        # keyboard focus, accessible names, reduced motion
-node registry/test-injection.mjs
+node data/rules/test-detect.mjs
+npm --prefix packages/engine test
+node packages/engine/scripts/check-rebuild-example.mjs
+node packages/engine/scripts/check-icon-slots-example.mjs
+npm --prefix packages/registry run test-render              # builds the demo, renders every component at 1440 and 390
+node packages/registry/test-a11y.mjs                        # keyboard focus, accessible names, reduced motion
+node packages/registry/test-injection.mjs
 
 # web
-npm --prefix web run build                         # type-checks too
-node web/scripts/check-traces.mjs
-npm --prefix web test
-npm --prefix web start &                           # serves the build on http://localhost:3240 ($PORT to change)
-node web/scripts/self-check.mjs
-node web/scripts/check-gallery.mjs
-node web/scripts/check-tone.mjs
-node web/scripts/check-metadata.mjs
-node web/scripts/check-a11y.mjs
+npm --prefix apps/web run build                         # type-checks too
+node apps/web/scripts/check-traces.mjs
+npm --prefix apps/web test
+npm --prefix apps/web start &                           # serves the build on http://localhost:3240 ($PORT to change)
+node apps/web/scripts/self-check.mjs
+node apps/web/scripts/check-gallery.mjs
+node apps/web/scripts/check-tone.mjs
+node apps/web/scripts/check-metadata.mjs
+node apps/web/scripts/check-a11y.mjs
 # then stop the server
 ```
 
 The five browser scripts take a base address. If port 3240 is busy, start the build with
-`PORT=3250 npm --prefix web start` and pass `http://localhost:3250` to each (or set `BASE_URL`); `gates.mjs` picks a
-free port itself. `self-check` allows only the findings listed, with a reason, in `web/scripts/self-check-baseline.json`;
-`check-a11y` allows only the counts in `web/scripts/a11y-baseline.json`, which may only go down
-(`node web/scripts/check-a11y.mjs --write-baseline` after a fix).
+`PORT=3250 npm --prefix apps/web start` and pass `http://localhost:3250` to each (or set `BASE_URL`); `gates.mjs` picks a
+free port itself. `self-check` allows only the findings listed, with a reason, in `apps/web/scripts/self-check-baseline.json`;
+`check-a11y` allows only the counts in `apps/web/scripts/a11y-baseline.json`, which may only go down
+(`node apps/web/scripts/check-a11y.mjs --write-baseline` after a fix).
 
 The fourth job, `action`, runs this repository's GitHub Action on `examples/rebuild/` on Linux and macOS. The same
 diagnosis locally:
 
 ```bash
-node engine/cli.mjs examples/rebuild/before.html examples/rebuild/after.html --sarif taster.sarif --fail-on none
+node packages/engine/cli.mjs examples/rebuild/before.html examples/rebuild/after.html --sarif taster.sarif --fail-on none
 ```
 
 ## Rules the repository holds itself to
@@ -129,9 +129,9 @@ Taster checks its own pages and text, so a change has to pass the rules it ships
   rejects both.
 - A relative link or picture in Markdown points at a file or folder that exists, in the same letter case. When you
   move a file, `node scripts/validate.mjs` names every page and line that still links the old path.
-- Colors, spacing, radii and type come from the tokens in `registry/src/tokens.css`, never hard-coded values.
+- Colors, spacing, radii and type come from the tokens in `packages/registry/src/tokens.css`, never hard-coded values.
 - No labels in capitals with wide letter spacing, no tinted pill badges, no rows of three identical icon cards: the
-  detector flags them in our own pages too (`node web/scripts/self-check.mjs`).
+  detector flags them in our own pages too (`node apps/web/scripts/self-check.mjs`).
 - A change to a screen keeps it free of findings and of horizontal scroll at 390 and 1280 wide.
 
 ## Code, pictures and text from elsewhere
@@ -140,8 +140,8 @@ Taster checks its own pages and text, so a change has to pass the rules it ships
   the link in the pattern's `inspiration` frontmatter.
 - If you copy or adapt code under a compatible license, keep its copyright notice, add a header line in the file
   (`// Upstream license: MIT, Copyright (c) <year> <holder>. Full text in THIRD_PARTY_NOTICES.md.`), set the
-  component's `credit` in `registry/registry.json`, and add the source and its full license text to
-  `registry/THIRD_PARTY_NOTICES.md`. The steps for redrawing a component are in
+  component's `credit` in `packages/registry/registry.json`, and add the source and its full license text to
+  `packages/registry/THIRD_PARTY_NOTICES.md`. The steps for redrawing a component are in
   [packages/registry/README.md](packages/registry/README.md#bringing-in-a-component-from-elsewhere).
 - Do not commit screenshots or captures of other people's sites, apps or products, or logos and wordmarks you do not
   own. Pictures in the repository are renders of Taster's own components, or images you made and can license under

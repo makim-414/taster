@@ -11,7 +11,8 @@ const stageVersion = createHash('sha256').update(readFileSync(path.join(repo, 'p
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: { STAGE_VERSION: stageVersion },
-  // The app reads ../../packages/engine, ../../rules and ../../packages/registry, so tracing and Turbopack start at the repo root.
+  // The app reads ../../packages/engine, ../../packages/registry and ../../data, so tracing and Turbopack start at the
+  // repo root.
   outputFileTracingRoot: repo,
   turbopack: { root: repo },
   serverExternalPackages: ['playwright-core', '@sparticuz/chromium'],

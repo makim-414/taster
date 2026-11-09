@@ -7,7 +7,7 @@ Everything the schema cannot express (cross references, partition, decision key,
 
 ```bash
 node scripts/check-taxonomy.mjs        # TAXONOMY OK ... on success
-node --test taxonomy/axes.test.mjs     # the axes module
+node --test data/taxonomy/axes.test.mjs     # the axes module
 node scripts/build-docs.mjs            # after any change: refreshes gaps, READMEs and the skill bundle
 ```
 
@@ -27,7 +27,7 @@ node scripts/build-docs.mjs            # after any change: refreshes gaps, READM
 | `constraints` | Design principles as linear inequalities over axes |
 | `ruleMap` | Every slop rule, the categories it applies to and the axis it pushes |
 | `gaps` | Categories with no registry component and fewer than two patterns (generated) |
-| `iconography` | The icon slot map, see `patterns/icon-placement.md` |
+| `iconography` | The icon slot map, see `data/patterns/icon-placement.md` |
 
 ## Nodes
 
@@ -66,13 +66,13 @@ navigation, single request), then sequence, waiting and measured values, then th
 generic part kinds (absence, value controls, overlays, in-place switches, actions, events, labels, columns, media,
 containers, structure).
 
-`taxonomy/classify.mjs` exports `classify(features)` and `createClassifier(spec)`; both return
+`data/taxonomy/classify.mjs` exports `classify(features)` and `createClassifier(spec)`; both return
 `{ category, step, fallback }`.
 
 The checker proves the key is sound: every step reads known features and ends in a known category; no step requires
 and forbids the same feature; no step is shadowed by an earlier one (an earlier step whose `all` and `none` are subsets
 of a later step's always fires first); every category is returned by some step; every feature is read by some step.
-`taxonomy/fixtures/parts.json` holds over 100 generic parts with their features and expected category, including the
+`data/taxonomy/fixtures/parts.json` holds over 100 generic parts with their features and expected category, including the
 hard boundary cases (a date field with a popover, a mega menu, a band of figures, a live step list, a logo marquee);
 each must classify exactly, every step must be reached by some part, and no part may reach the fallback.
 
@@ -82,8 +82,8 @@ each must classify exactly, every step must be reached by some part, and no part
 2. If no existing feature tells it apart, add a feature with a one sentence definition.
 3. Insert a step at the place in `classify` where its boundary policy holds, with a `why`.
 4. Add at least one part to `fixtures/parts.json` for the new category and one for each boundary it shares.
-5. Migrate every reference when you rename or split: pattern frontmatter, `patterns/INDEX.json`,
-   `registry/registry.json`, `ruleMap`, skill references and READMEs. Then run `node scripts/build-docs.mjs` and
+5. Migrate every reference when you rename or split: pattern frontmatter, `data/patterns/INDEX.json`,
+   `packages/registry/registry.json`, `ruleMap`, skill references and READMEs. Then run `node scripts/build-docs.mjs` and
    `node scripts/check-taxonomy.mjs`.
 
 ## Axes
@@ -104,7 +104,7 @@ Each axis is a dial from 0 to 1:
 }
 ```
 
-`drives` lists the exact custom properties in `registry/src/tokens.css` the axis controls. Every name must exist in
+`drives` lists the exact custom properties in `packages/registry/src/tokens.css` the axis controls. Every name must exist in
 the `:root` block there, and no property is driven by two axes, so a setting maps to tokens without conflict.
 Properties that are floors rather than tone (body and small type sizes, `--control-touch`, `--r-pill`, easing curves,
 semantic colors) are deliberately driven by no axis.
@@ -155,7 +155,7 @@ A constraint holds when `sum(terms[axis] * setting[axis]) op bound`. A bound on 
 `ruleMap` to one of the constraint's axes. The checker proves the defaults satisfy every constraint and that the
 constraints are satisfiable on the snapped grid.
 
-## Weighting module: taxonomy/axes.mjs
+## Weighting module: data/taxonomy/axes.mjs
 
 ```js
 import { AXIS_IDS, DEFAULTS, STEPS, snapValue, validateAxes, balance, createAxes } from './taxonomy/axes.mjs';
@@ -196,10 +196,10 @@ against a brute force minimum over every feasible grid point for a subset.
 
 ## Rule map
 
-`ruleMap["AC-04"] = { "categories": ["badge-label"], "axis": "color-restraint" }`. Every rule in `rules/rules.json`
+`ruleMap["AC-04"] = { "categories": ["badge-label"], "axis": "color-restraint" }`. Every rule in `data/rules/rules.json`
 has an entry. `categories` are where the tell shows up. `axis` is the dial whose extreme produces the tell, or `null`
 when the rule is a ban that no dial setting causes (most copy, Korean type and responsive rules). The rule entries
-themselves stay unchanged, because `engine/scripts/check-rules.mjs` pins their keys.
+themselves stay unchanged, because `packages/engine/scripts/check-rules.mjs` pins their keys.
 
 ## Gaps
 
@@ -208,7 +208,7 @@ themselves stay unchanged, because `engine/scripts/check-rules.mjs` pins their k
 
 ## Negative controls
 
-`taxonomy/fixtures/broken/*.json` each patch a copy of the taxonomy into a known broken state and name the error code
+`data/taxonomy/fixtures/broken/*.json` each patch a copy of the taxonomy into a known broken state and name the error code
 the checker must report: overlap (a category in two families, a shared example), orphan (a category in no family, a
 use or surface no pattern serves, a feature no step reads), dangling or self exclusions, unknown ids, a shadowed
 step, an unreachable category, a missing fallback, drive collisions and unknown properties, missing coverage, an off

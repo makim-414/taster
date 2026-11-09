@@ -1,41 +1,41 @@
 # engine
 
-Runs the slop detector (`rules/detect.js`) in a real Chromium at 1440 and 390 wide, writes an annotated capture per width, and serves the same thing to agents over MCP and to editors over ACP.
+Runs the slop detector (`data/rules/detect.js`) in a real Chromium at 1440 and 390 wide, writes an annotated capture per width, and serves the same thing to agents over MCP and to editors over ACP.
 
-`rules/detect.js` has no dependencies. Any browser tool can load it into a page and call `window.tasterDetect({ highlight: true })`, as `skills/taster/references/diagnose.md` describes. This folder is the ready-made runner for when you have Node.
+`data/rules/detect.js` has no dependencies. Any browser tool can load it into a page and call `window.tasterDetect({ highlight: true })`, as `skills/taster/references/diagnose.md` describes. This folder is the ready-made runner for when you have Node.
 
 ## Setup
 
 Node.js 22 or later. From the repository root:
 
 ```bash
-npm ci --prefix engine
-node engine/setup.mjs    # finds a browser (Playwright's Chromium, then Google Chrome), downloads Chromium only if neither starts
+npm ci --prefix packages/engine
+node packages/engine/setup.mjs    # finds a browser (Playwright's Chromium, then Google Chrome), downloads Chromium only if neither starts
 ```
 
-`npx --prefix engine playwright install chromium` installs Chromium directly.
+`npx --prefix packages/engine playwright install chromium` installs Chromium directly.
 
 ## CLI
 
 ```bash
-node engine/cli.mjs https://example.com --out out    # report.json, annotated-1440.jpg, annotated-390.jpg
-node engine/cli.mjs ./page.html --json --widths 1440 # one width, JSON to stdout
-node engine/cli.mjs https://example.com --widths responsive  # 360 to 1440 in nine steps, for the RSP rules
-node engine/cli.mjs https://example.com --extract    # content JSON for a rebuild (content.json with --out)
-node engine/cli.mjs https://example.com --brand      # brand theme CSS and notes (theme.css with --out, JSON with --json)
-node engine/cli.mjs --system https://example.com --ref ./liked.html --out sys  # design system: taster.system.json, theme.css
-node engine/cli.mjs --tune sys/taster.system.json density=0.75  # move a weight, rebalance, say what moved
-node engine/cli.mjs --consistency a.html b.html --system tokens.css --system theme.css  # drift between screens, values off the system
-node engine/cli.mjs --plan https://example.com --out work --system theme.css  # taster.plan.json: the screens, one at a time
-node engine/cli.mjs --rules                          # every rule, how it is checked, severity
-node engine/cli.mjs --explain KO-01                  # what, why, how it is found, fix
-node engine/cli.mjs lint src                         # the rules' source form, no browser (also: node engine/lint.mjs)
-node engine/cli.mjs --help                           # every option, and the exit codes
+node packages/engine/cli.mjs https://example.com --out out    # report.json, annotated-1440.jpg, annotated-390.jpg
+node packages/engine/cli.mjs ./page.html --json --widths 1440 # one width, JSON to stdout
+node packages/engine/cli.mjs https://example.com --widths responsive  # 360 to 1440 in nine steps, for the RSP rules
+node packages/engine/cli.mjs https://example.com --extract    # content JSON for a rebuild (content.json with --out)
+node packages/engine/cli.mjs https://example.com --brand      # brand theme CSS and notes (theme.css with --out, JSON with --json)
+node packages/engine/cli.mjs --system https://example.com --ref ./liked.html --out sys  # design system: taster.system.json, theme.css
+node packages/engine/cli.mjs --tune sys/taster.system.json density=0.75  # move a weight, rebalance, say what moved
+node packages/engine/cli.mjs --consistency a.html b.html --system tokens.css --system theme.css  # drift between screens, values off the system
+node packages/engine/cli.mjs --plan https://example.com --out work --system theme.css  # taster.plan.json: the screens, one at a time
+node packages/engine/cli.mjs --rules                          # every rule, how it is checked, severity
+node packages/engine/cli.mjs --explain KO-01                  # what, why, how it is found, fix
+node packages/engine/cli.mjs lint src                         # the rules' source form, no browser (also: node packages/engine/lint.mjs)
+node packages/engine/cli.mjs --help                           # every option, and the exit codes
 ```
 
 `add` copies components into an app, relative to the folder it runs in, so run it from the app folder by the clone's
-path: `node /path/to/taster/engine/cli.mjs add blocks/button --dir src/components/taster` (see
-`registry/README.md`).
+path: `node /path/to/taster/packages/engine/cli.mjs add blocks/button --dir src/components/taster` (see
+`packages/registry/README.md`).
 
 A page that answers with a bot check, a block or error page (HTTP 4xx or 5xx), or a sign-in page on another host is not
 diagnosed: nothing is measured, the report says why, and the exit code is 2. Nothing here gets past a check or a
@@ -63,7 +63,7 @@ outside the scale, SRC-03 stock palette class instead of a token, SRC-04 Tailwin
 extended (the defaults vanish and every sm: and lg: class stops generating CSS).
 
 - `--baseline <file>` turns it into a ratchet: counts per file and check may only go down. Write the first one with
-  `--write-baseline`. This repository's registry runs that way in CI (`registry/lint-baseline.json`).
+  `--write-baseline`. This repository's registry runs that way in CI (`packages/registry/lint-baseline.json`).
 - `taster-allow <reason>` on the line or the line above lets one line through; without a reason it is reported (SRC-00).
 - `--selftest` runs every check on lines it must catch and lines it must pass, so a check that stops matching fails CI.
 - Comments, Markdown code fences, `node_modules`, build output and minified files are skipped.
@@ -86,13 +86,13 @@ temporary folder is deleted with the answer; a capture that would not fit is lef
 named by its path.
 
 `start.mjs` installs the engine's dependencies on its first start, then serves `mcp.mjs` on stdio. That first install
-can take longer than a client waits for a server: run `npm ci --prefix /path/to/taster/engine` once beforehand, or
+can take longer than a client waits for a server: run `npm ci --prefix /path/to/taster/packages/engine` once beforehand, or
 reconnect the server after it finishes.
 
 Claude Code:
 
 ```bash
-claude mcp add taster -- node /path/to/taster/engine/start.mjs
+claude mcp add taster -- node /path/to/taster/packages/engine/start.mjs
 ```
 
 Codex, in `~/.codex/config.toml`:
@@ -100,13 +100,13 @@ Codex, in `~/.codex/config.toml`:
 ```toml
 [mcp_servers.taster]
 command = "node"
-args = ["/path/to/taster/engine/start.mjs"]
+args = ["/path/to/taster/packages/engine/start.mjs"]
 ```
 
 Cursor, in `.cursor/mcp.json` (or `~/.cursor/mcp.json`):
 
 ```json
-{ "mcpServers": { "taster": { "command": "node", "args": ["/path/to/taster/engine/start.mjs"] } } }
+{ "mcpServers": { "taster": { "command": "node", "args": ["/path/to/taster/packages/engine/start.mjs"] } } }
 ```
 
 ## Hosted MCP (HTTP)
@@ -118,12 +118,12 @@ statelessly (`handleMcpRequest(request, { remote })`), so it runs on serverless 
 system tools and the screen by screen tools, which open pages in a local browser and read or write files, and
 `preview_component` answers with the still and a live link instead of a render.
 
-`web/app/api/mcp/route.ts` mounts it at `/api/mcp` and gives all three, so the hosted server lacks only
+`apps/web/app/api/mcp/route.ts` mounts it at `/api/mcp` and gives all three, so the hosted server lacks only
 `extract_content`, the design system tools and the screen by screen tools. `diagnose`, `brand_theme` and the reference
 screens go through the same fence as `/api/diagnose` and `/api/brand`: public http(s) only, a request budget, per
 client limits that each instance keeps on its own, and one browser at a time. The route takes one JSON-RPC message
 per POST (a batch gets 400), counts every tool call against a per client minute, and answers with an error instead of
-anything over 4 MB (`web/README.md`).
+anything over 4 MB (`apps/web/README.md`).
 
 ## ACP agent
 
@@ -147,7 +147,7 @@ Zed, in `settings.json`:
 ```json
 {
   "agent_servers": {
-    "Taster": { "type": "custom", "command": "node", "args": ["/path/to/taster/engine/start.mjs", "acp"], "env": {} }
+    "Taster": { "type": "custom", "command": "node", "args": ["/path/to/taster/packages/engine/start.mjs", "acp"], "env": {} }
   }
 }
 ```
@@ -159,7 +159,7 @@ full path of `node` in `command`. With the engine linked or installed globally, 
 Try it by hand:
 
 ```bash
-printf '%s\n' '{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":1}}' | node engine/acp.mjs
+printf '%s\n' '{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":1}}' | node packages/engine/acp.mjs
 ```
 
 ## Checks
@@ -167,13 +167,13 @@ printf '%s\n' '{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocol
 `node scripts/gates.mjs` runs these with every other gate, in CI's order (see `CONTRIBUTING.md`). One by one:
 
 ```bash
-node rules/test-detect.mjs           # fixtures: exact rule sets on slop pages, zero on the clean page at both widths
-node engine/scripts/check-rules.mjs  # rules.json schema, and detect.js checks exactly the measured rules
-npm --prefix engine test             # CLI, MCP, ACP, extract, consistency and the plan steps
-node engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop (the count the READMEs give), both rebuilt screens are clean, consistent and on the system
+node data/rules/test-detect.mjs           # fixtures: exact rule sets on slop pages, zero on the clean page at both widths
+node packages/engine/scripts/check-rules.mjs  # rules.json schema, and detect.js checks exactly the measured rules
+npm --prefix packages/engine test             # CLI, MCP, ACP, extract, consistency and the plan steps
+node packages/engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop (the count the READMEs give), both rebuilt screens are clean, consistent and on the system
 ```
 
-To add a measured rule: write the check in `rules/detect.js` (`flag('XX-00', el, evidence)`), set its `detect.level` to `deterministic` in `rules/rules.json`, make a fixture in `rules/fixtures/` hit it and add the id to `rules/fixtures/expected-engine.json`. The clean fixture must stay at zero.
+To add a measured rule: write the check in `data/rules/detect.js` (`flag('XX-00', el, evidence)`), set its `detect.level` to `deterministic` in `data/rules/rules.json`, make a fixture in `data/rules/fixtures/` hit it and add the id to `data/rules/fixtures/expected-engine.json`. The clean fixture must stay at zero.
 
 Before trusting a new check, run it on the code from before your fix and watch it fail (a negative control): a check that passes on both versions measures nothing. Known findings you decide to keep go in a baseline with a reason (`taster lint --baseline`), and the count may only go down.
 

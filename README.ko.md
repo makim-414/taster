@@ -35,7 +35,7 @@ Action, 원격 MCP 서버, 확장은 [쓰기](#쓰기) 에 있습니다.
 
 ## 들어 있는 것
 
-- **규칙.** 규칙 88개, 그중 85개는 `rules/detect.js` 가 실제 브라우저에서 재고 나머지는 캡처를 보고 눈으로 판단합니다. 대문자에 넓은 자간을 준 라벨, 색을 옅게 깐 알약 배지, 카드 왼쪽의 두꺼운 색 띠, 이모지 불릿, 단어 중간에서 끊기는 한글 줄바꿈 같은 것들입니다. 걸렸다는 것은 그 페이지에 그 흔적이 있다는 뜻이지, 누가 무엇으로 만들었는지를 말하지 않습니다([규칙의 근거](#규칙의-근거)).
+- **규칙.** 규칙 88개, 그중 85개는 `data/rules/detect.js` 가 실제 브라우저에서 재고 나머지는 캡처를 보고 눈으로 판단합니다. 대문자에 넓은 자간을 준 라벨, 색을 옅게 깐 알약 배지, 카드 왼쪽의 두꺼운 색 띠, 이모지 불릿, 단어 중간에서 끊기는 한글 줄바꿈 같은 것들입니다. 걸렸다는 것은 그 페이지에 그 흔적이 있다는 뜻이지, 누가 무엇으로 만들었는지를 말하지 않습니다([규칙의 근거](#규칙의-근거)).
 - **패턴.** 패턴 122개. 방문자가 하려는 일(요금제 비교, 믿을 근거 확인, 상태 표시)과 화면 종류(랜딩, 대시보드, 쇼핑, AI 대화 등)로 정리했습니다. 규칙마다 그것을 고치는 패턴이 연결돼 있습니다.
 - **부품.** 부품 144개. 토큰으로 만든 React 컴포넌트입니다. 설치할 패키지 없이 필요한 파일만 복사해 쓰고, 지워야 할 남의 브랜드도 없습니다.
 
@@ -75,11 +75,11 @@ Action, 원격 MCP 서버, 확장은 [쓰기](#쓰기) 에 있습니다.
 
 `examples/rebuild/` 에 맨 위 그림의 다시 짓기 예시가 있습니다. AI 티 나는 랜딩을 다시 지어 두 폭 모두 0건,
 제목·버튼·메뉴는 하나도 빠지지 않고 브랜드 색도 그대로입니다. 같은 부품으로 지은 두 번째 화면도 있고, 첫 화면과
-어긋나지 않고 시스템 안에 있는지 확인합니다. `node engine/scripts/check-rebuild-example.mjs` 가 그림 아래 적은 규칙
+어긋나지 않고 시스템 안에 있는지 확인합니다. `node packages/engine/scripts/check-rebuild-example.mjs` 가 그림 아래 적은 규칙
 수까지 모두 확인합니다.
 
 `examples/icon-slots/` 에는 아이콘 자리(조작, 설명용, 식별 마크, 데이터 표식, 아이콘 없음)마다 변형 5개씩, `taxonomy.json` 에
-적힌 25개가 그대로 있습니다. `node engine/scripts/check-icon-slots-example.mjs` 가 분류 체계와 맞는지, 두 폭 모두 0건인지
+적힌 25개가 그대로 있습니다. `node packages/engine/scripts/check-icon-slots-example.mjs` 가 분류 체계와 맞는지, 두 폭 모두 0건인지
 확인합니다.
 
 ## 디자인 시스템
@@ -92,8 +92,8 @@ Action, 원격 MCP 서버, 확장은 [쓰기](#쓰기) 에 있습니다.
 브랜드가 들어 있고, 글자 대비는 WCAG AA 이상입니다. 모든 화면과 부품이 이 파일을 불러 씁니다.
 
 ```bash
-node engine/cli.mjs --system https://your-site.example --ref ./a-page-you-like.html --out system
-node engine/cli.mjs --tune system/taster.system.json roundness=1
+node packages/engine/cli.mjs --system https://your-site.example --ref ./a-page-you-like.html --out system
+node packages/engine/cli.mjs --tune system/taster.system.json roundness=1
 ```
 
 MCP 도구: `design_system`, `tune_system`, `system_for_category`. 측정값이 단계로, 단계가 토큰으로 바뀌는 방식은
@@ -106,22 +106,22 @@ MCP 도구: `design_system`, `tune_system`, `system_for_category`. 측정값이 
 - Node.js 22 이상(`.nvmrc` 의 버전)과 git. MCP 서버, 명령줄, `add` 는 이 리포를 받은 클론에서 실행합니다. npm
   패키지는 아직 게시 전입니다.
 - 페이지를 여는 기능에는 브라우저가 필요합니다. Playwright 의 Chromium 이 있으면 그것을, 없으면 설치된 Google
-  Chrome 을 씁니다. 클론에서 `node engine/setup.mjs` 를 실행하면 둘 중 하나가 뜨는지 확인하고, 둘 다 안 될 때만
+  Chrome 을 씁니다. 클론에서 `node packages/engine/setup.mjs` 를 실행하면 둘 중 하나가 뜨는지 확인하고, 둘 다 안 될 때만
   Chromium 을 받습니다. 소스 린트에는 브라우저가 필요 없습니다.
 
 ### 다른 클라이언트에서 MCP 서버 쓰기
 
-리포를 받아 엔진을 한 번 설치한 뒤, 클라이언트에 `engine/start.mjs` 를 연결합니다.
+리포를 받아 엔진을 한 번 설치한 뒤, 클라이언트에 `packages/engine/start.mjs` 를 연결합니다.
 
 ```bash
 git clone https://github.com/makim-414/taster.git /path/to/taster
-npm ci --prefix /path/to/taster/engine
+npm ci --prefix /path/to/taster/packages/engine
 ```
 
 플러그인 없이 Claude Code:
 
 ```bash
-claude mcp add taster -- node /path/to/taster/engine/start.mjs
+claude mcp add taster -- node /path/to/taster/packages/engine/start.mjs
 ```
 
 Codex 는 `~/.codex/config.toml` 에 넣습니다(리포를 Codex 플러그인으로 설치하면 `.codex-plugin/plugin.json` 이 스킬과
@@ -130,13 +130,13 @@ Codex 는 `~/.codex/config.toml` 에 넣습니다(리포를 Codex 플러그인�
 ```toml
 [mcp_servers.taster]
 command = "node"
-args = ["/path/to/taster/engine/start.mjs"]
+args = ["/path/to/taster/packages/engine/start.mjs"]
 ```
 
 Cursor 는 프로젝트의 `.cursor/mcp.json`, 모든 프로젝트에 쓰려면 `~/.cursor/mcp.json` 에 넣습니다.
 
 ```json
-{ "mcpServers": { "taster": { "command": "node", "args": ["/path/to/taster/engine/start.mjs"] } } }
+{ "mcpServers": { "taster": { "command": "node", "args": ["/path/to/taster/packages/engine/start.mjs"] } } }
 ```
 
 로컬 서버는 내 사용자 권한으로 돕니다. 받은 http, https 주소는 사설 주소까지 모두 열고(그래서 개발 서버를 잴 수
@@ -158,10 +158,10 @@ Claude Code 에서 `/taster` 를 치면(또는 에이전트에게 "Taster 시작
 클론에서:
 
 ```bash
-npm ci --prefix engine
-node engine/cli.mjs https://example.com --out ./taster-report
-node engine/cli.mjs https://example.com --extract    # 다시 짓기에 쓸 페이지 내용
-node engine/cli.mjs https://example.com --brand      # 사이트 브랜드를 토큰 테마로
+npm ci --prefix packages/engine
+node packages/engine/cli.mjs https://example.com --out ./taster-report
+node packages/engine/cli.mjs https://example.com --extract    # 다시 짓기에 쓸 페이지 내용
+node packages/engine/cli.mjs https://example.com --brand      # 사이트 브랜드를 토큰 테마로
 ```
 
 봇 확인, 차단·오류 화면, 다른 호스트의 로그인 화면이 돌아오면 진단하지 않았다고 알리고 발견은 내놓지 않습니다(종료
@@ -174,10 +174,10 @@ node engine/cli.mjs https://example.com --brand      # 사이트 브랜드를 �
 
 ```bash
 git clone https://github.com/makim-414/taster.git /path/to/taster   # 한 번만
-npm ci --prefix /path/to/taster/engine                              # 한 번만
-node /path/to/taster/engine/cli.mjs lint src                                  # 옅은 알약, transition-all, 하드코딩 색 ...
-node /path/to/taster/engine/cli.mjs lint src --baseline taster-baseline.json --write-baseline   # 오래된 코드에 처음 도입
-node /path/to/taster/engine/cli.mjs lint src --baseline taster-baseline.json  # 그 뒤로는 개수가 줄기만 해야 함
+npm ci --prefix /path/to/taster/packages/engine                              # 한 번만
+node /path/to/taster/packages/engine/cli.mjs lint src                                  # 옅은 알약, transition-all, 하드코딩 색 ...
+node /path/to/taster/packages/engine/cli.mjs lint src --baseline taster-baseline.json --write-baseline   # 오래된 코드에 처음 도입
+node /path/to/taster/packages/engine/cli.mjs lint src --baseline taster-baseline.json  # 그 뒤로는 개수가 줄기만 해야 함
 ```
 
 `taster-allow <이유>` 주석을 단 줄은 통과하고, 이유 없는 허용은 따로 보고합니다. npm 패키지가 게시되면 클론 대신
@@ -188,7 +188,7 @@ node /path/to/taster/engine/cli.mjs lint src --baseline taster-baseline.json  # 
 내 앱 폴더에서, 위 단계의 클론으로:
 
 ```bash
-node /path/to/taster/engine/cli.mjs add blocks/button blocks/citations --dir src/components/taster
+node /path/to/taster/packages/engine/cli.mjs add blocks/button blocks/citations --dir src/components/taster
 ```
 
 부품마다 그 부품이 import 하는 파일과 토큰 파일을 함께, 명령을 실행한 폴더 기준 `--dir` 아래로 복사하고, Taster 의
@@ -212,8 +212,8 @@ MIT 라이선스도 옆에 둡니다. shadcn 같은 다른 CLI 는 필요 없습
 
 ### MCP 없는 에이전트용 규칙 파일
 
-`node engine/cli.mjs export all --dir <내 앱>` 은 규칙을 AGENTS.md, Claude Code, Cursor, Windsurf, Cline, GitHub Copilot,
-Gemini CLI 용 지침 파일로 만들어(`rules/rules.json` 에서 생성) 각 도구가 읽는 자리에 넣고, 같이 쓰는 파일에서는 내 글을
+`node packages/engine/cli.mjs export all --dir <내 앱>` 은 규칙을 AGENTS.md, Claude Code, Cursor, Windsurf, Cline, GitHub Copilot,
+Gemini CLI 용 지침 파일로 만들어(`data/rules/rules.json` 에서 생성) 각 도구가 읽는 자리에 넣고, 같이 쓰는 파일에서는 내 글을
 그대로 둡니다. [릴리스](https://github.com/makim-414/taster/releases)마다 같은 파일 7개를 `taster-exports-<버전>.zip` 으로도
 붙입니다.
 
@@ -234,7 +234,7 @@ steps:
 ```
 
 결과를 작업 요약과 SARIF 로 남기고, SARIF 를 코드 스캔에 올려 바뀐 파일 위에 표시하며, `fail-on`(기본 high) 이상이면
-단계를 실패시킵니다. 코드 스캔이 없으면 `upload-sarif: 'false'`. 로컬에서는 `node engine/cli.mjs <대상...> --sarif taster.sarif`.
+단계를 실패시킵니다. 코드 스캔이 없으면 `upload-sarif: 'false'`. 로컬에서는 `node packages/engine/cli.mjs <대상...> --sarif taster.sarif`.
 `v0` 은 가장 최근 0.x 릴리스를 따릅니다. 바뀐 내용을 하나하나 보고 쓰려면 커밋 SHA 전체로 고정하세요.
 
 봇 확인, 오류 화면, 로그인 화면이 돌아온 대상은 진단하지 않습니다. 단계는 종료 코드 2 로 실패하고, 작업 요약과
@@ -252,7 +252,7 @@ SARIF 에 이유를 적으며 발견은 없습니다. 배포 보호가 켜진 �
 확장을 쓰세요. 고정 파일 이전에 저장한 북마클릿은 `/taster/overlay.js` 를 받아 그 사이트가 지금 주는 것을 실행하고,
 그 첫 요청에는 Referer 가 붙습니다. `/bookmarklet` 에서 북마클릿을 다시 끌어 두세요.
 
-그런 화면이나 외부 스크립트를 막는 사이트에서는 `extension/` 폴더를 크롬이나 엣지에 압축해제 확장으로 불러오세요.
+그런 화면이나 외부 스크립트를 막는 사이트에서는 `apps/extension/` 폴더를 크롬이나 엣지에 압축해제 확장으로 불러오세요.
 같은 파일을 확장 안에 들고 있고, `activeTab`, `scripting` 권한만 쓰며, 단추를 누른 때만 동작합니다.
 
 ### 설치 없이 쓰기 (원격 MCP)
@@ -274,10 +274,10 @@ JSON-RPC 메시지 하나만 받고(묶음은 거부), 4 MB 를 넘는 답은 �
 
 ### 에디터에서 쓰기 (ACP)
 
-`engine/acp.mjs` 는 [Agent Client Protocol](https://agentclientprotocol.com) 을 말하므로 에이전트 패널이 있는
+`packages/engine/acp.mjs` 는 [Agent Client Protocol](https://agentclientprotocol.com) 을 말하므로 에이전트 패널이 있는
 에디터에서 Taster 를 바로 돌릴 수 있습니다. 안에 모델은 없고 슬래시 명령에 엔진 결과로 답합니다(`/start`,
 `/diagnose <주소나 파일>`, `/extract <주소>`, `/brand <주소>`, `/explain <규칙 id>`, `/rules`, `/help`). 교체나
-다시 짓기는 MCP 를 쓰는 에이전트 안에서 스킬로 하세요. 에디터에는 `engine/start.mjs acp` 를 넣으면 됩니다. 처음
+다시 짓기는 MCP 를 쓰는 에이전트 안에서 스킬로 하세요. 에디터에는 `packages/engine/start.mjs acp` 를 넣으면 됩니다. 처음
 켤 때 엔진 의존성을 알아서 설치합니다. Zed 의 `settings.json` 에는 이렇게 넣습니다.
 
 ```json
@@ -286,7 +286,7 @@ JSON-RPC 메시지 하나만 받고(묶음은 거부), 4 MB 를 넘는 답은 �
     "Taster": {
       "type": "custom",
       "command": "node",
-      "args": ["/path/to/taster/engine/start.mjs", "acp"],
+      "args": ["/path/to/taster/packages/engine/start.mjs", "acp"],
       "env": {}
     }
   }
@@ -313,9 +313,9 @@ JetBrains IDE 는 같은 `agent_servers` 모양(`type` 없이)을 `~/.jetbrains/
 
 분류마다 한 문장 정의, 포함하는 것, 제외하는 것과 그것이 대신 가는 곳, 일반적인 예시가 있습니다. 예·아니오로 답하는
 특징 33개에 대한 결정 키가 모든 UI 부품을 분류 하나에 정확히 넣고, 처음 맞는 단계가 이깁니다. 가중치 축은
-`registry/src/tokens.css` 의 이름 있는 속성을 움직이고, 정해진 단계에만 놓여 애매한 중간값이 없으며, 선형 제약으로
+`packages/registry/src/tokens.css` 의 이름 있는 속성을 움직이고, 정해진 단계에만 놓여 애매한 중간값이 없으며, 선형 제약으로
 적은 디자인 원칙이 균형을 지킵니다(빽빽한 화면에 포스터 같은 글자는 올 수 없고, 깊은 그림자에는 절제된 색이 필요합니다).
-`taxonomy/axes.mjs` 가 설정을 검사하고 균형을 맞춥니다. 자세한 내용은 [data/taxonomy/SCHEMA.md](data/taxonomy/SCHEMA.md) 에
+`data/taxonomy/axes.mjs` 가 설정을 검사하고 균형을 맞춥니다. 자세한 내용은 [data/taxonomy/SCHEMA.md](data/taxonomy/SCHEMA.md) 에
 있고, 묶음별 분류와 패턴 수 표는 영어 README 의 [Taxonomy at a glance](README.md#taxonomy-at-a-glance) 에 있습니다(빌드가
 자동으로 씁니다).
 
@@ -330,7 +330,7 @@ JetBrains IDE 는 같은 `agent_servers` 모양(`type` 없이)을 `~/.jetbrains/
 외부 글이나 표준은 링크, 읽은 날짜, 규칙을 뒷받침하는 내용을 담은 ref 로 적습니다. 그 내용은 15단어 이하의 인용이거나,
 요약이라고 표시한 Taster 의 한 줄입니다. 다른 글을 옮긴 글은 `derived_from` 에 원래 글을 적습니다. 출처는 각자의
 라이선스를 따르고, Taster 는 링크만 걸 뿐 글도 코드도 가져오지 않습니다. Taster 가 직접 본 것은 규칙의 `observation`
-에 적습니다. `node engine/scripts/check-rules.mjs` 가 모든 규칙의 근거와 ref 를 검사합니다.
+에 적습니다. `node packages/engine/scripts/check-rules.mjs` 가 모든 규칙의 근거와 ref 를 검사합니다.
 
 규칙 하나에 걸렸다고 AI 가 만들었다는 뜻은 아닙니다. 표준에 근거한 규칙은 누가 만들었든 화면 품질의 문제이고, 사람이
 손으로 만든 페이지도 다른 규칙에 걸릴 수 있습니다.

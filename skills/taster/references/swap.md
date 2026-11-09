@@ -24,12 +24,12 @@ own code, and prove it with a second detector run.
 2. Open each `data/patterns/<id>.md`. Pick the one whose "When to use" matches this spot.
 3. Apply the "Swap recipe". It is written at the CSS or JSX level. Keep the user's content, brand color and
    framework.
-4. If the pattern lists `components`, copy the component from `registry/src/` (see `data/registry.json` for the
+4. If the pattern lists `components`, copy the component from `packages/registry/src/` (see `data/registry.json` for the
    file) together with the tokens it uses. Rename classes to the user's conventions if they have them.
 5. Re run detect.js at both widths. The finding must be gone. If a new finding appears, you introduced it; fix it
    before moving on.
 
-6. Lint the files you touched (`taster lint <files>`, or `node engine/lint.mjs <files>`). It reads the source form of
+6. Lint the files you touched (`taster lint <files>`, or `node packages/engine/lint.mjs <files>`). It reads the source form of
    the same rules (tinted pills, transition-all, hard-coded colors, pixel one-offs) without a browser, so a swap that
    reintroduced one shows up even where the page did not render it. Leave a `taster-allow <reason>` only where the
    user asked for the exception.

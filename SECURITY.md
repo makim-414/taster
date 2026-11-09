@@ -33,12 +33,12 @@ What happens next:
 
 In scope:
 
-- The local MCP server and ACP agent (`engine/mcp.mjs`, `engine/acp.mjs`, both started by `engine/start.mjs`).
-- The command line (`engine/cli.mjs`, `bin/taster.mjs`), including `lint`, `add` and `export`.
+- The local MCP server and ACP agent (`packages/engine/mcp.mjs`, `packages/engine/acp.mjs`, both started by `packages/engine/start.mjs`).
+- The command line (`packages/engine/cli.mjs`, `packages/engine/taster.mjs`), including `lint`, `add` and `export`.
 - The hosted site at https://taster-six.vercel.app and its routes `/api/diagnose`, `/api/brand` and `/api/mcp`.
-- The bookmarklet (https://taster-six.vercel.app/bookmarklet) and the browser extension (`extension/`).
+- The bookmarklet (https://taster-six.vercel.app/bookmarklet) and the browser extension (`apps/extension/`).
 - The GitHub Action (`action.yml`).
-- The registry components that `add` copies into your app (`registry/src/`), for example markup injected through a
+- The registry components that `add` copies into your app (`packages/registry/src/`), for example markup injected through a
   prop.
 
 Out of scope:

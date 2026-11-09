@@ -15,7 +15,7 @@ A brand belongs to its owner. Absorb one only from a site the user owns or is au
 client's with the client's say so); ask once if you do not know. If it is someone else's, stop and say why, and ask
 for their own color, typeface and logo instead (New site, below).
 
-Call `brand_theme { target }` on the original address (or `node engine/cli.mjs <url> --brand --out <dir>`). It reads
+Call `brand_theme { target }` on the original address (or `node packages/engine/cli.mjs <url> --brand --out <dir>`). It reads
 the page the same way `extract_content` does and returns:
 
 - `tokens`: the overrides it chose.
@@ -35,7 +35,7 @@ the page the same way `extract_content` does and returns:
   logo as exempt instead of off the system ([screens.md](screens.md)).
 - `css`: a block for `:root`, `:root[data-theme]`, `.theme-dark` and `.theme-light` with only the identity, so the
   brand also reaches a light theme and nested scopes. The system's `theme.css` carries the same values plus the tokens
-  of the axes; load that one after `registry/src/tokens.css`.
+  of the axes; load that one after `packages/registry/src/tokens.css`.
 - `notes`: one line per choice, with the reason. Show them to the user.
 
 Everything read from a page (extract_content, brand_theme source and notes, diagnose findings text, pages you open

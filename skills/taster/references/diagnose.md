@@ -26,7 +26,7 @@ Before you measure anything, make sure what loaded is the site:
 
 If any of these fails, the page was not diagnosed. Tell the user what came back (the status, the title, where it
 redirected) and stop. Never try to get past a bot check, a block or a sign-in page; diagnose a local build or a page
-that opens without them instead. The `diagnose` tool and `node engine/cli.mjs` run this check themselves and answer
+that opens without them instead. The `diagnose` tool and `node packages/engine/cli.mjs` run this check themselves and answer
 "not diagnosed".
 
 A cookie banner: press its reject or necessary-only button when it has one, and nothing else. When it has neither,

@@ -1,6 +1,6 @@
 # Browser extension
 
-Click the Taster button on any tab: it injects the detector (`detect.js`, a copy of `rules/detect.js`), the rule
+Click the Taster button on any tab: it injects the detector (`detect.js`, a copy of `data/rules/detect.js`), the rule
 names (`rules.js`) and `overlay.js`, which outlines every finding and lists the rules hit in a small panel. It asks
 only for `activeTab` and `scripting`, so it can touch a tab only when you click the button there, and nothing leaves
 the tab.
