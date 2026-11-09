@@ -10,7 +10,7 @@ import { axesToTokens, nearestRefs, toneAxes } from '../../../packages/engine/to
 const BASE = process.argv[2] || 'http://localhost:3240';
 const OUT = new URL('../shots/', import.meta.url);
 mkdirSync(OUT, { recursive: true });
-const catalog = JSON.parse(readFileSync(new URL('../../../taxonomy/tone-refs.json', import.meta.url), 'utf8'));
+const catalog = JSON.parse(readFileSync(new URL('../../../data/taxonomy/tone-refs.json', import.meta.url), 'utf8'));
 const geek = new Set(catalog.refs.filter((r) => r.genres.includes('geek')).map((r) => r.name));
 const picture = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800"><rect width="1280" height="800" fill="#d9d9d6"/></svg>')}`;
 

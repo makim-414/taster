@@ -3,7 +3,7 @@
 import { createHash } from 'node:crypto';
 import { copyFileSync, cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
-const from = new URL('../../../rules/fixtures/', import.meta.url);
+const from = new URL('../../../data/rules/fixtures/', import.meta.url);
 const to = new URL('../public/fixtures/', import.meta.url);
 mkdirSync(to, { recursive: true });
 for (const name of ['slop.html', 'slop-ko.html', 'clean.html']) copyFileSync(new URL(name, from), new URL(name, to));

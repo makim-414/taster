@@ -1,5 +1,5 @@
 // The tone step: a spot on two axes (x: commerce 0 to brand personality 1, y: minimal 0 to expressive 1) and an
-// optional genre become the nearest real references (taxonomy/tone-refs.json) and a set of token values. Pure
+// optional genre become the nearest real references (data/taxonomy/tone-refs.json) and a set of token values. Pure
 // functions with no file or browser access, so the MCP tool (server.mjs) and the web page (apps/web/app/tone) import
 // the same code and answer the same.
 //
@@ -7,10 +7,10 @@
 // color-restraint, elevation, motion, stroke). `toneAxes` returns them as { id: step }, the shape a design system
 // takes as builder intent. The rule: each corner of the map holds one setting, the spot blends the four, the genre
 // nudges, every value snaps to its nearest step, and the result goes through the design system's balance()
-// (taxonomy/axes.mjs), so a tone never breaks a design constraint (for example, loud type only with quiet color) and
+// (data/taxonomy/axes.mjs), so a tone never breaks a design constraint (for example, loud type only with quiet color) and
 // what the tone page shows is what design_system would build from these axes. Readability is a floor, not a dial: no
 // setting lowers text contrast below the defaults.
-import { balance } from '../../taxonomy/axes.mjs';
+import { balance } from '../../data/taxonomy/axes.mjs';
 
 export const TONE_AXES = [
   { id: 'density', name: 'Density', ko: '밀도', steps: [0, 0.25, 0.5, 0.75, 1], names: ['spacious', 'airy', 'regular', 'snug', 'compact'], namesKo: ['넉넉함', '여유', '보통', '촘촘', '빽빽'] },
@@ -256,7 +256,7 @@ export function toneUrl(base, { x, y, genre, theme, brand } = {}) {
 
 /**
  * Everything the tone step answers for one spot.
- * @param {object} catalog the parsed taxonomy/tone-refs.json
+ * @param {object} catalog the parsed data/taxonomy/tone-refs.json
  * @param {{ x?: number, y?: number, genre?: string, theme?: 'dark' | 'light', brand?: string | null, limit?: number }} input
  */
 export function pickTone(catalog, { x, y, genre, theme = 'dark', brand = null, limit = 4 } = {}) {

@@ -9,7 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MAX_SHOT_BYTES, RULES, toUrl } from '../diagnose.mjs';
 
 const cli = fileURLToPath(new URL('../cli.mjs', import.meta.url));
-const fixture = (name) => fileURLToPath(new URL(`../../../rules/fixtures/${name}`, import.meta.url));
+const fixture = (name) => fileURLToPath(new URL(`../../../data/rules/fixtures/${name}`, import.meta.url));
 const run = (...args) => spawnSync(process.execPath, [cli, ...args], { encoding: 'utf8', timeout: 90000 });
 // For a run against a server in this process: spawnSync would block the server from answering.
 const runAsync = (...args) =>

@@ -11,8 +11,8 @@
 // skills/taster/references/system.md (measurement to axis, token tables, contrast floor).
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
-import taxonomy from '../../taxonomy/taxonomy.json' with { type: 'json' };
-import { AXIS_IDS, DEFAULTS, STEPS, balance, createAxes, snapValue, validateAxes } from '../../taxonomy/axes.mjs';
+import taxonomy from '../../data/taxonomy/taxonomy.json' with { type: 'json' };
+import { AXIS_IDS, DEFAULTS, STEPS, balance, createAxes, snapValue, validateAxes } from '../../data/taxonomy/axes.mjs';
 import { TASTER_FONT, brandTheme, contrast as hexContrast, hexToOklch, oklchToHex } from './brand.mjs';
 import { EXTRACT_SOURCE, launch, toUrl } from './diagnose.mjs';
 
@@ -530,7 +530,7 @@ function checkSettings(settings, what) {
   return settings;
 }
 
-// Holds every pinned axis at its value and moves the others the least (taxonomy/axes.mjs balance). With two or more
+// Holds every pinned axis at its value and moves the others the least (data/taxonomy/axes.mjs balance). With two or more
 // pinned axes it runs the same balance over a copy of the taxonomy whose pinned axes have that single step.
 function settle(start, pinned) {
   const keys = AXIS_IDS.filter((a) => a in pinned);

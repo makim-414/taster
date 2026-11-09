@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "taxonomy.schema.json",
   "title": "Taster taxonomy",
-  "description": "Shape of taxonomy/taxonomy.json. Cross references, partition, decision key, constraints and coverage are checked by scripts/check-taxonomy.mjs, not by this schema. See taxonomy/SCHEMA.md.",
+  "description": "Shape of data/taxonomy/taxonomy.json. Cross references, partition, decision key, constraints and coverage are checked by scripts/check-taxonomy.mjs, not by this schema. See taxonomy/SCHEMA.md.",
   "type": "object",
   "additionalProperties": false,
   "required": [

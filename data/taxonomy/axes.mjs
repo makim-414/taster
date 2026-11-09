@@ -1,5 +1,5 @@
 // Weighting axes: validation and balancing over taxonomy.axes, taxonomy.snap and taxonomy.constraints.
-// Pure functions, no I/O after the JSON import. See taxonomy/SCHEMA.md, "Axes" and "Balance".
+// Pure functions, no I/O after the JSON import. See data/taxonomy/SCHEMA.md, "Axes" and "Balance".
 //
 //   validateAxes({ density: 1, 'type-expression': 1 })
 //     -> [{ code: 'constraint', constraint: 'dense-screens-quiet-type', prevents: ['TYP-04', 'TYP-05'], ... }]

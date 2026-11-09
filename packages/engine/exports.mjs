@@ -1,10 +1,10 @@
 // Taster's rules as instruction files for coding agents that do not speak MCP: AGENTS.md, Cursor, Windsurf, Cline,
-// GitHub Copilot, Gemini CLI and Claude Code. One body, rendered from rules/rules.json, wrapped per tool.
+// GitHub Copilot, Gemini CLI and Claude Code. One body, rendered from data/rules/rules.json, wrapped per tool.
 // `cli.mjs export` writes one into a project; scripts/build-exports.mjs writes all of them for a release.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
-const RULES_FILE = new URL('../../rules/rules.json', import.meta.url);
+const RULES_FILE = new URL('../../data/rules/rules.json', import.meta.url);
 const REPO = 'https://github.com/makim-414/taster';
 const HOSTED = 'https://taster-six.vercel.app';
 const START = '<!-- taster:start -->';

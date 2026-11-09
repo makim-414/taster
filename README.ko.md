@@ -4,7 +4,7 @@
 
 프론트엔드에서 AI 티가 나는 곳(슬롭)을 찾고, 그 자리를 같은 일을 더 잘하는 패턴으로 갈아 끼우거나, 처음부터 슬롭 없이 화면을 짓습니다.
 
-[사이트](https://taster-six.vercel.app) | [부품](https://taster-six.vercel.app/components) | [규칙](rules/RULES.md) | [패턴](patterns/README.md) | [변경 기록](CHANGELOG.md) | [기여 안내](CONTRIBUTING.md)
+[사이트](https://taster-six.vercel.app) | [부품](https://taster-six.vercel.app/components) | [규칙](data/rules/RULES.md) | [패턴](data/patterns/README.md) | [변경 기록](CHANGELOG.md) | [기여 안내](CONTRIBUTING.md)
 
 | 고치기 전 | 고친 뒤 |
 |---|---|
@@ -315,14 +315,14 @@ JetBrains IDE 는 같은 `agent_servers` 모양(`type` 없이)을 `~/.jetbrains/
 특징 33개에 대한 결정 키가 모든 UI 부품을 분류 하나에 정확히 넣고, 처음 맞는 단계가 이깁니다. 가중치 축은
 `registry/src/tokens.css` 의 이름 있는 속성을 움직이고, 정해진 단계에만 놓여 애매한 중간값이 없으며, 선형 제약으로
 적은 디자인 원칙이 균형을 지킵니다(빽빽한 화면에 포스터 같은 글자는 올 수 없고, 깊은 그림자에는 절제된 색이 필요합니다).
-`taxonomy/axes.mjs` 가 설정을 검사하고 균형을 맞춥니다. 자세한 내용은 [taxonomy/SCHEMA.md](taxonomy/SCHEMA.md) 에
+`taxonomy/axes.mjs` 가 설정을 검사하고 균형을 맞춥니다. 자세한 내용은 [data/taxonomy/SCHEMA.md](data/taxonomy/SCHEMA.md) 에
 있고, 묶음별 분류와 패턴 수 표는 영어 README 의 [Taxonomy at a glance](README.md#taxonomy-at-a-glance) 에 있습니다(빌드가
 자동으로 씁니다).
 
 ## 규칙의 근거
 
 <!-- rules:start -->
-규칙 88개, 그중 85개는 실제 브라우저에서 재고 3개는 캡처를 보고 눈으로 판단합니다. 규칙마다 `rules/rules.json` 의 `basis` 에 근거가 적혀 있습니다. 53개는 생성된 페이지를 다룬 외부 글, 18개는 웹 표준이나 플랫폼 가이드, 49개는 Taster 가 직접 본 것에 근거하고, 그중 21개는 직접 본 것만이 근거입니다. 한 규칙이 여러 근거를 가질 수 있습니다.
+규칙 88개, 그중 85개는 실제 브라우저에서 재고 3개는 캡처를 보고 눈으로 판단합니다. 규칙마다 `data/rules/rules.json` 의 `basis` 에 근거가 적혀 있습니다. 53개는 생성된 페이지를 다룬 외부 글, 18개는 웹 표준이나 플랫폼 가이드, 49개는 Taster 가 직접 본 것에 근거하고, 그중 21개는 직접 본 것만이 근거입니다. 한 규칙이 여러 근거를 가질 수 있습니다.
 
 인용한 외부 글(많이 인용한 순): Signs of AI design; kill-ai-slop; AI Slop Detector by Made with Jev; Impeccable slop catalog; Adrian Krebs, AI design patterns in Show HN pages; taste-skill; Anthropic frontend-design skill; slop-detect; prg.sh, why AI keeps building the same purple gradient; 925 Studios, AI slop design tells; Solo Design, AI design slop tells; Paul Bakaus, Impeccable 3.5 launch post; Hallmark; css-slop-detector.
 <!-- rules:end -->

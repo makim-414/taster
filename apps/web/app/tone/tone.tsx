@@ -6,7 +6,7 @@
 // packages/engine/tone.mjs, the same code the pick_tone tool runs, so the page and the agent give the same answer.
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
-import data from '../../../../taxonomy/tone-refs.json';
+import data from '../../../../data/taxonomy/tone-refs.json';
 import { axesToTokens, describeAxes, nearestRefs, quadrantOf, readSpot, toneAxes, toneParts, tokensCss, toneUrl, DEMO_BRAND, TONE_AXES, type Spot, type ToneCatalog, type ToneRef } from '../../../../packages/engine/tone.mjs';
 import { CopyButton } from '../components/copy-button';
 import { LookBar } from '../components/look-bar';

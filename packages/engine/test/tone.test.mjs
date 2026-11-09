@@ -6,8 +6,8 @@ import { launch } from '../diagnose.mjs';
 import { loadToneRefs } from '../catalog.mjs';
 import { DEMO_BRAND, TONE_AXES, axesToTokens, nearestRefs, pickTone, quadrantOf, readSpot, toneAxes, toneParts, toneUrl } from '../tone.mjs';
 import { readFirstScreen } from '../tone-capture.mjs';
-import { validateAxes } from '../../../taxonomy/axes.mjs';
-import taxonomy from '../../../taxonomy/taxonomy.json' with { type: 'json' };
+import { validateAxes } from '../../../data/taxonomy/axes.mjs';
+import taxonomy from '../../../data/taxonomy/taxonomy.json' with { type: 'json' };
 
 const catalog = loadToneRefs();
 const fixture = (name) => pathToFileURL(new URL(`./fixtures/${name}`, import.meta.url).pathname).href;

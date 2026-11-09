@@ -6,7 +6,7 @@ packages/registry/stage/** linguist-generated
 packages/registry/previews/** linguist-generated
 apps/extension/detect.js linguist-generated
 apps/extension/rules.js linguist-generated
-rules/RULES.md linguist-generated
-patterns/README.md linguist-generated
+data/rules/RULES.md linguist-generated
+data/patterns/README.md linguist-generated
 packages/registry/src/motion/orb-recipes.ts linguist-generated
 apps/web/scripts/og/meta.json linguist-generated

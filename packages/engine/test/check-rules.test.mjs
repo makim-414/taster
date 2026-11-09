@@ -7,17 +7,18 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const here = (rel) => fileURLToPath(new URL(rel, import.meta.url));
-const RULES = JSON.parse(readFileSync(here('../../../rules/rules.json'), 'utf8'));
-const DETECT = readFileSync(here('../../../rules/detect.js'), 'utf8');
+const RULES = JSON.parse(readFileSync(here('../../../data/rules/rules.json'), 'utf8'));
+const DETECT = readFileSync(here('../../../data/rules/detect.js'), 'utf8');
 
-// check-rules reads rules/ two levels above packages/engine/scripts/, so each case gets its own copy of that layout.
+// check-rules reads data/rules/ three levels above packages/engine/scripts/, so each case gets its own copy of that
+// layout.
 function check({ rules = RULES, detect = DETECT } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'taster-check-rules-'));
   mkdirSync(join(dir, 'packages', 'engine', 'scripts'), { recursive: true });
-  mkdirSync(join(dir, 'rules'));
+  mkdirSync(join(dir, 'data', 'rules'), { recursive: true });
   copyFileSync(here('../scripts/check-rules.mjs'), join(dir, 'packages', 'engine', 'scripts', 'check-rules.mjs'));
-  writeFileSync(join(dir, 'rules', 'rules.json'), JSON.stringify(rules));
-  writeFileSync(join(dir, 'rules', 'detect.js'), detect);
+  writeFileSync(join(dir, 'data', 'rules', 'rules.json'), JSON.stringify(rules));
+  writeFileSync(join(dir, 'data', 'rules', 'detect.js'), detect);
   return spawnSync(process.execPath, [join(dir, 'packages', 'engine', 'scripts', 'check-rules.mjs')], { encoding: 'utf8' });
 }
 const edit = (fn) => {

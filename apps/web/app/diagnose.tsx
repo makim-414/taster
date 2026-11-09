@@ -159,7 +159,7 @@ export function Diagnose({ ruleCount }: { ruleCount: number }) {
 
       <footer className="colophon">
         <p>
-          검사기는 저장소의 rules/detect.js 하나이고, 이 화면도 같은 검사기로 잽니다. 보고 있는 페이지에서 바로 재려면{' '}
+          검사기는 저장소의 data/rules/detect.js 하나이고, 이 화면도 같은 검사기로 잽니다. 보고 있는 페이지에서 바로 재려면{' '}
           <a href="/bookmarklet">북마클릿과 확장</a>을 쓰세요. 고칠 때 쓰는 부품은 <a href="/components">부품 갤러리</a>에 있습니다. MIT
           라이선스, 소스는 <a href="https://github.com/makim-414/taster">GitHub 저장소</a>에 있습니다.
         </p>

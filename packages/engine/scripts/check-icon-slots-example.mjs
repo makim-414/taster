@@ -8,7 +8,7 @@ import { diagnose } from '../diagnose.mjs';
 const root = new URL('../../../', import.meta.url);
 const page = fileURLToPath(new URL('examples/icon-slots/index.html', root));
 const html = readFileSync(page, 'utf8');
-const slots = JSON.parse(readFileSync(new URL('taxonomy/taxonomy.json', root), 'utf8')).iconography.slots;
+const slots = JSON.parse(readFileSync(new URL('data/taxonomy/taxonomy.json', root), 'utf8')).iconography.slots;
 
 const fail = (msg) => {
   console.error(`ICON SLOTS EXAMPLE FAIL: ${msg}`);

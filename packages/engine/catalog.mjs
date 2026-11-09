@@ -7,11 +7,11 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const readJson = (rel) => JSON.parse(readFileSync(join(ROOT, rel), 'utf8'));
 const readText = (rel) => readFileSync(join(ROOT, rel), 'utf8');
 
-export const loadRules = () => readJson('rules/rules.json').rules;
-export const loadPatterns = () => readJson('patterns/INDEX.json');
+export const loadRules = () => readJson('data/rules/rules.json').rules;
+export const loadPatterns = () => readJson('data/patterns/INDEX.json');
 export const loadRegistry = () => readJson('packages/registry/registry.json');
-export const loadTaxonomy = () => readJson('taxonomy/taxonomy.json');
-export const loadToneRefs = () => readJson('taxonomy/tone-refs.json');
+export const loadTaxonomy = () => readJson('data/taxonomy/taxonomy.json');
+export const loadToneRefs = () => readJson('data/taxonomy/tone-refs.json');
 
 export function patternsForRule(ruleId) {
   const rule = loadRules().find((r) => r.id === ruleId);
@@ -66,7 +66,7 @@ export function listPatterns({ family, category, use, surface, rule } = {}) {
 
 export function getPattern(id) {
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id)) throw new Error('Pattern ids are kebab-case');
-  const rel = `patterns/${id}.md`;
+  const rel = `data/patterns/${id}.md`;
   if (!existsSync(join(ROOT, rel))) throw new Error(`Unknown pattern ${id}`);
   return readText(rel);
 }

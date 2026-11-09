@@ -11,7 +11,7 @@ const SKILL = new URL('../../../skills/taster/', import.meta.url);
 const read = (rel) => readFileSync(new URL(rel, SKILL), 'utf8');
 const refs = readdirSync(new URL('references/', SKILL)).filter((f) => f.endsWith('.md')).map((f) => `references/${f}`);
 const docs = Object.fromEntries(['SKILL.md', ...refs].map((rel) => [rel, read(rel)]));
-const rules = JSON.parse(readFileSync(new URL('../../../rules/rules.json', import.meta.url), 'utf8')).rules;
+const rules = JSON.parse(readFileSync(new URL('../../../data/rules/rules.json', import.meta.url), 'utf8')).rules;
 
 // Tool name to its argument names, as an agent sees them over MCP.
 async function schemas(remote) {

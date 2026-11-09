@@ -60,7 +60,7 @@ export default function Page() {
 
       <footer className="colophon">
         <p>
-          북마클릿과 확장은 같은 검사기(rules/detect.js)를 넣습니다. <a href="https://github.com/makim-414/taster">GitHub 저장소</a>.
+          북마클릿과 확장은 같은 검사기(data/rules/detect.js)를 넣습니다. <a href="https://github.com/makim-414/taster">GitHub 저장소</a>.
         </p>
       </footer>
     </main>

@@ -65,7 +65,7 @@ export const COUNTED_FILES = [
   'packages/registry/README.md',
 ];
 // How the READMEs and descriptions say each count: "88 rules, 85 measured in a real browser", "144 components", and
-// in Korean "규칙 88개, 그중 85개는 (`rules/detect.js` 가) 실제 브라우저에서", "패턴 122개", "부품 144개".
+// in Korean "규칙 88개, 그중 85개는 (`data/rules/detect.js` 가) 실제 브라우저에서", "패턴 122개", "부품 144개".
 const PHRASES = [
   [/\b(\d+) rules\b/g, 'rules'],
   [/\b(\d+) measured\b/g, 'measured'],
@@ -166,13 +166,14 @@ export function npxErrors(pkg, docs) {
     .map(([file]) => `${file} says npx ${pkg.name}, but package.json is private (not published); use the node packages/engine/cli.mjs line`);
 }
 
-// Links to patterns/<id>.md anywhere, and pattern to pattern links inside patterns/, name a pattern that exists.
+// Links to patterns/<id>.md anywhere (data/patterns/<id>.md included), and pattern to pattern links inside
+// data/patterns/, name a pattern that exists.
 export function patternLinkErrors(file, text, ids) {
   const errors = [];
   const bad = (id) => id !== 'README' && !ids.has(id);
-  for (const m of text.matchAll(/patterns\/([A-Za-z0-9_-]+)\.md\b/g)) if (bad(m[1])) errors.push(`${file} links patterns/${m[1]}.md, which is not in patterns/INDEX.json`);
+  for (const m of text.matchAll(/patterns\/([A-Za-z0-9_-]+)\.md\b/g)) if (bad(m[1])) errors.push(`${file} links patterns/${m[1]}.md, which is not in data/patterns/INDEX.json`);
   if (/(^|\/)patterns\/[^/]+$/.test(file)) {
-    for (const m of text.matchAll(/\]\(([A-Za-z0-9_-]+)\.md(?:#[^)]*)?\)/g)) if (bad(m[1])) errors.push(`${file} links ${m[1]}.md, which is not in patterns/INDEX.json`);
+    for (const m of text.matchAll(/\]\(([A-Za-z0-9_-]+)\.md(?:#[^)]*)?\)/g)) if (bad(m[1])) errors.push(`${file} links ${m[1]}.md, which is not in data/patterns/INDEX.json`);
   }
   return errors;
 }

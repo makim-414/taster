@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import { TARGETS, renderAll, renderBody, renderTarget, writeTarget } from '../exports.mjs';
 
 test('every rule is in the body, high severity first, no dash characters', () => {
-  const rules = JSON.parse(readFileSync(new URL('../../../rules/rules.json', import.meta.url), 'utf8')).rules;
+  const rules = JSON.parse(readFileSync(new URL('../../../data/rules/rules.json', import.meta.url), 'utf8')).rules;
   const body = renderBody(rules);
   for (const r of rules) assert.ok(body.includes(`- ${r.id} `), r.id);
   assert.ok(body.indexOf('## High') < body.indexOf('## Medium'));

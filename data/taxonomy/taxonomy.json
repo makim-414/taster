@@ -1,7 +1,7 @@
 {
   "$schema": "./taxonomy.schema.json",
   "version": "1.0.0",
-  "about": "Strict taxonomy of UI parts. Read taxonomy/SCHEMA.md. Checked by scripts/check-taxonomy.mjs.",
+  "about": "Strict taxonomy of UI parts. Read data/taxonomy/SCHEMA.md. Checked by scripts/check-taxonomy.mjs.",
   "features": [
     {
       "id": "renders_3d",

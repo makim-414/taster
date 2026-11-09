@@ -10,7 +10,7 @@ import { chromium } from 'playwright-core';
 
 const root = new URL('../../../../', import.meta.url);
 const out = new URL(process.argv[2] ? `file://${process.argv[2].replace(/\/?$/, '/')}` : '../../public/compare/', import.meta.url);
-const DETECT = readFileSync(new URL('rules/detect.js', root), 'utf8');
+const DETECT = readFileSync(new URL('data/rules/detect.js', root), 'utf8');
 const EMOJI_CSS = 'https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=block';
 const MAC_CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || (existsSync(MAC_CHROME) ? MAC_CHROME : undefined) });

@@ -1,4 +1,4 @@
-// The taxonomy decision key as a pure function. See taxonomy/SCHEMA.md, "Decision key".
+// The taxonomy decision key as a pure function. See data/taxonomy/SCHEMA.md, "Decision key".
 //
 //   classify(['is_page_section', 'is_first_section'])  -> { category: 'hero', step: 12, fallback: false }
 //

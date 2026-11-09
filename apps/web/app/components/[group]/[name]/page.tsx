@@ -35,7 +35,7 @@ export default async function Page({ params }: Params) {
             <h2>언제 쓰나요</h2>
             <ul>
               {item.patterns.map((p) => (
-                <li key={p.id} lang={langOf(p.name + p.summary)}><a href={`https://github.com/makim-414/taster/blob/main/patterns/${p.id}.md`}>{p.name}</a><span>{p.summary}</span></li>
+                <li key={p.id} lang={langOf(p.name + p.summary)}><a href={`https://github.com/makim-414/taster/blob/main/data/patterns/${p.id}.md`}>{p.name}</a><span>{p.summary}</span></li>
               ))}
             </ul>
           </section>

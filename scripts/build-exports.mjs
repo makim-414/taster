@@ -11,7 +11,7 @@ const files = renderAll();
 const readme = [
   '# Taster rules for agents without MCP',
   '',
-  'Generated from `rules/rules.json` of https://github.com/makim-414/taster. Copy a file to the place its tool reads.',
+  'Generated from `data/rules/rules.json` of https://github.com/makim-414/taster. Copy a file to the place its tool reads.',
   'In a file you share with your own instructions, paste it at the end; the Taster part sits between',
   '`<!-- taster:start -->` and `<!-- taster:end -->`, so you can replace it later.',
   '',

@@ -12,7 +12,7 @@ const err = (m) => errors.push(m);
 const kebab = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 // Taxonomy
-const tax = readJson('taxonomy/taxonomy.json');
+const tax = readJson('data/taxonomy/taxonomy.json');
 const famIds = new Set(tax.families.map((f) => f.id));
 const catIds = new Set(tax.categories.map((c) => c.id));
 const useIds = new Set(tax.uses.map((u) => u.id));
@@ -32,7 +32,7 @@ for (const f of tax.families) for (const c of f.categories) {
 for (const e of runTaxonomyChecks().errors) err(`taxonomy: ${e}`);
 
 // Rules
-const rules = readJson('rules/rules.json').rules;
+const rules = readJson('data/rules/rules.json').rules;
 const ruleIds = new Set(rules.map((r) => r.id));
 if (ruleIds.size !== rules.length) err('duplicate rule id');
 for (const r of rules) {
@@ -60,7 +60,7 @@ for (const c of registry) {
 }
 
 // Patterns
-const index = readJson('patterns/INDEX.json');
+const index = readJson('data/patterns/INDEX.json');
 const files = loadPatterns();
 const fileIds = new Set(files.map((p) => p.file.replace(/\.md$/, '')));
 for (const s of index) if (!fileIds.has(s.id)) err(`INDEX pattern without file: ${s.id}`);
@@ -84,7 +84,7 @@ for (const p of files) {
   sections.forEach((s, i) => { if (s.trim().length < 40) err(`${id} section "${PATTERN_SECTIONS[i]}" too short`); });
 }
 
-// Iconography: the icon slot map in the taxonomy names real rules and patterns (see patterns/icon-placement.md).
+// Iconography: the icon slot map in the taxonomy names real rules and patterns (see data/patterns/icon-placement.md).
 {
   const ico = tax.iconography;
   const SLOT_KEYS = ['id', 'name', 'covers', 'test', 'keep_when', 'instead', 'size_px', 'accessibility', 'rules', 'patterns'];
@@ -160,7 +160,7 @@ for (const e of meta.creditErrors(registry, Object.fromEntries(files.filter((p) 
 // usual substitutes (TYP-02), and a Hangul family in the stack (KO-02).
 {
   const tokens = fs.readFileSync(path.join(ROOT, 'packages/registry/src/tokens.css'), 'utf8');
-  const detect = fs.readFileSync(path.join(ROOT, 'rules/detect.js'), 'utf8');
+  const detect = fs.readFileSync(path.join(ROOT, 'data/rules/detect.js'), 'utf8');
   const list = (name) => {
     const m = detect.match(new RegExp(`var ${name} = \\{([\\s\\S]*?)\\};`));
     return m ? [...m[1].matchAll(/'([^']+)'|(\b[a-z][\w-]*)\s*:/g)].map((x) => (x[1] || x[2]).toLowerCase()) : null;
@@ -168,7 +168,7 @@ for (const e of meta.creditErrors(registry, Object.fromEntries(files.filter((p) 
   const favorites = list('FAVORITE_FONTS');
   const defaults = list('DEFAULT_FONTS');
   const korean = new RegExp(detect.match(/var KOREAN_FONT_RE = \/(.+)\/i;/)[1], 'i');
-  if (!favorites || !favorites.includes('geist') || !defaults || !defaults.includes('arial')) err('could not read the font lists from rules/detect.js');
+  if (!favorites || !favorites.includes('geist') || !defaults || !defaults.includes('arial')) err('could not read the font lists from data/rules/detect.js');
   for (const token of ['--font', '--font-mono']) {
     const stack = (tokens.match(new RegExp(`${token}:\\s*([^;]+);`)) || [])[1];
     if (!stack) { err(`tokens.css has no ${token}`); continue; }
@@ -231,8 +231,8 @@ for (const e of meta.npxErrors(readJson('package.json'), docs)) err(e);
 {
   const { extensionRules } = await import('./lib.mjs');
   const same = (rel, content) => fs.existsSync(path.join(ROOT, rel)) && fs.readFileSync(path.join(ROOT, rel), 'utf8') === content;
-  if (!same('apps/extension/detect.js', fs.readFileSync(path.join(ROOT, 'rules/detect.js'), 'utf8'))) err('apps/extension/detect.js is stale (run node scripts/build-docs.mjs)');
-  if (!same('apps/extension/rules.js', extensionRules(readJson('rules/rules.json').rules))) err('apps/extension/rules.js is stale (run node scripts/build-docs.mjs)');
+  if (!same('apps/extension/detect.js', fs.readFileSync(path.join(ROOT, 'data/rules/detect.js'), 'utf8'))) err('apps/extension/detect.js is stale (run node scripts/build-docs.mjs)');
+  if (!same('apps/extension/rules.js', extensionRules(readJson('data/rules/rules.json').rules))) err('apps/extension/rules.js is stale (run node scripts/build-docs.mjs)');
 }
 
 // Orb recipes: each one is complete, uses only known keys and in-range values, and the generated module is current.

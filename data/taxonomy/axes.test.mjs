@@ -1,4 +1,4 @@
-// node --test taxonomy/axes.test.mjs
+// node --test data/taxonomy/axes.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import taxonomy from './taxonomy.json' with { type: 'json' };

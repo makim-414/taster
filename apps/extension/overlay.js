@@ -1,5 +1,5 @@
 /*
- * Taster overlay: runs rules/detect.js on the page it is injected into, outlines every finding and shows a small
+ * Taster overlay: runs data/rules/detect.js on the page it is injected into, outlines every finding and shows a small
  * panel with the rules hit. Used by the browser extension (apps/extension/background.js) and the bookmarklet served by
  * the web app. Lives in a shadow root so the page's styles cannot reach it, and removes itself before a rescan so
  * it is never measured. Plain DOM, no dependencies.

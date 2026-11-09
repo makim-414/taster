@@ -13,7 +13,7 @@ import { loadEngine, runDiagnosis } from '../lib/diagnose.ts';
 import { runBrand } from '../lib/brand.ts';
 import { allKept, captureShots } from '../lib/tone-shot.ts';
 
-const FIXTURES = path.resolve(import.meta.dirname, '../../../rules/fixtures');
+const FIXTURES = path.resolve(import.meta.dirname, '../../../data/rules/fixtures');
 const TONE_FIXTURES = path.resolve(import.meta.dirname, '../../../packages/engine/test/fixtures');
 
 

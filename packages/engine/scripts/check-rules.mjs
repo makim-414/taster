@@ -1,10 +1,10 @@
-// Checks rules/rules.json against the repository rule schema and against detect.js.
+// Checks data/rules/rules.json against the repository rule schema and against detect.js.
 // Prints RULES SCHEMA OK on success.
 import { readFileSync } from 'node:fs';
 
 const ROOT = new URL('../../../', import.meta.url);
-const doc = JSON.parse(readFileSync(new URL('rules/rules.json', ROOT), 'utf8'));
-const detect = readFileSync(new URL('rules/detect.js', ROOT), 'utf8');
+const doc = JSON.parse(readFileSync(new URL('data/rules/rules.json', ROOT), 'utf8'));
+const detect = readFileSync(new URL('data/rules/detect.js', ROOT), 'utf8');
 const errors = [];
 const err = (m) => errors.push(m);
 

@@ -4,7 +4,7 @@
 // quote the page: a value read from it is named by its field in `source` (source.logo.text), which carries it as data.
 import { readFileSync } from 'node:fs';
 
-const DETECT = readFileSync(new URL('../../rules/detect.js', import.meta.url), 'utf8');
+const DETECT = readFileSync(new URL('../../data/rules/detect.js', import.meta.url), 'utf8');
 function fontList(name) {
   const m = DETECT.match(new RegExp(`var ${name} = \\{([\\s\\S]*?)\\};`));
   return new Set(m ? [...m[1].matchAll(/'([^']+)'|(\b[a-z][\w-]*)\s*:/g)].map((x) => (x[1] || x[2]).toLowerCase()) : []);

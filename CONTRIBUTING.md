@@ -34,9 +34,9 @@ build.
 
 | Folder | What it holds |
 |---|---|
-| `rules/` | `rules.json`, the detector `detect.js` that measures them in the page, fixtures and their test |
-| `patterns/` | one Markdown file per pattern, listed in `patterns/INDEX.json` |
-| `taxonomy/` | categories and their decision key, uses, surfaces, weighting axes and constraints ([SCHEMA.md](taxonomy/SCHEMA.md)) |
+| `data/rules/` | `rules.json`, the detector `detect.js` that measures them in the page, fixtures and their test |
+| `data/patterns/` | one Markdown file per pattern, listed in `data/patterns/INDEX.json` |
+| `data/taxonomy/` | categories and their decision key, uses, surfaces, weighting axes and constraints ([SCHEMA.md](data/taxonomy/SCHEMA.md)) |
 | `packages/registry/` | the components, their tokens, the demo page and the stills ([README](packages/registry/README.md)) |
 | `packages/engine/` | the CLI, the MCP server and the ACP agent ([README](packages/engine/README.md)) |
 | `apps/web/` | the hosted site ([README](apps/web/README.md)) |

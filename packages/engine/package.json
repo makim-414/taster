@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "description": "Runs rules/detect.js in a real browser at two widths, writes annotated captures, and serves it to agents over MCP and to editors over ACP.",
+  "description": "Runs data/rules/detect.js in a real browser at two widths, writes annotated captures, and serves it to agents over MCP and to editors over ACP.",
   "bin": {
     "taster-diagnose": "cli.mjs",
     "taster-mcp": "mcp.mjs",

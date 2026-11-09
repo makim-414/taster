@@ -9,7 +9,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 // Browser: the Chromium that Playwright installed (npx --prefix packages/engine playwright install chromium), the one CI uses,
 // so a local run and CI measure with the same build. CHROME_PATH picks another Chrome on purpose.
 const CHROME = process.env.CHROME_PATH;
-const ENGINE_PW = path.join(here, '..', 'packages', 'engine', 'node_modules', 'playwright');
+const ENGINE_PW = path.join(here, '..', '..', 'packages', 'engine', 'node_modules', 'playwright');
 
 async function loadPlaywright() {
   const candidates = [];

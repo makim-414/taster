@@ -12,7 +12,7 @@ The first tagged release (`v0.2.0`, and `v0` for the GitHub Action).
 
 ### Added
 
-- A strict taxonomy (`taxonomy/`, [SCHEMA.md](taxonomy/SCHEMA.md)): 33 categories in 8 families, a decision key over
+- A strict taxonomy (`taxonomy/`, [SCHEMA.md](data/taxonomy/SCHEMA.md)): 33 categories in 8 families, a decision key over
   33 yes or no features that gives every UI part exactly one category, eight weighting axes (density, contrast,
   roundness, type expression, color restraint, elevation, motion, stroke) on named steps, and 10 design constraints
   that keep the axes balanced.

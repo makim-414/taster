@@ -1,4 +1,4 @@
-// Runs rules/detect.js on this app's own screens at 1440, 1280 and 390 wide and fails on any finding, page error or
+// Runs data/rules/detect.js on this app's own screens at 1440, 1280 and 390 wide and fails on any finding, page error or
 // sideways scroll. The screens: the first screen and a result that lists every measured rule (the API is answered
 // locally with a synthetic report so no outside site is involved), the gallery, the page of every component in
 // packages/registry/registry.json, the board, the bookmarklet page and the tone page. Three pages run at a time. The 404 screen
@@ -10,8 +10,8 @@ import { chromium } from 'playwright-core';
 
 const BASE = process.argv[2] || process.env.BASE_URL || 'http://localhost:3240';
 const ROOT = new URL('../../../', import.meta.url);
-const DETECT = readFileSync(new URL('rules/detect.js', ROOT), 'utf8');
-const RULES = JSON.parse(readFileSync(new URL('rules/rules.json', ROOT), 'utf8')).rules;
+const DETECT = readFileSync(new URL('data/rules/detect.js', ROOT), 'utf8');
+const RULES = JSON.parse(readFileSync(new URL('data/rules/rules.json', ROOT), 'utf8')).rules;
 const IDS = JSON.parse(readFileSync(new URL('packages/registry/registry.json', ROOT), 'utf8')).components.map((c) => c.id);
 const BASELINE = JSON.parse(readFileSync(new URL('self-check-baseline.json', import.meta.url), 'utf8')).allow;
 const WIDTHS = [1440, 1280, 390];

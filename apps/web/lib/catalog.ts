@@ -2,9 +2,9 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import registry from '../../../packages/registry/registry.json';
-import patterns from '../../../patterns/INDEX.json';
-import taxonomy from '../../../taxonomy/taxonomy.json';
-import rules from '../../../rules/rules.json';
+import patterns from '../../../data/patterns/INDEX.json';
+import taxonomy from '../../../data/taxonomy/taxonomy.json';
+import rules from '../../../data/rules/rules.json';
 
 export type CatalogItem = {
   id: string;
@@ -17,7 +17,7 @@ export type CatalogItem = {
   familyName: string;
   summary: string;
   // The language of summary and categoryName, for a lang attribute on the Korean pages: the repository writes them in
-  // English (patterns/INDEX.json, taxonomy/taxonomy.json).
+  // English (data/patterns/INDEX.json, data/taxonomy/taxonomy.json).
   summaryLang: Lang;
   categoryLang: Lang;
   patterns: { id: string; name: string; summary: string }[];

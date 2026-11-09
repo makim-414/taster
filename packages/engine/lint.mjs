@@ -14,7 +14,7 @@ import { basename, extname, join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
-const RULES_JSON = JSON.parse(readFileSync(new URL('../../rules/rules.json', import.meta.url), 'utf8')).rules;
+const RULES_JSON = JSON.parse(readFileSync(new URL('../../data/rules/rules.json', import.meta.url), 'utf8')).rules;
 const RULE_BY_ID = new Map(RULES_JSON.map((r) => [r.id, r]));
 
 const CHROMA = '(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)';

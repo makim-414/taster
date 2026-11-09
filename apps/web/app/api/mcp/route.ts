@@ -25,7 +25,7 @@ import {
 import { PageLoadError, runDiagnosis, trimReport } from '../../../lib/diagnose.ts';
 import { runBrand } from '../../../lib/brand.ts';
 import { allKept, captureShots, type Shot } from '../../../lib/tone-shot.ts';
-import catalog from '../../../../../taxonomy/tone-refs.json' with { type: 'json' };
+import catalog from '../../../../../data/taxonomy/tone-refs.json' with { type: 'json' };
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

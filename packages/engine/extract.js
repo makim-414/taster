@@ -8,7 +8,7 @@ window.tasterExtract = function tasterExtract() {
   const cut = (s) => (s.length > MAX_TEXT ? `${s.slice(0, MAX_TEXT)}...` : s);
 
   // Computed colors come back as rgb(), or in their own syntax for oklch, lab, color() and the like. Those go through
-  // a 1px canvas, which reads any CSS color as an sRGB pixel (the same path as rules/detect.js).
+  // a 1px canvas, which reads any CSS color as an sRGB pixel (the same path as data/rules/detect.js).
   const swatch = document.createElement('canvas');
   swatch.width = swatch.height = 1;
   const paint = swatch.getContext('2d', { willReadFrequently: true });
@@ -75,7 +75,7 @@ window.tasterExtract = function tasterExtract() {
     return right - left < 2 || bottom - top < 2;
   }
   // A scroll reveal waits at opacity 0 below the first screen until the visitor scrolls to it: that is content, not a
-  // hidden box. Same reading as MOT-01 in rules/detect.js.
+  // hidden box. Same reading as MOT-01 in data/rules/detect.js.
   function waitsToReveal(el, s, r) {
     if (r.top <= innerHeight) return false;
     return el.hasAttribute('data-aos') || REVEAL.test(el.getAttribute('class') || '') || s.transform !== 'none' || s.animationName !== 'none';

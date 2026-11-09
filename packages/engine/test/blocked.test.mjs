@@ -39,7 +39,7 @@ test('classifyLoad: bot checks, block pages, HTTP errors and sign-in on another 
 
 // The fixtures served the way a real server answers them, on 127.0.0.1; /account sends the browser to localhost.
 async function serve() {
-  const clean = readFileSync(new URL('../../../rules/fixtures/clean.html', import.meta.url), 'utf8');
+  const clean = readFileSync(new URL('../../../data/rules/fixtures/clean.html', import.meta.url), 'utf8');
   let port;
   const server = createServer((req, res) => {
     const html = (code, body, headers = {}) => res.writeHead(code, { 'content-type': 'text/html; charset=utf-8', ...headers }).end(body);

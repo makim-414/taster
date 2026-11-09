@@ -4,7 +4,7 @@ English | [한국어](README.ko.md)
 
 Find the AI slop in a frontend, swap each spot for a pattern that does the same job better, or build a new screen without it.
 
-[Live site](https://taster-six.vercel.app) | [Components](https://taster-six.vercel.app/components) | [Rules](rules/RULES.md) | [Patterns](patterns/README.md) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md)
+[Live site](https://taster-six.vercel.app) | [Components](https://taster-six.vercel.app/components) | [Rules](data/rules/RULES.md) | [Patterns](data/patterns/README.md) | [Changelog](CHANGELOG.md) | [Contributing](CONTRIBUTING.md)
 
 | Before | After |
 |---|---|
@@ -324,7 +324,7 @@ generic examples. A decision key over 33 yes or no features gives every UI part 
 wins. The weighting axes drive named properties in `registry/src/tokens.css`, snap to fixed steps so a setting never
 sits in an ambiguous middle, and are kept balanced by design principles written as linear constraints (a dense screen
 cannot carry poster type, deep shadows need a restrained palette). `taxonomy/axes.mjs` validates and balances a
-setting. Read [taxonomy/SCHEMA.md](taxonomy/SCHEMA.md).
+setting. Read [data/taxonomy/SCHEMA.md](data/taxonomy/SCHEMA.md).
 
 <!-- taxonomy:start -->
 122 patterns, 88 rules, 144 components, 33 categories in 8 families, 40 uses, 8 surfaces, 8 weighting axes, 10 constraints.
@@ -344,7 +344,7 @@ setting. Read [taxonomy/SCHEMA.md](taxonomy/SCHEMA.md).
 ## Where the rules come from
 
 <!-- rules:start -->
-88 rules, 85 measured in a real browser and 3 judged by eye from the captures. Each rule's `basis` in `rules/rules.json` says what it rests on: 53 cite outside write-ups about generated pages, 18 a web standard or platform guide, and 49 rest on Taster's own observation, 21 of them on that alone. A rule can rest on more than one.
+88 rules, 85 measured in a real browser and 3 judged by eye from the captures. Each rule's `basis` in `data/rules/rules.json` says what it rests on: 53 cite outside write-ups about generated pages, 18 a web standard or platform guide, and 49 rest on Taster's own observation, 21 of them on that alone. A rule can rest on more than one.
 
 Outside write-ups cited, most cited first: Signs of AI design; kill-ai-slop; AI Slop Detector by Made with Jev; Impeccable slop catalog; Adrian Krebs, AI design patterns in Show HN pages; taste-skill; Anthropic frontend-design skill; slop-detect; prg.sh, why AI keeps building the same purple gradient; 925 Studios, AI slop design tells; Solo Design, AI design slop tells; Paul Bakaus, Impeccable 3.5 launch post; Hallmark; css-slop-detector.
 <!-- rules:end -->

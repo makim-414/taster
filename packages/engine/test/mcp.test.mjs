@@ -12,7 +12,7 @@ import { MAX_SHOT_BYTES, RULES } from '../diagnose.mjs';
 import { PAGE_DATA, captureContent } from '../server.mjs';
 
 const server = fileURLToPath(new URL('../mcp.mjs', import.meta.url));
-const fixture = fileURLToPath(new URL('../../../rules/fixtures/slop.html', import.meta.url));
+const fixture = fileURLToPath(new URL('../../../data/rules/fixtures/slop.html', import.meta.url));
 const VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 
 async function connect() {
@@ -232,7 +232,7 @@ test('a page that is not the site is an error in diagnose, extract_content and b
 test('diagnose says how many findings a consent manager drew and does not count them', { timeout: 120000 }, async () => {
   const client = await connect();
   try {
-    const out = await client.callTool({ name: 'diagnose', arguments: { target: fileURLToPath(new URL('../../../rules/fixtures/consent-overlay.html', import.meta.url)), screenshots: false } });
+    const out = await client.callTool({ name: 'diagnose', arguments: { target: fileURLToPath(new URL('../../../data/rules/fixtures/consent-overlay.html', import.meta.url)), screenshots: false } });
     assert.ok(!out.isError, out.content[0].text);
     const n = Number(/ (\d+) findings inside a consent manager were not counted\./.exec(out.content[0].text)?.[1]);
     assert.ok(n > 0, out.content[0].text);

@@ -65,7 +65,7 @@ test('a versioned overlay folder is cached for good, the old address only briefl
 });
 
 test('the link preview picture names the rule counts the rules have now', () => {
-  const rules = JSON.parse(readFileSync(new URL('../../../rules/rules.json', import.meta.url), 'utf8')).rules as { detect: { level: string } }[];
+  const rules = JSON.parse(readFileSync(new URL('../../../data/rules/rules.json', import.meta.url), 'utf8')).rules as { detect: { level: string } }[];
   const meta = JSON.parse(readFileSync(new URL('../scripts/og/meta.json', import.meta.url), 'utf8'));
   const now = { rules: rules.length, measured: rules.filter((r) => r.detect.level !== 'manual').length };
   assert.deepEqual(meta, now, 'public/og.png is out of date: run node apps/web/scripts/og/render.mjs');

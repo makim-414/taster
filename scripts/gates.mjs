@@ -21,7 +21,7 @@ export const JOBS = {
     { name: 'Generated docs are current', cmd: 'node scripts/build-docs.mjs', unchanged: true },
     { name: 'Repository data and skill bundle', cmd: 'node scripts/validate.mjs' },
     { name: 'Strict taxonomy, negative controls and balance sweep', cmd: 'node scripts/check-taxonomy.mjs' },
-    { name: 'Weighting axes', cmd: 'node --test taxonomy/axes.test.mjs' },
+    { name: 'Weighting axes', cmd: 'node --test data/taxonomy/axes.test.mjs' },
     { name: 'Rule schema matches the detector', cmd: 'node packages/engine/scripts/check-rules.mjs' },
     { name: 'Registry typecheck', cmd: 'npm --prefix packages/registry run typecheck' },
     { name: 'Source lint finds its own bad lines', cmd: 'node packages/engine/lint.mjs --selftest' },
@@ -30,7 +30,7 @@ export const JOBS = {
     { name: 'Commit emails are GitHub noreply addresses', cmd: 'node scripts/check-authors.mjs', authors: true },
   ],
   browser: [
-    { name: 'Detector fixtures', cmd: 'node rules/test-detect.mjs' },
+    { name: 'Detector fixtures', cmd: 'node data/rules/test-detect.mjs' },
     { name: 'Engine CLI and MCP', cmd: 'npm --prefix packages/engine test' },
     { name: 'Rebuild example stays clean and keeps its content', cmd: 'node packages/engine/scripts/check-rebuild-example.mjs' },
     { name: 'Icon slot variations match the taxonomy and stay clean', cmd: 'node packages/engine/scripts/check-icon-slots-example.mjs' },

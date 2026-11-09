@@ -26,9 +26,9 @@ import { toSarif } from '../sarif.mjs';
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');
 const json = (rel) => JSON.parse(read(rel));
-const RULES = json('rules/rules.json').rules;
+const RULES = json('data/rules/rules.json').rules;
 const COMPONENTS = json('packages/registry/registry.json').components;
-const counts = metaCounts({ rules: RULES, patterns: json('patterns/INDEX.json'), components: COMPONENTS });
+const counts = metaCounts({ rules: RULES, patterns: json('data/patterns/INDEX.json'), components: COMPONENTS });
 const files = () => Object.fromEntries([...DESCRIPTIONS.map((d) => d.file), 'packages/engine/package.json'].map((f) => [f, json(f)]));
 const SOURCES = ['packages/engine/server.mjs', 'packages/engine/acp.mjs', 'packages/engine/sarif.mjs'];
 
@@ -65,7 +65,7 @@ test('a stale count and "rules measured" fail, with the line they are on', () =>
 });
 
 test('the Korean README is read in its own words, and other numbers are left alone', () => {
-  const ko = (m) => `규칙 ${counts.rules}개, 그중 ${m}개는 \`rules/detect.js\` 가 실제 브라우저에서 잽니다. 그중 21개는 직접 본 것만이 근거입니다.`;
+  const ko = (m) => `규칙 ${counts.rules}개, 그중 ${m}개는 \`data/rules/detect.js\` 가 실제 브라우저에서 잽니다. 그중 21개는 직접 본 것만이 근거입니다.`;
   assert.deepEqual(countErrors('README.ko.md', ko(counts.measured), counts), []);
   assert.equal(countErrors('README.ko.md', ko(counts.measured - 1), counts).length, 1);
   assert.equal(countErrors('README.ko.md', `패턴 1개, 부품 2개, 규칙 ${counts.rules}개, 그중 ${counts.measured}개는 실제 브라우저에서 재고`, counts).length, 2);
@@ -119,10 +119,10 @@ test('npm pack publishes the code, license and notices, and no tests, apps or CI
   const packed = JSON.parse(pack.stdout)[0].files.map((x) => x.path);
   assert.deepEqual(packErrors(packed, pkg), []);
 
-  const bad = [...packed.filter((p) => p !== 'THIRD_PARTY_NOTICES.md'), 'taxonomy/axes.test.mjs', 'taxonomy/fixtures/parts.json', 'apps/web/package.json', 'apps/extension/manifest.json', 'packages/engine/node_modules/zod/package.json'];
+  const bad = [...packed.filter((p) => p !== 'THIRD_PARTY_NOTICES.md'), 'data/taxonomy/axes.test.mjs', 'data/taxonomy/fixtures/parts.json', 'apps/web/package.json', 'apps/extension/manifest.json', 'packages/engine/node_modules/zod/package.json'];
   assert.deepEqual(packErrors(bad, pkg), [
-    'npm pack would publish taxonomy/axes.test.mjs',
-    'npm pack would publish taxonomy/fixtures/parts.json',
+    'npm pack would publish data/taxonomy/axes.test.mjs',
+    'npm pack would publish data/taxonomy/fixtures/parts.json',
     'npm pack would publish apps/web/package.json',
     'npm pack would publish apps/extension/manifest.json',
     'npm pack would publish packages/engine/node_modules/zod/package.json',
@@ -139,15 +139,15 @@ test('an npx line fails only while the package is private', () => {
 });
 
 test('links to patterns name patterns that exist', () => {
-  const ids = new Set(json('patterns/INDEX.json').map((p) => p.id));
+  const ids = new Set(json('data/patterns/INDEX.json').map((p) => p.id));
   assert.deepEqual(patternLinkErrors('packages/registry/src/blocks/glass-folder.tsx', read('packages/registry/src/blocks/glass-folder.tsx'), ids), []);
   // The link glass-folder.tsx had, built here so the repository's own link check does not read it from this file.
   const gone = ['patterns', 'quiet-section-background.md'].join('/');
   assert.deepEqual(patternLinkErrors('a.tsx', `// see ${gone} and patterns/README.md`, ids), [
-    `a.tsx links ${gone}, which is not in patterns/INDEX.json`,
+    `a.tsx links ${gone}, which is not in data/patterns/INDEX.json`,
   ]);
-  assert.equal(patternLinkErrors('patterns/hairline-card.md', 'See [x](no-such-pattern.md) and [y](hairline-card.md#do).', ids).length, 1);
-  assert.deepEqual(patternLinkErrors('docs/a.md', 'See [x](no-such-page.md).', ids), [], 'relative links are read only inside patterns/');
+  assert.equal(patternLinkErrors('data/patterns/hairline-card.md', 'See [x](no-such-pattern.md) and [y](hairline-card.md#do).', ids).length, 1);
+  assert.deepEqual(patternLinkErrors('docs/a.md', 'See [x](no-such-page.md).', ids), [], 'relative links are read only inside data/patterns/');
 });
 
 test('relative links and pictures in every Markdown file git tracks point at files that exist', () => {

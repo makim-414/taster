@@ -10,7 +10,7 @@ import { RULES } from './diagnose.mjs';
 
 const VERSION = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version;
 const LEVEL = { high: 'error', medium: 'warning', low: 'note' };
-const HELP_BASE = 'https://github.com/makim-414/taster/blob/main/patterns/';
+const HELP_BASE = 'https://github.com/makim-414/taster/blob/main/data/patterns/';
 
 function localPath(url) {
   try {

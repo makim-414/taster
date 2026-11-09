@@ -1,5 +1,5 @@
-// Runs rules/detect.js in Chromium at each viewport, the way references/diagnose.md describes,
-// and joins the findings with rules/rules.json (name, severity, fix, fix patterns).
+// Runs data/rules/detect.js in Chromium at each viewport, the way references/diagnose.md describes,
+// and joins the findings with data/rules/rules.json (name, severity, fix, fix patterns).
 import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -9,9 +9,9 @@ import { NotDiagnosedError, classifyLoad } from './blocked.mjs';
 export { NotDiagnosedError } from './blocked.mjs';
 
 const ROOT = new URL('../../', import.meta.url);
-export const DETECT_SOURCE = readFileSync(new URL('rules/detect.js', ROOT), 'utf8');
+export const DETECT_SOURCE = readFileSync(new URL('data/rules/detect.js', ROOT), 'utf8');
 export const EXTRACT_SOURCE = readFileSync(new URL('./extract.js', import.meta.url), 'utf8');
-export const RULES = JSON.parse(readFileSync(new URL('rules/rules.json', ROOT), 'utf8')).rules;
+export const RULES = JSON.parse(readFileSync(new URL('data/rules/rules.json', ROOT), 'utf8')).rules;
 export const RULE_BY_ID = new Map(RULES.map((r) => [r.id, r]));
 export const VIEWPORTS = [
   { width: 1440, height: 900 },

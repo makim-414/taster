@@ -1,5 +1,5 @@
 // Runs the repository's own diagnosis (packages/engine/diagnose.mjs: detectOnce and summarize, which run
-// rules/detect.js) inside the fenced server browser. Nothing here measures slop by itself.
+// data/rules/detect.js) inside the fenced server browser. Nothing here measures slop by itself.
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -40,7 +40,7 @@ type Engine = {
 };
 
 // The engine is loaded at run time from the repository, not bundled, so it keeps reading
-// rules/detect.js and rules/rules.json next to itself exactly as the CLI and MCP server do.
+// data/rules/detect.js and data/rules/rules.json next to itself exactly as the CLI and MCP server do.
 let enginePromise: Promise<Engine> | null = null;
 function engineFile(): string {
   const candidates = [

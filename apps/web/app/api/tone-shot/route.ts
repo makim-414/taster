@@ -1,7 +1,7 @@
 // The first screens of up to four tone references, for the tone page. Only ids from the catalog are accepted, so
 // this route never opens an address a visitor typed. Pictures go back in the response; they are never written to disk, kept in server memory up to 30 minutes.
 import { NextResponse } from 'next/server';
-import catalog from '../../../../../taxonomy/tone-refs.json';
+import catalog from '../../../../../data/taxonomy/tone-refs.json';
 import { NEED_MS, clientIp, gateBudget, takeShotCeiling, takeShotToken, withGate } from '../../../lib/limits.ts';
 import { allKept, captureShots } from '../../../lib/tone-shot.ts';
 

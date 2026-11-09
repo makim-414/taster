@@ -547,7 +547,7 @@ export function createServer({ remote } = {}) {
     'taxonomy',
     {
       title: 'Taxonomy',
-      description: 'The strict taxonomy: families and categories (each with definition, includes, excludes and examples), the classify decision key over a boolean feature vocabulary, uses, surfaces, the weighting axes with the tokens each drives, snap steps, per-category relevance, design constraints, the rule map and gaps, plus the icon slot map (iconography). See taxonomy/SCHEMA.md.',
+      description: 'The strict taxonomy: families and categories (each with definition, includes, excludes and examples), the classify decision key over a boolean feature vocabulary, uses, surfaces, the weighting axes with the tokens each drives, snap steps, per-category relevance, design constraints, the rule map and gaps, plus the icon slot map (iconography). See data/taxonomy/SCHEMA.md.',
       inputSchema: {},
       annotations: readOnly,
     },

@@ -10,7 +10,7 @@ import { chromium } from 'playwright-core';
 
 const BASE = process.argv[2] || 'http://localhost:3240';
 const ROOT = new URL('../../../', import.meta.url);
-const DETECT = readFileSync(new URL('rules/detect.js', ROOT), 'utf8');
+const DETECT = readFileSync(new URL('data/rules/detect.js', ROOT), 'utf8');
 const IDS = JSON.parse(readFileSync(new URL('packages/registry/registry.json', ROOT), 'utf8')).components.map((c) => c.id);
 
 let failures = 0;
@@ -146,7 +146,7 @@ try {
   await bm.close();
   const src = code.match(/s\.src='([^']+)'/)[1];
   const local = code.replace(src, BASE + new URL(src).pathname);
-  const fixture = readFileSync(new URL('rules/fixtures/slop.html', ROOT));
+  const fixture = readFileSync(new URL('data/rules/fixtures/slop.html', ROOT));
   const other = http.createServer((req, res) => res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }).end(fixture));
   await new Promise((resolve) => other.listen(0, '127.0.0.1', resolve));
   try {
