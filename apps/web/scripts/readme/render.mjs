@@ -1,4 +1,4 @@
-// Renders the pictures for the repository page into assets/ at the repository root: social-preview.png, the 1280x640
+// Renders the pictures for the repository page into .github/assets/: social-preview.png, the 1280x640
 // card GitHub shows when the repository is linked (the owner uploads it in the repository settings, Social preview), and
 // components.dark.jpg and components.light.jpg, six component stills from packages/registry/previews in three columns and two
 // rows (2400x1000) for the README. The pages are social-preview.html and components.html here, with the registry
@@ -14,7 +14,7 @@ import path from 'node:path';
 import { chromium } from 'playwright-core';
 
 const root = new URL('../../../../', import.meta.url);
-const out = new URL('assets/', root);
+const out = new URL('.github/assets/', root);
 const at = process.argv.indexOf('--html');
 const htmlDir = at > 0 ? path.resolve(process.argv[at + 1] ?? '.') : null;
 const read = (rel) => readFileSync(new URL(rel, root));
@@ -101,7 +101,7 @@ try {
     const [w, h] = size(bytes);
     if (w !== p.width || h !== p.height) throw new Error(`${p.name}.${ext} is ${w}x${h}, expected ${p.width}x${p.height}`);
     const over = p.target && bytes.length > p.target ? `, over the ${Math.round(p.target / 1000)} KB target` : '';
-    console.log(`assets/${p.name}.${ext} ${w}x${h} ${Math.round(bytes.length / 1000)} KB (${bytes.length} bytes)${over}`);
+    console.log(`.github/assets/${p.name}.${ext} ${w}x${h} ${Math.round(bytes.length / 1000)} KB (${bytes.length} bytes)${over}`);
   }
   console.log('README pictures written, 0 page errors, 0 console errors');
 } finally {

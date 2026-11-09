@@ -40,9 +40,9 @@ source lint, the GitHub Action, the hosted MCP server and the extension: [Use](#
 - **Components.** 144 components: token based React components you copy into your app. No package to install, no brand to undo.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/components.dark.jpg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/components.light.jpg">
-  <img alt="Six Taster components from the registry in three columns and two rows: a plan table, an activity feed, a chat thread, a cart, a settings section and an accordion" src="assets/components.light.jpg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/components.dark.jpg">
+  <source media="(prefers-color-scheme: light)" srcset=".github/assets/components.light.jpg">
+  <img alt="Six Taster components from the registry in three columns and two rows: a plan table, an activity feed, a chat thread, a cart, a settings section and an accordion" src=".github/assets/components.light.jpg">
 </picture>
 
 **[Browse the components](https://taster-six.vercel.app/components).** Every one runs live: click it, recolor it with your
@@ -211,7 +211,7 @@ reject button leaves a link only), the eight axes and tokens of that spot, and T
 references set the direction; the parts show what Taster builds.
 [taster-six.vercel.app/tone](https://taster-six.vercel.app/tone) is the same map to drag by hand.
 
-![The board: two candidates running live side by side, one picked](assets/board.jpg)
+![The board: two candidates running live side by side, one picked](.github/assets/board.jpg)
 
 ### Rules for agents without MCP
 

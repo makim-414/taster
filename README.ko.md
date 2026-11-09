@@ -40,9 +40,9 @@ Action, 원격 MCP 서버, 확장은 [쓰기](#쓰기) 에 있습니다.
 - **부품.** 부품 144개. 토큰으로 만든 React 컴포넌트입니다. 설치할 패키지 없이 필요한 파일만 복사해 쓰고, 지워야 할 남의 브랜드도 없습니다.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/components.dark.jpg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/components.light.jpg">
-  <img alt="registry 의 Taster 부품 여섯 개를 3열 2줄로 놓은 그림: 요금제 표, 활동 기록, 대화 스레드, 장바구니, 설정 섹션, 아코디언" src="assets/components.light.jpg">
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/components.dark.jpg">
+  <source media="(prefers-color-scheme: light)" srcset=".github/assets/components.light.jpg">
+  <img alt="registry 의 Taster 부품 여섯 개를 3열 2줄로 놓은 그림: 요금제 표, 활동 기록, 대화 스레드, 장바구니, 설정 섹션, 아코디언" src=".github/assets/components.light.jpg">
 </picture>
 
 설치 없이 써 보기: https://taster-six.vercel.app 에 주소를 넣으면 데스크톱과 폰 폭 캡처 위에 걸린 규칙을
@@ -208,7 +208,7 @@ MIT 라이선스도 옆에 둡니다. shadcn 같은 다른 CLI 는 필요 없습
 단추가 없는 쿠키 창은 링크만), 그 위치의 8개 축과 토큰, 그 토큰을 입은 Taster 부품을 보여 줍니다. 레퍼런스는 방향이고,
 부품이 실제로 받게 될 화면입니다. [톤 고르기](https://taster-six.vercel.app/tone) 화면에서 직접 점을 옮겨 볼 수 있습니다.
 
-![비교 화면: 후보 두 개가 나란히 실제로 돌아가고 하나를 고른 화면](assets/board.jpg)
+![비교 화면: 후보 두 개가 나란히 실제로 돌아가고 하나를 고른 화면](.github/assets/board.jpg)
 
 ### MCP 없는 에이전트용 규칙 파일
 
