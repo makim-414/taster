@@ -227,12 +227,12 @@ for (const e of meta.npxErrors(readJson('package.json'), docs)) err(e);
   }
 }
 
-// extension/ carries a copy of the detector and generated rule names; both must match the sources.
+// apps/extension/ carries a copy of the detector and generated rule names; both must match the sources.
 {
   const { extensionRules } = await import('./lib.mjs');
   const same = (rel, content) => fs.existsSync(path.join(ROOT, rel)) && fs.readFileSync(path.join(ROOT, rel), 'utf8') === content;
-  if (!same('extension/detect.js', fs.readFileSync(path.join(ROOT, 'rules/detect.js'), 'utf8'))) err('extension/detect.js is stale (run node scripts/build-docs.mjs)');
-  if (!same('extension/rules.js', extensionRules(readJson('rules/rules.json').rules))) err('extension/rules.js is stale (run node scripts/build-docs.mjs)');
+  if (!same('apps/extension/detect.js', fs.readFileSync(path.join(ROOT, 'rules/detect.js'), 'utf8'))) err('apps/extension/detect.js is stale (run node scripts/build-docs.mjs)');
+  if (!same('apps/extension/rules.js', extensionRules(readJson('rules/rules.json').rules))) err('apps/extension/rules.js is stale (run node scripts/build-docs.mjs)');
 }
 
 // Orb recipes: each one is complete, uses only known keys and in-range values, and the generated module is current.

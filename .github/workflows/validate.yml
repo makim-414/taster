@@ -122,16 +122,16 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: |
-            web/package-lock.json
+            apps/web/package-lock.json
             engine/package-lock.json
       - name: Install the web app and the engine
         timeout-minutes: 8
         run: |
-          timeout 240 npm ci --prefix web --prefer-offline --no-audit --no-fund || timeout 240 npm ci --prefix web --prefer-offline --no-audit --no-fund
+          timeout 240 npm ci --prefix apps/web --prefer-offline --no-audit --no-fund || timeout 240 npm ci --prefix apps/web --prefer-offline --no-audit --no-fund
           timeout 240 npm ci --prefix engine --omit=dev --ignore-scripts --prefer-offline --no-audit --no-fund || timeout 240 npm ci --prefix engine --omit=dev --ignore-scripts --prefer-offline --no-audit --no-fund
       - name: Playwright version
         id: playwright
-        run: echo "version=$(node -p "[...new Set(['engine', 'web'].map((d) => require('./' + d + '/package-lock.json').packages['node_modules/playwright-core'].version))].join('-')")" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(node -p "[...new Set(['engine', 'apps/web'].map((d) => require('./' + d + '/package-lock.json').packages['node_modules/playwright-core'].version))].join('-')")" >> "$GITHUB_OUTPUT"
       - name: Chromium from the cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -148,40 +148,41 @@ jobs:
         timeout-minutes: 12
         run: |
           fc-cache -f > /dev/null 2>&1 || true
-          npx --prefix web playwright-core install chromium
-          if ! (node -e "require('./web/node_modules/playwright-core').chromium.launch().then((b) => b.close())" && for l in ko ja zh th; do fc-list ":lang=$l" | grep -q . || exit 1; done); then
-            npx --prefix web playwright-core install-deps chromium
+          npx --prefix apps/web playwright-core install chromium
+          if ! (node -e "require('./apps/web/node_modules/playwright-core').chromium.launch().then((b) => b.close())" && for l in ko ja zh th; do fc-list ":lang=$l" | grep -q . || exit 1; done); then
+            npx --prefix apps/web playwright-core install-deps chromium
             mkdir -p ~/.local/share/fonts/ci
             for p in fonts-ipafont-gothic fonts-wqy-zenhei fonts-tlwg-loma-otf fonts-freefont-ttf fonts-unifont; do dpkg -L "$p" 2>/dev/null; done | grep -E '\.(ttf|otf|ttc)$' | xargs -r cp -t ~/.local/share/fonts/ci/
           fi
       - name: Next.js build cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: web/.next/cache
-          key: next-${{ runner.os }}-${{ hashFiles('web/package-lock.json') }}-${{ hashFiles('web/app/**', 'web/lib/**', 'web/next.config.mjs') }}
-          restore-keys: next-${{ runner.os }}-${{ hashFiles('web/package-lock.json') }}-
-      # next build type-checks the whole project (web/tsconfig.json), the same files npm --prefix web run typecheck reads.
+          path: apps/web/.next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('apps/web/package-lock.json') }}-${{ hashFiles('apps/web/app/**', 'apps/web/lib/**', 'apps/web/next.config.mjs') }}
+          restore-keys: next-${{ runner.os }}-${{ hashFiles('apps/web/package-lock.json') }}-
+      # next build type-checks the whole project (apps/web/tsconfig.json), the same files
+      # npm --prefix apps/web run typecheck reads.
       - name: Typecheck and build
-        run: npm --prefix web run build
+        run: npm --prefix apps/web run build
       - name: Routes trace the engine files they read at run time
-        run: node web/scripts/check-traces.mjs
+        run: node apps/web/scripts/check-traces.mjs
       - name: Address guard, limits and fenced engine on the fixtures
-        run: npm --prefix web test
+        run: npm --prefix apps/web test
       - name: Serve the build
         run: |
-          npm --prefix web start > "$RUNNER_TEMP/web.log" 2>&1 &
+          npm --prefix apps/web start > "$RUNNER_TEMP/web.log" 2>&1 &
           for i in $(seq 1 30); do curl -sf http://localhost:3240/ > /dev/null && break; sleep 2; done
           curl -sf http://localhost:3240/ | grep -q 'id="target"' || { cat "$RUNNER_TEMP/web.log"; echo "web did not start"; exit 1; }
       - name: Zero findings on every page at 1440, 1280 and 390
-        run: node web/scripts/self-check.mjs
+        run: node apps/web/scripts/self-check.mjs
       - name: The gallery works on a phone, a tablet and a desktop
-        run: node web/scripts/check-gallery.mjs
+        run: node apps/web/scripts/check-gallery.mjs
       - name: The tone page works on a phone, a tablet and a desktop
-        run: node web/scripts/check-tone.mjs
+        run: node apps/web/scripts/check-tone.mjs
       - name: Head tags, the 404 screen and the headers hold
-        run: node web/scripts/check-metadata.mjs
+        run: node apps/web/scripts/check-metadata.mjs
       - name: Pages stay at or under the accessibility baseline (axe, keyboard focus, reduced motion)
-        run: node web/scripts/check-a11y.mjs
+        run: node apps/web/scripts/check-a11y.mjs
   action:
     strategy:
       fail-fast: false

@@ -120,10 +120,10 @@ for (const d of DESCRIPTIONS) {
   }
 }
 
-// extension/: the detector and the rule names next to the overlay, so the extension and the bookmarklet
-// (served by web/app/taster) inject the same files.
-fs.copyFileSync(path.join(ROOT, 'rules/detect.js'), path.join(ROOT, 'extension/detect.js'));
-fs.writeFileSync(path.join(ROOT, 'extension/rules.js'), extensionRules(rules.rules));
+// apps/extension/: the detector and the rule names next to the overlay, so the extension and the bookmarklet
+// (served by apps/web/app/taster) inject the same files.
+fs.copyFileSync(path.join(ROOT, 'rules/detect.js'), path.join(ROOT, 'apps/extension/detect.js'));
+fs.writeFileSync(path.join(ROOT, 'apps/extension/rules.js'), extensionRules(rules.rules));
 
 // Thinking orb recipes: contributors edit the JSON, the component imports the module.
 fs.writeFileSync(path.join(ROOT, 'registry/src/motion/orb-recipes.ts'), orbRecipesModule(readJson('registry/recipes/orbs.json')));

@@ -87,8 +87,8 @@ test('versions agree and the engine reads its version from package.json', () => 
   const handWritten = { 'engine/sarif.mjs': read('engine/sarif.mjs').replace(/version: VERSION/, `version: '${json('package.json').version}'`) };
   assert.ok(versionErrors(files(), handWritten).some((e) => /engine\/sarif.mjs writes the version .* by hand/.test(e)));
   const drift = files();
-  drift['extension/manifest.json'].version = '0.0.9';
-  assert.deepEqual(versionErrors(drift, {}), [`extension/manifest.json version is 0.0.9, package.json is ${drift['package.json'].version}`]);
+  drift['apps/extension/manifest.json'].version = '0.0.9';
+  assert.deepEqual(versionErrors(drift, {}), [`apps/extension/manifest.json version is 0.0.9, package.json is ${drift['package.json'].version}`]);
 });
 
 test('root and engine packages agree on dependencies, Node and the lockfile', () => {
@@ -112,18 +112,19 @@ test('root and engine packages agree on dependencies, Node and the lockfile', ()
   ]);
 });
 
-test('npm pack publishes the code, license and notices, and no tests, site or CI', () => {
+test('npm pack publishes the code, license and notices, and no tests, apps or CI', () => {
   const pkg = json('package.json');
   const pack = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: ROOT, encoding: 'utf8', shell: process.platform === 'win32' });
   assert.equal(pack.status, 0, pack.stderr);
   const packed = JSON.parse(pack.stdout)[0].files.map((x) => x.path);
   assert.deepEqual(packErrors(packed, pkg), []);
 
-  const bad = [...packed.filter((p) => p !== 'THIRD_PARTY_NOTICES.md'), 'taxonomy/axes.test.mjs', 'taxonomy/fixtures/parts.json', 'web/package.json', 'engine/node_modules/zod/package.json'];
+  const bad = [...packed.filter((p) => p !== 'THIRD_PARTY_NOTICES.md'), 'taxonomy/axes.test.mjs', 'taxonomy/fixtures/parts.json', 'apps/web/package.json', 'apps/extension/manifest.json', 'engine/node_modules/zod/package.json'];
   assert.deepEqual(packErrors(bad, pkg), [
     'npm pack would publish taxonomy/axes.test.mjs',
     'npm pack would publish taxonomy/fixtures/parts.json',
-    'npm pack would publish web/package.json',
+    'npm pack would publish apps/web/package.json',
+    'npm pack would publish apps/extension/manifest.json',
     'npm pack would publish engine/node_modules/zod/package.json',
     'npm pack leaves out THIRD_PARTY_NOTICES.md',
   ]);

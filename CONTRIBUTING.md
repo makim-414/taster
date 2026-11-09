@@ -39,7 +39,7 @@ build.
 | `taxonomy/` | categories and their decision key, uses, surfaces, weighting axes and constraints ([SCHEMA.md](taxonomy/SCHEMA.md)) |
 | `registry/` | the components, their tokens, the demo page and the stills ([README](registry/README.md)) |
 | `engine/` | the CLI, the MCP server and the ACP agent ([README](engine/README.md)) |
-| `web/` | the hosted site ([README](web/README.md)) |
+| `apps/web/` | the hosted site ([README](apps/web/README.md)) |
 | `skills/taster/` | the skill; its `data/` folder is generated |
 
 Some files are generated. Do not edit them by hand; edit the source and run the build:

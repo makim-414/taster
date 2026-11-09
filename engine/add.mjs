@@ -1,7 +1,7 @@
 // Copy registry components into an app, standalone: no shadcn CLI, no components.json, no account. Resolves every
 // relative import a component makes (helpers, other components, icons), adds the token files once, and reports the
 // npm packages to install. Works from this repository or from a hosted copy (`--from https://...`), which serves the
-// same file list as JSON at /r/<id>.json (web/app/r/[...id]/route.ts).
+// same file list as JSON at /r/<id>.json (apps/web/app/r/[...id]/route.ts).
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, posix, relative, resolve, win32 } from 'node:path';
 import { fileURLToPath } from 'node:url';

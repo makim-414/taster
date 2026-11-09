@@ -1,6 +1,6 @@
 // Opens a reference site's first screen for the tone step, given a Playwright page the caller made (a local browser
 // for the MCP server, the fenced server browser for the web). Nothing is written to disk: the picture goes back to
-// the caller as bytes (the web keeps it in server memory up to 30 minutes, see web/lib/tone-shot.ts).
+// the caller as bytes (the web keeps it in server memory up to 30 minutes, see apps/web/lib/tone-shot.ts).
 // Cookie banners: only a reject or necessary-only button is pressed, never accept. A banner that offers no reject
 // button is neither accepted nor hidden: the site is reported as `consent` with no picture. A bot check, a block page
 // or an error status is reported as `blocked` with no picture. Either way the caller shows the link only. Nothing

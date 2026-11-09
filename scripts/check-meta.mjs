@@ -24,7 +24,7 @@ export const DESCRIPTIONS = [
       `Find the AI generated look in a frontend and fix it: ${c.rules} rules, ${c.measured} measured in a real browser, ${c.patterns} patterns and ${c.components} components to swap in, for agents (MCP, ACP), editors, CI and the browser.`,
   },
   {
-    file: 'extension/manifest.json',
+    file: 'apps/extension/manifest.json',
     at: ['description'],
     max: 132,
     text: (c) => `Outline the habits that make a page look AI generated: ${c.rules} rules, ${c.measured} measured on the page you are viewing.`,
@@ -109,7 +109,7 @@ export function versionErrors(json, sources) {
   const version = json['package.json'].version;
   const stated = [
     ['engine/package.json', ['version']],
-    ['extension/manifest.json', ['version']],
+    ['apps/extension/manifest.json', ['version']],
     ['.github/acp-registry/taster/agent.json', ['version']],
     ['.claude-plugin/marketplace.json', ['plugins', 0, 'version']],
     ['.codex-plugin/plugin.json', ['version']],
@@ -146,8 +146,9 @@ export function packageErrors(root, engine, nvmrc, lock) {
   return errors;
 }
 
-// What npm would publish: no installs, site, CI or tests, and the license and notices that must travel with the code.
-const NOT_PUBLISHED = [/(^|\/)node_modules\//, /^web\//, /^\.github\//, /(^|\/)(test|tests|__tests__|fixtures)\//, /\.test\.[cm]?[jt]sx?$/];
+// What npm would publish: no installs, apps (the site and the extension), CI or tests, and the license and notices
+// that must travel with the code.
+const NOT_PUBLISHED = [/(^|\/)node_modules\//, /^apps\//, /^\.github\//, /(^|\/)(test|tests|__tests__|fixtures)\//, /\.test\.[cm]?[jt]sx?$/];
 const PUBLISHED = ['LICENSE', 'THIRD_PARTY_NOTICES.md', 'registry/THIRD_PARTY_NOTICES.md', 'registry/stage/THIRD_PARTY_LICENSES.txt', 'README.md'];
 export function packErrors(files, pkg) {
   const errors = [];

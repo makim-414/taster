@@ -1,5 +1,0 @@
-{
-  "version": 1,
-  "note": "check-a11y baseline: counts per page and check may only go down. Lower it with node web/scripts/check-a11y.mjs --write-baseline.",
-  "counts": {}
-}

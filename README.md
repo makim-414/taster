@@ -8,7 +8,7 @@ Find the AI slop in a frontend, swap each spot for a pattern that does the same 
 
 | Before | After |
 |---|---|
-| ![Acme Ledger before: a purple gradient hero with a blurred pink glow, a pill badge with an emoji, an all caps eyebrow with wide letter spacing, a gradient word and an italic serif word in the headline, emoji in the text, and three identical icon cards with tinted pill badges, each finding outlined by Taster](web/public/compare/before-780.jpg) | ![Acme Ledger after: the same headline, text and actions on a plain dark page, a sentence case label, one accent button next to a text link, and the features as a list instead of cards](web/public/compare/after-780.jpg) |
+| ![Acme Ledger before: a purple gradient hero with a blurred pink glow, a pill badge with an emoji, an all caps eyebrow with wide letter spacing, a gradient word and an italic serif word in the headline, emoji in the text, and three identical icon cards with tinted pill badges, each finding outlined by Taster](apps/web/public/compare/before-780.jpg) | ![Acme Ledger after: the same headline, text and actions on a plain dark page, a sentence case label, one accent button next to a text link, and the features as a list instead of cards](apps/web/public/compare/after-780.jpg) |
 
 Before: Acme Ledger, a made-up landing page that breaks 18 of the rules, each finding outlined by Taster. After: the same content rebuilt to the rules, with 0 findings at 1440 and 390 pixels wide. Both pages and the check that proves it are in [`examples/rebuild/`](examples/rebuild/).
 

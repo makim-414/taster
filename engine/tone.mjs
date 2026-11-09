@@ -1,7 +1,7 @@
 // The tone step: a spot on two axes (x: commerce 0 to brand personality 1, y: minimal 0 to expressive 1) and an
 // optional genre become the nearest real references (taxonomy/tone-refs.json) and a set of token values. Pure
-// functions with no file or browser access, so the MCP tool (server.mjs) and the web page (web/app/tone) import the
-// same code and answer the same.
+// functions with no file or browser access, so the MCP tool (server.mjs) and the web page (apps/web/app/tone) import
+// the same code and answer the same.
 //
 // The spot sets the eight weighting axes by their ids and snap steps (density, contrast, roundness, type-expression,
 // color-restraint, elevation, motion, stroke). `toneAxes` returns them as { id: step }, the shape a design system

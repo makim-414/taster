@@ -39,15 +39,15 @@ export const JOBS = {
     { name: 'No component runs what its props hold', cmd: 'node registry/test-injection.mjs' },
   ],
   web: [
-    { name: 'Typecheck and build', cmd: 'npm --prefix web run build' },
-    { name: 'Routes trace the engine files they read at run time', cmd: 'node web/scripts/check-traces.mjs' },
-    { name: 'Address guard, limits and fenced engine on the fixtures', cmd: 'npm --prefix web test' },
+    { name: 'Typecheck and build', cmd: 'npm --prefix apps/web run build' },
+    { name: 'Routes trace the engine files they read at run time', cmd: 'node apps/web/scripts/check-traces.mjs' },
+    { name: 'Address guard, limits and fenced engine on the fixtures', cmd: 'npm --prefix apps/web test' },
     { name: 'Serve the build', serve: true },
-    { name: 'Zero findings on every page at 1440, 1280 and 390', cmd: 'node web/scripts/self-check.mjs', base: true },
-    { name: 'The gallery works on a phone, a tablet and a desktop', cmd: 'node web/scripts/check-gallery.mjs', base: true },
-    { name: 'The tone page works on a phone, a tablet and a desktop', cmd: 'node web/scripts/check-tone.mjs', base: true },
-    { name: 'Head tags, the 404 screen and the headers', cmd: 'node web/scripts/check-metadata.mjs', base: true },
-    { name: 'Pages stay at or under the accessibility baseline', cmd: 'node web/scripts/check-a11y.mjs', base: true },
+    { name: 'Zero findings on every page at 1440, 1280 and 390', cmd: 'node apps/web/scripts/self-check.mjs', base: true },
+    { name: 'The gallery works on a phone, a tablet and a desktop', cmd: 'node apps/web/scripts/check-gallery.mjs', base: true },
+    { name: 'The tone page works on a phone, a tablet and a desktop', cmd: 'node apps/web/scripts/check-tone.mjs', base: true },
+    { name: 'Head tags, the 404 screen and the headers', cmd: 'node apps/web/scripts/check-metadata.mjs', base: true },
+    { name: 'Pages stay at or under the accessibility baseline', cmd: 'node apps/web/scripts/check-a11y.mjs', base: true },
   ],
   action: [{ name: 'The diagnosis the action runs: findings for before.html, none for after.html', sarif: true, ci: false }],
 };
@@ -76,7 +76,7 @@ let server = null;
 async function serve() {
   const port = Number(process.env.PORT) || (await freePort());
   const base = `http://localhost:${port}`;
-  const child = spawn('npm', ['--prefix', 'web', 'start'], { cwd: ROOT, env: { ...process.env, PORT: String(port) }, stdio: 'ignore', detached: true });
+  const child = spawn('npm', ['--prefix', 'apps/web', 'start'], { cwd: ROOT, env: { ...process.env, PORT: String(port) }, stdio: 'ignore', detached: true });
   server = child;
   for (let i = 0; i < 60; i++) {
     try {
@@ -139,7 +139,7 @@ async function runGate(gate, base) {
 }
 
 function install() {
-  for (const dir of ['engine', 'registry', 'web']) {
+  for (const dir of ['engine', 'registry', 'apps/web']) {
     if (existsSync(path.join(ROOT, dir, 'node_modules'))) continue;
     console.log(`\n-- npm ci --prefix ${dir}`);
     if (!sh(`npm ci --prefix ${dir} --no-audit --no-fund`)) return false;

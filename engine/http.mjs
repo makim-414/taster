@@ -1,7 +1,7 @@
 // Hosted MCP over Streamable HTTP, stateless: every request builds a fresh server and transport, so it runs on
 // serverless functions with no session store. The host passes `remote.diagnose`, and `remote.brand` and `remote.tone`
 // when it has them, which must open pages only through its own fenced browser (public http(s) URLs, request budget,
-// rate limit). See web/app/api/mcp/route.ts.
+// rate limit). See apps/web/app/api/mcp/route.ts.
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 import { createServer } from './server.mjs';
 
