@@ -37,8 +37,8 @@ build.
 | `rules/` | `rules.json`, the detector `detect.js` that measures them in the page, fixtures and their test |
 | `patterns/` | one Markdown file per pattern, listed in `patterns/INDEX.json` |
 | `taxonomy/` | categories and their decision key, uses, surfaces, weighting axes and constraints ([SCHEMA.md](taxonomy/SCHEMA.md)) |
-| `registry/` | the components, their tokens, the demo page and the stills ([README](registry/README.md)) |
-| `engine/` | the CLI, the MCP server and the ACP agent ([README](engine/README.md)) |
+| `packages/registry/` | the components, their tokens, the demo page and the stills ([README](packages/registry/README.md)) |
+| `packages/engine/` | the CLI, the MCP server and the ACP agent ([README](packages/engine/README.md)) |
 | `apps/web/` | the hosted site ([README](apps/web/README.md)) |
 | `skills/taster/` | the skill; its `data/` folder is generated |
 
@@ -142,7 +142,7 @@ Taster checks its own pages and text, so a change has to pass the rules it ships
   (`// Upstream license: MIT, Copyright (c) <year> <holder>. Full text in THIRD_PARTY_NOTICES.md.`), set the
   component's `credit` in `registry/registry.json`, and add the source and its full license text to
   `registry/THIRD_PARTY_NOTICES.md`. The steps for redrawing a component are in
-  [registry/README.md](registry/README.md#bringing-in-a-component-from-elsewhere).
+  [packages/registry/README.md](packages/registry/README.md#bringing-in-a-component-from-elsewhere).
 - Do not commit screenshots or captures of other people's sites, apps or products, or logos and wordmarks you do not
   own. Pictures in the repository are renders of Taster's own components, or images you made and can license under
   MIT. A font file comes with its license file.

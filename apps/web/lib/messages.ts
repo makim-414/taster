@@ -29,7 +29,7 @@ export function errorText(code: string | undefined, message: string | undefined,
 const HTTP_ERROR: Record<number, string> = { 401: '로그인·보호', 403: '접근 거부', 404: '찾을 수 없음', 407: '로그인·보호', 410: '찾을 수 없음', 429: '요청 제한' };
 
 /**
- * What the home says for a not-diagnosed answer (engine/blocked.mjs classifyLoad's reason and the HTTP status): the
+ * What the home says for a not-diagnosed answer (packages/engine/blocked.mjs classifyLoad's reason and the HTTP status): the
  * page that came back is not the site, Taster does not get past it, and none of it is about that site.
  */
 export function notDiagnosedText(reason: string | undefined, status: number | null | undefined): string {

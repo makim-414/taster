@@ -1,4 +1,4 @@
-// Runs the real server path (engine/diagnose.mjs through the fenced browser) against local
+// Runs the real server path (packages/engine/diagnose.mjs through the fenced browser) against local
 // servers. The fixture server is on loopback, so these tests pass the test-only allowLoopback
 // flag; private ranges stay blocked even then, which is what the redirect cases check.
 import test from 'node:test';
@@ -14,7 +14,7 @@ import { runBrand } from '../lib/brand.ts';
 import { allKept, captureShots } from '../lib/tone-shot.ts';
 
 const FIXTURES = path.resolve(import.meta.dirname, '../../../rules/fixtures');
-const TONE_FIXTURES = path.resolve(import.meta.dirname, '../../../engine/test/fixtures');
+const TONE_FIXTURES = path.resolve(import.meta.dirname, '../../../packages/engine/test/fixtures');
 
 
 function serve(): Promise<{ base: string; close: () => void }> {

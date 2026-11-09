@@ -33,11 +33,11 @@ runs:
     - name: Install Taster engine and Chromium
       shell: bash
       run: |
-        npm ci --prefix "$GITHUB_ACTION_PATH/engine" --omit=dev --no-audit --no-fund
-        npx --prefix "$GITHUB_ACTION_PATH/engine" playwright install chromium
+        npm ci --prefix "$GITHUB_ACTION_PATH/packages/engine" --omit=dev --no-audit --no-fund
+        npx --prefix "$GITHUB_ACTION_PATH/packages/engine" playwright install chromium
         # On Linux, the system libraries and the CJK and Thai fonts only when the runner lacks them.
-        if [ "$RUNNER_OS" = Linux ] && ! (node -e "require(process.argv[1]).chromium.launch().then((b) => b.close())" "$GITHUB_ACTION_PATH/engine/node_modules/playwright" && for l in ko ja zh th; do fc-list ":lang=$l" | grep -q . || exit 1; done); then
-          npx --prefix "$GITHUB_ACTION_PATH/engine" playwright install-deps chromium
+        if [ "$RUNNER_OS" = Linux ] && ! (node -e "require(process.argv[1]).chromium.launch().then((b) => b.close())" "$GITHUB_ACTION_PATH/packages/engine/node_modules/playwright" && for l in ko ja zh th; do fc-list ":lang=$l" | grep -q . || exit 1; done); then
+          npx --prefix "$GITHUB_ACTION_PATH/packages/engine" playwright install-deps chromium
         fi
     - name: Diagnose
       id: diagnose
@@ -54,7 +54,7 @@ runs:
           if [ -n "${line//[[:space:]]/}" ]; then list+=("$line"); fi
         done < <(printf '%s\n' "$TARGETS")
         set +e
-        node "$GITHUB_ACTION_PATH/engine/cli.mjs" "${list[@]}" --widths "$WIDTHS" --sarif "$SARIF" --summary "$GITHUB_STEP_SUMMARY" --fail-on "$FAIL_ON"
+        node "$GITHUB_ACTION_PATH/packages/engine/cli.mjs" "${list[@]}" --widths "$WIDTHS" --sarif "$SARIF" --summary "$GITHUB_STEP_SUMMARY" --fail-on "$FAIL_ON"
         code=$?
         set -e
         echo "exit=$code" >> "$GITHUB_OUTPUT"

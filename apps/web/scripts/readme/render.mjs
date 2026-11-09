@@ -1,6 +1,6 @@
 // Renders the pictures for the repository page into assets/ at the repository root: social-preview.png, the 1280x640
 // card GitHub shows when the repository is linked (the owner uploads it in the repository settings, Social preview), and
-// components.dark.jpg and components.light.jpg, six component stills from registry/previews in three columns and two
+// components.dark.jpg and components.light.jpg, six component stills from packages/registry/previews in three columns and two
 // rows (2400x1000) for the README. The pages are social-preview.html and components.html here, with the registry
 // tokens inlined as scripts/og/render.mjs does (tokens.css, the dark core, and themes/light.css, which only applies under
 // data-theme="light"), so each page defines both modes and the html element picks one; every picture is a data URI.
@@ -8,7 +8,7 @@
 // make it stale. Run it again when the sentence changes or one of the chosen components' stills does. A page error or
 // a console error (a font or picture that did not load) fails the run before anything is written.
 // Usage: node scripts/readme/render.mjs [--html <dir>]   (--html also writes the filled pages into <dir>, so
-// node engine/cli.mjs can measure exactly what was drawn)
+// node packages/engine/cli.mjs can measure exactly what was drawn)
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright-core';
@@ -18,7 +18,7 @@ const out = new URL('assets/', root);
 const at = process.argv.indexOf('--html');
 const htmlDir = at > 0 ? path.resolve(process.argv[at + 1] ?? '.') : null;
 const read = (rel) => readFileSync(new URL(rel, root));
-const tokens = ['registry/src/tokens.css', 'registry/src/themes/light.css'].map((f) => read(f).toString('utf8')).join('\n');
+const tokens = ['packages/registry/src/tokens.css', 'packages/registry/src/themes/light.css'].map((f) => read(f).toString('utf8')).join('\n');
 const jpeg = (rel) => `data:image/jpeg;base64,${read(rel).toString('base64')}`;
 // A function replacement, so a $ in the tokens or the base64 is never read as a pattern.
 const fill = (file, swaps) => Object.entries(swaps).reduce((t, [k, v]) => t.replace(k, () => v), readFileSync(new URL(file, import.meta.url), 'utf8'));
@@ -51,7 +51,7 @@ const PAGES = [
     html: fill('components.html', {
       '/*THEME*/': theme,
       '/*TOKENS*/': tokens,
-      '<!--TILES-->': PARTS.map(([id, label]) => `<img src="${jpeg(`registry/previews/${id}.${theme}.jpg`)}" alt="${label} component">`).join(''),
+      '<!--TILES-->': PARTS.map(([id, label]) => `<img src="${jpeg(`packages/registry/previews/${id}.${theme}.jpg`)}" alt="${label} component">`).join(''),
     }),
   })),
 ];

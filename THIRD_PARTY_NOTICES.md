@@ -6,8 +6,8 @@ keep their own license files in `node_modules` and are not repeated here.
 
 | What | Where | Notices |
 |---|---|---|
-| Code and API shapes the component registry follows (shadcn/ui, Radix, Magic UI, motion-primitives, cult-ui, beUI, 21st.dev listings and others), and the design references no code was taken from | `registry/src/` | [`registry/THIRD_PARTY_NOTICES.md`](registry/THIRD_PARTY_NOTICES.md) |
-| npm packages bundled into the prebuilt gallery page | `registry/stage/index.html` | [`registry/stage/THIRD_PARTY_LICENSES.txt`](registry/stage/THIRD_PARTY_LICENSES.txt), written by `registry/demo/build.mjs` on every stage build |
+| Code and API shapes the component registry follows (shadcn/ui, Radix, Magic UI, motion-primitives, cult-ui, beUI, 21st.dev listings and others), and the design references no code was taken from | `packages/registry/src/` | [`packages/registry/THIRD_PARTY_NOTICES.md`](packages/registry/THIRD_PARTY_NOTICES.md) |
+| npm packages bundled into the prebuilt gallery page | `packages/registry/stage/index.html` | [`packages/registry/stage/THIRD_PARTY_LICENSES.txt`](packages/registry/stage/THIRD_PARTY_LICENSES.txt), written by `packages/registry/demo/build.mjs` on every stage build |
 | The home page's before/after slider | `apps/web/app/compare-reveal.tsx`, `apps/web/app/compare-spring.ts` | Motiq, below |
 | Noto Sans KR, latin slice | `apps/web/app/fonts/` | SIL Open Font License 1.1, [`apps/web/app/fonts/OFL.txt`](apps/web/app/fonts/OFL.txt) |
 | The home page comparison pictures | `apps/web/public/compare/` | Taster's own example, below |

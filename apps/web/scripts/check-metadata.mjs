@@ -11,7 +11,7 @@ import { chromium } from 'playwright-core';
 const BASE = process.argv[2] || 'http://localhost:3240';
 const ROOT = new URL('../../../', import.meta.url);
 const DETECT = readFileSync(new URL('rules/detect.js', ROOT), 'utf8');
-const IDS = JSON.parse(readFileSync(new URL('registry/registry.json', ROOT), 'utf8')).components.map((c) => c.id);
+const IDS = JSON.parse(readFileSync(new URL('packages/registry/registry.json', ROOT), 'utf8')).components.map((c) => c.id);
 
 let failures = 0;
 const ok = (cond, label) => {

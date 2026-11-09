@@ -6,55 +6,55 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.join(here, '..', '..');
 // The gallery asks for /stage/index.html?v=<this>, so each stage build has its own address the browser can keep for good.
-const stageVersion = createHash('sha256').update(readFileSync(path.join(repo, 'registry/stage/index.html'))).digest('hex').slice(0, 12);
+const stageVersion = createHash('sha256').update(readFileSync(path.join(repo, 'packages/registry/stage/index.html'))).digest('hex').slice(0, 12);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: { STAGE_VERSION: stageVersion },
-  // The app reads ../../engine, ../../rules and ../../registry, so tracing and Turbopack start at the repo root.
+  // The app reads ../../packages/engine, ../../rules and ../../packages/registry, so tracing and Turbopack start at the repo root.
   outputFileTracingRoot: repo,
   turbopack: { root: repo },
   serverExternalPackages: ['playwright-core', '@sparticuz/chromium'],
-  // engine/diagnose.mjs is imported at run time (not bundled), so the engine files it reads are listed by hand.
+  // packages/engine/diagnose.mjs is imported at run time (not bundled), so the engine files it reads are listed by hand.
   outputFileTracingIncludes: {
-    // engine/http.mjs and engine/server.mjs are also imported at run time; they read the catalog files below.
+    // packages/engine/http.mjs and packages/engine/server.mjs are also imported at run time; they read the catalog files below.
     '/api/mcp': [
-      '../../engine/*.mjs',
-      '../../engine/*.js',
-      '../../engine/package.json',
-      '../../engine/node_modules/**',
+      '../../packages/engine/*.mjs',
+      '../../packages/engine/*.js',
+      '../../packages/engine/package.json',
+      '../../packages/engine/node_modules/**',
       '../../rules/detect.js',
       '../../rules/rules.json',
       '../../patterns/**',
       '../../taxonomy/**',
-      '../../registry/registry.json',
-      '../../registry/src/**',
-      '../../registry/previews/**',
+      '../../packages/registry/registry.json',
+      '../../packages/registry/src/**',
+      '../../packages/registry/previews/**',
       '../../skills/taster/references/start.md',
       './node_modules/playwright-core/**',
       './node_modules/@sparticuz/chromium/**',
     ],
     // Keys are globs over route paths, so the brackets of [...slug] would read as a character class.
-    '/r/**': ['../../engine/add.mjs', '../../registry/registry.json', '../../registry/src/**', '../../registry/THIRD_PARTY_NOTICES.md'],
+    '/r/**': ['../../packages/engine/add.mjs', '../../packages/registry/registry.json', '../../packages/registry/src/**', '../../packages/registry/THIRD_PARTY_NOTICES.md'],
     '/api/brand': [
-      '../../engine/*.mjs',
-      '../../engine/*.js',
-      '../../engine/package.json',
+      '../../packages/engine/*.mjs',
+      '../../packages/engine/*.js',
+      '../../packages/engine/package.json',
       '../../rules/detect.js',
       '../../rules/rules.json',
       './node_modules/playwright-core/**',
       './node_modules/@sparticuz/chromium/**',
     ],
-    // The capture code (engine/tone-capture.mjs) and the catalog are bundled into the route; only the browser is traced.
+    // The capture code (packages/engine/tone-capture.mjs) and the catalog are bundled into the route; only the browser is traced.
     '/api/tone-shot': ['./node_modules/playwright-core/**', './node_modules/@sparticuz/chromium/**'],
     '/api/diagnose': [
-      '../../engine/*.mjs',
-      '../../engine/*.js',
-      '../../engine/package.json',
+      '../../packages/engine/*.mjs',
+      '../../packages/engine/*.js',
+      '../../packages/engine/package.json',
       '../../rules/detect.js',
       '../../rules/rules.json',
-      '../../engine/node_modules/playwright/**',
-      '../../engine/node_modules/playwright-core/**',
+      '../../packages/engine/node_modules/playwright/**',
+      '../../packages/engine/node_modules/playwright-core/**',
       './node_modules/playwright-core/**',
       './node_modules/@sparticuz/chromium/**',
     ],

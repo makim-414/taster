@@ -1,6 +1,6 @@
 // Reads a site's brand through the fenced server browser and turns it into tokens with the engine's own brandTheme, so
 // the gallery and brand_theme give the same answer. A bot check, an error or a sign-in page is not the site, so its
-// colors and fonts are not read as the site's brand (engine/blocked.mjs classifyLoad, the same check diagnose uses).
+// colors and fonts are not read as the site's brand (packages/engine/blocked.mjs classifyLoad, the same check diagnose uses).
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -16,16 +16,16 @@ type BlockedModule = { classifyLoad: (load: { status: number | null; headers: Re
 function engineModule(file: string): string | undefined {
   return [
     process.env.TASTER_ENGINE ? path.join(path.dirname(process.env.TASTER_ENGINE), file) : '',
-    path.resolve(process.cwd(), '../../engine', file),
-    path.resolve(process.cwd(), 'engine', file),
-    path.join('/var/task/engine', file),
+    path.resolve(process.cwd(), '../../packages/engine', file),
+    path.resolve(process.cwd(), 'packages/engine', file),
+    path.join('/var/task/packages/engine', file),
   ].filter(Boolean).find((c) => existsSync(c));
 }
 
 let brandPromise: Promise<BrandModule> | null = null;
 function loadBrand(): Promise<BrandModule> {
   const found = engineModule('brand.mjs');
-  if (!found) return Promise.reject(new Error('engine/brand.mjs not found'));
+  if (!found) return Promise.reject(new Error('packages/engine/brand.mjs not found'));
   brandPromise ||= import(/* webpackIgnore: true */ /* turbopackIgnore: true */ pathToFileURL(found).href) as Promise<BrandModule>;
   return brandPromise;
 }
@@ -33,7 +33,7 @@ function loadBrand(): Promise<BrandModule> {
 let blockedPromise: Promise<BlockedModule> | null = null;
 function loadBlocked(): Promise<BlockedModule> {
   const found = engineModule('blocked.mjs');
-  if (!found) return Promise.reject(new Error('engine/blocked.mjs not found'));
+  if (!found) return Promise.reject(new Error('packages/engine/blocked.mjs not found'));
   blockedPromise ||= import(/* webpackIgnore: true */ /* turbopackIgnore: true */ pathToFileURL(found).href) as Promise<BlockedModule>;
   return blockedPromise;
 }

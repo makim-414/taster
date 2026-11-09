@@ -5,7 +5,7 @@
 // Usage: node scripts/check-tone.mjs [base url]   (default http://localhost:3240)
 import { mkdirSync, readFileSync } from 'node:fs';
 import { chromium } from 'playwright-core';
-import { axesToTokens, nearestRefs, toneAxes } from '../../../engine/tone.mjs';
+import { axesToTokens, nearestRefs, toneAxes } from '../../../packages/engine/tone.mjs';
 
 const BASE = process.argv[2] || 'http://localhost:3240';
 const OUT = new URL('../shots/', import.meta.url);

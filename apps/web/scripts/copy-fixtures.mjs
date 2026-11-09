@@ -35,8 +35,8 @@ for (const dir of [new URL(`${folder}/`, pub), pub]) {
 writeFileSync(new URL('bookmarklet.json', pub), `${JSON.stringify({ version: folder, overlay: sri(overlay) }, null, 2)}\n`);
 console.log(`overlay copied to public/taster/${folder}`);
 
-// The gallery's live stage and preview pictures. registry/ holds them for the MCP tools too. Generated, not committed.
-const reg = new URL('../../../registry/', import.meta.url);
+// The gallery's live stage and preview pictures. packages/registry/ holds them for the MCP tools too. Generated, not committed.
+const reg = new URL('../../../packages/registry/', import.meta.url);
 cpSync(new URL('stage/index.html', reg), new URL('../public/stage/index.html', import.meta.url));
 // The license texts of the packages the stage bundles; the stage page points to this file next to it.
 cpSync(new URL('stage/THIRD_PARTY_LICENSES.txt', reg), new URL('../public/stage/THIRD_PARTY_LICENSES.txt', import.meta.url));

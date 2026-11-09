@@ -1,7 +1,7 @@
 // Runs rules/detect.js on this app's own screens at 1440, 1280 and 390 wide and fails on any finding, page error or
 // sideways scroll. The screens: the first screen and a result that lists every measured rule (the API is answered
 // locally with a synthetic report so no outside site is involved), the gallery, the page of every component in
-// registry/registry.json, the board, the bookmarklet page and the tone page. Three pages run at a time. The 404 screen
+// packages/registry/registry.json, the board, the bookmarklet page and the tone page. Three pages run at a time. The 404 screen
 // is check-metadata's. A finding listed in self-check-baseline.json, with the reason it stays, is reported and allowed
 // up to its count on that screen at every width; one more, or any other finding, fails.
 // Usage: node scripts/self-check.mjs [base url]   (default $BASE_URL, else http://localhost:3240)
@@ -12,7 +12,7 @@ const BASE = process.argv[2] || process.env.BASE_URL || 'http://localhost:3240';
 const ROOT = new URL('../../../', import.meta.url);
 const DETECT = readFileSync(new URL('rules/detect.js', ROOT), 'utf8');
 const RULES = JSON.parse(readFileSync(new URL('rules/rules.json', ROOT), 'utf8')).rules;
-const IDS = JSON.parse(readFileSync(new URL('registry/registry.json', ROOT), 'utf8')).components.map((c) => c.id);
+const IDS = JSON.parse(readFileSync(new URL('packages/registry/registry.json', ROOT), 'utf8')).components.map((c) => c.id);
 const BASELINE = JSON.parse(readFileSync(new URL('self-check-baseline.json', import.meta.url), 'utf8')).allow;
 const WIDTHS = [1440, 1280, 390];
 const PARALLEL = 3;
@@ -45,7 +45,7 @@ const synthetic = {
 const picture = placeholder(1280, 800);
 
 // The home page in its two states, then the pages around the gallery and the tone page. The components inside frames
-// are the registry's business (registry/test-render.mjs, registry/test-a11y.mjs); this measures the page around them.
+// are the registry's business (packages/registry/test-render.mjs, packages/registry/test-a11y.mjs); this measures the page around them.
 const screens = [
   { path: '/', state: 'first' },
   { path: '/', state: 'result' },

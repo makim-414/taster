@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT } from './lib.mjs';
-import { TARGETS, renderAll } from '../engine/exports.mjs';
+import { TARGETS, renderAll } from '../packages/engine/exports.mjs';
 
 const OUT = path.join(ROOT, 'exports');
 const files = renderAll();
@@ -19,7 +19,7 @@ const readme = [
   '|---|---|---|',
   ...Object.entries(TARGETS).map(([name, t]) => `| ${t.label} | \`${name}/${path.basename(t.file)}\` | \`${t.file}\` |`),
   '',
-  'Or, in a clone of Taster, let the CLI place them and keep your own text: `node engine/cli.mjs export all --dir <your app>`.',
+  'Or, in a clone of Taster, let the CLI place them and keep your own text: `node packages/engine/cli.mjs export all --dir <your app>`.',
   '',
 ].join('\n');
 

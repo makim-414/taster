@@ -1,9 +1,9 @@
 // First screens of the tone references, opened through the fenced server browser (browser.ts): public addresses only,
-// a request budget per page, GET and HEAD only. engine/tone-capture.mjs does the page work, the same code the local
+// a request budget per page, GET and HEAD only. packages/engine/tone-capture.mjs does the page work, the same code the local
 // MCP server runs: reject buttons only, never accept, and no picture of a bot check or block page.
 // A picture is never written to disk and is kept in server memory up to 30 minutes, so a cold instance simply opens
 // the site again. A site with a cookie banner that offers no reject button comes back as `consent`, with no picture.
-import { readFirstScreen } from '../../../engine/tone-capture.mjs';
+import { readFirstScreen } from '../../../packages/engine/tone-capture.mjs';
 import { closeBrowser, fencePage, launchBrowser, type Budget } from './browser.ts';
 
 export type Shot = { status: 'ok'; image: string } | { status: 'blocked' | 'consent' | 'failed' | 'busy' };

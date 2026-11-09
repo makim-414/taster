@@ -11,7 +11,7 @@ import { DESCRIPTIONS, getAt, setAt } from './check-meta.mjs';
 const patterns = loadPatterns().map((p) => p.data).filter(Boolean);
 const taxonomy = readJson('taxonomy/taxonomy.json');
 const rules = readJson('rules/rules.json');
-const registry = readJson('registry/registry.json');
+const registry = readJson('packages/registry/registry.json');
 
 // rules.fix_patterns <- patterns.replaces
 for (const r of rules.rules) {
@@ -23,7 +23,7 @@ writeJson('rules/rules.json', rules);
 for (const c of registry.components) {
   c.patterns = patterns.filter((p) => (p.components || []).includes(c.id)).map((p) => p.id).sort();
 }
-writeJson('registry/registry.json', registry);
+writeJson('packages/registry/registry.json', registry);
 
 // taxonomy.gaps <- categories with no registry component and fewer than two patterns
 taxonomy.gaps = computeGaps(taxonomy, { patterns, registry: registry.components });
@@ -126,7 +126,7 @@ fs.copyFileSync(path.join(ROOT, 'rules/detect.js'), path.join(ROOT, 'apps/extens
 fs.writeFileSync(path.join(ROOT, 'apps/extension/rules.js'), extensionRules(rules.rules));
 
 // Thinking orb recipes: contributors edit the JSON, the component imports the module.
-fs.writeFileSync(path.join(ROOT, 'registry/src/motion/orb-recipes.ts'), orbRecipesModule(readJson('registry/recipes/orbs.json')));
+fs.writeFileSync(path.join(ROOT, 'packages/registry/src/motion/orb-recipes.ts'), orbRecipesModule(readJson('packages/registry/recipes/orbs.json')));
 
 // Skill bundle
 fs.rmSync(SKILL_DATA, { recursive: true, force: true });

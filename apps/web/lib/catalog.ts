@@ -1,7 +1,7 @@
 // The component catalog for the gallery pages, read from the repository at build time. Server side only.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import registry from '../../../registry/registry.json';
+import registry from '../../../packages/registry/registry.json';
 import patterns from '../../../patterns/INDEX.json';
 import taxonomy from '../../../taxonomy/taxonomy.json';
 import rules from '../../../rules/rules.json';
@@ -86,5 +86,5 @@ export const FAMILIES = taxonomy.families
 export const SURFACES = taxonomy.surfaces.map((s) => ({ id: s.id, name: s.name }));
 
 export function sourceOf(item: CatalogItem): string {
-  return readFileSync(path.resolve(process.cwd(), '../../registry', item.file), 'utf8');
+  return readFileSync(path.resolve(process.cwd(), '../../packages/registry', item.file), 'utf8');
 }

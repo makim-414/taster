@@ -3,11 +3,11 @@
 // The tone step on the web: a pad on two axes, the nearest real sites (first screens opened on request by
 // /api/tone-shot, never written to disk, kept in server memory up to 30 minutes), and Taster parts running live in
 // the tokens of that spot. The rules are
-// engine/tone.mjs, the same code the pick_tone tool runs, so the page and the agent give the same answer.
+// packages/engine/tone.mjs, the same code the pick_tone tool runs, so the page and the agent give the same answer.
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import data from '../../../../taxonomy/tone-refs.json';
-import { axesToTokens, describeAxes, nearestRefs, quadrantOf, readSpot, toneAxes, toneParts, tokensCss, toneUrl, DEMO_BRAND, TONE_AXES, type Spot, type ToneCatalog, type ToneRef } from '../../../../engine/tone.mjs';
+import { axesToTokens, describeAxes, nearestRefs, quadrantOf, readSpot, toneAxes, toneParts, tokensCss, toneUrl, DEMO_BRAND, TONE_AXES, type Spot, type ToneCatalog, type ToneRef } from '../../../../packages/engine/tone.mjs';
 import { CopyButton } from '../components/copy-button';
 import { LookBar } from '../components/look-bar';
 import { LiveFrame, useStudio, type Look } from '../components/studio';

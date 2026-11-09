@@ -19,8 +19,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 // Until the CLI is on npm, the add command runs from a clone of the repository (engine installed once with
-// npm ci --prefix engine) and reads the files from this site, so it works from inside the visitor's own app.
-const installLine = (id: string) => `node /path/to/taster/engine/cli.mjs add ${id} --from ${SITE} --dir src/components/taster`;
+// npm ci --prefix packages/engine) and reads the files from this site, so it works from inside the visitor's own app.
+const installLine = (id: string) => `node /path/to/taster/packages/engine/cli.mjs add ${id} --from ${SITE} --dir src/components/taster`;
 
 export default async function Page({ params }: Params) {
   const { group, name } = await params;

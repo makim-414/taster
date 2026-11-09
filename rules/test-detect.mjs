@@ -1,15 +1,15 @@
 // Runs detect.js against the fixtures in headless Chromium and checks the results.
 // Playwright location: PLAYWRIGHT_CORE or PLAYWRIGHT_CORE_PATH (a path to playwright or playwright-core), else
-// engine/node_modules/playwright, else the installed package.
+// packages/engine/node_modules/playwright, else the installed package.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-// Browser: the Chromium that Playwright installed (npx --prefix engine playwright install chromium), the one CI uses,
+// Browser: the Chromium that Playwright installed (npx --prefix packages/engine playwright install chromium), the one CI uses,
 // so a local run and CI measure with the same build. CHROME_PATH picks another Chrome on purpose.
 const CHROME = process.env.CHROME_PATH;
-const ENGINE_PW = path.join(here, '..', 'engine', 'node_modules', 'playwright');
+const ENGINE_PW = path.join(here, '..', 'packages', 'engine', 'node_modules', 'playwright');
 
 async function loadPlaywright() {
   const candidates = [];
@@ -34,7 +34,7 @@ async function loadPlaywright() {
       // try the next package name
     }
   }
-  throw new Error('playwright not found: run npm ci --prefix engine, or set PLAYWRIGHT_CORE');
+  throw new Error('playwright not found: run npm ci --prefix packages/engine, or set PLAYWRIGHT_CORE');
 }
 
 const failures = [];
@@ -53,7 +53,7 @@ try {
   browser = await chromium.launch(CHROME ? { executablePath: CHROME, headless: true } : { headless: true });
 } catch (e) {
   console.error(String((e && e.message) || e).split('\n')[0]);
-  console.error(CHROME ? `CHROME_PATH does not start: ${CHROME}` : 'Install the browser: npx --prefix engine playwright install chromium');
+  console.error(CHROME ? `CHROME_PATH does not start: ${CHROME}` : 'Install the browser: npx --prefix packages/engine playwright install chromium');
   process.exit(1);
 }
 console.log(`browser: ${CHROME || 'Playwright Chromium'} ${browser.version()}`);

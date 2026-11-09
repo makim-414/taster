@@ -6,7 +6,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright-core';
 
 const root = new URL('../../../../', import.meta.url);
-const tokens = ['registry/src/tokens.css', 'registry/src/themes/light.css'].map((p) => readFileSync(new URL(p, root), 'utf8')).join('\n');
+const tokens = ['packages/registry/src/tokens.css', 'packages/registry/src/themes/light.css'].map((p) => readFileSync(new URL(p, root), 'utf8')).join('\n');
 const rules = JSON.parse(readFileSync(new URL('rules/rules.json', root), 'utf8')).rules;
 // Manual rules are judged by eye, so the picture counts the measured ones apart, as app/page.tsx does.
 const counts = { rules: rules.length, measured: rules.filter((r) => r.detect.level !== 'manual').length };

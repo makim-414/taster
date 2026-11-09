@@ -39,18 +39,18 @@ type Remote = {
 const TONE_URLS = new Map(catalog.refs.map((r) => [r.id, r.url]));
 type Http = { handleMcpRequest: (request: Request, options: { remote: Remote }) => Promise<Response> };
 
-// Loaded at run time from the repository, like engine/diagnose.mjs in lib/diagnose.ts, so the server keeps
+// Loaded at run time from the repository, like packages/engine/diagnose.mjs in lib/diagnose.ts, so the server keeps
 // reading rules, patterns, taxonomy and registry files next to itself.
 let httpPromise: Promise<Http> | null = null;
 function loadHttp(): Promise<Http> {
   const candidates = [
     process.env.TASTER_ENGINE ? path.join(path.dirname(process.env.TASTER_ENGINE), 'http.mjs') : '',
-    path.resolve(process.cwd(), '../../engine/http.mjs'),
-    path.resolve(process.cwd(), 'engine/http.mjs'),
-    '/var/task/engine/http.mjs',
+    path.resolve(process.cwd(), '../../packages/engine/http.mjs'),
+    path.resolve(process.cwd(), 'packages/engine/http.mjs'),
+    '/var/task/packages/engine/http.mjs',
   ].filter(Boolean);
   const found = candidates.find((c) => existsSync(c));
-  if (!found) return Promise.reject(new Error(`engine/http.mjs not found (looked in ${candidates.join(', ')})`));
+  if (!found) return Promise.reject(new Error(`packages/engine/http.mjs not found (looked in ${candidates.join(', ')})`));
   httpPromise ||= import(/* webpackIgnore: true */ /* turbopackIgnore: true */ pathToFileURL(found).href) as Promise<Http>;
   return httpPromise;
 }
@@ -106,7 +106,7 @@ function remoteFor(ip: string, started: number): Remote {
         return { report: trimReport(result.report), shots: result.shots };
       } catch (err) {
         // NotDiagnosedError is a PageLoadError, so a page that is not the site reaches the agent as "load: not
-        // diagnosed: ...", which engine/server.mjs answers as not diagnosed.
+        // diagnosed: ...", which packages/engine/server.mjs answers as not diagnosed.
         if (err instanceof PageLoadError) throw new Error(`load: ${err.message}`);
         throw err;
       }
@@ -146,6 +146,6 @@ async function handle(request: Request): Promise<Response> {
 }
 
 export const POST = handle;
-// Stateless: engine/http.mjs answers GET (no event stream to open) and DELETE (no session to end) with 405.
+// Stateless: packages/engine/http.mjs answers GET (no event stream to open) and DELETE (no session to end) with 405.
 export const GET = handle;
 export const DELETE = handle;

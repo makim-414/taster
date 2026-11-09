@@ -1,4 +1,4 @@
-// Accessibility gate for the site's own pages (the components inside the stage frames are registry/test-a11y.mjs's).
+// Accessibility gate for the site's own pages (the components inside the stage frames are packages/registry/test-a11y.mjs's).
 // Three checks, at 390 and 1280 wide:
 // - axe-core with the WCAG 2.0 A and AA and 2.1 AA rules on every page: the home page, the gallery, every component's
 //   page, the board, the bookmarklet page and the tone page, and the pages that follow the gallery theme in both
@@ -16,7 +16,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import http from 'node:http';
 import { createRequire } from 'node:module';
 import { chromium } from 'playwright-core';
-import { compareBaseline, countsOf } from '../../../engine/lint.mjs';
+import { compareBaseline, countsOf } from '../../../packages/engine/lint.mjs';
 
 const args = process.argv.slice(2);
 const WRITE = args.includes('--write-baseline');
@@ -26,7 +26,7 @@ const require = createRequire(import.meta.url);
 const AXE = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21aa'];
 const BASELINE_FILE = new URL('a11y-baseline.json', import.meta.url);
-const IDS = JSON.parse(readFileSync(new URL('../../../registry/registry.json', import.meta.url), 'utf8')).components.map((c) => c.id);
+const IDS = JSON.parse(readFileSync(new URL('../../../packages/registry/registry.json', import.meta.url), 'utf8')).components.map((c) => c.id);
 const WIDTHS = [390, 1280];
 const PARALLEL = 3;
 const BOARD = '/board?ids=blocks/button,blocks/card';

@@ -29,7 +29,7 @@ function luminance(hex: string): number {
   };
   return 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
 }
-// Text on the brand color: white or near black, whichever reads better. Same choice as engine/brand.mjs.
+// Text on the brand color: white or near black, whichever reads better. Same choice as packages/engine/brand.mjs.
 export function textOn(hex: string): string {
   const l = luminance(hex);
   return (1.05 / (l + 0.05)) >= (l + 0.05) / (luminance('#111111') + 0.05) ? '#ffffff' : '#111111';

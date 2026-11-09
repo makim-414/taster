@@ -19,13 +19,13 @@ import { createAxes } from '../taxonomy/axes.mjs';
 const EPS = 1e-9;
 
 export function loadContext() {
-  const tokens = fs.readFileSync(path.join(ROOT, 'registry/src/tokens.css'), 'utf8');
+  const tokens = fs.readFileSync(path.join(ROOT, 'packages/registry/src/tokens.css'), 'utf8');
   // The first top-level block whose selector list names :root (it is `:root, .theme-dark` since the theme scopes).
   const rootBlock = tokens.match(/^:root(?:\s*,[^{]*)?\{([\s\S]*?)\n\}/m);
   return {
     schema: readJson('taxonomy/taxonomy.schema.json'),
     patterns: loadPatterns().map((p) => p.data).filter(Boolean),
-    registry: readJson('registry/registry.json').components,
+    registry: readJson('packages/registry/registry.json').components,
     rules: readJson('rules/rules.json').rules,
     tokenVars: new Set([...(rootBlock ? rootBlock[1] : '').matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1])),
     parts: readJson('taxonomy/fixtures/parts.json').parts,
@@ -146,7 +146,7 @@ export function checkTaxonomy(tax, ctx) {
   const driver = new Map();
   for (const a of tax.axes) {
     for (const v of a.drives) {
-      if (!ctx.tokenVars.has(v)) err('DRIVES', `axis ${a.id} drives ${v}, which registry/src/tokens.css does not define`);
+      if (!ctx.tokenVars.has(v)) err('DRIVES', `axis ${a.id} drives ${v}, which packages/registry/src/tokens.css does not define`);
       if (driver.has(v)) err('DRIVES', `${v} is driven by both ${driver.get(v)} and ${a.id}`);
       driver.set(v, a.id);
     }

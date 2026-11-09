@@ -1,4 +1,4 @@
-/* Only registry/src/tokens.css and themes/light.css values, read through var().
+/* Only packages/registry/src/tokens.css and themes/light.css values, read through var().
    Two tokens are rebound. --font: the registry default is IBM Plex Sans with IBM Plex Sans KR;
    this site sets Korean body text in Noto Sans KR instead, self-hosted from app/fonts (see
    layout.tsx). The stack leads with a named face, since a system stack alone trips AC-15.

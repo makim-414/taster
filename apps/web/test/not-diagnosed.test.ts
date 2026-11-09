@@ -12,7 +12,7 @@ import { NotDiagnosedError, PageLoadError, hostsOnly, loadFailure, runDiagnosis 
 import { runBrand } from '../lib/brand.ts';
 import { errorText, notDiagnosedText } from '../lib/messages.ts';
 
-const LOAD_FIXTURES = path.resolve(import.meta.dirname, '../../../engine/test/fixtures');
+const LOAD_FIXTURES = path.resolve(import.meta.dirname, '../../../packages/engine/test/fixtures');
 
 // The fence opens only ports 80, 443, 8080 and 8443, and fence.test.ts holds 8080 while the test files run side by
 // side, so these pages are served on 8443.

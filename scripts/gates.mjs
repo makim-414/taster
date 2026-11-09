@@ -22,21 +22,21 @@ export const JOBS = {
     { name: 'Repository data and skill bundle', cmd: 'node scripts/validate.mjs' },
     { name: 'Strict taxonomy, negative controls and balance sweep', cmd: 'node scripts/check-taxonomy.mjs' },
     { name: 'Weighting axes', cmd: 'node --test taxonomy/axes.test.mjs' },
-    { name: 'Rule schema matches the detector', cmd: 'node engine/scripts/check-rules.mjs' },
-    { name: 'Registry typecheck', cmd: 'npm --prefix registry run typecheck' },
-    { name: 'Source lint finds its own bad lines', cmd: 'node engine/lint.mjs --selftest' },
-    { name: 'The registry stays at or under its lint baseline', cmd: 'node engine/lint.mjs registry/src --baseline registry/lint-baseline.json' },
+    { name: 'Rule schema matches the detector', cmd: 'node packages/engine/scripts/check-rules.mjs' },
+    { name: 'Registry typecheck', cmd: 'npm --prefix packages/registry run typecheck' },
+    { name: 'Source lint finds its own bad lines', cmd: 'node packages/engine/lint.mjs --selftest' },
+    { name: 'The registry stays at or under its lint baseline', cmd: 'node packages/engine/lint.mjs packages/registry/src --baseline packages/registry/lint-baseline.json' },
     { name: 'Gate scripts', cmd: 'node --test scripts/check-authors.test.mjs scripts/gates.test.mjs' },
     { name: 'Commit emails are GitHub noreply addresses', cmd: 'node scripts/check-authors.mjs', authors: true },
   ],
   browser: [
     { name: 'Detector fixtures', cmd: 'node rules/test-detect.mjs' },
-    { name: 'Engine CLI and MCP', cmd: 'npm --prefix engine test' },
-    { name: 'Rebuild example stays clean and keeps its content', cmd: 'node engine/scripts/check-rebuild-example.mjs' },
-    { name: 'Icon slot variations match the taxonomy and stay clean', cmd: 'node engine/scripts/check-icon-slots-example.mjs' },
-    { name: 'Every component renders at 1440 and 390 with no page or console error', cmd: 'npm --prefix registry run test-render' },
-    { name: 'Component keyboard, names and reduced motion', cmd: 'node registry/test-a11y.mjs' },
-    { name: 'No component runs what its props hold', cmd: 'node registry/test-injection.mjs' },
+    { name: 'Engine CLI and MCP', cmd: 'npm --prefix packages/engine test' },
+    { name: 'Rebuild example stays clean and keeps its content', cmd: 'node packages/engine/scripts/check-rebuild-example.mjs' },
+    { name: 'Icon slot variations match the taxonomy and stay clean', cmd: 'node packages/engine/scripts/check-icon-slots-example.mjs' },
+    { name: 'Every component renders at 1440 and 390 with no page or console error', cmd: 'npm --prefix packages/registry run test-render' },
+    { name: 'Component keyboard, names and reduced motion', cmd: 'node packages/registry/test-a11y.mjs' },
+    { name: 'No component runs what its props hold', cmd: 'node packages/registry/test-injection.mjs' },
   ],
   web: [
     { name: 'Typecheck and build', cmd: 'npm --prefix apps/web run build' },
@@ -104,12 +104,12 @@ function stopServer() {
   server = null;
 }
 
-// The action's diagnosis (engine/cli.mjs on examples/rebuild) and the same SARIF check as the action job.
+// The action's diagnosis (packages/engine/cli.mjs on examples/rebuild) and the same SARIF check as the action job.
 function sarif() {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'taster-gates-'));
   const file = path.join(dir, 'taster.sarif');
   try {
-    if (!sh('node engine/cli.mjs examples/rebuild/before.html examples/rebuild/after.html', ['--sarif', file, '--fail-on', 'none'])) return false;
+    if (!sh('node packages/engine/cli.mjs examples/rebuild/before.html examples/rebuild/after.html', ['--sarif', file, '--fail-on', 'none'])) return false;
     const s = JSON.parse(readFileSync(file, 'utf8'));
     const count = (uri) => s.runs[0].results.filter((x) => x.locations[0].physicalLocation.artifactLocation.uri === uri).length;
     const before = count('examples/rebuild/before.html');
@@ -139,16 +139,16 @@ async function runGate(gate, base) {
 }
 
 function install() {
-  for (const dir of ['engine', 'registry', 'apps/web']) {
+  for (const dir of ['packages/engine', 'packages/registry', 'apps/web']) {
     if (existsSync(path.join(ROOT, dir, 'node_modules'))) continue;
     console.log(`\n-- npm ci --prefix ${dir}`);
     if (!sh(`npm ci --prefix ${dir} --no-audit --no-fund`)) return false;
   }
-  console.log('\n-- npx --prefix engine playwright install chromium');
-  if (!sh('npx --prefix engine playwright install chromium')) return false;
-  const probe = "require('./engine/node_modules/playwright').chromium.launch().then((b) => b.close())";
+  console.log('\n-- npx --prefix packages/engine playwright install chromium');
+  if (!sh('npx --prefix packages/engine playwright install chromium')) return false;
+  const probe = "require('./packages/engine/node_modules/playwright').chromium.launch().then((b) => b.close())";
   if (quiet(process.execPath, ['-e', probe]).status !== 0) {
-    console.log('Chromium is installed but does not start. On Linux, add its libraries: npx --prefix engine playwright install-deps chromium');
+    console.log('Chromium is installed but does not start. On Linux, add its libraries: npx --prefix packages/engine playwright install-deps chromium');
     return false;
   }
   return true;

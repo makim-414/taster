@@ -195,7 +195,7 @@ node /path/to/taster/engine/cli.mjs add blocks/button blocks/citations --dir src
 Copies each component with every file it imports and the token files into `--dir`, relative to the folder you run it
 in, with Taster's MIT license next to them; no shadcn or other CLI involved. `--from https://taster-six.vercel.app`
 reads the component files from the hosted copy instead of the clone; the command itself still runs from the clone
-until the npm release. See [registry/README.md](registry/README.md).
+until the npm release. See [packages/registry/README.md](packages/registry/README.md).
 
 ### Choose by eye with your agent
 

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "note": "taster lint baseline: counts per file and check may only go down",
+  "counts": {
+    "packages/registry/src/blocks/coverflow-carousel.tsx::SRC-01": 3,
+    "packages/registry/src/blocks/liquid-nav.tsx::SRC-01": 6,
+    "packages/registry/src/blocks/location-map.tsx::SRC-02": 2,
+    "packages/registry/src/blocks/side-folder.tsx::SRC-01": 3,
+    "packages/registry/src/commerce/buy-box.tsx::SRC-02": 1,
+    "packages/registry/src/commerce/cart.tsx::SRC-02": 1,
+    "packages/registry/src/content/article.tsx::SRC-02": 1,
+    "packages/registry/src/content/pull-quote.tsx::SRC-02": 1,
+    "packages/registry/src/content/section-heading.tsx::SRC-02": 1,
+    "packages/registry/src/marketing/cta-band.tsx::SRC-02": 1,
+    "packages/registry/src/marketing/customer-quote.tsx::SRC-02": 1,
+    "packages/registry/src/marketing/feature-rows.tsx::SRC-02": 1,
+    "packages/registry/src/marketing/photo-hero.tsx::SRC-02": 2,
+    "packages/registry/src/marketing/product-hero.tsx::SRC-02": 1,
+    "packages/registry/src/marketing/site-footer.tsx::SRC-02": 1,
+    "packages/registry/src/marketing/site-header.tsx::SRC-02": 1,
+    "packages/registry/src/marketing/split-form-hero.tsx::SRC-02": 2,
+    "packages/registry/src/motion/_color.ts::SRC-01": 1,
+    "packages/registry/src/motion/glass-logo-reveal.tsx::SRC-01": 1,
+    "packages/registry/src/motion/light-beams.tsx::SRC-01": 3,
+    "packages/registry/src/motion/mesh-drift.tsx::SRC-01": 5
+  }
+}

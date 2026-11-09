@@ -1,11 +1,11 @@
 version: 2
 updates:
-  # The root package.json is the published command and lists the same dependencies as engine/,
+  # The root package.json is the published command and lists the same dependencies as packages/engine/,
   # so a version moves in both at once, one pull request per dependency.
   - package-ecosystem: npm
     directories:
       - /
-      - /engine
+      - /packages/engine
     schedule:
       interval: weekly
     cooldown:
@@ -25,7 +25,7 @@ updates:
   # The registry and the web app: minor and patch updates in one pull request per folder.
   - package-ecosystem: npm
     directories:
-      - /registry
+      - /packages/registry
       - /apps/web
     schedule:
       interval: weekly

@@ -21,7 +21,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-          cache-dependency-path: registry/package-lock.json
+          cache-dependency-path: packages/registry/package-lock.json
       - name: Generated docs are current
         run: |
           node scripts/build-docs.mjs
@@ -37,16 +37,16 @@ jobs:
       - name: Weighting axes
         run: node --test taxonomy/axes.test.mjs
       - name: Rule schema matches the detector
-        run: node engine/scripts/check-rules.mjs
+        run: node packages/engine/scripts/check-rules.mjs
       - name: Install the registry
         timeout-minutes: 8
-        run: timeout 240 npm ci --prefix registry --prefer-offline --no-audit --no-fund || timeout 240 npm ci --prefix registry --prefer-offline --no-audit --no-fund
+        run: timeout 240 npm ci --prefix packages/registry --prefer-offline --no-audit --no-fund || timeout 240 npm ci --prefix packages/registry --prefer-offline --no-audit --no-fund
       - name: Registry typecheck
-        run: npm --prefix registry run typecheck
+        run: npm --prefix packages/registry run typecheck
       - name: Source lint finds its own bad lines, and the registry stays at or under its baseline
         run: |
-          node engine/lint.mjs --selftest
-          node engine/lint.mjs registry/src --baseline registry/lint-baseline.json
+          node packages/engine/lint.mjs --selftest
+          node packages/engine/lint.mjs packages/registry/src --baseline packages/registry/lint-baseline.json
       - name: Gate scripts
         run: node --test scripts/check-authors.test.mjs scripts/gates.test.mjs
       - name: Commit emails on this pull request are GitHub noreply addresses
@@ -64,17 +64,17 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: |
-            engine/package-lock.json
-            registry/package-lock.json
+            packages/engine/package-lock.json
+            packages/registry/package-lock.json
       - name: Install the engine and the registry
         timeout-minutes: 8
         run: |
-          for dir in engine registry; do
+          for dir in packages/engine packages/registry; do
             timeout 240 npm ci --prefix "$dir" --prefer-offline --no-audit --no-fund || timeout 240 npm ci --prefix "$dir" --prefer-offline --no-audit --no-fund
           done
       - name: Playwright version
         id: playwright
-        run: echo "version=$(node -p "[...new Set(['engine', 'registry'].map((d) => require('./' + d + '/package-lock.json').packages['node_modules/playwright-core'].version))].join('-')")" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(node -p "[...new Set(['packages/engine', 'packages/registry'].map((d) => require('./' + d + '/package-lock.json').packages['node_modules/playwright-core'].version))].join('-')")" >> "$GITHUB_OUTPUT"
       - name: Chromium from the cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -91,27 +91,27 @@ jobs:
         timeout-minutes: 12
         run: |
           fc-cache -f > /dev/null 2>&1 || true
-          npx --prefix engine playwright install chromium
-          npx --prefix registry playwright-core install chromium
-          if ! (node -e "require('./engine/node_modules/playwright').chromium.launch().then((b) => b.close())" && for l in ko ja zh th; do fc-list ":lang=$l" | grep -q . || exit 1; done); then
-            npx --prefix engine playwright install-deps chromium
+          npx --prefix packages/engine playwright install chromium
+          npx --prefix packages/registry playwright-core install chromium
+          if ! (node -e "require('./packages/engine/node_modules/playwright').chromium.launch().then((b) => b.close())" && for l in ko ja zh th; do fc-list ":lang=$l" | grep -q . || exit 1; done); then
+            npx --prefix packages/engine playwright install-deps chromium
             mkdir -p ~/.local/share/fonts/ci
             for p in fonts-ipafont-gothic fonts-wqy-zenhei fonts-tlwg-loma-otf fonts-freefont-ttf fonts-unifont; do dpkg -L "$p" 2>/dev/null; done | grep -E '\.(ttf|otf|ttc)$' | xargs -r cp -t ~/.local/share/fonts/ci/
           fi
       - name: Detector fixtures
         run: node rules/test-detect.mjs
       - name: Engine CLI and MCP
-        run: npm --prefix engine test
+        run: npm --prefix packages/engine test
       - name: Rebuild example stays clean and keeps its content
-        run: node engine/scripts/check-rebuild-example.mjs
+        run: node packages/engine/scripts/check-rebuild-example.mjs
       - name: Icon slot variations match the taxonomy and stay clean
-        run: node engine/scripts/check-icon-slots-example.mjs
+        run: node packages/engine/scripts/check-icon-slots-example.mjs
       - name: Every component renders at 1440 and 390 with no page or console error
-        run: npm --prefix registry run test-render
+        run: npm --prefix packages/registry run test-render
       - name: Component keyboard focus, accessible names and reduced motion
-        run: node registry/test-a11y.mjs
+        run: node packages/registry/test-a11y.mjs
       - name: No component runs what its props hold
-        run: node registry/test-injection.mjs
+        run: node packages/registry/test-injection.mjs
   web:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -123,15 +123,15 @@ jobs:
           cache: npm
           cache-dependency-path: |
             apps/web/package-lock.json
-            engine/package-lock.json
+            packages/engine/package-lock.json
       - name: Install the web app and the engine
         timeout-minutes: 8
         run: |
           timeout 240 npm ci --prefix apps/web --prefer-offline --no-audit --no-fund || timeout 240 npm ci --prefix apps/web --prefer-offline --no-audit --no-fund
-          timeout 240 npm ci --prefix engine --omit=dev --ignore-scripts --prefer-offline --no-audit --no-fund || timeout 240 npm ci --prefix engine --omit=dev --ignore-scripts --prefer-offline --no-audit --no-fund
+          timeout 240 npm ci --prefix packages/engine --omit=dev --ignore-scripts --prefer-offline --no-audit --no-fund || timeout 240 npm ci --prefix packages/engine --omit=dev --ignore-scripts --prefer-offline --no-audit --no-fund
       - name: Playwright version
         id: playwright
-        run: echo "version=$(node -p "[...new Set(['engine', 'apps/web'].map((d) => require('./' + d + '/package-lock.json').packages['node_modules/playwright-core'].version))].join('-')")" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(node -p "[...new Set(['packages/engine', 'apps/web'].map((d) => require('./' + d + '/package-lock.json').packages['node_modules/playwright-core'].version))].join('-')")" >> "$GITHUB_OUTPUT"
       - name: Chromium from the cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:

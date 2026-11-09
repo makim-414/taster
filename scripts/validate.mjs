@@ -5,7 +5,7 @@ import path from 'node:path';
 import * as meta from './check-meta.mjs';
 import { ROOT, PATTERN_SECTIONS, readJson, loadPatterns, bundleFiles, parseFrontmatter } from './lib.mjs';
 import { runAll as runTaxonomyChecks } from './check-taxonomy.mjs';
-import { previewFile, stageHash } from '../registry/stage-hash.mjs';
+import { previewFile, stageHash } from '../packages/registry/stage-hash.mjs';
 
 const errors = [];
 const err = (m) => errors.push(m);
@@ -42,20 +42,20 @@ for (const r of rules) {
 }
 
 // Registry
-const registry = readJson('registry/registry.json').components;
+const registry = readJson('packages/registry/registry.json').components;
 const compIds = new Set(registry.map((c) => c.id));
 for (const c of registry) {
-  if (!fs.existsSync(path.join(ROOT, 'registry', c.file))) err(`registry ${c.id} file missing: ${c.file}`);
+  if (!fs.existsSync(path.join(ROOT, 'packages/registry', c.file))) err(`registry ${c.id} file missing: ${c.file}`);
   if (!catIds.has(c.category)) err(`registry ${c.id} unknown category ${c.category}`);
 }
 
 // The stage page and preview pictures the gallery and the MCP tools show
-const REBUILD = 'run: npm --prefix registry run build-stage';
-if (!fs.existsSync(path.join(ROOT, 'registry/stage/index.html'))) err(`registry/stage/index.html missing, ${REBUILD}`);
-else if (readJson('registry/stage/meta.json').sourceHash !== stageHash()) err(`registry/stage is older than the components, ${REBUILD}`);
+const REBUILD = 'run: npm --prefix packages/registry run build-stage';
+if (!fs.existsSync(path.join(ROOT, 'packages/registry/stage/index.html'))) err(`packages/registry/stage/index.html missing, ${REBUILD}`);
+else if (readJson('packages/registry/stage/meta.json').sourceHash !== stageHash()) err(`packages/registry/stage is older than the components, ${REBUILD}`);
 for (const c of registry) {
   for (const theme of ['dark', 'light']) {
-    if (!fs.existsSync(path.join(ROOT, 'registry/previews', previewFile(c.id, theme)))) err(`registry ${c.id} has no ${theme} preview, ${REBUILD}`);
+    if (!fs.existsSync(path.join(ROOT, 'packages/registry/previews', previewFile(c.id, theme)))) err(`registry ${c.id} has no ${theme} preview, ${REBUILD}`);
   }
 }
 
@@ -98,7 +98,7 @@ for (const p of files) {
       for (const r of s.rules || []) if (!ruleIds.has(r)) err(`icon slot ${s.id} unknown rule ${r}`);
       for (const pid of s.patterns || []) if (!fileIds.has(pid)) err(`icon slot ${s.id} unknown pattern ${pid}`);
       if (s.id !== 'no-icon' && !(s.patterns || []).length) err(`icon slot ${s.id} needs at least one pattern`);
-      // Five worked variations per slot, rendered in examples/icon-slots/ (checked there by engine/scripts/check-icon-slots-example.mjs).
+      // Five worked variations per slot, rendered in examples/icon-slots/ (checked there by packages/engine/scripts/check-icon-slots-example.mjs).
       const vars = s.variations || [];
       if (vars.length !== 5) err(`icon slot ${s.id} needs 5 variations, has ${vars.length}`);
       for (const v of vars) {
@@ -133,16 +133,16 @@ for (const e of meta.codexMcpErrors(cx, (rel) => fs.existsSync(path.join(ROOT, r
 // dependencies and Node versions, and the files npm would publish.
 const counts = meta.metaCounts({ rules, patterns: files, components: registry });
 {
-  const json = Object.fromEntries([...new Set([...meta.DESCRIPTIONS.map((d) => d.file), 'engine/package.json'])].map((f) => [f, readJson(f)]));
+  const json = Object.fromEntries([...new Set([...meta.DESCRIPTIONS.map((d) => d.file), 'packages/engine/package.json'])].map((f) => [f, readJson(f)]));
   for (const d of meta.DESCRIPTIONS) {
     const text = d.text(counts);
     if (meta.getAt(json[d.file], d.at) !== text) err(`${d.file} ${d.at.join('.')} is stale (run node scripts/build-docs.mjs)`);
     if (d.max && text.length > d.max) err(`${d.file} ${d.at.join('.')} has ${text.length} characters, the limit is ${d.max}`);
   }
   for (const f of meta.COUNTED_FILES) for (const e of meta.countErrors(f, fs.readFileSync(path.join(ROOT, f), 'utf8'), counts)) err(e);
-  const sources = Object.fromEntries(['engine/server.mjs', 'engine/acp.mjs', 'engine/sarif.mjs'].map((f) => [f, fs.readFileSync(path.join(ROOT, f), 'utf8')]));
+  const sources = Object.fromEntries(['packages/engine/server.mjs', 'packages/engine/acp.mjs', 'packages/engine/sarif.mjs'].map((f) => [f, fs.readFileSync(path.join(ROOT, f), 'utf8')]));
   for (const e of meta.versionErrors(json, sources)) err(e);
-  for (const e of meta.packageErrors(json['package.json'], json['engine/package.json'], fs.readFileSync(path.join(ROOT, '.nvmrc'), 'utf8'), readJson('engine/package-lock.json'))) err(e);
+  for (const e of meta.packageErrors(json['package.json'], json['packages/engine/package.json'], fs.readFileSync(path.join(ROOT, '.nvmrc'), 'utf8'), readJson('packages/engine/package-lock.json'))) err(e);
   const pack = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: ROOT, encoding: 'utf8', shell: process.platform === 'win32' });
   let packed = null;
   try {
@@ -159,7 +159,7 @@ for (const e of meta.creditErrors(registry, Object.fromEntries(files.filter((p) 
 // The registry's own default type must pass the repo's own font rules: not a stock default (AC-15), not one of the
 // usual substitutes (TYP-02), and a Hangul family in the stack (KO-02).
 {
-  const tokens = fs.readFileSync(path.join(ROOT, 'registry/src/tokens.css'), 'utf8');
+  const tokens = fs.readFileSync(path.join(ROOT, 'packages/registry/src/tokens.css'), 'utf8');
   const detect = fs.readFileSync(path.join(ROOT, 'rules/detect.js'), 'utf8');
   const list = (name) => {
     const m = detect.match(new RegExp(`var ${name} = \\{([\\s\\S]*?)\\};`));
@@ -238,8 +238,8 @@ for (const e of meta.npxErrors(readJson('package.json'), docs)) err(e);
 // Orb recipes: each one is complete, uses only known keys and in-range values, and the generated module is current.
 {
   const { orbRecipesModule } = await import('./lib.mjs');
-  const recipes = readJson('registry/recipes/orbs.json');
-  const src = fs.readFileSync(path.join(ROOT, 'registry/src/motion/_orb-recipe.ts'), 'utf8');
+  const recipes = readJson('packages/registry/recipes/orbs.json');
+  const src = fs.readFileSync(path.join(ROOT, 'packages/registry/src/motion/_orb-recipe.ts'), 'utf8');
   const states = src.match(/ORB_STATES = \[(.*?)\]/)[1].match(/'([a-z]+)'/g).map((x) => x.slice(1, -1));
   const seen = new Set();
   for (const r of recipes) {
@@ -263,8 +263,8 @@ for (const e of meta.npxErrors(readJson('package.json'), docs)) err(e);
       else if (v < Number(m[1]) || v > Number(m[2])) err(`${at}: ${k} out of range`);
     }
   }
-  const mod = path.join(ROOT, 'registry/src/motion/orb-recipes.ts');
-  if (!fs.existsSync(mod) || fs.readFileSync(mod, 'utf8') !== orbRecipesModule(recipes)) err('registry/src/motion/orb-recipes.ts is stale (run node scripts/build-docs.mjs)');
+  const mod = path.join(ROOT, 'packages/registry/src/motion/orb-recipes.ts');
+  if (!fs.existsSync(mod) || fs.readFileSync(mod, 'utf8') !== orbRecipesModule(recipes)) err('packages/registry/src/motion/orb-recipes.ts is stale (run node scripts/build-docs.mjs)');
 }
 
 if (errors.length) {

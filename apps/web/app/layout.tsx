@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
-import '../../../registry/src/tokens.css';
-import '../../../registry/src/themes/light.css';
+import '../../../packages/registry/src/tokens.css';
+import '../../../packages/registry/src/themes/light.css';
 import './globals.css';
 import { PREVIEW, SITE } from '../lib/page-meta';
 

@@ -1,4 +1,4 @@
-// Runs the repository's own diagnosis (engine/diagnose.mjs: detectOnce and summarize, which run
+// Runs the repository's own diagnosis (packages/engine/diagnose.mjs: detectOnce and summarize, which run
 // rules/detect.js) inside the fenced server browser. Nothing here measures slop by itself.
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -17,7 +17,7 @@ export type RuleHit = {
   fix_patterns: string[];
   findings: { width: number; selector: string; text?: string; evidence?: unknown }[];
 };
-// What engine/blocked.mjs classifyLoad says about a page that came back but is not the site.
+// What packages/engine/blocked.mjs classifyLoad says about a page that came back but is not the site.
 export type NotDiagnosed = { reason: 'bot-check' | 'block-page' | 'http-error' | 'sign-in'; status: number | null; title: string; finalUrl: string; message: string };
 export type Summary = {
   url: string;
@@ -45,13 +45,13 @@ let enginePromise: Promise<Engine> | null = null;
 function engineFile(): string {
   const candidates = [
     process.env.TASTER_ENGINE,
-    path.resolve(process.cwd(), '../../engine/diagnose.mjs'),
-    path.resolve(process.cwd(), 'engine/diagnose.mjs'),
+    path.resolve(process.cwd(), '../../packages/engine/diagnose.mjs'),
+    path.resolve(process.cwd(), 'packages/engine/diagnose.mjs'),
     // Vercel keeps the traced repo layout under /var/task.
-    '/var/task/engine/diagnose.mjs',
+    '/var/task/packages/engine/diagnose.mjs',
   ].filter(Boolean) as string[];
   const found = candidates.find((c) => existsSync(c));
-  if (!found) throw new Error(`engine/diagnose.mjs not found (looked in ${candidates.join(', ')})`);
+  if (!found) throw new Error(`packages/engine/diagnose.mjs not found (looked in ${candidates.join(', ')})`);
   return found;
 }
 export function loadEngine(): Promise<Engine> {

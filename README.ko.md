@@ -194,7 +194,7 @@ node /path/to/taster/engine/cli.mjs add blocks/button blocks/citations --dir src
 부품마다 그 부품이 import 하는 파일과 토큰 파일을 함께, 명령을 실행한 폴더 기준 `--dir` 아래로 복사하고, Taster 의
 MIT 라이선스도 옆에 둡니다. shadcn 같은 다른 CLI 는 필요 없습니다. `--from https://taster-six.vercel.app` 를 붙이면
 부품 파일을 클론 대신 호스팅 사본에서 읽지만, npm 게시 전까지 명령 자체는 클론에서 실행합니다. 자세한 내용은
-[registry/README.md](registry/README.md).
+[packages/registry/README.md](packages/registry/README.md).
 
 ### 에이전트와 함께 눈으로 고르기
 
