@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="../../packages/registry/src/tokens.css">
 <link rel="stylesheet" href="theme.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <!-- The second screen, built from the same stylesheet as after.html and checked against it with check_consistency. -->
 <link rel="stylesheet" href="site.css">
 </head>
@@ -20,26 +20,29 @@
   </header>
 
   <main>
-    <section class="hero">
+    <section class="hero" aria-labelledby="title">
       <div class="wrap">
-        <p class="kicker">Pricing</p>
-        <h1>One plan per stage of your finance team</h1>
-        <p class="lead">Every plan reconciles, closes and reports in one place. Prices come from the owner; this sample leaves them out instead of inventing them.</p>
-        <div class="actions">
-          <a class="primary" href="#">Get started</a>
-          <a class="text-link" href="#">Book a demo</a>
+        <div class="copy">
+          <p class="kicker">Pricing</p>
+          <h1 id="title">One plan per stage <span class="soft">of your finance team</span></h1>
+          <p class="lead">Every plan reconciles, closes and reports in one place.</p>
+          <div class="actions">
+            <a class="primary" href="#">Get started</a>
+            <a class="text-link" href="#">Book a demo</a>
+          </div>
+          <p class="note">Prices come from the owner; this sample leaves them out instead of inventing them.</p>
         </div>
-      </div>
-    </section>
 
-    <section class="features">
-      <div class="wrap">
-        <h2>Plans</h2>
-        <div class="rows">
-          <div class="row"><h3>Starter</h3><p>One entity, monthly close, bank feeds and matching.</p><span class="state">Self serve</span></div>
-          <div class="row"><h3>Growth</h3><p>Several entities, a shared close checklist and approvals.</p><span class="state">Self serve</span></div>
-          <div class="row"><h3>Enterprise</h3><p>Custom controls, an audit trail and a named contact.</p><span class="state">Book a demo</span></div>
-        </div>
+        <section class="panel" aria-labelledby="plans">
+          <h2 id="plans">Plans</h2>
+          <p class="sub">Each plan adds what a larger close needs, from one entity to many.</p>
+          <p class="cap">How each plan starts</p>
+          <ul class="rows">
+            <li class="row"><h3>Starter</h3><p>One entity, monthly close, bank feeds and matching.</p><span class="state">Self serve</span></li>
+            <li class="row"><h3>Growth</h3><p>Several entities, a shared close checklist and approvals.</p><span class="state">Self serve</span></li>
+            <li class="row"><h3>Enterprise</h3><p>Custom controls, an audit trail and a named contact.</p><span class="state">Book a demo</span></li>
+          </ul>
+        </section>
       </div>
     </section>
   </main>
