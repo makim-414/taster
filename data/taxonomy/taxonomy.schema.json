@@ -1,0 +1,657 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "taxonomy.schema.json",
+  "title": "Taster taxonomy",
+  "description": "Shape of data/taxonomy/taxonomy.json. Cross references, partition, decision key, constraints and coverage are checked by scripts/check-taxonomy.mjs, not by this schema. See data/taxonomy/SCHEMA.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "version",
+    "about",
+    "features",
+    "classify",
+    "families",
+    "categories",
+    "uses",
+    "surfaces",
+    "axes",
+    "snap",
+    "relevance",
+    "constraints",
+    "ruleMap",
+    "gaps",
+    "iconography"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "about": {
+      "type": "string",
+      "minLength": 10
+    },
+    "features": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/feature"
+      }
+    },
+    "classify": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    },
+    "families": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/family"
+      }
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/category"
+      }
+    },
+    "uses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/use"
+      }
+    },
+    "surfaces": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/surface"
+      }
+    },
+    "axes": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/axis"
+      }
+    },
+    "snap": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/snap"
+      }
+    },
+    "relevance": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": {
+          "$ref": "#/$defs/id"
+        },
+        "additionalProperties": {
+          "$ref": "#/$defs/quarter"
+        }
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/constraint"
+      }
+    },
+    "ruleMap": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/ruleId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/ruleMapEntry"
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/gap"
+      }
+    },
+    "iconography": {
+      "type": "object",
+      "required": [
+        "summary",
+        "set",
+        "slots"
+      ]
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "featureId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
+    },
+    "ruleId": {
+      "type": "string",
+      "pattern": "^[A-Z]{2,3}-\\d{2}$"
+    },
+    "cssVar": {
+      "type": "string",
+      "pattern": "^--[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "quarter": {
+      "enum": [
+        0,
+        0.25,
+        0.5,
+        0.75,
+        1
+      ]
+    },
+    "unit": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "sentence": {
+      "description": "One sentence: starts with a capital or a digit, ends with a period, no second sentence inside.",
+      "type": "string",
+      "minLength": 10,
+      "pattern": "^(?!.*\\.\\s+[A-Z])[A-Z0-9].*\\.$"
+    },
+    "nameKo": {
+      "description": "Korean name. Korean appears only here and in README.ko.md.",
+      "type": "string",
+      "pattern": "\\p{Script=Hangul}"
+    },
+    "phrase": {
+      "type": "string",
+      "minLength": 3
+    },
+    "exclude": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "what",
+        "goes_to"
+      ],
+      "properties": {
+        "what": {
+          "$ref": "#/$defs/phrase"
+        },
+        "goes_to": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "feature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "definition"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/featureId"
+        },
+        "definition": {
+          "$ref": "#/$defs/sentence"
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "all",
+        "none",
+        "category",
+        "why"
+      ],
+      "properties": {
+        "all": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/featureId"
+          }
+        },
+        "none": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/featureId"
+          }
+        },
+        "category": {
+          "$ref": "#/$defs/id"
+        },
+        "why": {
+          "$ref": "#/$defs/sentence"
+        },
+        "fallback": {
+          "const": true
+        }
+      }
+    },
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "name_ko",
+        "definition",
+        "includes",
+        "excludes",
+        "examples",
+        "categories"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/phrase"
+        },
+        "name_ko": {
+          "$ref": "#/$defs/nameKo"
+        },
+        "definition": {
+          "$ref": "#/$defs/sentence"
+        },
+        "includes": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/phrase"
+          }
+        },
+        "excludes": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/exclude"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/phrase"
+          }
+        },
+        "categories": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "category": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "name_ko",
+        "family",
+        "definition",
+        "includes",
+        "excludes",
+        "examples"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/phrase"
+        },
+        "name_ko": {
+          "$ref": "#/$defs/nameKo"
+        },
+        "family": {
+          "$ref": "#/$defs/id"
+        },
+        "definition": {
+          "$ref": "#/$defs/sentence"
+        },
+        "includes": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/phrase"
+          }
+        },
+        "excludes": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/exclude"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/phrase"
+          }
+        }
+      }
+    },
+    "use": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "name_ko",
+        "question",
+        "definition",
+        "includes",
+        "excludes",
+        "examples"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/phrase"
+        },
+        "name_ko": {
+          "$ref": "#/$defs/nameKo"
+        },
+        "question": {
+          "type": "string",
+          "pattern": "[.?]$"
+        },
+        "definition": {
+          "$ref": "#/$defs/sentence"
+        },
+        "includes": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/phrase"
+          }
+        },
+        "excludes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/exclude"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/phrase"
+          }
+        }
+      }
+    },
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "name_ko",
+        "definition",
+        "includes",
+        "excludes",
+        "examples"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/phrase"
+        },
+        "name_ko": {
+          "$ref": "#/$defs/nameKo"
+        },
+        "definition": {
+          "$ref": "#/$defs/sentence"
+        },
+        "includes": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/phrase"
+          }
+        },
+        "excludes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/exclude"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/phrase"
+          }
+        }
+      }
+    },
+    "axis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "name_ko",
+        "definition",
+        "anchors",
+        "drives",
+        "default",
+        "rationale"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/phrase"
+        },
+        "name_ko": {
+          "$ref": "#/$defs/nameKo"
+        },
+        "definition": {
+          "$ref": "#/$defs/sentence"
+        },
+        "anchors": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "0",
+            "0.5",
+            "1"
+          ],
+          "properties": {
+            "0": {
+              "$ref": "#/$defs/phrase"
+            },
+            "1": {
+              "$ref": "#/$defs/phrase"
+            },
+            "0.5": {
+              "$ref": "#/$defs/phrase"
+            }
+          }
+        },
+        "drives": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/cssVar"
+          }
+        },
+        "default": {
+          "$ref": "#/$defs/unit"
+        },
+        "rationale": {
+          "$ref": "#/$defs/phrase"
+        }
+      }
+    },
+    "snap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "steps",
+        "names"
+      ],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/unit"
+          }
+        },
+        "names": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "principle",
+        "terms",
+        "op",
+        "bound",
+        "prevents"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "principle": {
+          "$ref": "#/$defs/phrase"
+        },
+        "terms": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "#/$defs/id"
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "op": {
+          "enum": [
+            "<=",
+            ">="
+          ]
+        },
+        "bound": {
+          "type": "number"
+        },
+        "prevents": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/ruleId"
+          }
+        }
+      }
+    },
+    "ruleMapEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "categories",
+        "axis"
+      ],
+      "properties": {
+        "categories": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "axis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        }
+      }
+    },
+    "gap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "patterns",
+        "components"
+      ],
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/id"
+        },
+        "patterns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "components": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

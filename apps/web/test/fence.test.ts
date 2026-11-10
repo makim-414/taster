@@ -1,0 +1,201 @@
+// Runs the real server path (packages/engine/diagnose.mjs through the fenced browser) against local
+// servers. The fixture server is on loopback, so these tests pass the test-only allowLoopback
+// flag; private ranges stay blocked even then, which is what the redirect cases check.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import http from 'node:http';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import type { AddressInfo } from 'node:net';
+
+import { fencePage, launchBrowser, type Budget } from '../lib/browser.ts';
+import { loadEngine, runDiagnosis } from '../lib/diagnose.ts';
+import { runBrand } from '../lib/brand.ts';
+import { allKept, captureShots } from '../lib/tone-shot.ts';
+
+const FIXTURES = path.resolve(import.meta.dirname, '../../../data/rules/fixtures');
+const TONE_FIXTURES = path.resolve(import.meta.dirname, '../../../packages/engine/test/fixtures');
+
+
+function serve(): Promise<{ base: string; close: () => void }> {
+  const server = http.createServer(async (req, res) => {
+    const url = new URL(req.url || '/', 'http://x');
+    if (url.pathname === '/to-metadata') return res.writeHead(302, { location: 'http://169.254.169.254/latest/meta-data/' }).end();
+    if (url.pathname === '/to-private') return res.writeHead(301, { location: 'http://10.0.0.1/' }).end();
+    if (url.pathname === '/to-private-name') return res.writeHead(302, { location: 'http://10.0.0.1.nip.io/' }).end();
+    if (url.pathname === '/hop') return res.writeHead(302, { location: '/fixtures/clean.html' }).end();
+    if (url.pathname === '/subresource-private') {
+      return res.writeHead(200, { 'content-type': 'text/html' }).end('<!doctype html><html lang="en"><body><img src="http://169.254.169.254/x.png"><p>hi</p></body></html>');
+    }
+    if (url.pathname.startsWith('/tone-fixtures/')) {
+      try {
+        const body = await readFile(path.join(TONE_FIXTURES, path.basename(url.pathname)));
+        return res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }).end(body);
+      } catch {
+        return res.writeHead(404).end();
+      }
+    }
+    // A bot check served with 403, the shape the engine's load check treats as "not the site".
+    if (url.pathname === '/challenge') {
+      const body = await readFile(path.join(TONE_FIXTURES, 'load-403-challenge.html'));
+      return res.writeHead(403, { 'content-type': 'text/html; charset=utf-8' }).end(body);
+    }
+    if (url.pathname.startsWith('/fixtures/')) {
+      try {
+        const body = await readFile(path.join(FIXTURES, path.basename(url.pathname)));
+        return res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }).end(body);
+      } catch {
+        return res.writeHead(404).end();
+      }
+    }
+    res.writeHead(404).end();
+  });
+  return new Promise((resolve) => server.listen(0, '127.0.0.1', () => resolve({ base: `http://127.0.0.1:${(server.address() as AddressInfo).port}`, close: () => server.close() })));
+}
+
+// Ports outside the allow list (80, 443, 8080, 8443) are refused even in tests, so the local
+// server is reached through a small forwarder on 8080.
+async function serveOn8080(): Promise<{ base: string; close: () => void } | null> {
+  const inner = await serve();
+  const port = Number(new URL(inner.base).port);
+  const proxy = http.createServer((req, res) => {
+    const up = http.request({ host: '127.0.0.1', port, path: req.url, method: req.method, headers: req.headers }, (r) => {
+      res.writeHead(r.statusCode || 502, r.headers);
+      r.pipe(res);
+    });
+    up.on('error', () => res.writeHead(502).end());
+    req.pipe(up);
+  });
+  return new Promise((resolve) => {
+    proxy.once('error', () => {
+      inner.close();
+      resolve(null);
+    });
+    proxy.listen(8080, '127.0.0.1', () => resolve({ base: 'http://127.0.0.1:8080', close: () => (proxy.close(), inner.close()) }));
+  });
+}
+
+test('fence: redirects into private space and private subresources are blocked', async (t) => {
+  const srv = await serveOn8080();
+  if (!srv) return t.skip('port 8080 is busy');
+  const browser = await launchBrowser();
+  try {
+    for (const hop of ['/to-metadata', '/to-private', '/to-private-name']) {
+      const page = await browser.newPage();
+      const budget: Budget = { requests: 0, bytes: 0, blocked: null, allowLoopback: true };
+      await fencePage(page, budget);
+      await assert.rejects(page.goto(`${srv.base}${hop}`, { timeout: 15000 }), hop);
+      assert.ok(budget.blocked, `${hop} should be blocked by the guard, got ${budget.blocked}`);
+      await page.close();
+    }
+    // A same-site redirect is followed and lands on the fixture.
+    const page = await browser.newPage();
+    const budget: Budget = { requests: 0, bytes: 0, blocked: null, allowLoopback: true };
+    await fencePage(page, budget);
+    const res = await page.goto(`${srv.base}/hop`, { timeout: 15000 });
+    assert.equal(new URL(page.url()).pathname, '/fixtures/clean.html');
+    assert.equal(res?.status(), 200);
+    // An image pointing at the metadata address fails instead of loading.
+    const failed: string[] = [];
+    page.on('requestfailed', (r) => failed.push(r.url()));
+    await page.goto(`${srv.base}/subresource-private`, { timeout: 15000 });
+    assert.ok(failed.some((u) => u.startsWith('http://169.254.169.254/')), `metadata image should fail, failed=${failed.join(',')}`);
+    await page.close();
+  } finally {
+    await browser.close();
+    srv.close();
+  }
+
+});
+
+test('fence: the browser has no direct network route (dead proxy)', async () => {
+  const browser = await launchBrowser();
+  try {
+    const page = await browser.newPage();
+    await assert.rejects(page.goto('http://example.com/', { timeout: 10000 }));
+    await page.close();
+  } finally {
+    await browser.close();
+  }
+});
+
+test('engine through the fence: slop.html is hit, clean.html has zero findings', async (t) => {
+  const srv = await serveOn8080();
+  if (!srv) return t.skip('port 8080 is busy');
+  try {
+    const engine = await loadEngine();
+    assert.equal(typeof engine.detectOnce, 'function');
+    const slop = await runDiagnosis(`${srv.base}/fixtures/slop.html`, { allowLoopback: true });
+    assert.ok(slop.report.rulesHit >= 15, `slop.html hit only ${slop.report.rulesHit} rules`);
+    assert.ok(slop.shots['1440']?.startsWith('data:image/jpeg;base64,'), 'missing 1440 capture');
+    assert.ok(slop.shots['390']?.startsWith('data:image/jpeg;base64,'), 'missing 390 capture');
+    assert.deepEqual(slop.missed, []);
+    // No time left for a second width: the first width is still the answer, and the rest is named.
+    const short = await runDiagnosis(`${srv.base}/fixtures/slop.html`, { allowLoopback: true, widthBudgetMs: 75000 });
+    assert.deepEqual(short.report.widths, [1440]);
+    assert.deepEqual(short.missed, [390]);
+    assert.ok(short.report.rulesHit >= 15, `partial slop.html hit only ${short.report.rulesHit} rules`);
+    assert.deepEqual(Object.keys(short.shots), ['1440']);
+    // A bot check is not the site: no report at all, instead of "no rules hit" for someone else's block page.
+    await assert.rejects(runDiagnosis(`${srv.base}/challenge`, { allowLoopback: true }), { code: 'not-diagnosed', message: /^not diagnosed: got a bot check page \(HTTP 403/ });
+    const clean = await runDiagnosis(`${srv.base}/fixtures/clean.html`, { allowLoopback: true });
+    assert.equal(clean.report.rulesHit, 0, `clean.html hit ${clean.report.rules.map((r) => r.ruleId).join(' ')}`);
+    console.log(`slop.html: ${slop.report.rulesHit} rules, ${slop.report.findings} places; clean.html: ${clean.report.rulesHit}`);
+  } finally {
+    srv.close();
+  }
+});
+
+test('out of time with one width measured: that width is the answer', async (t) => {
+  // The first load answers at once; every later one stalls, so the second width is still loading
+  // when the deadline comes.
+  let loads = 0;
+  const sockets = new Set<import('node:net').Socket>();
+  const server = http.createServer((req, res) => {
+    if (req.url !== '/') return res.writeHead(404).end();
+    if (loads++ === 0) return res.writeHead(200, { 'content-type': 'text/html' }).end('<!doctype html><title>t</title><p style="letter-spacing:.2em;text-transform:uppercase">Stalled second load</p>');
+  });
+  server.on('connection', (s) => (sockets.add(s), s.on('close', () => sockets.delete(s))));
+  const ok = await new Promise<boolean>((resolve) => {
+    server.once('error', () => resolve(false));
+    server.listen(8080, '127.0.0.1', () => resolve(true));
+  });
+  if (!ok) return t.skip('port 8080 is busy');
+  try {
+    const started = Date.now();
+    const result = await runDiagnosis('http://127.0.0.1:8080/', { allowLoopback: true, deadlineMs: 8000, widthBudgetMs: 0 });
+    assert.ok(Date.now() - started < 20000, `took ${Date.now() - started} ms`);
+    assert.deepEqual(result.report.widths, [1440]);
+    assert.deepEqual(result.missed, [390]);
+    assert.ok(loads >= 2, 'second width never started');
+  } finally {
+    for (const s of sockets) s.destroy();
+    server.close();
+  }
+});
+
+test('brand through the fence: tokens come from the page, and private addresses stay blocked', async (t) => {
+  const srv = await serveOn8080();
+  if (!srv) return t.skip('port 8080 is busy');
+  t.after(() => srv.close());
+  const result = await runBrand(`${srv.base}/fixtures/slop.html`, { allowLoopback: true });
+  assert.ok(result.tokens['--success'] && result.tokens['--danger']);
+  assert.ok(result.notes.length >= 3);
+  await assert.rejects(runBrand(`${srv.base}/to-private`, { allowLoopback: true }));
+});
+
+test('tone shots through the fence: a picture of a page, none of a check page, private addresses fail, kept pictures skip the browser', async (t) => {
+  const srv = await serveOn8080();
+  if (!srv) return t.skip('port 8080 is busy');
+  t.after(() => srv.close());
+  const page = { id: 'page', url: `${srv.base}/tone-fixtures/tone-consent.html` };
+  const shots = await captureShots([page, { id: 'check', url: `${srv.base}/tone-fixtures/tone-blocked.html` }, { id: 'private', url: `${srv.base}/to-private` }], { allowLoopback: true, settleMs: 100 });
+  assert.equal(shots.page.status, 'ok');
+  assert.ok(shots.page.status === 'ok' && shots.page.image.startsWith('data:image/jpeg;base64,'), 'missing the picture');
+  assert.equal(shots.check.status, 'blocked');
+  assert.equal(shots.private.status, 'failed');
+  assert.ok(allKept([page]), 'the picture is kept in memory');
+  assert.ok(!allKept([{ id: 'private', url: `${srv.base}/to-private` }]), 'a failure is not kept');
+  const again = await captureShots([{ id: 'same', url: page.url }], { allowLoopback: true, deadlineMs: 1 });
+  assert.deepEqual(again.same, shots.page);
+});

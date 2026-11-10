@@ -72,4 +72,4 @@ import { Icon } from './icons'
 
 ## Tokens
 
-`currentColor` for stroke, so `--text`, `--text-muted` or `--text-subtle` on the parent decides color. Spacing `--sp-2` between icon and label. No background token is used behind an icon. The shared `Icon` component in `registry/src/icons/index.tsx` is the place to add new paths.
+`currentColor` for stroke, so `--text`, `--text-muted` or `--text-subtle` on the parent decides color. Spacing `--sp-2` between icon and label. No background token is used behind an icon. The shared `Icon` component in `packages/registry/src/icons/index.tsx` is the place to add new paths.

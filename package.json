@@ -24,32 +24,30 @@
     "accessibility"
   ],
   "bin": {
-    "taster": "bin/taster.mjs"
+    "taster": "packages/engine/taster.mjs"
   },
   "engines": {
     "node": ">=22"
   },
   "files": [
-    "bin/",
-    "engine/*.mjs",
-    "engine/*.js",
-    "engine/package.json",
-    "engine/README.md",
-    "rules/detect.js",
-    "rules/rules.json",
-    "rules/RULES.md",
-    "patterns/",
-    "taxonomy/",
-    "!taxonomy/*.test.mjs",
-    "!taxonomy/fixtures/",
-    "registry/registry.json",
-    "registry/src/",
-    "registry/stage/",
-    "registry/previews/",
-    "registry/THIRD_PARTY_NOTICES.md",
-    "registry/README.md",
+    "packages/engine/*.mjs",
+    "packages/engine/*.js",
+    "packages/engine/package.json",
+    "packages/engine/README.md",
+    "data/rules/detect.js",
+    "data/rules/rules.json",
+    "data/rules/RULES.md",
+    "data/patterns/",
+    "data/taxonomy/",
+    "!data/taxonomy/*.test.mjs",
+    "!data/taxonomy/fixtures/",
+    "packages/registry/registry.json",
+    "packages/registry/src/",
+    "packages/registry/stage/",
+    "packages/registry/previews/",
+    "packages/registry/THIRD_PARTY_NOTICES.md",
+    "packages/registry/README.md",
     "skills/taster/",
-    "extension/",
     "commands/",
     "README.md",
     "README.ko.md",
@@ -67,8 +65,8 @@
     "build": "node scripts/build-docs.mjs",
     "validate": "node scripts/validate.mjs",
     "check:taxonomy": "node scripts/check-taxonomy.mjs",
-    "test:taxonomy": "node --test taxonomy/axes.test.mjs",
-    "test:detect": "node rules/test-detect.mjs",
-    "test:registry": "npm --prefix registry run typecheck && node registry/test-render.mjs"
+    "test:taxonomy": "node --test data/taxonomy/axes.test.mjs",
+    "test:detect": "node data/rules/test-detect.mjs",
+    "test:registry": "npm --prefix packages/registry run typecheck && node packages/registry/test-render.mjs"
   }
 }

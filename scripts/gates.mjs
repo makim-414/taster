@@ -21,33 +21,33 @@ export const JOBS = {
     { name: 'Generated docs are current', cmd: 'node scripts/build-docs.mjs', unchanged: true },
     { name: 'Repository data and skill bundle', cmd: 'node scripts/validate.mjs' },
     { name: 'Strict taxonomy, negative controls and balance sweep', cmd: 'node scripts/check-taxonomy.mjs' },
-    { name: 'Weighting axes', cmd: 'node --test taxonomy/axes.test.mjs' },
-    { name: 'Rule schema matches the detector', cmd: 'node engine/scripts/check-rules.mjs' },
-    { name: 'Registry typecheck', cmd: 'npm --prefix registry run typecheck' },
-    { name: 'Source lint finds its own bad lines', cmd: 'node engine/lint.mjs --selftest' },
-    { name: 'The registry stays at or under its lint baseline', cmd: 'node engine/lint.mjs registry/src --baseline registry/lint-baseline.json' },
+    { name: 'Weighting axes', cmd: 'node --test data/taxonomy/axes.test.mjs' },
+    { name: 'Rule schema matches the detector', cmd: 'node packages/engine/scripts/check-rules.mjs' },
+    { name: 'Registry typecheck', cmd: 'npm --prefix packages/registry run typecheck' },
+    { name: 'Source lint finds its own bad lines', cmd: 'node packages/engine/lint.mjs --selftest' },
+    { name: 'The registry stays at or under its lint baseline', cmd: 'node packages/engine/lint.mjs packages/registry/src --baseline packages/registry/lint-baseline.json' },
     { name: 'Gate scripts', cmd: 'node --test scripts/check-authors.test.mjs scripts/gates.test.mjs' },
     { name: 'Commit emails are GitHub noreply addresses', cmd: 'node scripts/check-authors.mjs', authors: true },
   ],
   browser: [
-    { name: 'Detector fixtures', cmd: 'node rules/test-detect.mjs' },
-    { name: 'Engine CLI and MCP', cmd: 'npm --prefix engine test' },
-    { name: 'Rebuild example stays clean and keeps its content', cmd: 'node engine/scripts/check-rebuild-example.mjs' },
-    { name: 'Icon slot variations match the taxonomy and stay clean', cmd: 'node engine/scripts/check-icon-slots-example.mjs' },
-    { name: 'Every component renders at 1440 and 390 with no page or console error', cmd: 'npm --prefix registry run test-render' },
-    { name: 'Component keyboard, names and reduced motion', cmd: 'node registry/test-a11y.mjs' },
-    { name: 'No component runs what its props hold', cmd: 'node registry/test-injection.mjs' },
+    { name: 'Detector fixtures', cmd: 'node data/rules/test-detect.mjs' },
+    { name: 'Engine CLI and MCP', cmd: 'npm --prefix packages/engine test' },
+    { name: 'Rebuild example stays clean and keeps its content', cmd: 'node packages/engine/scripts/check-rebuild-example.mjs' },
+    { name: 'Icon slot variations match the taxonomy and stay clean', cmd: 'node packages/engine/scripts/check-icon-slots-example.mjs' },
+    { name: 'Every component renders at 1440 and 390 with no page or console error', cmd: 'npm --prefix packages/registry run test-render' },
+    { name: 'Component keyboard, names and reduced motion', cmd: 'node packages/registry/test-a11y.mjs' },
+    { name: 'No component runs what its props hold', cmd: 'node packages/registry/test-injection.mjs' },
   ],
   web: [
-    { name: 'Typecheck and build', cmd: 'npm --prefix web run build' },
-    { name: 'Routes trace the engine files they read at run time', cmd: 'node web/scripts/check-traces.mjs' },
-    { name: 'Address guard, limits and fenced engine on the fixtures', cmd: 'npm --prefix web test' },
+    { name: 'Typecheck and build', cmd: 'npm --prefix apps/web run build' },
+    { name: 'Routes trace the engine files they read at run time', cmd: 'node apps/web/scripts/check-traces.mjs' },
+    { name: 'Address guard, limits and fenced engine on the fixtures', cmd: 'npm --prefix apps/web test' },
     { name: 'Serve the build', serve: true },
-    { name: 'Zero findings on every page at 1440, 1280 and 390', cmd: 'node web/scripts/self-check.mjs', base: true },
-    { name: 'The gallery works on a phone, a tablet and a desktop', cmd: 'node web/scripts/check-gallery.mjs', base: true },
-    { name: 'The tone page works on a phone, a tablet and a desktop', cmd: 'node web/scripts/check-tone.mjs', base: true },
-    { name: 'Head tags, the 404 screen and the headers', cmd: 'node web/scripts/check-metadata.mjs', base: true },
-    { name: 'Pages stay at or under the accessibility baseline', cmd: 'node web/scripts/check-a11y.mjs', base: true },
+    { name: 'Zero findings on every page at 1440, 1280 and 390', cmd: 'node apps/web/scripts/self-check.mjs', base: true },
+    { name: 'The gallery works on a phone, a tablet and a desktop', cmd: 'node apps/web/scripts/check-gallery.mjs', base: true },
+    { name: 'The tone page works on a phone, a tablet and a desktop', cmd: 'node apps/web/scripts/check-tone.mjs', base: true },
+    { name: 'Head tags, the 404 screen and the headers', cmd: 'node apps/web/scripts/check-metadata.mjs', base: true },
+    { name: 'Pages stay at or under the accessibility baseline', cmd: 'node apps/web/scripts/check-a11y.mjs', base: true },
   ],
   action: [{ name: 'The diagnosis the action runs: findings for before.html, none for after.html', sarif: true, ci: false }],
 };
@@ -76,7 +76,7 @@ let server = null;
 async function serve() {
   const port = Number(process.env.PORT) || (await freePort());
   const base = `http://localhost:${port}`;
-  const child = spawn('npm', ['--prefix', 'web', 'start'], { cwd: ROOT, env: { ...process.env, PORT: String(port) }, stdio: 'ignore', detached: true });
+  const child = spawn('npm', ['--prefix', 'apps/web', 'start'], { cwd: ROOT, env: { ...process.env, PORT: String(port) }, stdio: 'ignore', detached: true });
   server = child;
   for (let i = 0; i < 60; i++) {
     try {
@@ -104,12 +104,12 @@ function stopServer() {
   server = null;
 }
 
-// The action's diagnosis (engine/cli.mjs on examples/rebuild) and the same SARIF check as the action job.
+// The action's diagnosis (packages/engine/cli.mjs on examples/rebuild) and the same SARIF check as the action job.
 function sarif() {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'taster-gates-'));
   const file = path.join(dir, 'taster.sarif');
   try {
-    if (!sh('node engine/cli.mjs examples/rebuild/before.html examples/rebuild/after.html', ['--sarif', file, '--fail-on', 'none'])) return false;
+    if (!sh('node packages/engine/cli.mjs examples/rebuild/before.html examples/rebuild/after.html', ['--sarif', file, '--fail-on', 'none'])) return false;
     const s = JSON.parse(readFileSync(file, 'utf8'));
     const count = (uri) => s.runs[0].results.filter((x) => x.locations[0].physicalLocation.artifactLocation.uri === uri).length;
     const before = count('examples/rebuild/before.html');
@@ -139,16 +139,16 @@ async function runGate(gate, base) {
 }
 
 function install() {
-  for (const dir of ['engine', 'registry', 'web']) {
+  for (const dir of ['packages/engine', 'packages/registry', 'apps/web']) {
     if (existsSync(path.join(ROOT, dir, 'node_modules'))) continue;
     console.log(`\n-- npm ci --prefix ${dir}`);
     if (!sh(`npm ci --prefix ${dir} --no-audit --no-fund`)) return false;
   }
-  console.log('\n-- npx --prefix engine playwright install chromium');
-  if (!sh('npx --prefix engine playwright install chromium')) return false;
-  const probe = "require('./engine/node_modules/playwright').chromium.launch().then((b) => b.close())";
+  console.log('\n-- npx --prefix packages/engine playwright install chromium');
+  if (!sh('npx --prefix packages/engine playwright install chromium')) return false;
+  const probe = "require('./packages/engine/node_modules/playwright').chromium.launch().then((b) => b.close())";
   if (quiet(process.execPath, ['-e', probe]).status !== 0) {
-    console.log('Chromium is installed but does not start. On Linux, add its libraries: npx --prefix engine playwright install-deps chromium');
+    console.log('Chromium is installed but does not start. On Linux, add its libraries: npx --prefix packages/engine playwright install-deps chromium');
     return false;
   }
   return true;

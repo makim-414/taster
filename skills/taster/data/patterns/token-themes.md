@@ -86,4 +86,4 @@ import { Switch } from './blocks/toggle'
 
 ## Tokens
 
-This pattern owns the token files: `registry/src/tokens.css`, `registry/src/themes/light.css`, `registry/src/tailwind-preset.cjs`. Names: `--background`, `--foreground`, `--card`, `--bg`, `--bg-elev`, `--bg-sunken`, `--border`, `--text`, `--text-muted`, `--text-subtle`, `--brand`, `--accent`, `--accent-fg`, `--success`, `--warning`, `--danger`, `--chart-1` to `--chart-6`, `--r-sm` to `--r-4xl`, `--sp-1` to `--sp-16`, `--sh-card`, `--sh-pop`, `--ease-out`, `--dur-press`.
+This pattern owns the token files: `packages/registry/src/tokens.css`, `packages/registry/src/themes/light.css`, `packages/registry/src/tailwind-preset.cjs`. Names: `--background`, `--foreground`, `--card`, `--bg`, `--bg-elev`, `--bg-sunken`, `--border`, `--text`, `--text-muted`, `--text-subtle`, `--brand`, `--accent`, `--accent-fg`, `--success`, `--warning`, `--danger`, `--chart-1` to `--chart-6`, `--r-sm` to `--r-4xl`, `--sp-1` to `--sp-16`, `--sh-card`, `--sh-pop`, `--ease-out`, `--dur-press`.

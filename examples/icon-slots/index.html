@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Icon slots: five variations each</title>
-<link rel="stylesheet" href="../../registry/src/tokens.css">
-<link rel="stylesheet" href="../../registry/src/themes/light.css">
+<link rel="stylesheet" href="../../packages/registry/src/tokens.css">
+<link rel="stylesheet" href="../../packages/registry/src/themes/light.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 /* Five worked variations for each icon slot in taxonomy.json (iconography.slots[].variations).
    Every glyph comes from one set: 24 grid, stroke --icon-stroke, sizes --icon-sm/md/lg, text color.
-   Checked by engine/scripts/check-icon-slots-example.mjs: every variation present, zero findings at 1440 and 390. */
+   Checked by packages/engine/scripts/check-icon-slots-example.mjs: every variation present, zero findings at 1440 and 390. */
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: var(--t-body); line-height: var(--lh-normal); overflow-wrap: anywhere; }
 .board { max-width: 1680px; margin: 0 auto; padding: var(--sp-12) var(--sp-6); }
@@ -142,7 +142,7 @@ table.cmp th { color: var(--text-muted); }
       <h1>Icon slots, five variations each</h1>
       <p>A slot has more than one right answer. Everything below is drawn from one set: 24 grid, stroke 2, 16, 20 and 24px.</p>
     </div>
-    <div class="set">patterns/icon-placement.md<br>taxonomy.json iconography.slots[].variations</div>
+    <div class="set">data/patterns/icon-placement.md<br>taxonomy.json iconography.slots[].variations</div>
   </header>
 
   <!-- control -->

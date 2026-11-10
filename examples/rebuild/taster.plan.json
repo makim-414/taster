@@ -2,7 +2,7 @@
   "version": 1,
   "route": "rebuild",
   "system": [
-    "../../registry/src/tokens.css",
+    "../../packages/registry/src/tokens.css",
     "theme.css"
   ],
   "screens": [

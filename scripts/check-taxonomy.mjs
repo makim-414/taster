@@ -1,11 +1,11 @@
-// Enforces taxonomy/taxonomy.json: schema, family partition, exclusive decision key, boundaries, coverage of rules,
+// Enforces data/taxonomy/taxonomy.json: schema, family partition, exclusive decision key, boundaries, coverage of rules,
 // patterns and registry, axes, constraints and the balance function. Prints TAXONOMY OK on success.
 //
 // Three layers:
 //   1. checkTaxonomy(tax, ctx) returns coded errors for one taxonomy object. The repository taxonomy must return none.
-//   2. Every file in taxonomy/fixtures/broken/ patches a copy of the taxonomy into a known broken state, and
+//   2. Every file in data/taxonomy/fixtures/broken/ patches a copy of the taxonomy into a known broken state, and
 //      checkTaxonomy must report the code that file expects (negative controls: the checker can still fail).
-//   3. taxonomy/fixtures/parts.json classifies generic UI parts through the decision key, and a seeded sweep calls
+//   3. data/taxonomy/fixtures/parts.json classifies generic UI parts through the decision key, and a seeded sweep calls
 //      balance() and checks every result is valid, snapped, deterministic and minimal.
 // Also run from scripts/validate.mjs, so CI fails on any of it.
 import fs from 'node:fs';
@@ -13,22 +13,22 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { ROOT, readJson, loadPatterns } from './lib.mjs';
 import { validateSchema } from './schema-lite.mjs';
-import { createClassifier } from '../taxonomy/classify.mjs';
-import { createAxes } from '../taxonomy/axes.mjs';
+import { createClassifier } from '../data/taxonomy/classify.mjs';
+import { createAxes } from '../data/taxonomy/axes.mjs';
 
 const EPS = 1e-9;
 
 export function loadContext() {
-  const tokens = fs.readFileSync(path.join(ROOT, 'registry/src/tokens.css'), 'utf8');
+  const tokens = fs.readFileSync(path.join(ROOT, 'packages/registry/src/tokens.css'), 'utf8');
   // The first top-level block whose selector list names :root (it is `:root, .theme-dark` since the theme scopes).
   const rootBlock = tokens.match(/^:root(?:\s*,[^{]*)?\{([\s\S]*?)\n\}/m);
   return {
-    schema: readJson('taxonomy/taxonomy.schema.json'),
+    schema: readJson('data/taxonomy/taxonomy.schema.json'),
     patterns: loadPatterns().map((p) => p.data).filter(Boolean),
-    registry: readJson('registry/registry.json').components,
-    rules: readJson('rules/rules.json').rules,
+    registry: readJson('packages/registry/registry.json').components,
+    rules: readJson('data/rules/rules.json').rules,
     tokenVars: new Set([...(rootBlock ? rootBlock[1] : '').matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1])),
-    parts: readJson('taxonomy/fixtures/parts.json').parts,
+    parts: readJson('data/taxonomy/fixtures/parts.json').parts,
   };
 }
 
@@ -146,7 +146,7 @@ export function checkTaxonomy(tax, ctx) {
   const driver = new Map();
   for (const a of tax.axes) {
     for (const v of a.drives) {
-      if (!ctx.tokenVars.has(v)) err('DRIVES', `axis ${a.id} drives ${v}, which registry/src/tokens.css does not define`);
+      if (!ctx.tokenVars.has(v)) err('DRIVES', `axis ${a.id} drives ${v}, which packages/registry/src/tokens.css does not define`);
       if (driver.has(v)) err('DRIVES', `${v} is driven by both ${driver.get(v)} and ${a.id}`);
       driver.set(v, a.id);
     }
@@ -291,7 +291,7 @@ function sweepBalance(tax) {
 
 export function runAll() {
   const ctx = loadContext();
-  const tax = readJson('taxonomy/taxonomy.json');
+  const tax = readJson('data/taxonomy/taxonomy.json');
   const errors = checkTaxonomy(tax, ctx).map((e) => `${e.code} ${e.msg}`);
 
   // Fixture coverage: enough parts, every category, every specific step.
@@ -304,7 +304,7 @@ export function runAll() {
   for (const c of tax.categories) if (!hitCats.has(c.id)) errors.push(`FIXTURE no part expects category ${c.id}`);
 
   // Negative controls.
-  const dir = path.join(ROOT, 'taxonomy/fixtures/broken');
+  const dir = path.join(ROOT, 'data/taxonomy/fixtures/broken');
   const broken = fs.readdirSync(dir).filter((f) => f.endsWith('.json')).sort();
   for (const f of broken) {
     const fx = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));

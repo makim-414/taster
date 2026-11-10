@@ -4,14 +4,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT } from './lib.mjs';
-import { TARGETS, renderAll } from '../engine/exports.mjs';
+import { TARGETS, renderAll } from '../packages/engine/exports.mjs';
 
 const OUT = path.join(ROOT, 'exports');
 const files = renderAll();
 const readme = [
   '# Taster rules for agents without MCP',
   '',
-  'Generated from `rules/rules.json` of https://github.com/makim-414/taster. Copy a file to the place its tool reads.',
+  'Generated from `data/rules/rules.json` of https://github.com/makim-414/taster. Copy a file to the place its tool reads.',
   'In a file you share with your own instructions, paste it at the end; the Taster part sits between',
   '`<!-- taster:start -->` and `<!-- taster:end -->`, so you can replace it later.',
   '',
@@ -19,7 +19,7 @@ const readme = [
   '|---|---|---|',
   ...Object.entries(TARGETS).map(([name, t]) => `| ${t.label} | \`${name}/${path.basename(t.file)}\` | \`${t.file}\` |`),
   '',
-  'Or, in a clone of Taster, let the CLI place them and keep your own text: `node engine/cli.mjs export all --dir <your app>`.',
+  'Or, in a clone of Taster, let the CLI place them and keep your own text: `node packages/engine/cli.mjs export all --dir <your app>`.',
   '',
 ].join('\n');
 

@@ -25,7 +25,7 @@ Every screen, before it ships. Generated layouts are usually checked at one phon
 
 ## Do
 
-- Run the check at all nine widths (`node engine/cli.mjs <url> --widths responsive`) and open the 768, 820 and 1024 captures yourself. Zero findings is the floor, not the proof.
+- Run the check at all nine widths (`node packages/engine/cli.mjs <url> --widths responsive`) and open the 768, 820 and 1024 captures yourself. Zero findings is the floor, not the proof.
 - Truncate only long titles, keep the first words visible, and show the full text on hover or focus.
 - Mark a row that scrolls sideways on purpose with `data-taster-allow="scroll"` and let the last visible item be cut so readers see that more follows.
 - Measure Korean on a machine whose fallback font is as wide as the CI font. Hangul is about 0.87em wide in macOS fonts and 1em in many Linux fonts, so a name that fits on a Mac can be cut in CI.

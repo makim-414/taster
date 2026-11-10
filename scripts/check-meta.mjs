@@ -24,7 +24,7 @@ export const DESCRIPTIONS = [
       `Find the AI generated look in a frontend and fix it: ${c.rules} rules, ${c.measured} measured in a real browser, ${c.patterns} patterns and ${c.components} components to swap in, for agents (MCP, ACP), editors, CI and the browser.`,
   },
   {
-    file: 'extension/manifest.json',
+    file: 'apps/extension/manifest.json',
     at: ['description'],
     max: 132,
     text: (c) => `Outline the habits that make a page look AI generated: ${c.rules} rules, ${c.measured} measured on the page you are viewing.`,
@@ -62,10 +62,10 @@ export const COUNTED_FILES = [
   'action.yml',
   'README.md',
   'README.ko.md',
-  'registry/README.md',
+  'packages/registry/README.md',
 ];
 // How the READMEs and descriptions say each count: "88 rules, 85 measured in a real browser", "144 components", and
-// in Korean "규칙 88개, 그중 85개는 (`rules/detect.js` 가) 실제 브라우저에서", "패턴 122개", "부품 144개".
+// in Korean "규칙 88개, 그중 85개는 (`data/rules/detect.js` 가) 실제 브라우저에서", "패턴 122개", "부품 144개".
 const PHRASES = [
   [/\b(\d+) rules\b/g, 'rules'],
   [/\b(\d+) measured\b/g, 'measured'],
@@ -108,8 +108,8 @@ export function versionErrors(json, sources) {
   const errors = [];
   const version = json['package.json'].version;
   const stated = [
-    ['engine/package.json', ['version']],
-    ['extension/manifest.json', ['version']],
+    ['packages/engine/package.json', ['version']],
+    ['apps/extension/manifest.json', ['version']],
     ['.github/acp-registry/taster/agent.json', ['version']],
     ['.claude-plugin/marketplace.json', ['plugins', 0, 'version']],
     ['.codex-plugin/plugin.json', ['version']],
@@ -127,28 +127,29 @@ export function versionErrors(json, sources) {
   return errors;
 }
 
-// The published package runs engine/ through bin/, so the root and the engine declare the same dependencies and the
-// same Node versions, the ones CI runs (.nvmrc). The engine's lockfile matches its package.json, or the first-run
-// npm install in engine/start.mjs rewrites it in the user's clone.
+// The published package runs packages/engine/ through its taster.mjs, so the root and the engine declare the same
+// dependencies and the same Node versions, the ones CI runs (.nvmrc). The engine's lockfile matches its package.json,
+// or the first-run npm install in packages/engine/start.mjs rewrites it in the user's clone.
 export function packageErrors(root, engine, nvmrc, lock) {
   const errors = [];
   const same = (a, b) => JSON.stringify(Object.entries(a || {}).sort()) === JSON.stringify(Object.entries(b || {}).sort());
-  if (!same(root.dependencies, engine.dependencies)) errors.push('package.json and engine/package.json list different dependencies');
+  if (!same(root.dependencies, engine.dependencies)) errors.push('package.json and packages/engine/package.json list different dependencies');
   const want = `>=${nvmrc.trim()}`;
-  for (const [file, p] of [['package.json', root], ['engine/package.json', engine]]) {
+  for (const [file, p] of [['package.json', root], ['packages/engine/package.json', engine]]) {
     if (p.engines?.node !== want) errors.push(`${file} engines.node is ${p.engines?.node}, expected ${want} (from .nvmrc, the Node CI runs)`);
   }
   const locked = lock.packages?.[''] || {};
   for (const key of ['version', 'dependencies', 'bin', 'engines']) {
     const a = engine[key], b = locked[key];
-    if (typeof a === 'object' ? !same(a, b) : a !== b) errors.push(`engine/package-lock.json ${key} differs from engine/package.json (run npm --prefix engine install --package-lock-only)`);
+    if (typeof a === 'object' ? !same(a, b) : a !== b) errors.push(`packages/engine/package-lock.json ${key} differs from packages/engine/package.json (run npm --prefix packages/engine install --package-lock-only)`);
   }
   return errors;
 }
 
-// What npm would publish: no installs, site, CI or tests, and the license and notices that must travel with the code.
-const NOT_PUBLISHED = [/(^|\/)node_modules\//, /^web\//, /^\.github\//, /(^|\/)(test|tests|__tests__|fixtures)\//, /\.test\.[cm]?[jt]sx?$/];
-const PUBLISHED = ['LICENSE', 'THIRD_PARTY_NOTICES.md', 'registry/THIRD_PARTY_NOTICES.md', 'registry/stage/THIRD_PARTY_LICENSES.txt', 'README.md'];
+// What npm would publish: no installs, apps (the site and the extension), CI or tests, and the license and notices
+// that must travel with the code.
+const NOT_PUBLISHED = [/(^|\/)node_modules\//, /^apps\//, /^\.github\//, /(^|\/)(test|tests|__tests__|fixtures)\//, /\.test\.[cm]?[jt]sx?$/];
+const PUBLISHED = ['LICENSE', 'THIRD_PARTY_NOTICES.md', 'packages/registry/THIRD_PARTY_NOTICES.md', 'packages/registry/stage/THIRD_PARTY_LICENSES.txt', 'README.md'];
 export function packErrors(files, pkg) {
   const errors = [];
   for (const f of files) if (NOT_PUBLISHED.some((re) => re.test(f))) errors.push(`npm pack would publish ${f}`);
@@ -162,16 +163,17 @@ export function npxErrors(pkg, docs) {
   if (!pkg.private) return [];
   return Object.entries(docs)
     .filter(([, text]) => text.includes(`npx ${pkg.name}`))
-    .map(([file]) => `${file} says npx ${pkg.name}, but package.json is private (not published); use the node engine/cli.mjs line`);
+    .map(([file]) => `${file} says npx ${pkg.name}, but package.json is private (not published); use the node packages/engine/cli.mjs line`);
 }
 
-// Links to patterns/<id>.md anywhere, and pattern to pattern links inside patterns/, name a pattern that exists.
+// Links to patterns/<id>.md anywhere (data/patterns/<id>.md included), and pattern to pattern links inside
+// data/patterns/, name a pattern that exists.
 export function patternLinkErrors(file, text, ids) {
   const errors = [];
   const bad = (id) => id !== 'README' && !ids.has(id);
-  for (const m of text.matchAll(/patterns\/([A-Za-z0-9_-]+)\.md\b/g)) if (bad(m[1])) errors.push(`${file} links patterns/${m[1]}.md, which is not in patterns/INDEX.json`);
+  for (const m of text.matchAll(/patterns\/([A-Za-z0-9_-]+)\.md\b/g)) if (bad(m[1])) errors.push(`${file} links patterns/${m[1]}.md, which is not in data/patterns/INDEX.json`);
   if (/(^|\/)patterns\/[^/]+$/.test(file)) {
-    for (const m of text.matchAll(/\]\(([A-Za-z0-9_-]+)\.md(?:#[^)]*)?\)/g)) if (bad(m[1])) errors.push(`${file} links ${m[1]}.md, which is not in patterns/INDEX.json`);
+    for (const m of text.matchAll(/\]\(([A-Za-z0-9_-]+)\.md(?:#[^)]*)?\)/g)) if (bad(m[1])) errors.push(`${file} links ${m[1]}.md, which is not in data/patterns/INDEX.json`);
   }
   return errors;
 }

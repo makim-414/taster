@@ -20,7 +20,7 @@
   "mcpServers": {
     "taster": {
       "command": "node",
-      "args": ["./engine/start.mjs"],
+      "args": ["./packages/engine/start.mjs"],
       "cwd": "."
     }
   },

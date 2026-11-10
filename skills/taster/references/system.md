@@ -9,7 +9,7 @@ Screens.
 ## 1. Absorb the brand and read the references
 
 Call `design_system { brand, references, axes?, surface?, scheme?, out }` (or
-`node engine/cli.mjs --system <brand> --ref <page> --axis name=value --out <dir>`).
+`node packages/engine/cli.mjs --system <brand> --ref <page> --axis name=value --out <dir>`).
 
 - `brand`: the owner's site or any page that carries the brand. It decides identity: brand color, typeface, logo,
   light or dark, and the success and failure colors fitted to them (the same intake as [brand.md](brand.md)).
@@ -17,7 +17,7 @@ Call `design_system { brand, references, axes?, surface?, scheme?, out }` (or
   usually average into nothing.
 - `axes`: what the builder already said ("denser", "flatter", "no animation"), as axis values.
 
-Each page is opened in a real browser at 1440 wide and measured (`engine/measure.js`). Every measurement is mapped to
+Each page is opened in a real browser at 1440 wide and measured (`packages/engine/measure.js`). Every measurement is mapped to
 the axis step whose generated token is closest, so a page built from a system measures back to the same steps.
 
 Where each axis comes from, first match wins:
@@ -27,7 +27,7 @@ Where each axis comes from, first match wins:
 3. The brand site's own measurement.
 4. The taxonomy default.
 
-Then `balance` from `taxonomy/axes.mjs` holds every axis the builder set and moves the others the least needed to
+Then `balance` from `data/taxonomy/axes.mjs` holds every axis the builder set and moves the others the least needed to
 satisfy every constraint. `axisNotes` records, per axis, the value, the step name, what it means, where it came from
 with the evidence, and, when balance moved it, from which step and the principle of each constraint that forced it.
 
@@ -45,7 +45,7 @@ compact; roundness: square, crisp, soft, round, pillow; and so on).
 ## 3. Let the builder move weights
 
 When the builder moves an axis, call `tune_system { system, axes }` (or
-`node engine/cli.mjs --tune <dir>/taster.system.json roundness=1`). The moved axes stay where the builder put them;
+`node packages/engine/cli.mjs --tune <dir>/taster.system.json roundness=1`). The moved axes stay where the builder put them;
 balance moves the least needed elsewhere, and the summary says which axes moved and quotes the principle:
 
 > roundness set to pillow (1) by the builder. elevation moved lifted (0.25) to raised (0.5): "Radius and depth
@@ -57,7 +57,7 @@ names the constraint; ask which one gives way.
 
 ## 4. Write it and use it
 
-`out` (or `--out`) writes `taster.system.json` and `theme.css`. Load `theme.css` after `registry/src/tokens.css` on
+`out` (or `--out`) writes `taster.system.json` and `theme.css`. Load `theme.css` after `packages/registry/src/tokens.css` on
 every screen and in every part. Components read the alias tokens only (`var(--r-card)`, `var(--sp-4)`,
 `var(--sh-card)`, `var(--dur-press)`); never type a value from the system into a component.
 
@@ -101,7 +101,7 @@ An axis with nothing to measure (no cards, no text) has no evidence and falls th
 
 ## Tokens from the axes
 
-Each axis has one value per step, lowest step first. The regular or default step reproduces `registry/src/tokens.css`
+Each axis has one value per step, lowest step first. The regular or default step reproduces `packages/registry/src/tokens.css`
 exactly, so a system at the defaults changes nothing.
 
 | Axis | Tokens | Per step |

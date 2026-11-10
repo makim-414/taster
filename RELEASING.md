@@ -7,8 +7,8 @@ order, by the owner. Version 0.2.0.
 
 - `node scripts/gates.mjs` passes on `main` (every gate CI runs, in the same order; see `CONTRIBUTING.md`) and CI is
   green there.
-- `npm pack --dry-run` lists `bin/`, `engine/`, `rules/`, `patterns/`, `taxonomy/`, `registry/`, `skills/`,
-  `extension/` and no `node_modules`, `web/` or `.github/`.
+- `npm pack --dry-run` lists `packages/engine/` (with `taster.mjs`, the command), `packages/registry/`, `data/rules/`,
+  `data/patterns/`, `data/taxonomy/`, `skills/` and `commands/`, and no `node_modules`, `apps/` or `.github/`.
 - Run the private name check over the repository and fix every hit.
 
 ## Release day
@@ -25,7 +25,7 @@ order, by the owner. Version 0.2.0.
      its description and `node scripts/validate.mjs` checks its version and npx package against `package.json`.
    - The registry lists agents with Agent or Terminal auth. Taster has no account, so its terminal method is the
      one-time browser setup (`taster acp --setup`), which nothing requires before use.
-4. Chrome Web Store: zip `extension/` (manifest, background, overlay, generated detector and rule names, icons) and
+4. Chrome Web Store: zip `apps/extension/` (manifest, background, overlay, generated detector and rule names, icons) and
    submit. Permissions to explain: `activeTab` and `scripting`, used only when the button is clicked. No data leaves
    the tab. Edge Add-ons takes the same zip.
 5. Agent skill directories: the skill is `skills/taster/SKILL.md` (name and description frontmatter). The Claude Code
@@ -40,7 +40,7 @@ order, by the owner. Version 0.2.0.
 ## After
 
 - Once step 2 is live, turn the install lines that run the clone's CLI back into npx lines: in `README.md`,
-  `README.ko.md` and `registry/README.md`, `node /path/to/taster/engine/cli.mjs lint ...` and `... add ...` become
+  `README.ko.md` and `packages/registry/README.md`, `node /path/to/taster/packages/engine/cli.mjs lint ...` and `... add ...` become
   `npx @makim-414/taster lint ...` and `npx @makim-414/taster add ...`, and the clone and `npm ci` lines that only
   served them go. Do the same for the install lines on the web (the component pages and the board), and say in the
   READMEs that the package is published.

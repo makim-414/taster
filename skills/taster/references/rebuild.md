@@ -24,7 +24,7 @@ so you do not strip what the owner chose on purpose. Ask when you are not sure.
 
 ## 2. Read the content
 
-Call `extract_content { target }` (or `node engine/cli.mjs <url> --extract`). It returns, in reading order:
+Call `extract_content { target }` (or `node packages/engine/cli.mjs <url> --extract`). It returns, in reading order:
 
 - `sections`: each h1 or h2 with the text, subheadings, lists, actions (buttons and button-like links with their
   targets), images, quotes and forms under it.
@@ -80,10 +80,10 @@ logo and partner marks stay as the owner's files.
 
 Ask once: "Where should the new site live?" If the user has no preference, build:
 
-- a plain HTML and CSS page with `registry/src/tokens.css` for a quick preview they can open, and
+- a plain HTML and CSS page with `packages/registry/src/tokens.css` for a quick preview they can open, and
 - the same page as React components from the registry when they will keep developing it.
 
-Bring the brand and the tone in through tokens only: load the system's `theme.css` after `registry/src/tokens.css`,
+Bring the brand and the tone in through tokens only: load the system's `theme.css` after `packages/registry/src/tokens.css`,
 read the alias tokens in every part (`system_for_category` lists the ones that matter per part), and keep the logo as
 the owner's file. One accent color at most.
 
@@ -102,5 +102,5 @@ consistency check itself), show it to the builder, and ask `plan_next` for the n
 the components the checked screens use, so `check_consistency` against them stays at zero ([screens.md](screens.md)).
 
 The repository has a worked example in `examples/rebuild/` with its own check
-(`node engine/scripts/check-rebuild-example.mjs`): the original, the rebuilt home screen, a second screen built from
+(`node packages/engine/scripts/check-rebuild-example.mjs`): the original, the rebuilt home screen, a second screen built from
 the same components, and the finished `taster.plan.json`.

@@ -2,7 +2,7 @@ node_modules/
 dist/
 exports/
 .DS_Store
-registry/demo/shots/
+packages/registry/demo/shots/
 *.log
 .env
 .env.*

@@ -1,12 +1,12 @@
-# Files written by scripts/build-docs.mjs, `npm --prefix registry run build-stage` or a renderer in web/scripts/.
+# Files written by scripts/build-docs.mjs, `npm --prefix packages/registry run build-stage` or a renderer in apps/web/scripts/.
 # Edit the source and rebuild; CONTRIBUTING.md lists the sources. linguist-generated folds these in pull request
 # diffs and leaves them out of the language bar. They stay committed because installers and the site read them.
 skills/taster/data/** linguist-generated
-registry/stage/** linguist-generated
-registry/previews/** linguist-generated
-extension/detect.js linguist-generated
-extension/rules.js linguist-generated
-rules/RULES.md linguist-generated
-patterns/README.md linguist-generated
-registry/src/motion/orb-recipes.ts linguist-generated
-web/scripts/og/meta.json linguist-generated
+packages/registry/stage/** linguist-generated
+packages/registry/previews/** linguist-generated
+apps/extension/detect.js linguist-generated
+apps/extension/rules.js linguist-generated
+data/rules/RULES.md linguist-generated
+data/patterns/README.md linguist-generated
+packages/registry/src/motion/orb-recipes.ts linguist-generated
+apps/web/scripts/og/meta.json linguist-generated
