@@ -186,7 +186,7 @@ try {
     ok(await other.locator('.slot').count() === 3, `${name}: shared board link shows the same three`);
     await fresh.close();
 
-    // Detail: a real click inside the component works, the width switch narrows the stage, and the install line is there.
+    // Detail: a real click inside the component works, the width switch narrows the stage, and the install steps are there.
     await page.goto(`${BASE}/components/blocks/toggle`, { waitUntil: 'networkidle' });
     const live = await stageFrame(page, 'blocks/toggle');
     const box = live.locator('input[type=checkbox], [role=switch], [role=checkbox]').first();
@@ -199,7 +199,11 @@ try {
       const stage = await page.locator('.stage-inner').boundingBox();
       ok(Math.abs(stage.width - 390) < 2, `${name}: phone width narrows the stage (${Math.round(stage.width)})`);
     }
-    ok((await page.locator('.code-line code').innerText()).includes('add blocks/toggle'), `${name}: install line names the component`);
+    const lines = await page.locator('.install-box .code-line code').allInnerTexts();
+    ok(lines[0]?.startsWith('git clone https://github.com/makim-414/taster.git'), `${name}: install starts with the clone the add command runs from`);
+    ok(lines.some((l) => l.includes('add blocks/toggle')), `${name}: install line names the component`);
+    const setup = await page.locator('.install-box').innerText();
+    ok(setup.includes('tailwind-preset.cjs') && setup.includes('@config'), `${name}: install shows the Tailwind preset for v3 and v4`);
     ok(await noScroll(page), `${name}: detail has no sideways scroll`);
     await page.locator('.source summary').click();
     ok((await page.locator('.source code').innerText()).includes('export'), `${name}: source opens`);

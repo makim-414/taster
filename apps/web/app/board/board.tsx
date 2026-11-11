@@ -5,13 +5,9 @@ import { useEffect, useState } from 'react';
 import { CopyButton } from '../components/copy-button';
 import { LookBar } from '../components/look-bar';
 import { LiveFrame, useStudio } from '../components/studio';
-import { SITE } from '../../lib/page-meta';
+import { addLine } from '../../lib/install';
 
 type Item = { id: string; name: string; group: string; slug: string; categoryName: string };
-
-// Until the CLI is on npm, the add command runs from a clone of the repository (engine installed once with
-// npm ci --prefix packages/engine) and reads the files from this site, so it works from inside the visitor's own app.
-const installLine = (id: string) => `node /path/to/taster/packages/engine/cli.mjs add ${id} --from ${SITE} --dir src/components/taster`;
 
 function Slot({ item, number, chosen, onChoose }: { item: Item; number: number; chosen: boolean; onChoose: () => void }) {
   const { look, ready } = useStudio();
@@ -92,7 +88,7 @@ export function Board({ items }: { items: Item[] }) {
                 <p className="send-text" lang={korean ? undefined : 'en'}>{message}</p>
                 <div className="send-tools">
                   <CopyButton text={message} label="이 글 복사" className="button" />
-                  <CopyButton text={chosen.map(installLine).join('\n')} label="설치 명령 복사" />
+                  <CopyButton text={chosen.map(addLine).join('\n')} label="설치 명령 복사" />
                 </div>
               </>
             ) : (

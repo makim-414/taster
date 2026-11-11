@@ -85,6 +85,12 @@
 .install-box h2, .facts h2, .send h2 { margin: 0 0 var(--sp-3); font-size: var(--t-title); font-weight: var(--w-semi); }
 .code-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); padding: var(--sp-2) var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); }
 .code-line code { flex: 1 1 14rem; min-width: 0; overflow-wrap: anywhere; font-size: var(--t-body); }
+.install-steps { margin: 0; padding-left: var(--sp-5); display: grid; gap: var(--sp-6); }
+.install-steps p { margin: 0 0 var(--sp-2); max-width: 44rem; line-height: var(--lh-normal); }
+.install-steps .code-line + p, .install-steps .code-block + p { margin-top: var(--sp-3); }
+/* Several lines that wrap instead of scrolling, so the page never scrolls sideways and needs no focusable region. */
+.code-block { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--sp-2) var(--sp-3); padding: var(--sp-2) var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); }
+.code-block pre { flex: 1 1 14rem; min-width: 0; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: var(--lh-normal); }
 .facts { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-8); margin-top: var(--sp-8); }
 @media (min-width: 1024px) { .facts { grid-template-columns: 2fr 1fr 1fr; } }
 .facts ul { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--sp-3); }
