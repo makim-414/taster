@@ -55,7 +55,7 @@ Chrome 이나 Playwright 의 Chromium 이 필요합니다. [자세한 설치](#�
 
 - **규칙.** 규칙 88개, 그중 85개는 `data/rules/detect.js` 가 실제 브라우저에서 재고 나머지는 캡처를 보고 눈으로 판단합니다. 대문자에 넓은 자간을 준 라벨, 색을 옅게 깐 알약 배지, 카드 왼쪽의 두꺼운 색 띠, 이모지 불릿, 단어 중간에서 끊기는 한글 줄바꿈 같은 것들입니다. 걸렸다는 것은 그 페이지에 그 흔적이 있다는 뜻이지, 누가 무엇으로 만들었는지를 말하지 않습니다([규칙의 근거](#규칙의-근거)).
 - **패턴.** 패턴 122개. 방문자가 하려는 일(요금제 비교, 믿을 근거 확인, 상태 표시)과 화면 종류(랜딩, 대시보드, 쇼핑, AI 대화 등)로 정리했습니다. 규칙마다 그것을 고치는 패턴이 연결돼 있습니다.
-- **부품.** 부품 144개. 토큰으로 만든 React 컴포넌트입니다. 설치할 패키지 없이 필요한 파일만 복사해 쓰고, 지워야 할 남의 브랜드도 없습니다.
+- **부품.** 부품 144개. 토큰으로 만든 React 컴포넌트이고, Tailwind 와 Taster 프리셋으로 스타일을 입힙니다. 부품 라이브러리를 설치하지 않고 필요한 파일만 복사해 쓰며, 지워야 할 남의 브랜드도 없습니다.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/assets/components.dark.jpg">
@@ -203,6 +203,9 @@ node /path/to/taster/packages/engine/cli.mjs lint src --baseline taster-baseline
 
 ### 내 앱에 부품 넣기
 
+부품은 Tailwind 클래스로 그리고, Taster 프리셋이 그 클래스를 토큰에 연결합니다. 그래서 내 앱에 Tailwind CSS(v3 또는
+v4)와 이 프리셋이 있어야 합니다. 없으면 빌드는 통과하는데 부품이 스타일 없이 나옵니다.
+
 내 앱 폴더에서, 위 단계의 클론으로:
 
 ```bash
@@ -213,6 +216,29 @@ node /path/to/taster/packages/engine/cli.mjs add blocks/button blocks/citations 
 MIT 라이선스도 옆에 둡니다. shadcn 같은 다른 CLI 는 필요 없습니다. `--from https://taster-six.vercel.app` 를 붙이면
 부품 파일을 클론 대신 호스팅 사본에서 읽지만, npm 게시 전까지 명령 자체는 클론에서 실행합니다. 자세한 내용은
 [packages/registry/README.md](packages/registry/README.md).
+
+그다음 `src/components/taster/tokens.css` 를 앱 루트에서 한 번 import 하고 Tailwind 에 프리셋을 줍니다. 설정 파일은 앱
+루트에 두고, `package.json` 에 `"type": "module"` 이 있는 앱에서도 `require` 가 되도록 이름을 `.cjs` 로 합니다.
+
+```js
+// tailwind.config.cjs
+module.exports = {
+  presets: [require('./src/components/taster/tailwind-preset.cjs')],
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+};
+```
+
+Tailwind v3 는 이 파일을 그대로 읽습니다. Tailwind v4 는 `@config` 로 읽습니다. Tailwind 를 불러오는 `src/` 의
+스타일시트(예: `src/index.css`) 맨 위에 넣습니다.
+
+```css
+@import "tailwindcss";
+@config "../tailwind.config.cjs";
+```
+
+`tokens.css` 는 `:root` 에 `--bg`, `--text`, `--border`, `--accent` 등을 정의합니다. 내 앱의 스타일시트가 같은 이름을
+정의하고 그 뒤에 불러오면 그쪽이 이기고, 부품이 그 색을 씁니다. 새로 만든 Vite 앱의 스타터 CSS 가 바로 그렇습니다.
+스타터 CSS 에서 그 변수들을 지우거나 이름을 바꾸세요.
 
 ### 에이전트와 함께 눈으로 고르기
 

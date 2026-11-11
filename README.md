@@ -57,7 +57,7 @@ the extension: [Use](#use).
 
 - **Rules.** 88 rules, 85 measured in a real browser by `data/rules/detect.js` and the rest judged by eye from the captures: all caps labels with wide letter spacing, tinted pill badges, thick colored left borders, emoji bullets, Korean text that breaks mid word. A finding says a page shows a trait, not who or what made it ([where the rules come from](#where-the-rules-come-from)).
 - **Patterns.** 122 patterns, sorted by what the visitor is trying to do (compare plans, prove trust, label a state) and where (landing, dashboard, store, AI chat and more). Every rule points to the patterns that fix it.
-- **Components.** 144 components: token based React components you copy into your app. No package to install, no brand to undo.
+- **Components.** 144 components: token based React components you copy into your app, styled through Tailwind and the Taster preset. No component library to install, no brand to undo.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/assets/components.dark.jpg">
@@ -206,6 +206,9 @@ replace the clone once it is published ([RELEASING.md](RELEASING.md)).
 
 ### Add components to your app
 
+The components use Tailwind classes that the Taster preset maps to the tokens, so your app needs Tailwind CSS (v3 or
+v4) with that preset. Without it the build still passes and the components show up unstyled.
+
 From your app folder, with the clone from the step above:
 
 ```bash
@@ -216,6 +219,29 @@ Copies each component with every file it imports and the token files into `--dir
 in, with Taster's MIT license next to them; no shadcn or other CLI involved. `--from https://taster-six.vercel.app`
 reads the component files from the hosted copy instead of the clone; the command itself still runs from the clone
 until the npm release. See [packages/registry/README.md](packages/registry/README.md).
+
+Then import `src/components/taster/tokens.css` once at your app root and give Tailwind the preset. A config at the app
+root, named `.cjs` so `require` works in an app whose `package.json` says `"type": "module"`:
+
+```js
+// tailwind.config.cjs
+module.exports = {
+  presets: [require('./src/components/taster/tailwind-preset.cjs')],
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+};
+```
+
+Tailwind v3 reads it as is. Tailwind v4 reads it through `@config`, at the top of the stylesheet in `src/` that loads
+Tailwind (for example `src/index.css`):
+
+```css
+@import "tailwindcss";
+@config "../tailwind.config.cjs";
+```
+
+`tokens.css` defines `--bg`, `--text`, `--border`, `--accent` and more on `:root`. A stylesheet of your app that
+defines the same names and loads after it wins, and the components take its colors; the starter CSS of a new Vite app
+does exactly that. Remove those variables from the starter CSS or rename them.
 
 ### Choose by eye with your agent
 
