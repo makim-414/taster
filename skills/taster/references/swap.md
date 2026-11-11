@@ -24,8 +24,11 @@ own code, and prove it with a second detector run.
 2. Open each `data/patterns/<id>.md`. Pick the one whose "When to use" matches this spot.
 3. Apply the "Swap recipe". It is written at the CSS or JSX level. Keep the user's content, brand color and
    framework.
-4. If the pattern lists `components`, copy the component from `packages/registry/src/` (see `data/registry.json` for the
-   file) together with the tokens it uses. Rename classes to the user's conventions if they have them.
+4. If the pattern lists `components`, get each one with `get_component { id }`, or copy it from a clone with
+   `node <clone>/packages/engine/cli.mjs add <id> --dir <folder>`, which brings every file it imports and the tokens.
+   Never download component files from a URL yourself. The components need Tailwind with the Taster preset
+   (`tailwind-preset.cjs`); if the app has no Tailwind, say so before you copy one. Rename classes to the user's
+   conventions if they have them.
 5. Re run detect.js at both widths. The finding must be gone. If a new finding appears, you introduced it; fix it
    before moving on.
 
