@@ -14,7 +14,6 @@ This is the short guide for coding agents and contributors; [CONTRIBUTING.md](CO
 - `apps/web/`: the hosted site
 - `apps/extension/`: the Chrome and Edge extension
 - `skills/taster/`: the skill; its `data/` folder is generated
-- `commands/`: the `/taster` command for Claude Code
 - `.claude-plugin/`, `.codex-plugin/`, `.mcp.json`: the plugin's own files, read when a user installs Taster as a
   Claude Code or Codex plugin. `.mcp.json` starts the engine from the installed copy through `${CLAUDE_PLUGIN_ROOT}`,
   which Claude Code sets only for an installed plugin. They are not a development setup for this repository; to run
@@ -34,8 +33,8 @@ Tools and settings outside this repository read these by path; moving or renamin
 - `packages/engine/start.mjs`, `packages/engine/cli.mjs`: users' MCP client settings name
   `/path/to/taster/packages/engine/start.mjs` (README), and `.mcp.json`, `.codex-plugin/plugin.json` and `action.yml`
   start the engine by path.
-- `.claude-plugin/`, `.codex-plugin/`, `.mcp.json`: the plugin manifests Claude Code and Codex read at the root, and
-  `commands/`, where Claude Code finds the plugin's `/taster` command.
+- `.claude-plugin/`, `.codex-plugin/`, `.mcp.json`: the plugin manifests Claude Code and Codex read at the root. The
+  plugin has no `commands/` folder: `/taster` is the skill itself, and a command of the same name would never run.
 - `skills/taster/`: skill installers copy the folder whole, and `SKILL.md` links into its own `data/`.
 - `action.yml`, `.nvmrc`, `packages/engine/package-lock.json`: an action lives at the root, installs the engine from
   that lockfile on the Node in `.nvmrc`, and users' workflows call it as `makim-414/taster@v0` or `@main`.

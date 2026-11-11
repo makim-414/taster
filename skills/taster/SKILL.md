@@ -11,9 +11,11 @@ Before anything else, ask the user, in their language:
 
 > Is this a site that already exists, or are we building a new one?
 
-(Korean: "이미 있는 사이트인가요, 아니면 새로 지을까요?") Skip it only when their first message already says which,
-and then name the path you are taking in one line. The full opening, including how to tell whether you have the
-source, is in [references/start.md](references/start.md).
+(Korean: "이미 있는 사이트인가요, 아니면 새로 지을까요?") When the user starts Taster with `/taster`, what they typed
+after it is their first message. Skip the question only when that message already says which (a URL with "fix this",
+or "build a landing page for ..."), and then name the path you are taking in one line and go. Otherwise your first
+reply is only the question. The full opening, including how to tell whether you have the source, is in
+[references/start.md](references/start.md).
 
 Every route runs in the same order: Diagnose (an existing site only), then Brand and references, then the design
 System made with the builder, then the Screens, each rebuilt from parts that fit its purpose and all wearing that
