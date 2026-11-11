@@ -52,7 +52,8 @@ Options
   --version         print the version
 
 add copies registry components into your app with every helper they import and the token files, no shadcn
-needed. --dir defaults to src/components/taster. --from reads a hosted copy (https://taster-six.vercel.app)
+needed. The components are styled with Tailwind CSS and the Taster preset (tailwind-preset.cjs, Tailwind v3 or v4);
+add prints the setup when it is done. --dir defaults to src/components/taster. --from reads a hosted copy (https://taster-six.vercel.app)
 instead of this repository. Files you changed are left alone unless --overwrite.
 
 lint reads source files (tsx, jsx, vue, svelte, html, css, md) for the code form of the rules: tinted and outlined
@@ -87,7 +88,7 @@ async function add(argv) {
     allowPositionals: true,
     options: { dir: { type: 'string' }, from: { type: 'string' }, overwrite: { type: 'boolean' }, list: { type: 'boolean' }, json: { type: 'boolean' } },
   });
-  const { fetchBundle, loadRegistry, resolveComponents, writeBundle } = await import('./add.mjs');
+  const { fetchBundle, loadRegistry, nextSteps, resolveComponents, writeBundle } = await import('./add.mjs');
   if (values.list) {
     for (const c of loadRegistry().components) console.log(`${c.id.padEnd(30)} ${c.category}`);
     return 0;
@@ -104,9 +105,9 @@ async function add(argv) {
   for (const f of written) console.log(`  ${f}`);
   for (const f of skipped) console.log(`  ${f}  (kept your copy, it differs; --overwrite to replace)`);
   if (bundle.npm.length) console.log(`\nInstall: npm install ${bundle.npm.join(' ')}`);
-  console.log(`\nThen import ${join(dir, 'tokens.css')} once at your app root and add ${join(dir, 'tailwind-preset.cjs')} to your Tailwind presets.`);
   const upstream = bundle.credits.filter((c) => /MIT|Apache|BSD/i.test(c.credit || ''));
-  if (upstream.length) console.log(`Keep the "Upstream license" lines at the top of copied files; the full texts are in ${join(dir, 'THIRD_PARTY_NOTICES.md')}.`);
+  if (upstream.length) console.log(`\nKeep the "Upstream license" lines at the top of copied files; the full texts are in ${join(dir, 'THIRD_PARTY_NOTICES.md')}.`);
+  console.log(`\n${nextSteps(dir).join('\n')}`);
   return 0;
 }
 

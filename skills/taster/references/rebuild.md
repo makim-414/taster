@@ -24,7 +24,8 @@ so you do not strip what the owner chose on purpose. Ask when you are not sure.
 
 ## 2. Read the content
 
-Call `extract_content { target }` (or `node packages/engine/cli.mjs <url> --extract`). It returns, in reading order:
+Call `extract_content { target }` (or `node <clone>/packages/engine/cli.mjs <url> --extract`, `<clone>` as in
+[where the engine comes from](../SKILL.md#where-the-engine-comes-from)). It returns, in reading order:
 
 - `sections`: each h1 or h2 with the text, subheadings, lists, actions (buttons and button-like links with their
   targets), images, quotes and forms under it.
@@ -102,5 +103,5 @@ consistency check itself), show it to the builder, and ask `plan_next` for the n
 the components the checked screens use, so `check_consistency` against them stays at zero ([screens.md](screens.md)).
 
 The repository has a worked example in `examples/rebuild/` with its own check
-(`node packages/engine/scripts/check-rebuild-example.mjs`): the original, the rebuilt home screen, a second screen built from
-the same components, and the finished `taster.plan.json`.
+(`node <clone>/packages/engine/scripts/check-rebuild-example.mjs`): the original, the rebuilt home screen, a second
+screen built from the same components, and the finished `taster.plan.json`.

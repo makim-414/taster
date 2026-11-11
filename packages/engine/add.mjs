@@ -132,6 +132,26 @@ export function writeBundle(bundle, dir, { overwrite = false } = {}) {
   return { written, skipped };
 }
 
+/**
+ * What to do once the files are in `dir`, printed last by `add`: the tokens import and the Tailwind preset, which the
+ * components need to be styled at all (without it the app still builds), and the :root names an app's own starter
+ * CSS tends to define after the tokens.
+ */
+export function nextSteps(dir) {
+  const slash = (p) => p.split(/[\\/]/).join('/');
+  const preset = slash(join(dir, 'tailwind-preset.cjs'));
+  const fromRoot = isAbsolute(dir) || preset.startsWith('.') ? preset : `./${preset}`;
+  return [
+    `Then import ${slash(join(dir, 'tokens.css'))} once at your app root.`,
+    'The components are styled with Tailwind classes, so the app needs Tailwind CSS with the Taster preset. In tailwind.config.cjs at the app root:',
+    `  module.exports = { presets: [require('${fromRoot}')], content: ['./index.html', './src/**/*.{ts,tsx}'] };`,
+    'Tailwind v3 reads that file as is. Tailwind v4 reads it from the top of the stylesheet in src/ that loads Tailwind:',
+    '  @import "tailwindcss";',
+    '  @config "../tailwind.config.cjs";',
+    'tokens.css defines --bg, --text, --border and --accent on :root. A stylesheet of your app that defines the same names after it wins: remove or rename them in your starter CSS.',
+  ];
+}
+
 /** Fetch the same bundle from a hosted Taster (the web app's /r/<id>.json), one request per id, merged. */
 export async function fetchBundle(ids, from) {
   const files = new Map();

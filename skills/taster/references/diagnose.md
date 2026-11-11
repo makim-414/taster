@@ -26,22 +26,23 @@ Before you measure anything, make sure what loaded is the site:
 
 If any of these fails, the page was not diagnosed. Tell the user what came back (the status, the title, where it
 redirected) and stop. Never try to get past a bot check, a block or a sign-in page; diagnose a local build or a page
-that opens without them instead. The `diagnose` tool and `node packages/engine/cli.mjs` run this check themselves and answer
-"not diagnosed".
+that opens without them instead. The `diagnose` tool and `node <clone>/packages/engine/cli.mjs` run this check
+themselves and answer "not diagnosed".
 
 A cookie banner: press its reject or necessary-only button when it has one, and nothing else. When it has neither,
 leave it in place and say the capture shows it.
 
 ## 2. Run the detector
 
-Load `data/detect.js` into the page and call it.
+Load `data/detect.js` into the page and call it. The file sits next to SKILL.md, in this skill's `data/` folder (in a
+clone of the repository the same file is also `data/rules/detect.js`).
 
-Playwright example:
+Playwright example, with `skillDir` the folder that holds SKILL.md:
 
 ```js
 const response = await page.goto(url, { waitUntil: 'networkidle' });
 // Check you got the page (section 1) from response.status(), page.url() and page.title() before you go on.
-const src = fs.readFileSync('data/detect.js', 'utf8');
+const src = fs.readFileSync(path.join(skillDir, 'data/detect.js'), 'utf8');
 await page.addScriptTag({ content: src });
 const report = await page.evaluate(() => window.tasterDetect({ highlight: true }));
 await page.screenshot({ path: 'diagnose-1440.png', fullPage: true });

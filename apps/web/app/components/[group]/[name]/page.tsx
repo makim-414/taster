@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CATALOG, langOf, sourceOf } from '../../../../lib/catalog';
-import { pageMetadata, SITE } from '../../../../lib/page-meta';
+import { addLine } from '../../../../lib/install';
+import { pageMetadata } from '../../../../lib/page-meta';
 import { CopyButton } from '../../copy-button';
 import { Detail } from './detail';
 
@@ -18,17 +19,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return pageMetadata({ title: item ? `${item.name} · Taster 부품` : 'Taster 부품', description: item?.summary || undefined, path: `/components/${group}/${name}` });
 }
 
-// Until the CLI is on npm, the add command runs from a clone of the repository (engine installed once with
-// npm ci --prefix packages/engine) and reads the files from this site, so it works from inside the visitor's own app.
-const installLine = (id: string) => `node /path/to/taster/packages/engine/cli.mjs add ${id} --from ${SITE} --dir src/components/taster`;
-
 export default async function Page({ params }: Params) {
   const { group, name } = await params;
   const item = CATALOG.find((c) => c.id === `${group}/${name}`);
   if (!item) notFound();
   const source = sourceOf(item);
   return (
-    <Detail id={item.id} name={item.name} kind={item.categoryName} kindLang={item.categoryLang} summary={item.summary} summaryLang={item.summaryLang} install={installLine(item.id)}>
+    <Detail id={item.id} name={item.name} kind={item.categoryName} kindLang={item.categoryLang} summary={item.summary} summaryLang={item.summaryLang} install={addLine(item.id)}>
       <div className="facts">
         {item.patterns.length > 0 && (
           <section>
@@ -49,7 +46,7 @@ export default async function Page({ params }: Params) {
         <section>
           <h2>정보</h2>
           <dl className="meta">
-            <div><dt>설치할 패키지</dt><dd>{item.deps.length ? item.deps.join(', ') : '없음'}</dd></div>
+            <div><dt>설치할 패키지</dt><dd>{['tailwindcss', ...item.deps].join(', ')}</dd></div>
             <div><dt>라이선스</dt><dd>{item.license || '표시 없음'}</dd></div>
             {item.credit && <div><dt>출처</dt><dd>{item.credit}</dd></div>}
           </dl>
