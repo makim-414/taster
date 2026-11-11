@@ -15,6 +15,10 @@ This is the short guide for coding agents and contributors; [CONTRIBUTING.md](CO
 - `apps/extension/`: the Chrome and Edge extension
 - `skills/taster/`: the skill; its `data/` folder is generated
 - `commands/`: the `/taster` command for Claude Code
+- `.claude-plugin/`, `.codex-plugin/`, `.mcp.json`: the plugin's own files, read when a user installs Taster as a
+  Claude Code or Codex plugin. `.mcp.json` starts the engine from the installed copy through `${CLAUDE_PLUGIN_ROOT}`,
+  which Claude Code sets only for an installed plugin. They are not a development setup for this repository; to run
+  the engine while you work on it, use the commands in [CONTRIBUTING.md](CONTRIBUTING.md).
 - `examples/`: a worked rebuild and the icon slot variations, each with its own check
 - `scripts/`: build-docs, validate, gates and the metadata checks
 - `.github/`: CI, issue templates, the code of conduct, the ACP registry entry and the pictures in the README

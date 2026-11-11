@@ -14,24 +14,42 @@
 
 ## <a id="스킬"></a>설치
 
-```bash
-npx skills add https://github.com/makim-414/taster --skill taster
-```
-
-스킬은 `SKILL.md` 를 읽는 모든 에이전트(Claude Code, Codex, Cursor 등)에서 돕니다.
-
-<a id="claude-code-플러그인"></a>Claude Code 에서는 플러그인이 스킬, `/taster` 명령, 로컬 MCP 서버를 함께 넣습니다.
+<a id="claude-code-플러그인"></a>**Claude Code 플러그인: 한 번에 전부.** 스킬, `/taster` 진입점, 로컬 MCP 서버를
+한 번에 넣습니다. MCP 서버가 엔진입니다. 실제 브라우저에서 하는 진단, 브랜드, 디자인 시스템, 화면을 맡습니다.
+Claude Code 가 보는 `PATH` 에 Node.js 22 이상이 있어야 하고, Google Chrome 이나 Playwright 의 Chromium 이 필요합니다.
 
 ```text
 /plugin marketplace add makim-414/taster
 /plugin install taster@taster
 ```
 
-서버를 처음 켤 때 엔진 의존성을 설치하는데, Claude Code 가 서버 연결을 기다리는 시간보다 길어질 수 있습니다.
-`/mcp` 에서 `taster` 가 실패로 보이면 설치가 끝난 뒤 그 화면에서 다시 연결하세요.
+터미널에서는 이렇게 합니다.
 
-필요한 것, 다른 MCP 클라이언트, 처음 할 말은 [자세한 설치](#자세한-설치) 에 있습니다. 명령줄, 소스 린트, GitHub
-Action, 원격 MCP 서버, 확장은 [쓰기](#쓰기) 에 있습니다.
+```bash
+claude plugin marketplace add makim-414/taster
+claude plugin install taster@taster
+```
+
+서버를 처음 켤 때 엔진 의존성을 설치하는데, Claude Code 가 서버 연결을 기다리는 시간보다 길어질 수 있습니다.
+`/mcp` 에서 `taster` 가 실패로 보이면 설치가 끝난 뒤 그 화면에서 다시 연결하세요. 이 리포 맨 위의 `.claude-plugin/`,
+`.codex-plugin/`, `.mcp.json` 은 Claude Code 와 Codex 가 플러그인을 설치할 때 읽는 플러그인 자체의 파일이고, 기여자용
+개발 설정이 아닙니다.
+
+**스킬만: 규칙과 패턴, 어느 에이전트에서나.**
+
+```bash
+npx skills add https://github.com/makim-414/taster --skill taster
+```
+
+`SKILL.md` 를 읽는 모든 에이전트(Claude Code, Codex, Cursor 등)에서 돌고, 규칙, 패턴, 페이지 안에서 도는 검사기
+(`data/detect.js`)를 줍니다. 검사기는 에이전트의 브라우저 도구로 실행합니다. 엔진은 위의 플러그인,
+[원격 MCP 서버](#설치-없이-쓰기-원격-mcp)(공개 주소의 진단과 브랜드. 디자인 시스템과 화면 도구는 없음), 또는 클론에서 옵니다.
+
+**클론: 명령줄, 소스 린트, `add`, 다른 클라이언트의 MCP 서버.** Node.js 22 이상과 git, 페이지를 여는 기능에는 Google
+Chrome 이나 Playwright 의 Chromium 이 필요합니다. [자세한 설치](#자세한-설치) 에 있습니다.
+
+처음 할 말은 [시작](#시작) 에 있습니다. 명령줄, 소스 린트, GitHub Action, 원격 MCP 서버, 확장은 [쓰기](#쓰기) 에
+있습니다.
 
 ## 들어 있는 것
 
@@ -103,8 +121,8 @@ MCP 도구: `design_system`, `tune_system`, `system_for_category`. 측정값이 
 
 ### 필요한 것
 
-- Node.js 22 이상(`.nvmrc` 의 버전)과 git. MCP 서버, 명령줄, `add` 는 이 리포를 받은 클론에서 실행합니다. npm
-  패키지는 아직 게시 전입니다.
+- Node.js 22 이상(`.nvmrc` 의 버전)과 git. 플러그인 밖에서는 MCP 서버, 명령줄, `add` 를 이 리포를 받은 클론에서
+  실행합니다. npm 패키지는 아직 게시 전입니다.
 - 페이지를 여는 기능에는 브라우저가 필요합니다. Playwright 의 Chromium 이 있으면 그것을, 없으면 설치된 Google
   Chrome 을 씁니다. 클론에서 `node packages/engine/setup.mjs` 를 실행하면 둘 중 하나가 뜨는지 확인하고, 둘 다 안 될 때만
   Chromium 을 받습니다. 소스 린트에는 브라우저가 필요 없습니다.

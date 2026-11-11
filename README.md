@@ -14,24 +14,44 @@ Before: Acme Ledger, a made-up landing page that breaks 18 of the rules, each fi
 
 ## <a id="skill"></a>Install
 
-```bash
-npx skills add https://github.com/makim-414/taster --skill taster
-```
-
-The skill works in any agent that reads `SKILL.md`: Claude Code, Codex, Cursor and others.
-
-<a id="claude-code-plugin"></a>In Claude Code, the plugin brings the skill, the `/taster` command and the local MCP server:
+<a id="claude-code-plugin"></a>**Claude Code plugin: everything in one step.** It installs the skill, the `/taster`
+entry and the local MCP server, which is the engine: diagnosis in a real browser, brand, design system and screens.
+It needs Node.js 22 or later on the `PATH` Claude Code sees, and Google Chrome or Playwright's Chromium.
 
 ```text
 /plugin marketplace add makim-414/taster
 /plugin install taster@taster
 ```
 
-The server's first start installs the engine's dependencies, which can take longer than Claude Code waits for a server
-to connect; if `taster` shows as failed in `/mcp`, reconnect it there once the install is done.
+The same from a terminal:
 
-Requirements, other MCP clients and the first thing to ask: [Install in detail](#install-in-detail). The command line,
-source lint, the GitHub Action, the hosted MCP server and the extension: [Use](#use).
+```bash
+claude plugin marketplace add makim-414/taster
+claude plugin install taster@taster
+```
+
+The server's first start installs the engine's dependencies, which can take longer than Claude Code waits for a server
+to connect; if `taster` shows as failed in `/mcp`, reconnect it there once the install is done. `.claude-plugin/`,
+`.codex-plugin/` and `.mcp.json` at the root of this repository are the plugin's own files, read when Claude Code or
+Codex installs it, not a development setup for contributors.
+
+**The skill alone: the rules and patterns, in any agent.**
+
+```bash
+npx skills add https://github.com/makim-414/taster --skill taster
+```
+
+It works in any agent that reads `SKILL.md` (Claude Code, Codex, Cursor and others) and gives it the rules, the
+patterns and the in-page detector (`data/detect.js`) to run with the agent's own browser tool. The engine comes from
+the plugin above, the [hosted MCP server](#use-without-installing-hosted-mcp) (diagnosis and brand on public
+addresses, without the design system and screen tools) or a clone.
+
+**A clone: the command line, source lint, `add` and the MCP server in other clients.** It needs Node.js 22 or later
+and git, and Google Chrome or Playwright's Chromium for anything that opens a page:
+[Install in detail](#install-in-detail).
+
+The first thing to ask: [Start](#start). The command line, source lint, the GitHub Action, the hosted MCP server and
+the extension: [Use](#use).
 
 ## What you get
 
@@ -103,8 +123,8 @@ to tokens: `skills/taster/references/system.md`.
 
 ### Requirements
 
-- Node.js 22 or later (the version in `.nvmrc`) and git. The MCP server, the command line and `add` run from a clone
-  of this repository; the npm package is not published yet.
+- Node.js 22 or later (the version in `.nvmrc`) and git. Outside the plugin, the MCP server, the command line and
+  `add` run from a clone of this repository; the npm package is not published yet.
 - A browser for anything that opens a page: Playwright's Chromium if it is installed, otherwise your Google Chrome.
   `node packages/engine/setup.mjs` in the clone checks for one and downloads Chromium only when neither starts. Source lint
   needs no browser.
