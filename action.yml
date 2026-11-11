@@ -36,8 +36,11 @@ runs:
         npm ci --prefix "$GITHUB_ACTION_PATH/packages/engine" --omit=dev --no-audit --no-fund
         npx --prefix "$GITHUB_ACTION_PATH/packages/engine" playwright install chromium
         # On Linux, the system libraries and the CJK and Thai fonts only when the runner lacks them.
+        # The Ubuntu mirrors sometimes stop answering a runner for many minutes, so the install gets
+        # five minutes and a failure only warns: Diagnose still reports a browser that cannot start.
         if [ "$RUNNER_OS" = Linux ] && ! (node -e "require(process.argv[1]).chromium.launch().then((b) => b.close())" "$GITHUB_ACTION_PATH/packages/engine/node_modules/playwright" && for l in ko ja zh th; do fc-list ":lang=$l" | grep -q . || exit 1; done); then
-          npx --prefix "$GITHUB_ACTION_PATH/packages/engine" playwright install-deps chromium
+          timeout 300 npx --prefix "$GITHUB_ACTION_PATH/packages/engine" playwright install-deps chromium \
+            || echo "::warning::Taster could not install Chromium's system packages or fonts (package mirror slow or unreachable); continuing with what the runner has."
         fi
     - name: Diagnose
       id: diagnose
