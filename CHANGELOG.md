@@ -26,6 +26,29 @@ All notable changes to Taster are recorded here. The format follows
     release moves the tag to the new layout, and `@main` runs the new layout once this is merged; the inputs are the
     same.
 - The npm package no longer lists the extension in its files; it is installed unpacked or from the store.
+- The README says what each install path gives and needs: the plugin (the skill, `/taster` and the local MCP server
+  in one step, now with the `claude plugin` terminal commands), the skill alone (the rules, patterns and in-page
+  detector) and a clone.
+- The READMEs and `packages/registry/README.md` say the components need Tailwind with the Taster preset, with the
+  config for Tailwind v3 and v4, and warn that an app stylesheet redefining `--bg`, `--text`, `--border` or `--accent`
+  after `tokens.css` wins.
+- `add` ends with that Tailwind setup and the `:root` warning instead of a one line pointer to the preset.
+- The component pages on the site show every step: clone the repository and install the engine, run `add` from the
+  app folder, and connect the preset; the packages row lists `tailwindcss`.
+- Installed alone, the skill says where the engine comes from (the plugin, the hosted MCP server at
+  `https://taster-six.vercel.app/api/mcp`, or a clone) and writes its commands as `node <clone>/packages/engine/...`.
+
+### Fixed
+
+- The skill no longer tells the agent to download missing component files from the main branch at run time; the code
+  comes from `get_component` or from `add` in a clone.
+- `lint` no longer reports the second line of a custom property value that a formatter split over lines
+  (`--shadow:` and then `rgba(...) ...;`), so the starter stylesheet of a new Vite app passes.
+
+### Removed
+
+- The plugin's `commands/taster.md`, which never ran because the skill of the same name answers `/taster`; `/taster`
+  still starts the skill.
 
 ## [0.2.0] - 2026-11-06
 
