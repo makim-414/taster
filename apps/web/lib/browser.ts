@@ -81,6 +81,9 @@ function isServerless(): boolean {
 // '.org.chromium.Chromium.' entries are those files from launches made before it existed.
 const RUN_PREFIX = 'taster-chromium-';
 const PROFILE_PREFIXES = ['playwright_chromiumdev_profile-', 'playwright-artifacts-', RUN_PREFIX, '.org.chromium.Chromium.'];
+// A Chromium that crashes on a heavy page leaves a core dump at the top of the folder
+// ("core.chromium.31", 430 MB on the live site), which alone filled it.
+const CORE_DUMP = /^core(\.|$)/;
 // Below this much free space after the cleanup, the log names what is filling the folder.
 const LOW_TMP_BYTES = 64 * 1048576;
 
@@ -106,7 +109,7 @@ export async function clearChromiumLeftovers(): Promise<void> {
   let removed = 0;
   const dir = tmpdir();
   for (const name of await readdir(dir).catch(() => [] as string[])) {
-    if (!PROFILE_PREFIXES.some((p) => name.startsWith(p))) continue;
+    if (!PROFILE_PREFIXES.some((p) => name.startsWith(p)) && !CORE_DUMP.test(name)) continue;
     await rm(path.join(dir, name), { recursive: true, force: true }).catch(() => {});
     removed++;
   }
