@@ -37,7 +37,7 @@ source lint, the GitHub Action, the hosted MCP server and the extension: [Use](#
 
 - **Rules.** 88 rules, 85 measured in a real browser by `data/rules/detect.js` and the rest judged by eye from the captures: all caps labels with wide letter spacing, tinted pill badges, thick colored left borders, emoji bullets, Korean text that breaks mid word. A finding says a page shows a trait, not who or what made it ([where the rules come from](#where-the-rules-come-from)).
 - **Patterns.** 122 patterns, sorted by what the visitor is trying to do (compare plans, prove trust, label a state) and where (landing, dashboard, store, AI chat and more). Every rule points to the patterns that fix it.
-- **Components.** 144 components: token based React components you copy into your app. No package to install, no brand to undo.
+- **Components.** 152 components: token based React components you copy into your app. No package to install, no brand to undo.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/assets/components.dark.jpg">
@@ -327,7 +327,7 @@ cannot carry poster type, deep shadows need a restrained palette). `data/taxonom
 setting. Read [data/taxonomy/SCHEMA.md](data/taxonomy/SCHEMA.md).
 
 <!-- taxonomy:start -->
-122 patterns, 88 rules, 144 components, 33 categories in 8 families, 40 uses, 8 surfaces, 8 weighting axes, 10 constraints.
+122 patterns, 88 rules, 152 components, 33 categories in 8 families, 40 uses, 8 surfaces, 8 weighting axes, 10 constraints.
 
 | Family | Categories | Patterns |
 |---|---|---|

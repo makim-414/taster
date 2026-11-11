@@ -66,6 +66,10 @@ import {
   WireframeForm,
   LightBeams,
   ThinkingOrb, ORB_RECIPES,
+  LampGlow,
+  BandShader,
+  PasswordField,
+  DEFAULT_PASSWORD_RULES,
 } from '../../src'
 import { AppSections } from './sections-app'
 import { ONLY } from './stage'
@@ -446,6 +450,15 @@ const STEPS: ShowcaseStep[] = [
   { id: 'swap', name: 'Swap', title: 'Replace each spot with a pattern', body: 'Every rule points to a pattern and, where one exists, a component to copy.', pictures: [{ alt: 'Pattern page next to the code change', aspect: 1440 / 900 }] },
   { id: 'check', name: 'Check', title: 'Run it again until it is clean', body: 'The change counts only when the rule no longer shows at either width.', pictures: [{ alt: 'Clean report', aspect: 1440 / 900 }] },
 ]
+
+// Korean labels for the password field's five default rules.
+const KO_PASSWORD_RULES: Record<string, string> = {
+  length: '8자 이상',
+  number: '숫자 1개 이상',
+  lowercase: '영문 소문자 1개 이상',
+  uppercase: '영문 대문자 1개 이상',
+  special: '특수문자 1개 이상',
+}
 
 export function Sections() {
   return (
@@ -949,6 +962,36 @@ export function Sections() {
         </div>
       </Section>
 
+      <Section id="motion/lamp-glow" title="Lamp glow">
+        <LampGlow className="rounded-card border border-border">
+          <h3 className="max-w-xl text-display font-semibold text-text">Light the one thing that matters</h3>
+          <p className="mt-3 max-w-md text-body text-text-muted">One source and the words in its light. The color reads the brand token and follows the theme.</p>
+        </LampGlow>
+      </Section>
+
+
+      <Section id="motion/band-shader" title="Band shader">
+        <div className="flex flex-col gap-3">
+          <div className="relative flex h-[28rem] items-center justify-center overflow-hidden rounded-card border border-border bg-bg px-6">
+            <BandShader />
+            <div className="relative max-w-2xl text-center">
+              <h3 className="text-balance text-h1 font-semibold leading-tight text-text sm:text-display">Light that keeps its edges</h3>
+              <p className="mt-3 text-body text-text-muted">Background only. The words are yours.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="relative h-40 overflow-hidden rounded-card border border-border bg-bg">
+              <BandShader split={0} bands={5} scrim={0} />
+              <span className="absolute bottom-2 left-2 rounded-sm bg-bg px-1.5 py-0.5 text-caption text-text">split 0, one clean color</span>
+            </div>
+            <div className="relative h-40 overflow-hidden rounded-card border border-border bg-bg">
+              <BandShader edges={['var(--chart-2)', 'var(--chart-5)']} angle={-20} ripple={1} scrim={0} />
+              <span className="absolute bottom-2 left-2 rounded-sm bg-bg px-1.5 py-0.5 text-caption text-text">edges from two tokens</span>
+            </div>
+          </div>
+        </div>
+      </Section>
+
 
       <Section id="blocks/session-list" title="Session list">
         <SessionList
@@ -965,6 +1008,25 @@ export function Sections() {
         <div className="flex max-w-sm flex-col gap-2">
           <label htmlFor="demo-sensitive" className="text-sm font-medium text-text">Sample value</label>
           <SensitiveInput id="demo-sensitive" defaultValue="demo_value_not_a_credential" showCopy />
+        </div>
+      </Section>
+
+      <Section id="blocks/password-field" title="Password field">
+        <div className="grid gap-8 md:grid-cols-3">
+          <PasswordField id="demo-password-empty" />
+          <PasswordField id="demo-password-filled" label="New password" defaultValue="demo-value" />
+          <PasswordField
+            id="demo-password-ko"
+            lang="ko"
+            label="비밀번호"
+            defaultValue="Demo-value-26"
+            requirementsLabel="비밀번호 조건"
+            strengthLabels={{ empty: '비밀번호를 입력하세요', weak: '약한 비밀번호', medium: '보통 비밀번호', strong: '안전한 비밀번호' }}
+            metLabel="충족"
+            unmetLabel="미충족"
+            revealLabel="비밀번호 보기"
+            rules={DEFAULT_PASSWORD_RULES.map((r) => ({ ...r, label: KO_PASSWORD_RULES[r.id] ?? r.label }))}
+          />
         </div>
       </Section>
 

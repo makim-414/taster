@@ -5,8 +5,8 @@ category: motion-particle
 uses: [set-the-mood]
 surfaces: [landing, auth-onboarding]
 replaces: [BG-01, COL-01, COL-03]
-components: [motion/mesh-drift, motion/point-field, motion/light-beams]
-inspiration: [https://blog.maximeheckel.com/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/, https://21st.dev/@admin_5eaa986a/components/dark-mono]
+components: [motion/mesh-drift, motion/point-field, motion/light-beams, motion/lamp-glow, motion/band-shader, scene/noise-orb, scene/ridge-terrain]
+inspiration: [https://blog.maximeheckel.com/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/, https://21st.dev/@admin_5eaa986a/components/dark-mono, https://21st.dev/@manuarora700/components/lamp, https://21st.dev/@designali-in/components/shader-animation, https://21st.dev/@dhileepkumargm/components/anomalous-matter-hero, https://21st.dev/@dhileepkumargm/components/mountain-scene]
 status: stable
 ---
 
@@ -27,6 +27,8 @@ A line field: thin lines displaced by noise, drawn in `--border` color on a calm
 Light beams: soft slanted shafts rising slowly, in `motion/light-beams`. They read `--brand` and suit a dark surface with a short headline. Keep them faint, since a strong beam turns into the neon look this pattern avoids (COL-03).
 
 All of them sit in an absolutely positioned layer with `pointer-events: none`, `aria-hidden="true"`, and a solid `--bg` behind them. Foreground text is above at full contrast. A static first frame is drawn before anything animates.
+
+Four more forms in the registry. `motion/lamp-glow` opens a section with one lamp: a crisp tube and light falling in a cone onto the words below it, CSS only, with no glow shadow. `motion/band-shader` draws wide diagonal slats of light with a hard edge in one WebGL shader; by default its edges split warm and cold from the core color, and `split={0}` keeps it to one neutral ink as this pattern prefers. `scene/noise-orb` is a dense wire sphere whose surface ripples with slow noise, drawn in `--text`. `scene/ridge-terrain` is a low-poly mountain field drifting toward the viewer, in `--brand` fading into the surface. Each holds one still frame under reduced motion and stops off screen.
 
 ## Do
 

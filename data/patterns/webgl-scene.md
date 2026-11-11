@@ -5,7 +5,7 @@ category: 3d
 uses: [set-the-mood, introduce-the-product, show-relationships]
 surfaces: [landing, dashboard]
 replaces: [BG-01, MOT-01]
-components: [scene/point-globe]
+components: [scene/point-globe, scene/noise-orb, scene/ridge-terrain]
 inspiration: [https://github.com/shuding/cobe, https://blog.maximeheckel.com/posts/the-magical-world-of-particles-with-react-three-fiber-and-shaders/]
 status: draft
 ---
@@ -26,6 +26,8 @@ Four restrained forms, pick one.
 4. Data graph: nodes and links from real data (a knowledge graph, a supply chain), orbit controls, a legend and a node detail panel next to it.
 
 Every form ships with the same four layers: a static poster image that shows instantly, a lazy-loaded renderer that replaces it, a render loop that runs only while the canvas is visible, and a reduced-motion path that renders one frame.
+
+Form 3 in the registry: `scene/noise-orb` (a wire sphere rippled by noise, on a 2D canvas) and `scene/ridge-terrain` (a low-poly heightfield drifting forward, one WebGL draw call). Both draw their first frame at once, stop off screen and hold still under reduced motion.
 
 ## Do
 

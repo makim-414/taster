@@ -5,7 +5,7 @@ category: motion-particle
 uses: [set-the-mood, prove-trust]
 surfaces: [landing]
 replaces: []
-components: [motion/marquee]
+components: [motion/marquee, marketing/index-testimonial]
 inspiration: [https://magicui.design/docs/components/marquee]
 status: stable
 ---
@@ -23,6 +23,8 @@ A clipping container with `overflow: hidden`. Inside, a track holding the items,
 Items have a uniform height (32 to 40px) and consistent spacing, with the gap included in the track padding so the seam is invisible. Edges can fade out with a CSS mask on the container.
 
 Controls: hover and focus-within pause the motion. A visible pause button is present when the band runs longer than five seconds, which is the rule for any automatic movement.
+
+Under a testimonial, `marketing/index-testimonial` runs the companies' names as a decorative band: the names are hidden from screen readers and the pause button stays.
 
 ## Do
 

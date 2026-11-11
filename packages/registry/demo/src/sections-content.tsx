@@ -46,6 +46,10 @@ import {
   PointField,
   PointGlobe,
   type GlobeMarker,
+  IndexTestimonial,
+  TopoHero,
+  NoiseOrb,
+  RidgeTerrain,
 } from '../../src'
 import { plate } from './placeholder'
 import { ONLY } from './stage'
@@ -455,6 +459,19 @@ export function ContentSections() {
         />
       </Section>
 
+      <Section id="marketing/topo-hero" title="Topo hero">
+        <TopoHero
+          as="h2"
+          image={{ src: plate('', 1600, 1000, 'c'), alt: 'Placeholder for a black and white photograph of a mountain valley' }}
+          eyebrow="Halide"
+          meta={['63.9915° N', '19.0610° W', '588 m']}
+          title={'Silver\nsulphide'}
+          caption={['Plate 14 of 40, exposed on fibre paper at first light.', 'Contours from the survey of the same valley.']}
+          action={{ label: 'See all 40 plates', href: '#plates' }}
+          seed={7}
+        />
+      </Section>
+
       <Section id="content/section-heading" title="Section heading">
         <div className="grid gap-12">
           <SectionHeading eyebrow="How it works" title="One check, two widths, every rule" link={{ label: 'Read the rules', href: '#rules' }}>
@@ -492,6 +509,10 @@ export function ContentSections() {
           org="a regional grocer"
           link={{ label: 'Read the case', href: '#case' }}
         />
+      </Section>
+
+      <Section id="marketing/index-testimonial" title="Index testimonial">
+        <IndexTestimonial className="border-y border-border" />
       </Section>
 
       <Section id="marketing/case-study-card" title="Case study card">
@@ -755,6 +776,30 @@ export function ContentSections() {
 
       <Section id="scene/point-globe" title="Point globe">
         <PointGlobe label="Globe with three places marked" markers={MARKERS} listLabel="Where we work" />
+      </Section>
+
+      <Section id="scene/noise-orb" title="Noise orb">
+        <div className="relative isolate flex min-h-[35rem] items-center justify-center overflow-hidden rounded-card border border-border bg-bg px-4 py-16 text-center">
+          <NoiseOrb />
+          <div className="relative z-0 max-w-xl">
+            {/* Readability scrim from the surface token: the mesh still shows, the small text reads at every frame. */}
+            <div aria-hidden="true" className="absolute -inset-x-8 -inset-y-12 -z-10 bg-[radial-gradient(closest-side,var(--bg)_45%,transparent)] opacity-80" />
+            <p className="text-label font-medium text-text-muted">Field notes on motion</p>
+            <h3 className="mt-2 text-h1 font-semibold leading-[var(--lh-tight)] tracking-[-0.01em] text-text text-balance lg:text-display">
+              Energy dances along unseen frontiers.
+            </h3>
+            <p className="mx-auto mt-4 max-w-md text-title text-text-muted text-pretty">
+              One surface, pushed by slow noise, turning in the dark. The words stay in the page, above it.
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="scene/ridge-terrain" title="Ridge terrain">
+        <div className="relative h-96 overflow-hidden rounded-card border border-border bg-bg md:h-[30rem]">
+          <RidgeTerrain />
+          <p className="relative px-6 pt-8 text-title font-semibold text-text">Background only. The words are yours.</p>
+        </div>
       </Section>
     </>
   )

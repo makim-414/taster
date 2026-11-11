@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "taster",
-      "description": "Diagnose, swap and build. 88 rules, 85 measured in a real browser, a taxonomy of 122 patterns sorted by use and surface, and a registry of 144 components built on tokens.",
+      "description": "Diagnose, swap and build. 88 rules, 85 measured in a real browser, a taxonomy of 122 patterns sorted by use and surface, and a registry of 152 components built on tokens.",
       "version": "0.2.0",
       "source": "./",
       "skills": ["./skills/taster"],

@@ -5,8 +5,8 @@ category: testimonial
 uses: [prove-trust]
 surfaces: [landing]
 replaces: [AC-17, CMP-08]
-components: [blocks/card, marketing/customer-quote, marketing/case-study-card]
-inspiration: [https://21st.dev/@uilayout.contact/components/testimonial-1]
+components: [blocks/card, marketing/customer-quote, marketing/case-study-card, marketing/index-testimonial]
+inspiration: [https://21st.dev/@uilayout.contact/components/testimonial-1, https://21st.dev/@jatin-yadav05/components/design-testimonial]
 status: stable
 ---
 
@@ -26,6 +26,8 @@ A card in a row of two or three, or one wide card.
 - Link: "Read the case" to a page where the claim is backed up, if one exists.
 
 Photographs are real headshots supplied by the person. If there is no photo, skip the avatar; do not use initials in a colored disc.
+
+One quote at a time: `marketing/index-testimonial` sets the item's position as a large faint numeral behind the quote, with previous and next buttons, and runs the companies' names as a quiet band below (`motion/marquee`, hidden from screen readers because the names are already in the quotes).
 
 ## Do
 
