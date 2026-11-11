@@ -71,6 +71,29 @@ test('links are not followed while walking, so a link loop ends', { skip: proces
   assert.equal(lintPaths(['linked'], dir).files, 1);
 });
 
+test('a custom property value a formatter split over lines is still its definition', () => {
+  // The starter stylesheet of a new Vite app, as its formatter writes it.
+  const css = [
+    ':root {',
+    '  --text: #6b6375;',
+    '  --shadow:',
+    '    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;',
+    '  --accent-bg:',
+    '    rgba(170, 59, 255, 0.1);',
+    '  color: var(--text);',
+    '}',
+    '.card {',
+    '  box-shadow:',
+    '    rgba(0, 0, 0, 0.1) 0 10px 15px -3px;',
+    '  color: #6b6375;',
+    '}',
+  ].join('\n');
+  // Only the plain properties of .card are reported: the split value of box-shadow and the color.
+  assert.deepEqual(lintText(css, 'index.css').map((f) => [f.rule, f.line]), [['SRC-01', 11], ['SRC-01', 12]]);
+  // The value ends at its semicolon: a color on the next property is reported again.
+  assert.deepEqual(lintText(':root {\n  --shadow:\n    rgba(0, 0, 0, 0.1) 0 10px;\n  outline-color: #ff0000;\n}', 'a.css').map((f) => f.line), [4]);
+});
+
 test('taster-allow needs a reason', () => {
   assert.equal(lintText('<div className="bg-indigo-600"> {/* taster-allow */}', 'a.tsx')[0].rule, 'SRC-00');
   assert.equal(lintText('{/* taster-allow the partner logo color, fixed by contract */}\n<div className="bg-indigo-600">', 'a.tsx').length, 0);
