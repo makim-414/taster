@@ -3,7 +3,7 @@
 // browser itself is pointed at a dead proxy so anything that slips past interception
 // (WebSocket, WebRTC, workers, cross-origin frames) has nowhere to go and simply fails.
 import { existsSync } from 'node:fs';
-import { mkdir, readdir, readFile, rm, statfs, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, mkdtemp, readdir, readFile, rm, statfs, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { chromium as playwright, type Browser, type Page } from 'playwright-core';
@@ -77,7 +77,12 @@ function isServerless(): boolean {
 // withGate (limits.ts) lets one instance run one Chromium at a time, so anything found is a
 // leftover. Serverless only: on a laptop or CI runner the same scan would hit the user's own
 // browser and profiles.
-const PROFILE_PREFIXES = ['playwright_chromiumdev_profile-', 'playwright-artifacts-'];
+// The run folder (RUN_PREFIX) is where Chromium's own temp files go, see launchBrowser; the
+// '.org.chromium.Chromium.' entries are those files from launches made before it existed.
+const RUN_PREFIX = 'taster-chromium-';
+const PROFILE_PREFIXES = ['playwright_chromiumdev_profile-', 'playwright-artifacts-', RUN_PREFIX, '.org.chromium.Chromium.'];
+// Below this much free space after the cleanup, the log names what is filling the folder.
+const LOW_TMP_BYTES = 64 * 1048576;
 
 export async function clearChromiumLeftovers(): Promise<void> {
   if (!isServerless()) return;
@@ -106,6 +111,31 @@ export async function clearChromiumLeftovers(): Promise<void> {
     removed++;
   }
   if (killed || removed) console.error(`[chromium] cleared ${killed} leftover process(es), ${removed} profile folder(s); ${await tmpFree()}`);
+  if ((await tmpFreeBytes()) < LOW_TMP_BYTES) console.error(`[chromium] temp folder nearly full, largest entries: ${await largestEntries(dir)}`);
+}
+
+async function sizeOf(p: string): Promise<number> {
+  const s = await lstat(p);
+  if (!s.isDirectory()) return s.size;
+  let total = 0;
+  for (const name of await readdir(p).catch(() => [] as string[])) total += await sizeOf(path.join(p, name)).catch(() => 0);
+  return total;
+}
+
+async function largestEntries(dir: string): Promise<string> {
+  const sizes: [string, number][] = [];
+  for (const name of await readdir(dir).catch(() => [] as string[])) sizes.push([name, await sizeOf(path.join(dir, name)).catch(() => 0)]);
+  sizes.sort((a, b) => b[1] - a[1]);
+  return sizes.slice(0, 8).map(([name, bytes]) => `${name} ${Math.round(bytes / 1048576)} MB`).join(', ') || 'none';
+}
+
+async function tmpFreeBytes(): Promise<number> {
+  try {
+    const s = await statfs(tmpdir());
+    return s.bavail * s.bsize;
+  } catch {
+    return Infinity;
+  }
 }
 
 /** Free space in the temp folder, for the log line when a launch or a page fails. */
@@ -134,7 +164,14 @@ export async function launchBrowser(): Promise<Browser> {
     fontReady ||= installKoreanFont().catch(() => null);
     await fontReady;
     await clearChromiumLeftovers();
-    return playwright.launch({ executablePath, args: mergeArgs(chromium.args), headless: true, logger: browserLogger() });
+    // Chromium writes its shared memory files, crash reports and caches under TMPDIR and HOME
+    // (HOME is /tmp on the platform). A run that crashes or is killed never deletes them, and
+    // after a few heavy pages they filled the 512 MB temp folder so no browser could start.
+    // Each launch gets its own folder instead, removed with the other leftovers after the run.
+    const runDir = await mkdtemp(path.join(tmpdir(), RUN_PREFIX));
+    const env: Record<string, string> = { TMPDIR: runDir, HOME: runDir };
+    for (const [key, value] of Object.entries(process.env)) if (value !== undefined && !(key in env)) env[key] = value;
+    return playwright.launch({ executablePath, args: mergeArgs(chromium.args), headless: true, logger: browserLogger(), env });
   }
   const executablePath = process.env.CHROME_PATH || (existsSync(MAC_CHROME) ? MAC_CHROME : undefined);
   return playwright.launch({ executablePath, args: mergeArgs([]), headless: true });
