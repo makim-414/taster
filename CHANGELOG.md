@@ -50,6 +50,14 @@ All notable changes to Taster are recorded here. The format follows
 - The plugin's `commands/taster.md`, which never ran because the skill of the same name answers `/taster`; `/taster`
   still starts the skill.
 
+### Fixed
+
+- The GitHub Action gives the Linux system packages and fonts five minutes to install and only warns when the package
+  mirror does not answer, instead of failing the job after twenty minutes; the diagnosis still fails if no browser
+  starts.
+- Hosted diagnosis no longer stops working after a heavy page: each server browser runs in its own temp folder, and the
+  files a crashed browser leaves, its core dump included, are removed before the next run.
+
 ## [0.2.0] - 2026-11-06
 
 The first tagged release (`v0.2.0`, and `v0` for the GitHub Action).
