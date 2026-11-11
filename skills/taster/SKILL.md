@@ -43,6 +43,35 @@ Data this skill reads (all inside this folder):
 - [data/tone-refs.json](data/tone-refs.json): the tone map. Real sites placed on commerce to brand personality and minimal to expressive, with genres and the public posts that praised them. Links only, no screens.
 - [data/registry.json](data/registry.json): token based React components you can copy. Source lives in the repository under `packages/registry/src/`; if this folder was installed alone, fetch the file from `https://raw.githubusercontent.com/makim-414/taster/main/packages/registry/<file>`.
 
+## Where the engine comes from
+
+This folder holds the rules, the patterns, the taxonomy, the component list and the in-page detector
+(`data/detect.js`, next to this SKILL.md). Diagnosis in a real browser, brand, the design system, the screen plan
+and the component code come from the engine, in one of three ways:
+
+- The Claude Code plugin (`/plugin marketplace add makim-414/taster`, then `/plugin install taster@taster`): this
+  skill and the local MCP server together.
+- The hosted MCP server, `https://taster-six.vercel.app/api/mcp` (Streamable HTTP, nothing to install). It opens
+  public http(s) addresses only and has no `extract_content`, `design_system`, `tune_system`,
+  `system_for_category`, `check_consistency`, `plan_screens`, `plan_next` or `plan_update`.
+- A clone of the repository, for the command line, source lint and the local MCP server in any client. With the
+  plugin, or when this skill sits inside a clone, the clone is already there: the folder two levels above this one,
+  which holds `packages/engine/`. Otherwise:
+
+  ```bash
+  git clone https://github.com/makim-414/taster.git <clone>
+  npm ci --prefix <clone>/packages/engine
+  ```
+
+  Then `node <clone>/packages/engine/cli.mjs <url>` diagnoses (also `--brand`, `--extract`, `--system`, `--plan`,
+  `--consistency`, `add <id>`), `node <clone>/packages/engine/lint.mjs <files>` reads source without a browser, and
+  `node <clone>/packages/engine/start.mjs` is the local MCP server. It needs Node.js 22 or later, and Google Chrome or
+  Playwright's Chromium for anything that opens a page.
+
+The npm package is not published, and the npm name `taster` belongs to someone else: never run a bare `taster`
+command or `npx taster`. When none of the three is there, say so, offer them, and meanwhile run `data/detect.js` in
+the page with your own browser tool ([references/diagnose.md](references/diagnose.md)).
+
 ## If the taster MCP server is connected
 
 Prefer its tools; they run the same detector in a real browser for you.
@@ -64,7 +93,8 @@ Prefer its tools; they run the same detector in a real browser for you.
 - `check_consistency { screens, system, widths, logoFont }`: drift between screens and values off the system, at 1440 and 390.
 - The hosted server (added by its URL, nothing installed) opens public http(s) addresses only. Its `diagnose` takes `target` alone and measures 1440 and 390, and its `preview_component` returns the default still with a live link in the brand. It has no `extract_content`, `design_system`, `tune_system`, `system_for_category`, `check_consistency`, `plan_screens`, `plan_next` or `plan_update`, since those open pages in a local browser or read and write local files; use the local server for them.
 
-Without the server, follow the steps below with any browser tool, or run `node packages/engine/cli.mjs <url>` from the repository.
+Without the server, follow the steps below with any browser tool and `data/detect.js`, or run
+`node <clone>/packages/engine/cli.mjs <url>` from a clone ([Where the engine comes from](#where-the-engine-comes-from)).
 
 ## Diagnose
 
@@ -74,7 +104,8 @@ Follow [references/diagnose.md](references/diagnose.md). Short version:
 2. Check you got the page: a status under 400, the final address on the host you asked for, no bot check, block page
    or captcha. If not, say it was not diagnosed and stop; never try to get past it. On a cookie banner press only a
    reject or necessary-only button.
-3. Run `data/detect.js` in the page with `{ highlight: true }`. Capture both widths with the outlines on.
+3. Run `data/detect.js` (next to this SKILL.md) in the page with `{ highlight: true }`. Capture both widths with the
+   outlines on.
 4. Walk the `manual` rules over the captures yourself.
 5. Report a table: rule id, what it is, where (selector and a crop or the outlined capture), severity, fix pattern. Group by rule, most severe first. Count deterministic findings exactly; never estimate them.
 

@@ -15,8 +15,10 @@ A brand belongs to its owner. Absorb one only from a site the user owns or is au
 client's with the client's say so); ask once if you do not know. If it is someone else's, stop and say why, and ask
 for their own color, typeface and logo instead (New site, below).
 
-Call `brand_theme { target }` on the original address (or `node packages/engine/cli.mjs <url> --brand --out <dir>`). It reads
-the page the same way `extract_content` does and returns:
+Call `brand_theme { target }` on the original address (or
+`node <clone>/packages/engine/cli.mjs <url> --brand --out <dir>`, `<clone>` as in
+[where the engine comes from](../SKILL.md#where-the-engine-comes-from)). It reads the page the same way `extract_content` does and
+returns:
 
 - `tokens`: the overrides it chose.
   - `--brand`: the solid color the site puts on its own buttons and links. A gradient is not a brand color; when
