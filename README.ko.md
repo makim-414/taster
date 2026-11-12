@@ -14,30 +14,48 @@
 
 ## <a id="스킬"></a>설치
 
-```bash
-npx skills add https://github.com/makim-414/taster --skill taster
-```
-
-스킬은 `SKILL.md` 를 읽는 모든 에이전트(Claude Code, Codex, Cursor 등)에서 돕니다.
-
-<a id="claude-code-플러그인"></a>Claude Code 에서는 플러그인이 스킬, `/taster` 명령, 로컬 MCP 서버를 함께 넣습니다.
+<a id="claude-code-플러그인"></a>**Claude Code 플러그인: 한 번에 전부.** 스킬, `/taster` 진입점, 로컬 MCP 서버를
+한 번에 넣습니다. MCP 서버가 엔진입니다. 실제 브라우저에서 하는 진단, 브랜드, 디자인 시스템, 화면을 맡습니다.
+Claude Code 가 보는 `PATH` 에 Node.js 22 이상이 있어야 하고, Google Chrome 이나 Playwright 의 Chromium 이 필요합니다.
 
 ```text
 /plugin marketplace add makim-414/taster
 /plugin install taster@taster
 ```
 
-서버를 처음 켤 때 엔진 의존성을 설치하는데, Claude Code 가 서버 연결을 기다리는 시간보다 길어질 수 있습니다.
-`/mcp` 에서 `taster` 가 실패로 보이면 설치가 끝난 뒤 그 화면에서 다시 연결하세요.
+터미널에서는 이렇게 합니다.
 
-필요한 것, 다른 MCP 클라이언트, 처음 할 말은 [자세한 설치](#자세한-설치) 에 있습니다. 명령줄, 소스 린트, GitHub
-Action, 원격 MCP 서버, 확장은 [쓰기](#쓰기) 에 있습니다.
+```bash
+claude plugin marketplace add makim-414/taster
+claude plugin install taster@taster
+```
+
+서버를 처음 켤 때 엔진 의존성을 설치하는데, Claude Code 가 서버 연결을 기다리는 시간보다 길어질 수 있습니다.
+`/mcp` 에서 `taster` 가 실패로 보이면 설치가 끝난 뒤 그 화면에서 다시 연결하세요. 이 리포 맨 위의 `.claude-plugin/`,
+`.codex-plugin/`, `.mcp.json` 은 Claude Code 와 Codex 가 플러그인을 설치할 때 읽는 플러그인 자체의 파일이고, 기여자용
+개발 설정이 아닙니다.
+
+**스킬만: 규칙과 패턴, 어느 에이전트에서나.**
+
+```bash
+npx skills add https://github.com/makim-414/taster --skill taster
+```
+
+`SKILL.md` 를 읽는 모든 에이전트(Claude Code, Codex, Cursor 등)에서 돌고, 규칙, 패턴, 페이지 안에서 도는 검사기
+(`data/detect.js`)를 줍니다. 검사기는 에이전트의 브라우저 도구로 실행합니다. 엔진은 위의 플러그인,
+[원격 MCP 서버](#설치-없이-쓰기-원격-mcp)(공개 주소의 진단과 브랜드. 디자인 시스템과 화면 도구는 없음), 또는 클론에서 옵니다.
+
+**클론: 명령줄, 소스 린트, `add`, 다른 클라이언트의 MCP 서버.** Node.js 22 이상과 git, 페이지를 여는 기능에는 Google
+Chrome 이나 Playwright 의 Chromium 이 필요합니다. [자세한 설치](#자세한-설치) 에 있습니다.
+
+처음 할 말은 [시작](#시작) 에 있습니다. 명령줄, 소스 린트, GitHub Action, 원격 MCP 서버, 확장은 [쓰기](#쓰기) 에
+있습니다.
 
 ## 들어 있는 것
 
 - **규칙.** 규칙 88개, 그중 85개는 `data/rules/detect.js` 가 실제 브라우저에서 재고 나머지는 캡처를 보고 눈으로 판단합니다. 대문자에 넓은 자간을 준 라벨, 색을 옅게 깐 알약 배지, 카드 왼쪽의 두꺼운 색 띠, 이모지 불릿, 단어 중간에서 끊기는 한글 줄바꿈 같은 것들입니다. 걸렸다는 것은 그 페이지에 그 흔적이 있다는 뜻이지, 누가 무엇으로 만들었는지를 말하지 않습니다([규칙의 근거](#규칙의-근거)).
 - **패턴.** 패턴 122개. 방문자가 하려는 일(요금제 비교, 믿을 근거 확인, 상태 표시)과 화면 종류(랜딩, 대시보드, 쇼핑, AI 대화 등)로 정리했습니다. 규칙마다 그것을 고치는 패턴이 연결돼 있습니다.
-- **부품.** 부품 152개. 토큰으로 만든 React 컴포넌트입니다. 설치할 패키지 없이 필요한 파일만 복사해 쓰고, 지워야 할 남의 브랜드도 없습니다.
+- **부품.** 부품 152개. 토큰으로 만든 React 컴포넌트이고, Tailwind 와 Taster 프리셋으로 스타일을 입힙니다. 부품 라이브러리를 설치하지 않고 필요한 파일만 복사해 쓰며, 지워야 할 남의 브랜드도 없습니다.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/assets/components.dark.jpg">
@@ -103,8 +121,8 @@ MCP 도구: `design_system`, `tune_system`, `system_for_category`. 측정값이 
 
 ### 필요한 것
 
-- Node.js 22 이상(`.nvmrc` 의 버전)과 git. MCP 서버, 명령줄, `add` 는 이 리포를 받은 클론에서 실행합니다. npm
-  패키지는 아직 게시 전입니다.
+- Node.js 22 이상(`.nvmrc` 의 버전)과 git. 플러그인 밖에서는 MCP 서버, 명령줄, `add` 를 이 리포를 받은 클론에서
+  실행합니다. npm 패키지는 아직 게시 전입니다.
 - 페이지를 여는 기능에는 브라우저가 필요합니다. Playwright 의 Chromium 이 있으면 그것을, 없으면 설치된 Google
   Chrome 을 씁니다. 클론에서 `node packages/engine/setup.mjs` 를 실행하면 둘 중 하나가 뜨는지 확인하고, 둘 다 안 될 때만
   Chromium 을 받습니다. 소스 린트에는 브라우저가 필요 없습니다.
@@ -185,6 +203,9 @@ node /path/to/taster/packages/engine/cli.mjs lint src --baseline taster-baseline
 
 ### 내 앱에 부품 넣기
 
+부품은 Tailwind 클래스로 그리고, Taster 프리셋이 그 클래스를 토큰에 연결합니다. 그래서 내 앱에 Tailwind CSS(v3 또는
+v4)와 이 프리셋이 있어야 합니다. 없으면 빌드는 통과하는데 부품이 스타일 없이 나옵니다.
+
 내 앱 폴더에서, 위 단계의 클론으로:
 
 ```bash
@@ -195,6 +216,29 @@ node /path/to/taster/packages/engine/cli.mjs add blocks/button blocks/citations 
 MIT 라이선스도 옆에 둡니다. shadcn 같은 다른 CLI 는 필요 없습니다. `--from https://taster-six.vercel.app` 를 붙이면
 부품 파일을 클론 대신 호스팅 사본에서 읽지만, npm 게시 전까지 명령 자체는 클론에서 실행합니다. 자세한 내용은
 [packages/registry/README.md](packages/registry/README.md).
+
+그다음 `src/components/taster/tokens.css` 를 앱 루트에서 한 번 import 하고 Tailwind 에 프리셋을 줍니다. 설정 파일은 앱
+루트에 두고, `package.json` 에 `"type": "module"` 이 있는 앱에서도 `require` 가 되도록 이름을 `.cjs` 로 합니다.
+
+```js
+// tailwind.config.cjs
+module.exports = {
+  presets: [require('./src/components/taster/tailwind-preset.cjs')],
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+};
+```
+
+Tailwind v3 는 이 파일을 그대로 읽습니다. Tailwind v4 는 `@config` 로 읽습니다. Tailwind 를 불러오는 `src/` 의
+스타일시트(예: `src/index.css`) 맨 위에 넣습니다.
+
+```css
+@import "tailwindcss";
+@config "../tailwind.config.cjs";
+```
+
+`tokens.css` 는 `:root` 에 `--bg`, `--text`, `--border`, `--accent` 등을 정의합니다. 내 앱의 스타일시트가 같은 이름을
+정의하고 그 뒤에 불러오면 그쪽이 이기고, 부품이 그 색을 씁니다. 새로 만든 Vite 앱의 스타터 CSS 가 바로 그렇습니다.
+스타터 CSS 에서 그 변수들을 지우거나 이름을 바꾸세요.
 
 ### 에이전트와 함께 눈으로 고르기
 

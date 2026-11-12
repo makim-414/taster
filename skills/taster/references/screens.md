@@ -21,9 +21,10 @@ Show the builder the theme notes and get their yes on color, typeface and logo b
 
 ## 2. Plan the screens
 
-Call `plan_screens { target, route, system, out }` (or `node packages/engine/cli.mjs --plan <url> --out <dir> --system
-<file>`). It reads the start page and lists it first, then every page on the same site its navigation links to, in
-the order the navigation shows them. It writes `taster.plan.json`:
+Call `plan_screens { target, route, system, out }` (or `node <clone>/packages/engine/cli.mjs --plan <url> --out <dir>
+--system <file>`, `<clone>` as in [where the engine comes from](../SKILL.md#where-the-engine-comes-from)).
+It reads the start page and lists it first, then every page on the same site its navigation links to, in the order
+the navigation shows them. It writes `taster.plan.json`:
 
 ```json
 {
@@ -105,8 +106,9 @@ When the last part is checked, the whole screen is checked once more, against th
 
 ## What the consistency check measures
 
-`check_consistency { screens, system }` (or `node packages/engine/cli.mjs --consistency a.html b.html --system tokens.css
---system theme.css`) renders every screen at 1440 and 390 and reads computed values on visible elements by role:
+`check_consistency { screens, system }` (or `node <clone>/packages/engine/cli.mjs --consistency a.html b.html
+--system tokens.css --system theme.css`) renders every screen at 1440 and 390 and reads computed values on visible
+elements by role:
 
 | Role | Found as | Values compared |
 |---|---|---|
@@ -152,4 +154,4 @@ screens before it, what the builder approved in their words, and anything left w
 last `plan_next` says `done`.
 
 The repository has a worked two screen example in `examples/rebuild/` (`taster.plan.json`, `after.html`,
-`pricing.html`) with its own check (`node packages/engine/scripts/check-rebuild-example.mjs`).
+`pricing.html`) with its own check (`node <clone>/packages/engine/scripts/check-rebuild-example.mjs`).

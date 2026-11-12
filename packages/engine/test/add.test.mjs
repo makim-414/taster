@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { GROUPS, fetchBundle, isRegistryPath, loadRegistry, resolveComponents, writeBundle } from '../add.mjs';
+import { GROUPS, fetchBundle, isRegistryPath, loadRegistry, nextSteps, resolveComponents, writeBundle } from '../add.mjs';
 
 test('add pulls in every relative import, the token files and the notices', () => {
   const b = resolveComponents(['blocks/session-list']);
@@ -17,6 +17,17 @@ test('add pulls in every relative import, the token files and the notices', () =
   assert.deepEqual(resolveComponents(['content/article']).npm, []);
   // An import written in a doc comment (Prose shows DOMPurify in its JSDoc) is not a dependency.
   assert.deepEqual(resolveComponents(['content/prose']).npm, []);
+});
+
+test('add ends with the Tailwind setup the components need, for v3 and v4, and the :root names that collide', () => {
+  const text = nextSteps('src/components/taster').join('\n');
+  assert.match(text, /import src\/components\/taster\/tokens\.css once/);
+  assert.match(text, /presets: \[require\('\.\/src\/components\/taster\/tailwind-preset\.cjs'\)\]/);
+  assert.match(text, /@import "tailwindcss";\n {2}@config "\.\.\/tailwind\.config\.cjs";/);
+  for (const name of ['--bg', '--text', '--border', '--accent']) assert.ok(text.includes(name), `does not name ${name}`);
+  // The require path is relative to the config at the app root; ./x stays ./x and ../x keeps its prefix.
+  assert.match(nextSteps('./ui').join('\n'), /require\('\.\/ui\/tailwind-preset\.cjs'\)/);
+  assert.match(nextSteps('../shared/taster').join('\n'), /require\('\.\.\/shared\/taster\/tailwind-preset\.cjs'\)/);
 });
 
 test('add refuses unknown ids and keeps files the user changed', () => {

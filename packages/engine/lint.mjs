@@ -227,12 +227,19 @@ export function lintText(text, file) {
   const lines = text.split('\n');
   const out = [];
   let fence = false, block = false;
+  // The first line of a custom property whose value a formatter moved to the lines below (`--shadow:` and then
+  // `rgba(0, 0, 0, 0.1) 0 10px ...;`). Those lines are still the definition, so each is checked together with it.
+  let valueHead = null;
   lines.forEach((line, i) => {
     if (DOCS.includes(ext) && /^\s*(```|~~~)/.test(line)) { fence = !fence; return; }
     if (fence) return;
     // Inside a multi-line /* */ or <!-- --> comment: skip until it closes.
     if (block) { if (/\*\/|-->/.test(line)) block = false; return; }
     if (!DOCS.includes(ext) && /^\s*(\/\*|<!--|\{\/\*)/.test(line) && !/\*\/|-->/.test(line)) { block = true; return; }
+    const head = valueHead;
+    if (valueHead !== null) { if (/[;{}]/.test(line) || !line.trim()) valueHead = null; }
+    else if (!DOCS.includes(ext) && /^\s*--[\w-]+\s*:[^;{}]*$/.test(line)) valueHead = line;
+    const declaration = head === null ? line : `${head.trim()} ${line.trim()}`;
     const allowHere = line.match(ALLOW) || (i > 0 && lines[i - 1].match(ALLOW));
     if (allowHere) {
       if (!allowHere[1].replace(/[*/>\-\s}]/g, '')) out.push({ rule: 'SRC-00', line: i + 1, column: 1, text: line.trim().slice(0, 120) });
@@ -243,7 +250,7 @@ export function lintText(text, file) {
       if (!c.ext.includes(ext)) continue;
       if (DOCS.includes(ext) && c.id !== 'AC-02' && c.id !== 'AC-03') continue;
       const m = line.match(c.re);
-      if (!m || (c.except && c.except.test(line))) continue;
+      if (!m || (c.except && c.except.test(declaration))) continue;
       out.push({ rule: c.id, line: i + 1, column: m.index + 1, text: line.trim().slice(0, 120) });
     }
   });
@@ -313,6 +320,9 @@ export function selftest() {
   if (lintText('// taster-allow', 'x.tsx').length !== 1) problems.push('SRC-00 missed an allow without a reason');
   if (lintText('/*\n  transition: all 1s ease-in;\n*/', 'x.css').length) problems.push('a multi-line comment was linted');
   if (lintText('// taster-allow brand color from the client logo\n<div style={{ color: "#7c3aed" }}>', 'x.tsx').length) problems.push('taster-allow with a reason did not allow the next line');
+  // A formatter splits a long custom property value over lines; the lines below the name are still its definition.
+  if (lintText(':root {\n  --shadow:\n    rgba(0, 0, 0, 0.1) 0 10px 15px -3px,\n    rgba(0, 0, 0, 0.05) 0 4px 6px -2px;\n}', 'x.css').length) problems.push('a custom property value split over lines was linted');
+  if (lintText(':root {\n  --shadow:\n    rgba(0, 0, 0, 0.1) 0 10px;\n}\n.card {\n  box-shadow:\n    rgba(0, 0, 0, 0.1) 0 10px;\n}', 'x.css').map((f) => f.line).join() !== '7') problems.push('a split value outside a custom property was not linted');
   return problems;
 }
 

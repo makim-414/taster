@@ -60,7 +60,8 @@ Run Diagnose on the result at 1440 and 390, ICO rules included. Show the user th
 
 Done means all of these, and zero overflow is the floor, not the proof:
 
-- no hard-coded colors (`taster lint` on the files you wrote), no slop findings, pageerror 0
+- no hard-coded colors (`node <clone>/packages/engine/lint.mjs` on the files you wrote, `<clone>` as in
+  [where the engine comes from](../SKILL.md#where-the-engine-comes-from)), no slop findings, pageerror 0
 - three levels of hierarchy or fewer in any block
 - `--widths responsive` (360 to 1440) with no overflow, and the 768, 820 and 1024 captures opened and looked at
 

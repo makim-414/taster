@@ -1,7 +1,9 @@
 # Registry
 
-Portable React and TypeScript components with neutral design tokens. There is no package to
-install and no other CLI to set up: `taster add` copies the files a component needs into your app.
+Portable React and TypeScript components with neutral design tokens. There is no component package
+to install and no other CLI to set up: `add` copies the files a component needs into your app. The
+components are styled with Tailwind classes that `tailwind-preset.cjs` maps to the tokens, so your app
+needs Tailwind CSS (v3 or v4) with that preset ([Tailwind](#tailwind)).
 
 152 components, one of them the keyboard hook `blocks/use-hotkeys`, MIT licensed. Every entry is listed in
 `registry.json` with its file, category, npm dependencies and credit.
@@ -26,13 +28,40 @@ instead of the clone, add `--from https://taster-six.vercel.app` (the same files
 `/r/index.json` lists the ids); the command itself still runs from the clone. The npm package will replace the clone
 once it is published (`RELEASING.md`).
 
+## Tailwind
+
+Import `tokens.css` once at your app root, then give Tailwind the preset. A config at the app root, named
+`.cjs` so `require` works in an app whose `package.json` says `"type": "module"`:
+
+```js
+// tailwind.config.cjs
+module.exports = {
+  presets: [require('./src/components/taster/tailwind-preset.cjs')],
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+};
+```
+
+Tailwind v3 reads it as is. Tailwind v4 reads it through `@config`, at the top of the stylesheet in
+`src/` that loads Tailwind (for example `src/index.css`):
+
+```css
+@import "tailwindcss";
+@config "../tailwind.config.cjs";
+```
+
+Without the preset the build still passes and the components show up unstyled. `tokens.css` defines
+`--bg`, `--text`, `--border`, `--accent` and more on `:root`, so a stylesheet of your app that defines
+the same names and loads after it wins and the components take its colors. The starter CSS of a new
+Vite app does exactly that: remove those variables from it or rename them.
+
 ## Copy a component by hand
 
 1. Tokens first. Components read CSS variables only, so nothing renders correctly without them.
    - Copy `src/tokens.css` and import it once at your app root.
-   - Copy `src/tailwind-preset.cjs` and add it to your Tailwind v3 config:
-     `presets: [require('./tailwind-preset.cjs')]`. It maps classes such as `bg-bg-elev`,
-     `text-text-muted`, `border-border-soft` and `text-label` to the variables.
+   - Copy `src/tailwind-preset.cjs` and add it to your Tailwind config:
+     `presets: [require('./tailwind-preset.cjs')]`, with the path from the config to the file (Tailwind
+     v4 reads the config through `@config`, see [Tailwind](#tailwind)). It maps classes such as
+     `bg-bg-elev`, `text-text-muted`, `border-border-soft` and `text-label` to the variables.
    - Optional: `src/themes/light.css` (activate with `<html data-theme="light">`) and
      `src/base.css` (only needed for Calendar and DatePicker, import it after
      `react-day-picker/style.css`).

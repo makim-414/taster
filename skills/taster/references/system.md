@@ -9,7 +9,8 @@ Screens.
 ## 1. Absorb the brand and read the references
 
 Call `design_system { brand, references, axes?, surface?, scheme?, out }` (or
-`node packages/engine/cli.mjs --system <brand> --ref <page> --axis name=value --out <dir>`).
+`node <clone>/packages/engine/cli.mjs --system <brand> --ref <page> --axis name=value --out <dir>`, `<clone>` as in
+[where the engine comes from](../SKILL.md#where-the-engine-comes-from)).
 
 - `brand`: the owner's site or any page that carries the brand. It decides identity: brand color, typeface, logo,
   light or dark, and the success and failure colors fitted to them (the same intake as [brand.md](brand.md)).
@@ -17,7 +18,7 @@ Call `design_system { brand, references, axes?, surface?, scheme?, out }` (or
   usually average into nothing.
 - `axes`: what the builder already said ("denser", "flatter", "no animation"), as axis values.
 
-Each page is opened in a real browser at 1440 wide and measured (`packages/engine/measure.js`). Every measurement is mapped to
+Each page is opened in a real browser at 1440 wide and measured (`<clone>/packages/engine/measure.js`). Every measurement is mapped to
 the axis step whose generated token is closest, so a page built from a system measures back to the same steps.
 
 Where each axis comes from, first match wins:
@@ -45,7 +46,7 @@ compact; roundness: square, crisp, soft, round, pillow; and so on).
 ## 3. Let the builder move weights
 
 When the builder moves an axis, call `tune_system { system, axes }` (or
-`node packages/engine/cli.mjs --tune <dir>/taster.system.json roundness=1`). The moved axes stay where the builder put them;
+`node <clone>/packages/engine/cli.mjs --tune <dir>/taster.system.json roundness=1`). The moved axes stay where the builder put them;
 balance moves the least needed elsewhere, and the summary says which axes moved and quotes the principle:
 
 > roundness set to pillow (1) by the builder. elevation moved lifted (0.25) to raised (0.5): "Radius and depth

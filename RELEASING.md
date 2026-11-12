@@ -8,7 +8,7 @@ order, by the owner. Version 0.2.0.
 - `node scripts/gates.mjs` passes on `main` (every gate CI runs, in the same order; see `CONTRIBUTING.md`) and CI is
   green there.
 - `npm pack --dry-run` lists `packages/engine/` (with `taster.mjs`, the command), `packages/registry/`, `data/rules/`,
-  `data/patterns/`, `data/taxonomy/`, `skills/` and `commands/`, and no `node_modules`, `apps/` or `.github/`.
+  `data/patterns/`, `data/taxonomy/` and `skills/`, and no `node_modules`, `apps/` or `.github/`.
 - Run the private name check over the repository and fix every hit.
 
 ## Release day
