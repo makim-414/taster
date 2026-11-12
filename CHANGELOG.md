@@ -6,6 +6,14 @@ All notable changes to Taster are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- 8 components, for 152 in the registry, written new after picks on 21st.dev with no code taken: `scene/noise-orb`
+  and `scene/ridge-terrain` (a wire sphere and a low-poly terrain), `motion/lamp-glow` and `motion/band-shader` (a
+  section lamp in CSS and light slats in one WebGL1 shader), `blocks/password-field` (strength bar and checklist on
+  `sensitive-input`), `blocks/location-expand` (a place card that opens into a map), `marketing/index-testimonial`
+  and `marketing/topo-hero`.
+
 ### Changed
 
 - **Breaking:** a new repository layout, the `apps/` and `packages/` shape most JavaScript monorepos use. The engine
