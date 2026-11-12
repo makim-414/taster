@@ -5,8 +5,8 @@ category: hero
 uses: [introduce-the-product]
 surfaces: [landing, commerce, editorial]
 replaces: [AC-19, BG-01, COL-03, LAY-01]
-components: [blocks/button, marketing/photo-hero, blocks/banner-hero]
-inspiration: [https://21st.dev/@felipemenezes098/components/hero-04, https://21st.dev/@ravikatiyar162/components/modern-hero-section, https://21st.dev/@sensewood8/components/responsive-hero-banner]
+components: [blocks/button, marketing/photo-hero, blocks/banner-hero, marketing/topo-hero]
+inspiration: [https://21st.dev/@felipemenezes098/components/hero-04, https://21st.dev/@ravikatiyar162/components/modern-hero-section, https://21st.dev/@sensewood8/components/responsive-hero-banner, https://21st.dev/@shivendra9795kumar/components/halide-topo-hero]
 status: draft
 ---
 
@@ -24,6 +24,8 @@ Two accepted forms.
 - Collage: a serif or display headline on one side, two or three overlapping photographs on the other. Photos differ in size and crop; one is tall, one is small, none has a card frame or drop shadow.
 
 Layers from back to front: photo, scrim (a linear gradient from transparent at 40% height to 55% black at the bottom), text block, action. The scrim is a plain dark gradient, not a colored one. Add a very fine grain overlay (2 to 4% opacity) over the photo to take off the glossy edge.
+
+`marketing/topo-hero` holds a black and white photograph on a plane tilted a few degrees, with survey contour lines over it, short facts in the corners, a large headline and one action; on a desk screen with a mouse the plane leans a little toward the pointer, and it lies flat on touch and under reduced motion.
 
 ## Do
 

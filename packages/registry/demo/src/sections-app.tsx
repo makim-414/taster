@@ -45,6 +45,7 @@ import {
   ToastProvider, ToastCard, useToast,
   UnderlineTabs,
   Wizard,
+  LocationExpand,
 } from '../../src'
 import { ONLY } from './stage'
 
@@ -992,6 +993,20 @@ export function AppSections() {
     <>
       <Section id="blocks/sidebar-nav" title="Sidebar nav"><SidebarDemo /></Section>
       <Section id="blocks/location-map" title="Location map"><MapDemo /></Section>
+
+      <Section id="blocks/location-expand" title="Location expand">
+        <div className="grid items-start gap-8 md:grid-cols-2">
+          <LocationExpand />
+          <LocationExpand
+            label="Office today"
+            place="Seoul, Jongno-gu"
+            coordinates={{ lat: 37.5735, lng: 126.979 }}
+            live={false}
+            seed={4}
+            defaultExpanded
+          />
+        </div>
+      </Section>
       <Section id="blocks/theme-scope" title="Theme scope"><ThemeScopeDemo /></Section>
       <Section id="blocks/settings-section" title="Settings page and section"><SettingsDemo /></Section>
       <Section id="blocks/master-detail" title="Master detail"><MasterDetailDemo /></Section>

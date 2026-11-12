@@ -2,7 +2,7 @@
   "name": "@makim-414/taster",
   "version": "0.2.0",
   "private": true,
-  "description": "Find the AI generated look in a frontend and fix it: 88 rules, 85 measured in a real browser, 122 patterns and 144 components to swap in, for agents (MCP, ACP), editors, CI and the browser.",
+  "description": "Find the AI generated look in a frontend and fix it: 88 rules, 85 measured in a real browser, 122 patterns and 152 components to swap in, for agents (MCP, ACP), editors, CI and the browser.",
   "type": "module",
   "license": "MIT",
   "author": "makim-414",

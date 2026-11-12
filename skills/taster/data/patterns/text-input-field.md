@@ -5,8 +5,8 @@ category: form-input
 uses: [enter-data]
 surfaces: [app, auth-onboarding]
 replaces: [AC-06, AC-09, AC-14, RSP-06]
-components: [blocks/input, blocks/sensitive-input, blocks/settings-section, blocks/field, blocks/textarea, blocks/slider, blocks/file-dropzone, blocks/tag-input]
-inspiration: [https://ui.shadcn.com/docs/components/input]
+components: [blocks/input, blocks/sensitive-input, blocks/settings-section, blocks/field, blocks/textarea, blocks/slider, blocks/file-dropzone, blocks/tag-input, blocks/password-field]
+inspiration: [https://ui.shadcn.com/docs/components/input, https://21st.dev/@uilayout.contact/components/password-input-1]
 status: stable
 ---
 
@@ -23,6 +23,8 @@ Any place a person types: names, emails, search terms, notes, settings. One fiel
 - Disabled: opacity 0.5 and no pointer events, with the reason in the hint.
 - Select: same chrome plus a line chevron on the right. File drop target: dashed 1px `--input` border, same radius, a sentence and a "Choose file" text button.
 - Settings layout: label and hint in a left column (about 240px), field in the right column, a 1px `--border-soft` rule between rows. A save bar slides in at the bottom only after something changes, with Save and Discard.
+
+A new password with its rules: `blocks/password-field` builds on `blocks/sensitive-input` and adds a thin strength bar, one strength word in a polite live region, and a checklist that says met or not met in words, not only by an icon.
 
 ## Do
 

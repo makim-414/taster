@@ -264,7 +264,9 @@ test('a capture over the image limit is named by its path, not attached', () => 
 });
 
 test('browse_components ranks what a part is above what it is only part of', () => {
-  const hero = browseComponents({ query: 'hero', limit: 8 }).map((c) => c.id);
+  // Ten, not eight: each new hero component (marketing/topo-hero) moves the wire form down one place; what this test
+  // holds is the order below, the wire form above the button.
+  const hero = browseComponents({ query: 'hero', limit: 10 }).map((c) => c.id);
   const first = browseComponents({ query: 'hero', limit: 3 });
   assert.ok(first.every((c) => c.category === 'hero' || c.category === 'motion-particle'), first.map((c) => c.id).join(', '));
   // The wire form is made for heroes; the button only sits inside hero patterns.

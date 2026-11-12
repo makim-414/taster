@@ -5,7 +5,7 @@ category: form-input
 uses: [sign-in-or-sign-up]
 surfaces: [auth-onboarding]
 replaces: []
-components: [blocks/input, blocks/button, blocks/field, blocks/otp-input]
+components: [blocks/input, blocks/button, blocks/field, blocks/otp-input, blocks/password-field]
 inspiration: []
 status: stable
 ---

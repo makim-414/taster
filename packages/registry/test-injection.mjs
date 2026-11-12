@@ -121,6 +121,7 @@ const cases = {
     h(R.FeatureRows, { rows: [{ id: 'a', title: 'T', body: 'B', link: { label: 'L', href: u }, media: { ...img, width: 4, height: 3 } }] }),
   'marketing/logo-wall': (u) => h(R.LogoWall, { caption: 'C', items: [{ name: 'Acme', href: u }] }),
   'marketing/photo-hero': (u) => h(R.PhotoHero, { image: img, title: 'T', action: { label: 'Go', href: u } }),
+  'marketing/topo-hero': (u) => h(R.TopoHero, { image: img, title: 'T', action: { label: 'Go', href: u } }),
   'marketing/plan-rows': (u) =>
     h(R.PlanRows, { plans: [{ id: 'a', name: 'A', blurb: 'B', price: { monthly: '$1', yearly: '$10' }, features: ['F'], cta: { label: 'Buy', href: u } }] }),
   'marketing/plan-table': (u) =>

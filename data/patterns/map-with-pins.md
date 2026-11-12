@@ -5,8 +5,8 @@ category: map
 uses: [show-relationships]
 surfaces: [app]
 replaces: []
-components: [blocks/location-map]
-inspiration: []
+components: [blocks/location-map, blocks/location-expand]
+inspiration: [https://21st.dev/@jatin-yadav05/components/expand-map]
 status: draft
 ---
 
@@ -23,6 +23,8 @@ Location is the thing people decide by: clinics near me, stores, venues, regiona
 - Moving or zooming the map filters the list to what is visible, with a quiet "Search this area" control when the filter is not automatic.
 - Selected item opens a detail panel or a popover anchored to the pin: name, address, one primary action.
 - World variant: a flat country map, one-hue fill by value, hover tooltips, no pins.
+
+One place shown as a status: `blocks/location-expand` is a compact card (place, an optional live status) that opens in place into a street sketch with a pin and the coordinates. No tiles, no key and no network.
 
 ## Do
 

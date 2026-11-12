@@ -5,7 +5,7 @@ to install and no other CLI to set up: `add` copies the files a component needs 
 components are styled with Tailwind classes that `tailwind-preset.cjs` maps to the tokens, so your app
 needs Tailwind CSS (v3 or v4) with that preset ([Tailwind](#tailwind)).
 
-144 components, one of them the keyboard hook `blocks/use-hotkeys`, MIT licensed. Every entry is listed in
+152 components, one of them the keyboard hook `blocks/use-hotkeys`, MIT licensed. Every entry is listed in
 `registry.json` with its file, category, npm dependencies and credit.
 
 ## Add a component to your app
@@ -74,7 +74,7 @@ Vite app does exactly that: remove those variables from it or rename them.
    An entry in `deps` that looks like `blocks/use-hotkeys` is another registry component,
    copy it too.
 5. Copy every file the component imports by a relative path. `blocks/coverflow-carousel`,
-   `blocks/sensitive-input`, `blocks/session-list` and `marketing/workflow-section` also need
+   `blocks/sensitive-input`, `blocks/password-field`, `blocks/session-list` and `marketing/workflow-section` also need
    `src/icons/index.tsx`. Every component that takes a URL in a prop also needs `src/blocks/_url.ts`
    (see below).
 6. The components that move read `prefers-reduced-motion` through `src/motion/_motion.ts` (reduced
@@ -82,9 +82,9 @@ Vite app does exactly that: remove those variables from it or rename them.
    file too: everything under `motion/`, `marketing/pricing-cards`, `marketing/reveal-faq`,
    `marketing/step-showcase`, `marketing/workflow-section` (its particle orb stops),
    `blocks/appearance-picker`, `blocks/banner-hero`, `blocks/citations`,
-   `blocks/curved-stream-hero`, `blocks/spotlight-card`, `content/prose`, `content/article` (which
-   also needs `content/prose`), `media/snap-carousel`, `chat/tool-call`, `chat/agent-status` and
-   `scene/point-globe`. `blocks/skeleton` pulses only under `motion-safe`.
+   `blocks/curved-stream-hero`, `blocks/location-expand`, `blocks/spotlight-card`, `content/prose`, `content/article` (which
+   also needs `content/prose`), `media/snap-carousel`, `marketing/index-testimonial`, `marketing/topo-hero`, `chat/tool-call`,
+   `chat/agent-status`, `scene/point-globe`, `scene/noise-orb` and `scene/ridge-terrain`. `blocks/skeleton` pulses only under `motion-safe`.
 7. The page section, content, media, commerce, chat and scene components (`marketing/*`,
    `content/*`, `media/*`, `commerce/*`, `chat/*`, `scene/*`) have no npm dependency and draw their
    own small line glyphs inline. `marketing/photo-hero`, `media/before-after` and
