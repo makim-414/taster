@@ -17,6 +17,12 @@ All notable changes to Taster are recorded here. The format follows
   cursors working on it at once. Diagnose runs the detector inside the original and visits each finding, swap wipes
   the rebuilt page in block by block while the count of rules left goes down, and system moves the rebuilt page's
   radius and spacing tokens live. The home page links to it under the before and after slider.
+- The worked rebuild in `examples/rebuild/` has a light mode: when the visitor's system asks for light, `site.css`
+  loads `light/theme.css`, the light scheme of the same design system (same brand and tone). Dark stays the default, so
+  the README and slider pictures do not change (`apps/web/scripts/compare/render.mjs` now asks for dark). It passes
+  CMP-11 (dark only) where every stylesheet is readable, as on `/demo`, which now ends at 17 rules to 0 at 1300 wide.
+  `check-rebuild-example.mjs` checks both modes: 0 findings at 1440 and 390, and 0 drift and 0 off-system values.
+  `diagnose()` and `checkConsistency()` in the engine take a `colorScheme` option for that.
 
 ### Changed
 

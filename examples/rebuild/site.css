@@ -1,6 +1,11 @@
 /* Shared by every rebuilt screen (after.html, pricing.html), so each screen is drawn from the same components.
    Brand color, typeface, meaning colors, spacing, radius, type scale, shadows, motion and borders all come from theme.css. */
 
+/* Light mode: when the visitor's system asks for light, the light scheme of the same design system replaces the dark
+   one, with the same brand and tone (node packages/engine/cli.mjs --system examples/rebuild/before.html --scheme light
+   --out examples/rebuild/light). Dark stays the default. */
+@import url("light/theme.css") (prefers-color-scheme: light);
+
 * { box-sizing: border-box; margin: 0; }
 body { display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); color: var(--text); font-family: var(--font); font-size: var(--t-title); line-height: var(--lh-normal); }
 p { text-wrap: pretty; }
@@ -41,6 +46,10 @@ h1 .soft { color: var(--text-subtle); }
 .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp-1) var(--sp-4); padding: var(--sp-3) var(--sp-4); border-radius: var(--r-sm); background: var(--card); }
 .row h3 { font-size: var(--t-body); font-weight: var(--w-semi); line-height: var(--lh-normal); }
 .row p { grid-column: 1 / -1; color: var(--text-muted); font-size: var(--t-body); }
+/* In light the card fill is opaque white, so a card on a card is no step at all; the rows take the muted fill instead. */
+@media (prefers-color-scheme: light) {
+  .row { background: var(--muted); }
+}
 
 /* status-label: the state as neutral text in a thin neutral ring, no tint and no colored dot */
 .state { grid-column: 2; grid-row: 1; align-self: center; justify-self: end; padding: var(--sp-1) var(--sp-2); border: 1px solid var(--border-soft); border-radius: var(--r-pill); color: var(--text-subtle); font-size: var(--t-sm); font-weight: var(--w-med); line-height: var(--lh-snug); white-space: nowrap; }

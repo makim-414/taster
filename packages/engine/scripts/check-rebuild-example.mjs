@@ -4,6 +4,9 @@
 // the original (brand and tone), so theme.css and taster.system.json must be exactly what designSystem gives. Then,
 // as references/screens.md asks, the second screen is clean too, both screens draw every component the same way and
 // only from the system (registry tokens plus theme.css), and taster.plan.json records both screens as checked.
+// The rebuild has both modes: dark by default, and light (light/theme.css, the light scheme of the same system) when the
+// visitor's system asks for it. The browser loads pages in light unless told otherwise, so every check above runs on
+// the light mode, and the rebuilt screens are diagnosed and checked for consistency again in dark.
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -55,6 +58,14 @@ const drift = differs(stable(JSON.parse(readFileSync(file('taster.system.json'),
 if (drift.length) fail(`examples/rebuild/taster.system.json drifted from design_system for before.html at ${drift.slice(0, 12).join(', ')}`);
 if (!/<link rel="stylesheet" href="theme\.css">/.test(readFileSync(after, 'utf8'))) fail('after.html does not load theme.css');
 
+// The light mode is the same system in the light scheme: the same brand and tone, light surfaces and ink.
+const lightSystem = await designSystem({ brand: before, intent: { scheme: 'light' } });
+if (readFileSync(file('light/theme.css'), 'utf8') !== lightSystem.css) fail('examples/rebuild/light/theme.css is not what design_system gives for before.html in the light scheme (regenerate: node packages/engine/cli.mjs --system examples/rebuild/before.html --scheme light --out examples/rebuild/light)');
+const lightDrift = differs(stable(JSON.parse(readFileSync(file('light/taster.system.json'), 'utf8'))), stable(lightSystem));
+if (lightDrift.length) fail(`examples/rebuild/light/taster.system.json drifted from design_system for before.html in the light scheme at ${lightDrift.slice(0, 12).join(', ')}`);
+if (lightSystem.tokens['--brand'] !== system.tokens['--brand']) fail(`the light scheme changes the brand from ${system.tokens['--brand']} to ${lightSystem.tokens['--brand']}`);
+if (!/@import url\("light\/theme\.css"\) \(prefers-color-scheme: light\);/.test(readFileSync(file('site.css'), 'utf8'))) fail('site.css no longer loads light/theme.css when the visitor asks for light');
+
 // Screen by screen: the second screen, consistency across both against the system, and the plan.
 const pricing = file('pricing.html');
 const diagPricing = await diagnose(pricing);
@@ -67,15 +78,28 @@ if (!consistency.ok) fail(`the two rebuilt screens are not consistent: ${consist
 // Negative control: the original was not drawn from this system, so the same check must fail on it.
 const control = await checkConsistency([after, before], { system: systemFiles });
 if (control.ok) fail('the consistency check passed the original against the system; it is not measuring anything');
+
+// Dark, the default mode: both screens clean, and consistent against the system without the light scheme on top.
+const darkFiles = systemFiles.filter((p) => !p.endsWith(join('light', 'theme.css')));
+if (darkFiles.length !== systemFiles.length - 1) fail('the plan should list light/theme.css in its system, after theme.css');
+const [darkAfter, darkPricing] = [await diagnose(after, { colorScheme: 'dark' }), await diagnose(pricing, { colorScheme: 'dark' })];
+if (darkAfter.rulesHit !== 0) fail(`in dark the rebuild hits ${darkAfter.rules.map((r) => r.ruleId).join(', ')}`);
+if (darkPricing.rulesHit !== 0) fail(`in dark pricing.html hits ${darkPricing.rules.map((r) => r.ruleId).join(', ')}`);
+const darkConsistency = await checkConsistency([after, pricing], { system: darkFiles, colorScheme: 'dark' });
+if (!darkConsistency.ok) fail(`in dark the two rebuilt screens are not consistent: ${darkConsistency.drift.map((d) => `${d.role} ${d.property}`).concat(darkConsistency.offSystem.map((f) => `${f.screen} ${f.role} ${f.property} ${f.value}`)).join(' | ')}`);
+// Negative control for the mode: the dark screens against the light system must fail, or the scheme never switched.
+const darkControl = await checkConsistency([after, pricing], { system: systemFiles, colorScheme: 'dark' });
+if (darkControl.ok) fail('the dark screens passed against the light system; the color scheme did not switch');
 if (nextStep(plan).action !== 'done') fail(`the plan is not finished: ${nextStep(plan).say}`);
 for (const s of plan.screens) if (!s.output || !existsSync(join(dirname(planFile), s.output))) fail(`plan screen ${s.id} has no output file`);
 if (plan.screens.map((s) => s.output).join() !== 'after.html,pricing.html') fail('the plan should list after.html and pricing.html in build order');
 
 console.log(`before: ${diagBefore.rulesHit} rules hit (${diagBefore.rules.map((r) => r.ruleId).join(' ')})`);
-console.log(`after: 0 rules hit at ${diagAfter.widths.join(' and ')}`);
+console.log(`after: 0 rules hit at ${diagAfter.widths.join(' and ')} (light, the browser's default)`);
 console.log(`design system: ${Object.keys(system.tokens).length} tokens, ${Object.entries(system.steps).map(([a, n]) => `${a} ${n}`).join(', ')}; lowest text contrast ${system.contrast.lowest.ratio}:1`);
 console.log(`content kept: ${parity.kept} of ${parity.expected} headings, actions and nav items; brand color ${contentAfter.brand.color}`);
 console.log(`pricing: 0 rules hit at ${diagPricing.widths.join(' and ')}`);
 console.log(`consistency: 0 drift, 0 off-system values across ${consistency.screens.length} screens and ${consistency.system.tokens} system tokens; the original against the same system: ${control.findings} findings`);
+console.log(`dark: 0 rules hit on both screens at ${darkAfter.widths.join(' and ')}; 0 drift, 0 off-system values against ${darkConsistency.system.tokens} tokens; the same screens against the light system: ${darkControl.findings} findings`);
 console.log(`plan: ${plan.screens.length} screens checked, next step ${nextStep(plan).action}`);
 console.log('REBUILD OK');
