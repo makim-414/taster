@@ -68,6 +68,8 @@ try {
       await page.click('button[type=submit]');
       await page.waitForSelector('.shot img');
     } }],
+    // The demo's frames load the worked rebuild and the pinned detector, so their own policy is tested on both.
+    ['/demo', '/demo', { act: (page) => page.waitForSelector('.demo-counts b', { timeout: 15000 }) }],
     ['/components', '/components', { act: async (page) => {
       await page.getByText('전부 움직이게').click();
       await stageReady(page);
@@ -123,7 +125,7 @@ try {
   ok(robots.status === 200 && /Disallow: \/api\//.test(robotsText) && /Disallow: \/board/.test(robotsText) && /Sitemap: \S+\/sitemap\.xml/.test(robotsText), '/robots.txt keeps crawlers off /api/ and /board and names the sitemap');
   const sitemap = await fetch(`${BASE}/sitemap.xml`);
   const locs = new Set([...(await sitemap.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname));
-  const want = ['/', '/components', '/tone', '/bookmarklet', ...IDS.map((id) => `/components/${id}`)];
+  const want = ['/', '/demo', '/components', '/tone', '/bookmarklet', ...IDS.map((id) => `/components/${id}`)];
   const missing = want.filter((p) => !locs.has(p));
   ok(sitemap.status === 200 && missing.length === 0 && !locs.has('/board'), `/sitemap.xml lists ${locs.size} pages, every component included ${missing.slice(0, 5).join(', ')}`);
 
@@ -134,6 +136,8 @@ try {
   ok(/camera=\(\)/.test(home.get('permissions-policy') || ''), 'pages turn off camera, microphone, location and topics');
   const stage = await headers('/stage/index.html');
   ok(/frame-ancestors 'self'/.test(stage.get('content-security-policy') || '') && stage.get('x-frame-options') === 'SAMEORIGIN', 'the stage can be framed by this site only');
+  const example = await headers('/examples/rebuild/before.html');
+  ok(/frame-ancestors 'self'/.test(example.get('content-security-policy') || '') && example.get('x-frame-options') === 'SAMEORIGIN', "the demo's example pages can be framed by this site only");
   const pin = await (await fetch(`${BASE}/taster/bookmarklet.json`)).json();
   const pinned = await headers(`/taster/${pin.version}/overlay.js`);
   ok(/immutable/.test(pinned.get('cache-control') || '') && pinned.get('access-control-allow-origin') === '*', `/taster/${pin.version}/ is cached for good and open to every origin`);

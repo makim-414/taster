@@ -1,0 +1,279 @@
+/* /demo. Only registry token values through var(), like globals.css. The frames keep their 1300x871 first screen
+   (FRAME in timeline.ts, set inline) and are scaled to the column; the marks, the chip and the cursors are drawn in
+   screen pixels over them, so their type stays readable on a phone. Cursor colors are the theme's danger, success and
+   accent tokens, solid, with no glow. */
+.demo-intro {
+  max-width: 760px;
+  padding: var(--sp-12) 0 var(--sp-8);
+}
+.demo-lede {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--t-title);
+  color: var(--text-muted);
+}
+
+.demo {
+  padding-bottom: var(--sp-12);
+}
+.demo-board {
+  position: relative;
+}
+.demo-stage {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.demo-frames {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+.demo-frames iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border: 0;
+  pointer-events: none;
+}
+.demo-after {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 100% 0);
+}
+.demo-after[data-whole] {
+  clip-path: none;
+}
+.demo-marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.demo-mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 2px solid var(--danger);
+  opacity: 0;
+  transition: opacity var(--dur-dropdown) var(--ease-out);
+}
+.demo-mark[data-on] {
+  opacity: 1;
+}
+.demo-chip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  gap: var(--sp-1);
+  max-width: 280px;
+  padding: var(--sp-1) var(--sp-2);
+  color: var(--accent-fg);
+  background: var(--danger);
+  border-radius: var(--r-sm);
+  box-shadow: var(--sh-pop);
+  font-size: var(--t-xs);
+  line-height: var(--lh-snug);
+  opacity: 0;
+  transition: opacity var(--dur-dropdown) var(--ease-out);
+}
+.demo-chip[data-on] {
+  opacity: 1;
+}
+.demo-chip code {
+  font-size: inherit;
+  font-weight: var(--w-semi);
+}
+@media (max-width: 639px) {
+  .demo-chip-name {
+    display: none;
+  }
+}
+.demo-end {
+  position: absolute;
+  left: var(--sp-4);
+  bottom: var(--sp-4);
+  margin: 0;
+  padding: var(--sp-2) var(--sp-4);
+  color: var(--text);
+  background: var(--bg-elev);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-pop);
+  font-size: var(--t-title);
+  font-weight: var(--w-semi);
+  opacity: 0;
+  transition: opacity var(--dur-modal) var(--ease-out);
+}
+.demo-end[data-on] {
+  opacity: 1;
+}
+@media (max-width: 639px) {
+  .demo-end {
+    left: var(--sp-2);
+    bottom: var(--sp-2);
+    padding: var(--sp-1) var(--sp-3);
+    font-size: var(--t-body);
+  }
+}
+
+.demo-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-4) var(--sp-8);
+  padding: var(--sp-5) 0 var(--sp-4);
+}
+@media (min-width: 900px) {
+  .demo-bar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+    align-items: center;
+  }
+}
+.demo-counts {
+  margin: 0;
+  font-size: var(--t-title);
+  font-variant-numeric: tabular-nums;
+}
+.demo-counts b {
+  font-weight: var(--w-semi);
+}
+.demo-tokens {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 var(--sp-5);
+}
+.demo-token {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0 var(--sp-2);
+  min-width: 0;
+}
+.demo-token label {
+  font-weight: var(--w-med);
+}
+.demo-token output {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.demo-token input {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: var(--control-touch);
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.demo-token input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.demo-controls button {
+  min-height: var(--control-touch);
+}
+button.demo-replay {
+  color: var(--text);
+  background: var(--bg-sunken);
+}
+.demo-note {
+  margin: 0;
+  color: var(--text-muted);
+}
+.demo-result {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--t-title);
+}
+.demo-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--sp-6);
+  margin: var(--sp-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.demo-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-touch);
+}
+
+.demo-cursors {
+  /* Reaches below the bar, so a name tag under a slider is not cut off. */
+  position: absolute;
+  inset: 0 0 calc(-1 * var(--sp-12)) 0;
+  overflow: clip;
+  pointer-events: none;
+}
+.demo-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--cursor);
+  will-change: transform;
+}
+.demo-cursor[data-who='diagnose'] {
+  --cursor: var(--danger);
+}
+.demo-cursor[data-who='swap'] {
+  --cursor: var(--success);
+}
+.demo-cursor[data-who='system'] {
+  --cursor: var(--accent);
+}
+.demo-cursor svg {
+  display: block;
+  width: var(--icon-md);
+  height: var(--icon-md);
+}
+.demo-cursor path {
+  fill: currentColor;
+  stroke: var(--bg);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.demo-cursor-tag {
+  position: absolute;
+  top: var(--sp-5);
+  left: var(--sp-3);
+  padding: var(--sp-1) var(--sp-2);
+  color: var(--accent-fg);
+  background: var(--cursor);
+  border-radius: var(--r-sm);
+  box-shadow: var(--sh-card);
+  font-size: var(--t-sm);
+  font-weight: var(--w-semi);
+  line-height: var(--lh-snug);
+  white-space: nowrap;
+}
+.demo-cursor[data-flip] .demo-cursor-tag {
+  left: auto;
+  right: var(--sp-1);
+}
+
+.demo-steps {
+  max-width: 760px;
+  padding: var(--sp-8) 0 var(--sp-12);
+  border-top: 1px solid var(--border);
+}
+.demo-steps .steps {
+  margin-top: var(--sp-4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-cursors {
+    display: none;
+  }
+  .demo-mark,
+  .demo-chip,
+  .demo-end {
+    transition: none;
+  }
+}

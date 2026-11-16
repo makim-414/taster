@@ -13,6 +13,10 @@ All notable changes to Taster are recorded here. The format follows
   section lamp in CSS and light slats in one WebGL1 shader), `blocks/password-field` (strength bar and checklist on
   `sensitive-input`), `blocks/location-expand` (a place card that opens into a map), `marketing/index-testimonial`
   and `marketing/topo-hero`.
+- The site has a `/demo` page: the worked rebuild in `examples/rebuild/` at its first screen, with three labeled
+  cursors working on it at once. Diagnose runs the detector inside the original and visits each finding, swap wipes
+  the rebuilt page in block by block while the count of rules left goes down, and system moves the rebuilt page's
+  radius and spacing tokens live. The home page links to it under the before and after slider.
 
 ### Changed
 

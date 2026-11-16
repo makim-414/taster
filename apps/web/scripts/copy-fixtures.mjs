@@ -42,3 +42,25 @@ cpSync(new URL('stage/index.html', reg), new URL('../public/stage/index.html', i
 cpSync(new URL('stage/THIRD_PARTY_LICENSES.txt', reg), new URL('../public/stage/THIRD_PARTY_LICENSES.txt', import.meta.url));
 cpSync(new URL('previews/', reg), new URL('../public/previews/', import.meta.url), { recursive: true });
 console.log('stage, its license texts and previews copied to public');
+
+// The /demo page's stage: the worked rebuild in examples/rebuild/, served from public/examples/rebuild/ so the page can
+// frame both screens on this site and run the detector inside them. after.html links the registry tokens by a path
+// into packages/registry/, rewritten to the copy next to it, and its Google Fonts lines are dropped: the site's policy
+// loads fonts from this site only, and the theme's font stack falls back on its own. With every stylesheet readable, the
+// detector also runs CMP-11 (dark only), which an unreadable cross-origin sheet makes it skip; /demo shows what it finds.
+// Generated, not committed.
+const example = new URL('../../../examples/rebuild/', import.meta.url);
+const stageDir = new URL('../public/examples/rebuild/', import.meta.url);
+mkdirSync(stageDir, { recursive: true });
+for (const name of ['before.html', 'site.css', 'theme.css']) copyFileSync(new URL(name, example), new URL(name, stageDir));
+copyFileSync(new URL('src/tokens.css', reg), new URL('tokens.css', stageDir));
+const TOKENS_LINK = 'href="../../packages/registry/src/tokens.css"';
+const afterSource = readFileSync(new URL('after.html', example), 'utf8');
+if (!afterSource.includes(TOKENS_LINK)) throw new Error(`examples/rebuild/after.html lost the link ${TOKENS_LINK}`);
+const afterCopy = afterSource
+  .replace(TOKENS_LINK, 'href="tokens.css"')
+  .split('\n')
+  .filter((line) => !line.includes('fonts.googleapis.com'))
+  .join('\n');
+writeFileSync(new URL('after.html', stageDir), afterCopy);
+console.log('examples/rebuild copied to public/examples/rebuild for /demo');

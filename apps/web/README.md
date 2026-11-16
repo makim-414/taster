@@ -14,6 +14,11 @@ Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLI
 - `app/tone/`: the tone map. A pad on commerce to brand personality and minimal to expressive, a genre filter, the
   four nearest reference sites, and three registry parts running in the tokens of the spot (`packages/engine/tone.mjs`, the
   same rules as the `pick_tone` tool). The address carries the spot, so an agent can hand over a link.
+- `app/demo/`: the worked rebuild (`examples/rebuild/before.html` and `after.html`, copied to `public/examples/rebuild/`
+  by `scripts/copy-fixtures.mjs`) at its 1300x871 first screen in two same-origin frames, with three cursors over it:
+  diagnose runs the pinned `detect.js` inside the before frame and visits each finding, swap wipes the rebuilt page in
+  block by block, and system moves the rebuilt page's radius and spacing tokens. The timeline is `app/demo/timeline.ts`;
+  with reduced motion the page shows the end state and the steps as a list.
 - `app/api/tone-shot/route.ts`: POST `{ ids }`, up to four ids from `data/taxonomy/tone-refs.json`, never a typed
   address. Opens each first screen through the same fence (`lib/tone-shot.ts` with `packages/engine/tone-capture.mjs`):
   cookie banners are only rejected, a banner without a reject button comes back as `consent` and a bot check or
@@ -68,7 +73,7 @@ fails while the counts are stale. `app/robots.ts` keeps crawlers off `/api/` and
 pages and every component, and `app/not-found.tsx` is the 404 screen.
 
 `next.config.mjs` sends a content security policy (everything from this site, data: pictures, no framing except the
-stage by this site) and a permissions policy on every response. The bookmarklet's files under `/taster/` are open to
+stage and the demo's example pages by this site) and a permissions policy on every response. The bookmarklet's files under `/taster/` are open to
 every origin; a folder named after their hash is cached for good, the old `/taster/*.js` for five minutes.
 `node scripts/check-metadata.mjs` checks all of it on a running build.
 

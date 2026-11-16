@@ -1,6 +1,6 @@
 // Runs data/rules/detect.js on this app's own screens at 1440, 1280 and 390 wide and fails on any finding, page error or
 // sideways scroll. The screens: the first screen and a result that lists every measured rule (the API is answered
-// locally with a synthetic report so no outside site is involved), the gallery, the page of every component in
+// locally with a synthetic report so no outside site is involved), the demo, the gallery, the page of every component in
 // packages/registry/registry.json, the board, the bookmarklet page and the tone page. Three pages run at a time. The 404 screen
 // is check-metadata's. A finding listed in self-check-baseline.json, with the reason it stays, is reported and allowed
 // up to its count on that screen at every width; one more, or any other finding, fails.
@@ -44,12 +44,14 @@ const synthetic = {
 // Reference screens on the tone page are answered locally: one picture, one block page.
 const picture = placeholder(1280, 800);
 
-// The home page in its two states, then the pages around the gallery and the tone page. The components inside frames
-// are the registry's business (packages/registry/test-render.mjs, packages/registry/test-a11y.mjs); this measures the page around them.
+// The home page in its two states, the demo, then the pages around the gallery and the tone page. The components inside
+// frames are the registry's business (packages/registry/test-render.mjs, packages/registry/test-a11y.mjs), and the demo's
+// frames hold the worked rebuild, slop on purpose (packages/engine/scripts/check-rebuild-example.mjs); the detector runs
+// in the top document only, so this measures the page around them.
 const screens = [
   { path: '/', state: 'first' },
   { path: '/', state: 'result' },
-  ...['/components', ...IDS.map((id) => `/components/${id}`), '/board?ids=blocks/button,blocks/card&brand=e4002b', '/bookmarklet', '/tone?x=0.8&y=0.18', '/tone?x=0.2&y=0.9&genre=geek&theme=light'].map((path) => ({ path })),
+  ...['/demo', '/components', ...IDS.map((id) => `/components/${id}`), '/board?ids=blocks/button,blocks/card&brand=e4002b', '/bookmarklet', '/tone?x=0.8&y=0.18', '/tone?x=0.2&y=0.9&genre=geek&theme=light'].map((path) => ({ path })),
 ];
 const jobs = WIDTHS.flatMap((width) => screens.map((s) => ({ ...s, width })));
 

@@ -50,6 +50,16 @@ test('the stage can be framed by this site only, and nothing else can', () => {
   assert.ok(blocks.indexOf(block('/stage/:file*')) > blocks.indexOf(block('/(.*)')), 'the stage block comes after the one for every page');
 });
 
+test('the demo frames the worked rebuild from this site only', () => {
+  const example = ['/(.*)', '/examples/:file*'];
+  assert.equal(last(example, 'X-Frame-Options'), 'SAMEORIGIN');
+  const csp = directives(last(example, 'Content-Security-Policy') || '');
+  assert.deepEqual(csp.get('frame-ancestors'), ["'self'"]);
+  assert.deepEqual(csp.get('default-src'), ["'self'"], 'the example pages keep the rest of the policy');
+  assert.deepEqual(csp.get('font-src'), ["'self'"], 'no outside fonts in the frames either');
+  assert.ok(blocks.indexOf(block('/examples/:file*')) > blocks.indexOf(block('/(.*)')), 'the example block comes after the one for every page');
+});
+
 test('a versioned overlay folder is cached for good, the old address only briefly', () => {
   const legacy = ['/taster/:file*'];
   const versioned = ['/taster/:file*', '/taster/:folder/:file+'];

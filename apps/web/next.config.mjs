@@ -96,8 +96,17 @@ const nextConfig = {
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        // The gallery runs each component in a frame on this same site. Later rules win, so this one must stay last.
+        // The gallery runs each component in a frame on this same site. Later rules win, so this one and the next stay
+        // after the block for every page.
         source: '/stage/:file*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Content-Security-Policy', value: csp("'self'") },
+        ],
+      },
+      {
+        // /demo frames the worked rebuild (examples/rebuild, copied by scripts/copy-fixtures.mjs) on this same site.
+        source: '/examples/:file*',
         headers: [
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'Content-Security-Policy', value: csp("'self'") },
