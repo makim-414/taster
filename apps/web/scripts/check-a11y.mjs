@@ -1,6 +1,6 @@
 // Accessibility gate for the site's own pages (the components inside the stage frames are packages/registry/test-a11y.mjs's).
 // Three checks, at 390 and 1280 wide:
-// - axe-core with the WCAG 2.0 A and AA and 2.1 AA rules on every page: the home page, the gallery, every component's
+// - axe-core with the WCAG 2.0 A and AA and 2.1 AA rules on every page: the home page, the demo, the gallery, every component's
 //   page, the board, the bookmarklet page and the tone page, and the pages that follow the gallery theme in both
 //   themes. Frames are left out.
 // - Keyboard: Tab through the main pages and compare the pixels around each stop with and without focus. A stop that
@@ -33,9 +33,9 @@ const BOARD = '/board?ids=blocks/button,blocks/card';
 
 // The gallery, a component page and the board take ?theme= (it changes the stills and the frames they show).
 const themed = ['/components', '/components/blocks/button', BOARD].flatMap((p) => ['dark', 'light'].map((t) => `${p}${p.includes('?') ? '&' : '?'}theme=${t}`));
-const axePages = ['/', ...themed, ...IDS.filter((id) => id !== 'blocks/button').map((id) => `/components/${id}`), '/bookmarklet', '/tone?x=0.8&y=0.18', '/tone?x=0.2&y=0.9&genre=geek&theme=light'];
-const keyboardPages = [['/', 30], ['/components', 40], ['/components/blocks/accordion', 30], [BOARD, 25], ['/bookmarklet', 15], ['/tone', 30]];
-const motionPages = ['/', '/components', '/components/motion/marquee', '/components/motion/thinking-orb', '/bookmarklet', '/tone'];
+const axePages = ['/', '/demo', ...themed, ...IDS.filter((id) => id !== 'blocks/button').map((id) => `/components/${id}`), '/bookmarklet', '/tone?x=0.8&y=0.18', '/tone?x=0.2&y=0.9&genre=geek&theme=light'];
+const keyboardPages = [['/', 30], ['/demo', 20], ['/components', 40], ['/components/blocks/accordion', 30], [BOARD, 25], ['/bookmarklet', 15], ['/tone', 30]];
+const motionPages = ['/', '/demo', '/components', '/components/motion/marquee', '/components/motion/thinking-orb', '/bookmarklet', '/tone'];
 
 const findings = [];
 const add = (page, rule, detail) => findings.push({ file: page, rule, detail });

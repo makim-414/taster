@@ -3,7 +3,8 @@
   "route": "rebuild",
   "system": [
     "../../packages/registry/src/tokens.css",
-    "theme.css"
+    "theme.css",
+    "light/theme.css"
   ],
   "screens": [
     {

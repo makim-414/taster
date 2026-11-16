@@ -321,8 +321,8 @@ function collectInPage({ tokens, kinds, maxPerRole }) {
 }
 /* eslint-enable no-undef */
 
-async function collectScreen(browser, url, viewport, { system, timeout }) {
-  const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true });
+async function collectScreen(browser, url, viewport, { system, timeout, colorScheme }) {
+  const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true, ...(colorScheme ? { colorScheme } : {}) });
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
     await page.waitForLoadState('load', { timeout: LOAD_WAIT }).catch(() => {});
@@ -673,7 +673,9 @@ export function screenIds(targets) {
 
 // screens: URLs, file paths or { id, source }. system: anything loadSystem accepts, or null. identity: { logoFont } (or
 // the family name) to exempt the logo face; it overrides what the system declares.
-export async function checkConsistency(targets, { system = null, identity = null, widths = CONSISTENCY_WIDTHS, timeout = 30000 } = {}) {
+// colorScheme ('light' or 'dark') sets prefers-color-scheme while the screens load, for a site with both modes; left
+// out, the browser's own default (light).
+export async function checkConsistency(targets, { system = null, identity = null, widths = CONSISTENCY_WIDTHS, timeout = 30000, colorScheme } = {}) {
   if (!Array.isArray(targets) || !targets.length) throw new Error('Give at least one screen');
   let sys = system == null ? null : system.loaded === true ? system : loadSystem(system);
   const declared = normIdentity(identity, 'identity option');
@@ -690,7 +692,7 @@ export async function checkConsistency(targets, { system = null, identity = null
       collected[s.id] = {};
       for (const width of widths) {
         const viewport = { width, height: width < 768 ? 844 : 900 };
-        collected[s.id][width] = await collectScreen(browser, s.url, viewport, { system: sys, timeout });
+        collected[s.id][width] = await collectScreen(browser, s.url, viewport, { system: sys, timeout, colorScheme });
       }
     }
   } finally {

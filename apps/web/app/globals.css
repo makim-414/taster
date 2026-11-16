@@ -263,6 +263,12 @@ button.example {
 .sample-captions p {
   margin: 0;
 }
+.sample-more {
+  margin: var(--sp-5) auto 0;
+  max-width: 760px;
+  text-align: center;
+  color: var(--text-muted);
+}
 
 .report {
   padding: var(--sp-8) 0 var(--sp-12);

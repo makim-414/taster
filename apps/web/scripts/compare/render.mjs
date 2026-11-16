@@ -3,7 +3,8 @@
 // are 1600x1072 JPEG (1300x871 at 16/13), the frame app/compare-reveal.tsx shows, plus a 780px wide copy of each
 // (<name>-780.jpg, the same page drawn at 0.6) that the slider's srcset gives to phones. Acme Ledger is a made-up product, so
 // the pictures hold no real site, logo or mark, and the emoji in before.html are drawn with Noto Color Emoji (OFL) rather
-// than the system's own emoji art. Run it again when the example changes.
+// than the system's own emoji art. after.html has a light mode too; the pictures show its default, dark, so the browser
+// is told the visitor prefers dark. Run it again when the example changes.
 // Usage: node scripts/compare/render.mjs [out dir]   (default public/compare)
 import { existsSync, readFileSync } from 'node:fs';
 import { chromium } from 'playwright-core';
@@ -18,7 +19,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const SIZES = [['', 16 / 13], ['-780', 0.6]];
 try {
   for (const [suffix, scale] of SIZES) for (const name of ['before', 'after']) {
-    const page = await browser.newPage({ viewport: { width: 1300, height: 871 }, deviceScaleFactor: scale });
+    const page = await browser.newPage({ viewport: { width: 1300, height: 871 }, deviceScaleFactor: scale, colorScheme: 'dark' });
     await page.goto(new URL(`examples/rebuild/${name}.html`, root).href, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
     if (name === 'before') {
