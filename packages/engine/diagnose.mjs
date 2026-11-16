@@ -108,8 +108,9 @@ async function capture(page, file, width, height) {
 // One page load at one viewport. Returns the raw detect.js report with `load` (classifyLoad's verdict) added.
 // A page that is not the site (a bot check, an error or sign-in page) is not measured: no findings, no capture.
 // bypassCSP: many large sites forbid inline scripts, which would block the injected detector.
-export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50 } = {}) {
-  const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true });
+// colorScheme ('light' or 'dark') sets prefers-color-scheme for the load; left out, the browser's own default (light).
+export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50, colorScheme } = {}) {
+  const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true, ...(colorScheme ? { colorScheme } : {}) });
   try {
     const load = await open(page, url, timeout);
     if (!load.diagnosed) return { url: load.finalUrl, viewport, page: { width: viewport.width, height: 0 }, counts: {}, findings: [], load };
@@ -128,14 +129,14 @@ export async function detectOnce(browser, url, viewport, { highlight = false, sc
   }
 }
 
-export async function diagnose(target, { viewports = VIEWPORTS, outDir = null, timeout = 30000, maxPerRule = 50 } = {}) {
+export async function diagnose(target, { viewports = VIEWPORTS, outDir = null, timeout = 30000, maxPerRule = 50, colorScheme } = {}) {
   const url = toUrl(target);
   const browser = await launch();
   try {
     const runs = [];
     for (const viewport of viewports) {
       const screenshot = outDir ? join(outDir, `annotated-${viewport.width}.jpg`) : null;
-      runs.push(await detectOnce(browser, url, viewport, { screenshot, timeout, maxPerRule }));
+      runs.push(await detectOnce(browser, url, viewport, { screenshot, timeout, maxPerRule, colorScheme }));
       // A block or error page is not loaded again at the next width.
       if (!runs.at(-1).load.diagnosed) break;
     }
