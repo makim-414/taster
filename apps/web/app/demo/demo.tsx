@@ -490,7 +490,8 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
       </ul>
       <p className="fineprint">
         수는 이 브라우저가 1300 폭 첫 화면 한 장에서 잰 값이라, 1440 폭과 390 폭을 함께 재는 진단 결과나 저장소 README 의 수와 다를 수
-        있습니다.
+        있습니다. README 의 고치기 전 수에는 390 폭에서만 걸리는 규칙 하나(RSP-01, 화면보다 넓은 페이지)가 더 들어 있습니다. 다시 지은
+        판은 어두운 판이 기본이고, 기기가 밝은 화면을 고르면 같은 시스템의 밝은 판으로 바뀝니다.
       </p>
     </section>
   );

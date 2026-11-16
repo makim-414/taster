@@ -68,8 +68,9 @@ test('the counters find every rule and end with none left', () => {
   assert.equal(revealAt(p, p.swapEnd), FRAME.h);
 });
 
+// The worked rebuild hits none (17 to 0 at 1300 wide); a page that still hit a rule would keep it in the count.
 test('a rule the rebuilt page still hits stays in the count to the end', () => {
-  const stays = new Set(['CMP-11']);
+  const stays = new Set(['TYP-01']);
   assert.deepEqual(countsAt(p, SPOTS, 0, stays), { found: 0, remaining: 0 });
   assert.deepEqual(countsAt(p, SPOTS, p.swapEnd, stays), { found: RULES.size, remaining: 1 });
   assert.equal(countsAt(p, SPOTS, p.swapEnd, new Set(['NEW-01'])).remaining, 1, 'a rule only the rebuilt page hits shows at the end');
