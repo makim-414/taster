@@ -35,7 +35,10 @@ node packages/engine/cli.mjs --help                           # every option, an
 
 `add` copies components into an app, relative to the folder it runs in, so run it from the app folder by the clone's
 path: `node /path/to/taster/packages/engine/cli.mjs add blocks/button --dir src/components/taster` (see
-`packages/registry/README.md`).
+`packages/registry/README.md`). In an app with its own Tailwind theme it maps the components' classes onto the app's
+tokens instead of copying Taster's token files, and points their icons at the app's own set through one adapter file
+(`fit.mjs`); it prints each mapping, then the import line and the JSX for each component for `--into <file>`, to place
+with an editor's Edit tool.
 
 A page that answers with a bot check, a block or error page (HTTP 4xx or 5xx), or a sign-in page on another host is not
 diagnosed: nothing is measured, the report says why, and the exit code is 2. Nothing here gets past a check or a
