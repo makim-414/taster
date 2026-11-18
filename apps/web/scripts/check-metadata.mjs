@@ -69,7 +69,7 @@ try {
       await page.waitForSelector('.shot img');
     } }],
     // The demo's frames load the worked rebuild and the pinned detector, so their own policy is tested on both.
-    ['/demo', '/demo', { act: (page) => page.waitForSelector('.demo-counts b', { timeout: 15000 }) }],
+    ['/demo', '/demo', { act: (page) => page.waitForSelector('.demo-board:is([data-state="playing"], [data-state="end"])', { timeout: 15000 }) }],
     ['/components', '/components', { act: async (page) => {
       await page.getByText('전부 움직이게').click();
       await stageReady(page);

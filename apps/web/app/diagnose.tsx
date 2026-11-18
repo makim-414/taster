@@ -147,7 +147,7 @@ export function Diagnose({ ruleCount }: { ruleCount: number }) {
             <p>다시 지은 판, after.html</p>
           </div>
           <p className="sample-more">
-            같은 예시를 커서 셋이 진단하고, 섹션마다 바꾸고, 토큰을 움직이는 과정은 <a href="/demo">움직이는 데모</a>에서 볼 수 있습니다.
+            같은 예시를 에이전트 여럿이 진단하고, 레이어마다 다시 쌓고, 토큰을 움직이는 과정은 <a href="/demo">움직이는 데모</a>에서 볼 수 있습니다.
           </p>
         </section>
       )}

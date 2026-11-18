@@ -9,6 +9,7 @@ keep their own license files in `node_modules` and are not repeated here.
 | Code and API shapes the component registry follows (shadcn/ui, Radix, Magic UI, motion-primitives, cult-ui, beUI, 21st.dev listings and others), and the design references no code was taken from | `packages/registry/src/` | [`packages/registry/THIRD_PARTY_NOTICES.md`](packages/registry/THIRD_PARTY_NOTICES.md) |
 | npm packages bundled into the prebuilt gallery page | `packages/registry/stage/index.html` | [`packages/registry/stage/THIRD_PARTY_LICENSES.txt`](packages/registry/stage/THIRD_PARTY_LICENSES.txt), written by `packages/registry/demo/build.mjs` on every stage build |
 | The home page's before/after slider | `apps/web/app/compare-reveal.tsx`, `apps/web/app/compare-spring.ts` | Motiq, below |
+| The /demo agents' cursor arrow, cursor curves and bezier solver | `apps/web/app/demo/stageshow.ts` | Stageshow, below |
 | Noto Sans KR, latin slice | `apps/web/app/fonts/` | SIL Open Font License 1.1, [`apps/web/app/fonts/OFL.txt`](apps/web/app/fonts/OFL.txt) |
 | The home page comparison pictures | `apps/web/public/compare/` | Taster's own example, below |
 | Code of conduct | `.github/CODE_OF_CONDUCT.md` | Adapted from the Contributor Covenant 2.1, credited in the file |
@@ -29,6 +30,42 @@ the divider is at rest.
 MIT License
 
 Copyright (c) 2026 Mahammad Rustamov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## Stageshow
+
+Source: Stageshow by Benji Taylor, from https://github.com/benjitaylor/skills (folder `stageshow/`, files
+`kit/ease.ts` and `kit/cursor.tsx`).
+License: MIT (https://github.com/benjitaylor/skills/blob/main/stageshow/LICENSE).
+
+Used for: the /demo page's agents, `apps/web/app/demo/stageshow.ts`. Kept: the named cursor curves (house, enter,
+trip, camera), the cubic-bezier solver (Newton with a bisection fallback) and the solid rounded arrowhead path with
+its tip. Changed: only those pieces, as a module with no DOM, and the arrow drawn in the demo's own SVG in the theme's
+colors. The swarm, the timeline and the measuring are written for Taster. Nothing from Stageshow's `kit/brands/` or
+`assets/` (app icons, brand marks, photographs), which its MIT license does not cover, is used.
+
+```text
+MIT License
+
+Copyright (c) 2026 Benji Taylor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -15,10 +15,13 @@ Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLI
   four nearest reference sites, and three registry parts running in the tokens of the spot (`packages/engine/tone.mjs`, the
   same rules as the `pick_tone` tool). The address carries the spot, so an agent can hand over a link.
 - `app/demo/`: the worked rebuild (`examples/rebuild/before.html` and `after.html`, copied to `public/examples/rebuild/`
-  by `scripts/copy-fixtures.mjs`) at its 1300x871 first screen in two same-origin frames, with three cursors over it:
-  diagnose runs the pinned `detect.js` inside the before frame and visits each finding, swap wipes the rebuilt page in
-  block by block, and system moves the rebuilt page's radius and spacing tokens. The timeline is `app/demo/timeline.ts`;
-  with reduced motion the page shows the end state and the steps as a list.
+  by `scripts/copy-fixtures.mjs`) in two same-origin frames at 1300x871, rebuilt by agents. A diagnose crew visits what
+  the pinned `detect.js` finds inside the before frame (plus a hidden 390 wide frame for the rules only a phone shows);
+  a rebuild crew builds the after page layer by layer from its own DOM (`app/demo/measure.ts`: every box and every
+  line of text in document order, at most 190); a system cursor moves the after page's radius and spacing tokens; an
+  end card gives the agents, the seconds and the rule counts. The timeline is `app/demo/timeline.ts` (pure functions of
+  time, tested in `test/demo-timeline.test.ts`), with the cursor curves and arrow from Stageshow in
+  `app/demo/stageshow.ts`; with reduced motion the page shows the end state and the steps as a list.
 - `app/api/tone-shot/route.ts`: POST `{ ids }`, up to four ids from `data/taxonomy/tone-refs.json`, never a typed
   address. Opens each first screen through the same fence (`lib/tone-shot.ts` with `packages/engine/tone-capture.mjs`):
   cookie banners are only rejected, a banner without a reject button comes back as `consent` and a bot check or
