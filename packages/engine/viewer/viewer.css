@@ -16,6 +16,7 @@
   --success: oklch(0.65 0.15 160);
   --ring: oklch(0.7 0 0);
   --ink-on-light: oklch(0.205 0 0);
+  --ink-on-cursor: var(--ink-on-light);
   --agent-1: oklch(0.72 0.16 250);
   --agent-2: oklch(0.74 0.15 160);
   --agent-3: oklch(0.78 0.14 75);
@@ -79,6 +80,7 @@
     --agent-5: oklch(0.52 0.11 210);
     --agent-6: oklch(0.55 0.18 35);
     --agent-hub: oklch(0.35 0 0);
+    --ink-on-cursor: var(--bg);
     --sh-card: 0 1px 2px rgba(0, 0, 0, 0.12);
     --sh-pop: 0 8px 24px rgba(0, 0, 0, 0.16);
   }
@@ -279,15 +281,24 @@ code {
   opacity: 1;
 }
 .mark[data-gone] {
-  border-style: dashed;
-  border-color: var(--success);
-  opacity: 0.7;
+  opacity: 0;
+  transition: none;
 }
+/* A resolved element shows once in green where it was, then fades out; the viewer removes it after. */
 .mark[data-resolved] {
   border-style: solid;
   border-color: var(--success);
   opacity: 0;
-  transition: opacity var(--dur-resolve) var(--ease-out) var(--dur-fade), border-color var(--dur-dropdown) var(--ease-out);
+  animation: resolve calc(var(--dur-fade) + var(--dur-resolve)) var(--ease-out) both;
+}
+@keyframes resolve {
+  0%,
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 .empty {
   display: grid;
@@ -438,9 +449,10 @@ code {
   left: var(--sp-3);
   display: grid;
   gap: 2px;
+  width: max-content;
   max-width: 280px;
   padding: var(--sp-1) var(--sp-2);
-  color: var(--ink-on-light);
+  color: var(--ink-on-cursor);
   background: var(--cursor);
   border-radius: var(--r-sm);
   box-shadow: var(--sh-pop);
@@ -454,6 +466,10 @@ code {
 .cursor-say {
   font-size: var(--t-xs);
   overflow-wrap: anywhere;
+  transition: opacity var(--dur-fade) var(--ease-out);
+}
+.cursor[data-quiet] .cursor-say {
+  opacity: 0;
 }
 .cursor-say:empty {
   display: none;
@@ -485,7 +501,11 @@ code {
   .shot,
   .mark,
   .token,
-  .cursor {
+  .cursor,
+  .cursor-say {
     transition: none;
+  }
+  .mark[data-resolved] {
+    animation: none;
   }
 }

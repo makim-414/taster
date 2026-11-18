@@ -2,8 +2,9 @@
 // through packages/engine/live.mjs, a second agent's swaps, component and token tune, and a stage refresh that measures
 // examples/rebuild/after.html in place of the changed page. The viewer is opened in headless Chromium before the
 // events (live) and again after them (replay), at desktop and phone width. It must draw the picture, the marks and a
-// cursor per agent, mark findings resolved after the refresh, and do it with no page error, no console error and no
-// content security policy violation. Run: node packages/engine/scripts/check-live-viewer.mjs
+// cursor per agent, mark findings resolved after the refresh and then clear those marks, let a cursor's last label fade
+// once its call is over, count in the singular for one, and do it with no page error, no console error and no content
+// security policy violation. Run: node packages/engine/scripts/check-live-viewer.mjs
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -84,6 +85,9 @@ try {
   await p.waitForFunction(() => document.querySelectorAll('.token').length >= 2, null, { timeout: 10000 }).catch(() => fail('desktop: the token diff never showed'));
   // The refresh: a newer picture crossfades in and some marks turn resolved.
   await p.waitForFunction(() => document.querySelectorAll('.mark[data-resolved]').length > 0, null, { timeout: 60000 }).catch(() => fail('desktop: no mark was resolved after the refresh'));
+  // Marks still waiting for the hub cursor are hidden, not left as outlines over the new picture.
+  const waiting = await p.evaluate(() => [...document.querySelectorAll('.mark[data-gone]')].filter((m) => getComputedStyle(m).opacity !== '0').length);
+  if (waiting) fail(`desktop: ${waiting} resolved marks still show as outlines on the new picture`);
   const shown = await p.evaluate(() => ({
     title: document.getElementById('stage-title').textContent,
     counts: document.getElementById('counts').textContent,
@@ -103,6 +107,19 @@ try {
   if (shown.calls < 2) fail(`desktop: ${shown.calls} calls in the log`);
   if (!/chosen here/.test(shown.note)) fail('desktop: the note on the visiting order is missing');
   if (!shown.picture || shown.picture.w !== 1440) fail(`desktop: the picture is ${JSON.stringify(shown.picture)}`);
+  // The resolved marks play their turn and go, so the new picture is not left under old boxes; the count stays.
+  await p.waitForFunction(() => document.querySelectorAll('.mark[data-resolved], .mark[data-gone]').length === 0, null, { timeout: 30000 }).catch(() => fail('desktop: resolved marks were still on the stage 30s after the refresh'));
+  const kept = await p.locator('#counts').textContent();
+  if (!/resolved after the change/.test(kept)) fail(`desktop: the resolved count went away: "${kept}"`);
+  // A cursor whose call is over keeps its arrow and name, and its last label fades.
+  const quiet = (client) =>
+    p
+      .waitForFunction((who) => [...document.querySelectorAll('.cursor')].some((c) => c.querySelector('.cursor-name').textContent.includes(who) && c.hasAttribute('data-idle') && c.querySelector('.cursor-say').textContent === ''), client, { timeout: 30000 })
+      .catch(() => fail(`desktop: the ${client} cursor still shows its last label after its call ended`));
+  await quiet('editor');
+  await quiet('hub');
+  const legend = await p.locator('.agent').count();
+  if (legend !== 3) fail(`desktop: the agent legend lost an agent once the cursors went quiet (${legend})`);
   await finish('desktop', desk);
 
   // A tab opened afterwards gets everything from the replay, and a phone width does not scroll sideways.
@@ -111,6 +128,23 @@ try {
   const wide = await phone.page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   if (wide > 0) fail(`phone: the page is ${wide}px wider than the screen`);
   await finish('phone', phone);
+
+  // One finding on one element reads in the singular, and a stage with no picture does not count elements.
+  const agentC = { id: 'cli-check', kind: 'cli', client: null, label: 'single' };
+  const one = (type, data, call) => ({ v: 1, n: 1, t: Date.now(), agent: agentC, call, tool: 'diagnose', type, data });
+  const finding = { ruleId: 'AC-01', severity: 'high', selector: 'h1', rect: { x: 10, y: 10, w: 100, h: 40 } };
+  await post([
+    one('stage', { url: 'https://example.test/one', width: 800, shotSize: { width: 800, height: 600 } }, 'c1'),
+    one('findings', { width: 800, findings: [finding] }, 'c1'),
+  ]);
+  const single = await openViewer({ width: 1440, height: 900 });
+  await single.page.waitForFunction(() => document.getElementById('counts').textContent === '1 rule, 1 finding at 800', null, { timeout: 10000 }).catch(async () => fail(`singular: counts say "${await single.page.locator('#counts').textContent()}"`));
+  await post([
+    one('stage', { url: 'https://example.test/two', width: 800 }, 'c2'),
+    one('findings', { width: 800, findings: [finding, { ...finding, selector: 'p' }] }, 'c2'),
+  ]);
+  await single.page.waitForFunction(() => document.getElementById('counts').textContent === '1 rule, 2 findings at 800', null, { timeout: 10000 }).catch(async () => fail(`no picture: counts say "${await single.page.locator('#counts').textContent()}"`));
+  await finish('singular', single);
 
   // A tab without the key reads nothing and says what to open.
   const nokey = await browser.newPage();

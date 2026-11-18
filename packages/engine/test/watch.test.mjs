@@ -245,3 +245,12 @@ test("the engine refresher takes a clean picture of a local page and measures it
     await refresher.close();
   }
 });
+
+// The live viewer is browser code with no build; scripts/check-live-viewer.mjs drives it. This keeps its count strings
+// from going back to a fixed plural ("1 rules, 1 findings"): every counted noun goes through plural().
+test('the viewer counts through plural(), so one is a rule and a finding', () => {
+  const src = readFileSync(new URL('../viewer/viewer.js', import.meta.url), 'utf8');
+  const fixed = src.match(/\$\{[^}]+\}\s(rules|findings|elements|tokens|screens|files|marks)\b/g) || [];
+  assert.deepEqual(fixed, [], 'a count with a fixed plural noun');
+  for (const noun of ['rule', 'finding', 'element', 'token', 'screen']) assert.match(src, new RegExp(`plural\\([^)]*'${noun}'\\)`), `${noun} is counted with plural()`);
+});
