@@ -28,6 +28,15 @@ Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLI
   block page as `blocked`, both with no picture. Pictures are never written to disk and are kept in server memory up
   to 30 minutes. 20 calls per IP per 10 minutes, and a ceiling per minute across all visitors.
 
+## Recording the demo on other pages
+
+`node apps/web/scripts/demo/record.mjs --before <url> --after <url> --out <file.mp4>` plays the same diagnose, rebuild,
+tune and end card on any two pages you can open and records it with Playwright, at 1280x800 by default (`--width`,
+`--height`, `--scheme dark|light`, `--speed 2`, `--site` for a local build instead of the hosted one). The two pages
+load straight into a local Chromium started with web security off, so the overlay can measure them across origins;
+nothing is uploaded. `--out` is required and must be outside the repository, so a recording of a private page never
+lands in a commit. An `.mp4` needs ffmpeg.
+
 ## Safety
 
 - Only http and https on ports 80, 443, 8080 and 8443. No credentials in the URL.

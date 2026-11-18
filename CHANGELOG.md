@@ -22,6 +22,8 @@ All notable changes to Taster are recorded here. The format follows
   restyles, and the end card says how many agents took how long and that the rules went from 18 to 0, with a link to
   the rebuilt page. Reduced motion shows the end state. The home page links to it under the before and after slider.
 - The demo's cursor curves and arrow come from Stageshow (MIT, credited in `THIRD_PARTY_NOTICES.md`).
+- `apps/web/scripts/demo/record.mjs` records the same demo on any before and after page you can open, to a local
+  video (`--before`, `--after`, `--out` outside the repository).
 - The worked rebuild in `examples/rebuild/` has a light mode: when the visitor's system asks for light, `site.css`
   loads `light/theme.css`, the light scheme of the same design system (same brand and tone). Dark stays the default, so
   the README and slider pictures do not change (`apps/web/scripts/compare/render.mjs` now asks for dark). It passes
