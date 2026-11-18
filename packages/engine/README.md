@@ -74,7 +74,7 @@ Exit code is 0 with no findings, 1 with findings, 2 on an error or a target that
 
 Prompt: `start` (the opening question: does the site already exist, or are we building a new one?).
 
-Tools: `pick_tone` (a spot on the tone map: the nearest real sites with their first screens, opened on request, never written to disk and kept in server memory up to 30 minutes, the eight axes of the spot passed through the design system's balance, its tokens, and a Taster part rendered in them), `browse_components` (numbered candidates as pictures, a live link each and one board link), `preview_component` (one component rendered in a brand, as a picture), `diagnose` (report plus one capture per width), `brand_theme` (the site's brand color, typeface and logo as token overrides, with success and failure colors fitted to them), `extract_content` (the page's content in reading order, for a rebuild), `design_system`, `tune_system` and `system_for_category` (the design system, see `skills/taster/references/system.md`), `list_rules`, `explain_rule`, and the swap tools `suggest_swaps`, `list_patterns`, `get_pattern`, `get_component`, `taxonomy`.
+Tools: `pick_tone` (a spot on the tone map: the nearest real sites with their first screens, opened on request, never written to disk and kept in server memory up to 30 minutes, the eight axes of the spot passed through the design system's balance, its tokens, and a Taster part rendered in them), `browse_components` (numbered candidates as pictures, a live link each and one board link), `preview_component` (one component rendered in a brand, as a picture), `diagnose` (a summary per rule, its counts, up to 3 example selectors and fix patterns, plus one capture per width; every finding is saved to a `report.json` the answer names, and `rules` or `detail: "full"` put findings in the answer), `get_findings` (one rule's findings from that saved report, up to 100 per call), `brand_theme` (the site's brand color, typeface and logo as token overrides, with success and failure colors fitted to them), `extract_content` (the page's content in reading order, for a rebuild), `design_system`, `tune_system` and `system_for_category` (the design system, see `skills/taster/references/system.md`), `list_rules`, `explain_rule`, and the swap tools `suggest_swaps`, `list_patterns`, `get_pattern`, `get_component`, `taxonomy`.
 
 Screen by screen (`skills/taster/references/screens.md`): `check_consistency` (render every screen at 1440 and 390 and report the same component drawn differently on two screens, and every radius, spacing step, typeface, color, shadow or duration that is not one of the system's tokens; the logo face a system declares as `identity.logoFont` is listed apart as exempt, inside the logo only), `plan_screens` (the start page and its same-site nav pages as `taster.plan.json`), `plan_next` (exactly one next step) and `plan_update` (records propose, revise, approve, build, check and accept; refuses a build before the builder's approval and a new screen before the last one is checked, runs the check itself, and passes it only when every finding left is an exception the builder accepted, with the reason and their words on record).
 
@@ -114,8 +114,8 @@ Cursor, in `.cursor/mcp.json` (or `~/.cursor/mcp.json`):
 `server.mjs` builds the MCP server; `mcp.mjs` serves it on stdio and `http.mjs` answers one Streamable HTTP request
 statelessly (`handleMcpRequest(request, { remote })`), so it runs on serverless functions. Hosted mode takes
 `remote.diagnose(url)` from the host instead of opening a local browser, and `brand_theme` and the reference screens of
-`pick_tone` only when the host gives `remote.brand` and `remote.tone`. It leaves out `extract_content`, the design
-system tools and the screen by screen tools, which open pages in a local browser and read or write files, and
+`pick_tone` only when the host gives `remote.brand` and `remote.tone`. It leaves out `get_findings` (there is no saved
+report; `diagnose` takes `rules` instead), `extract_content`, the design system tools and the screen by screen tools, which open pages in a local browser and read or write files, and
 `preview_component` answers with the still and a live link instead of a render.
 
 `apps/web/app/api/mcp/route.ts` mounts it at `/api/mcp` and gives all three, so the hosted server lacks only
@@ -188,7 +188,7 @@ node packages/engine/start.mjs watch             # the same from a plugin instal
   path, and secret looking keys hidden), `call.end` (`ok`, `ms`, `error`, `cancelled`), `stage`, `findings` (rule,
   severity, selector up to 200 characters, text up to 60, page rect), `rules`, `swaps`, `component`,
   `component.add` (file names, never contents), `edit`, `system`, `system.tuned` (token `diff`), `consistency`,
-  `plan`, and the hub's own `stage.refresh` and `stage.patch`.
+  `plan`, and the hub's own `stage.refresh`, `stage.patch` and `stage.error`.
 - **The stage.** While a hub listens, `diagnose()` passes `stageShot` to `detectOnce`, which takes a JPEG of the page
   from the same load before the detector runs, so the rects line up. The picture goes to `/ingest/shot` ahead of the
   `stage` event that names it and never into the report. After `component.add`, `system.tuned` or a plan check, the
@@ -201,7 +201,9 @@ node packages/engine/start.mjs watch             # the same from a plugin instal
   wrote. With no hub in the discovery file it exits 0 before reading stdin (about 25ms over Node's own start), and it
   always exits 0. On `edit` the hub waits 400ms for more, loads the stage again with `detectOnce({ stageShot, domShot })`
   and compares the element list (`domdiff.mjs`: path, rect, and a hash of own text and visible computed styles) with the
-  load before, loading again up to 4 times while nothing changed (a dev server still rebuilding). Right after each
+  load before, loading again up to 4 times while nothing changed (a dev server still rebuilding). A newer edit ends
+  that wait: the edits that showed nothing get a `stage.patch` with no picture and `superseded: true`, and the next
+  change goes to the newer edit; an edit that comes in while the load that shows a change runs joins that patch. Right after each
   diagnose it loads the stage 3 times with no edit and leaves the element paths that differ between those loads (a
   rotating headline word, a clock, a ticker, a chart drawn from random data) out of every comparison on that stage;
   when the picture itself differs between those loads (WebGL, video), only the elements decide that the reload has
@@ -211,7 +213,11 @@ node packages/engine/start.mjs watch             # the same from a plugin instal
   their neighbours, at most 10. They come from the comparison after the reload, not from tracing the edit; edits that
   land between two loads are matched to regions by file name words, marked `guessed`. The viewer flies each region's
   agent cursor to it, draws its box and size, crossfades only that region, resolves findings inside it, then settles
-  the full picture.
+  the full picture. When a load after an edit answers with an error (an HTTP error page such as a 5xx, a dev server
+  that is down), the hub stops once the same error comes back twice in a row and sends `stage.error` (`status`,
+  `reason`, a `message` of at most 160 characters, and the `file`, `tool`, `agent` and `edits` before it); it keeps
+  the last good load to compare the fix with. The viewer shows a line over the stage with the status and the edit,
+  and a failed line in the log, until the next `stage.patch` or `stage.refresh` of that stage.
 - **Honest order.** The detector is one `page.evaluate`, so findings are not found one by one. The viewer chooses the
   order its cursors visit them in from their real rects (the 30 most severe, top to bottom) and says so on the page.
 - **Hub routes.** `GET /api/hello`, `POST /ingest` and `POST /ingest/shot?id=` (token header), `GET /events?k=` (SSE,
@@ -220,8 +226,9 @@ node packages/engine/start.mjs watch             # the same from a plugin instal
   refused, and there are no CORS headers.
 
 `node packages/engine/scripts/check-live-viewer.mjs` runs a real diagnose against a hub on a free port, adds a second
-agent, a refresh, an edit and two patches, and opens the viewer in headless Chromium at 1440 and 390: marks, cursors,
-resolved marks, the region crossfade with its size, and no page error, console error or CSP violation.
+agent, a refresh, an edit, two patches and a page that broke after an edit, and opens the viewer in headless Chromium
+at 1440 and 390: marks, cursors, resolved marks, the region crossfade with its size, the error line over the stage and
+its clearing, and no page error, console error or CSP violation.
 
 ## Checks
 

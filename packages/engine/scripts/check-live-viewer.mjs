@@ -4,8 +4,9 @@
 // events (live) and again after them (replay), at desktop and phone width. It must draw the picture, the marks and a
 // cursor per agent, mark findings resolved after the refresh and then clear those marks, let a cursor's last label fade
 // once its call is over, count in the singular for one, draw a per-edit patch (the region of the new picture fading in
-// inside a box in the editing agent's color, a finding in it resolving), and do it with no page error, no console error
-// and no content security policy violation. Run: node packages/engine/scripts/check-live-viewer.mjs
+// inside a box in the editing agent's color, a finding in it resolving), show a line over the stage when the page does
+// not load after an edit and clear it on the next good load, and do it with no page error, no console error and no
+// content security policy violation. Run: node packages/engine/scripts/check-live-viewer.mjs
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -143,6 +144,22 @@ try {
   await p.waitForFunction(() => /2 edits shown, 1 resolved/.test(document.getElementById('counts').textContent), null, { timeout: 15000 }).catch(async () => fail(`desktop: after two patches the counts say "${await p.locator('#counts').textContent()}"`));
   await p.waitForFunction(() => document.querySelectorAll('.patch').length === 0, null, { timeout: 15000 }).catch(() => fail('desktop: the patch boxes stayed after the picture settled'));
   if (!editor?.includes('claude-code edits')) fail(`desktop: the editing cursor is named "${editor}"`);
+  // The page breaks after an edit: a line over the stage names the status and the edit, a failed line goes in the log,
+  // and the next good load clears it.
+  hub.publish('stage.error', { of: stageEvent.seq, url: stageEvent.data.url, width: 1440, status: 500, reason: 'http-error', message: 'got a server error page (HTTP 500) instead of the site', file: 'src/pricing.html', tool: 'Edit', agent: hookAgent, edits: [{ file: 'src/pricing.html', tool: 'Edit', agent: hookAgent }] });
+  await p.waitForFunction(() => {
+    const el = document.getElementById('stage-error');
+    return el && !el.hidden && el.getBoundingClientRect().height > 0 && /HTTP 500 after the edit to src\/pricing\.html: got a server error page/.test(el.textContent);
+  }, null, { timeout: 15000 }).catch(async () => fail(`desktop: the stage error line never showed (it says "${await p.locator('#stage-error').textContent()}")`));
+  if (!(await p.evaluate(() => [...document.querySelectorAll('.call[data-state="failed"]')].some((c) => c.textContent.includes('src/pricing.html') && c.textContent.includes('HTTP 500'))))) fail('desktop: the failed reload is not in the log');
+  const covered = await p.evaluate(() => {
+    const r = document.getElementById('stage-error').getBoundingClientRect();
+    const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return Boolean(top?.closest('#stage-error'));
+  });
+  if (!covered) fail('desktop: the stage error line is drawn under the picture or its marks');
+  hub.publish('stage.patch', { ...patch([], []), shot: null });
+  await p.waitForFunction(() => document.getElementById('stage-error').hidden, null, { timeout: 15000 }).catch(() => fail('desktop: the stage error line stayed after the next good load'));
   // A page shorter than the stage leaves no "Waiting for an agent" note under it.
   if (await p.evaluate(() => getComputedStyle(document.getElementById('empty')).display !== 'none')) fail('desktop: the empty note shows under the stage');
   const logged = await p.evaluate(() => [...document.querySelectorAll('.call')].some((c) => c.textContent.includes('src/hero.html')));
@@ -154,6 +171,7 @@ try {
   await phone.page.waitForFunction(() => document.querySelectorAll('.mark').length > 5 && document.querySelectorAll('.shot[data-on]').length === 1, null, { timeout: 15000 }).catch(() => fail('phone: the replay did not draw the stage'));
   const wide = await phone.page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   if (wide > 0) fail(`phone: the page is ${wide}px wider than the screen`);
+  if (!(await phone.page.evaluate(() => document.getElementById('stage-error').hidden))) fail('phone: the replay left the stage error line on after the good load that followed it');
   await finish('phone', phone);
 
   // One finding on one element reads in the singular, and a stage with no picture does not count elements.

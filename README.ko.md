@@ -166,7 +166,7 @@ Cursor 는 프로젝트의 `.cursor/mcp.json`, 모든 프로젝트에 쓰려면 
 ### 시작
 
 Claude Code 에서 `/taster` 를 치면(또는 에이전트에게 "Taster 시작해줘") 이미 있는 사이트인지 새로 지을지부터
-묻고 이어 갑니다. 바로 말해도 됩니다. "이 사이트 슬롭 진단해줘", "AI 사이트 빌더로 만든 내 사이트 AI 티 안 나게
+묻고 이어 갑니다. `/taster https://내-사이트` 처럼 주소나 페이지 파일을 함께 주면 묻지 않고 바로 진단합니다. 바로 말해도 됩니다. "이 사이트 슬롭 진단해줘", "AI 사이트 빌더로 만든 내 사이트 AI 티 안 나게
 다시 지어줘", "이 제품 요금제 페이지를 AI 티 안 나게 만들어줘".
 
 ## 쓰기
@@ -309,7 +309,7 @@ claude mcp add --transport http taster https://taster-six.vercel.app/api/mcp
 ```
 
 Cursor 는 `.cursor/mcp.json` 에 `{ "mcpServers": { "taster": { "url": "https://taster-six.vercel.app/api/mcp" } } }`.
-claude.ai 와 ChatGPT 는 같은 주소를 사용자 지정 커넥터로 넣습니다. 원격 서버에는 `extract_content`, 디자인 시스템
+claude.ai 와 ChatGPT 는 같은 주소를 사용자 지정 커넥터로 넣습니다. 원격 서버에는 `get_findings`, `extract_content`, 디자인 시스템
 도구, 화면 단위 도구가 없습니다. `diagnose` 와 `brand_theme` 는 공개 http(s) 주소만 받고, `preview_component` 는 그리는
 대신 정지 화면과 실행 링크를 돌려주며, `pick_tone` 은 같은 울타리를 거쳐 레퍼런스를 열고 부품은 그리는 대신 실행
 링크로 줍니다. 모든 도구 호출은 사용자별 한도에 들어가고, 이 한도는 서버 인스턴스마다 따로 셉니다. 요청 하나에는

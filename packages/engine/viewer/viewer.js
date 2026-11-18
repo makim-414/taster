@@ -6,7 +6,8 @@
 // findings, top to bottom. After an agent edits a file, the hub loads the page again and sends what changed
 // (stage.patch): that agent's cursor flies to each changed region, draws its box and size, and only that region of the
 // new picture fades in; the whole new picture settles once every region is shown, and findings that are gone resolve
-// where they were. Page text from events is only ever set with textContent.
+// where they were. When the page does not load after an edit (stage.error), a line over the stage says so, with the
+// edit, until the next good load. Page text from events is only ever set with textContent.
 'use strict';
 
 (() => {
@@ -19,6 +20,7 @@
     widths: $('widths'),
     counts: $('counts'),
     stage: $('stage'),
+    error: $('stage-error'),
     inner: $('inner'),
     shots: [$('shot-a'), $('shot-b')],
     pins: $('pins'),
@@ -293,6 +295,23 @@
     drawMarks(stage);
     drawWidths();
     drawCounts();
+    drawError(stage);
+  }
+
+  // The line over the stage while its page does not load after an edit.
+  function drawError(stage) {
+    const err = stage?.error;
+    ui.error.hidden = !err;
+    if (!err) {
+      ui.error.replaceChildren();
+      return;
+    }
+    ui.error.replaceChildren(h('b', null, err.status ? `HTTP ${err.status}` : 'Did not load'), ' after the edit to ', code(short(err.file || 'a file', 60)), `: ${short(err.message || 'the page did not load', 160)}`);
+  }
+  function clearError(stage) {
+    if (!stage.error) return;
+    stage.error = null;
+    if (stage === current) drawError(stage);
   }
 
   function drawWidths() {
@@ -451,9 +470,10 @@
   // ---- events ----
   function onEvent(e) {
     // A patch is drawn by the cursors of the agents whose edits it shows, one patch after another.
-    if (e.type === 'stage.patch') {
+    if (e.type === 'stage.patch' || e.type === 'stage.error') {
       const d = e.data || {};
-      patching = patching.then(() => patched(d)).catch((err) => console.warn('taster watch: could not draw a patch', err));
+      const draw = e.type === 'stage.patch' ? patched : (x) => broke(e, x);
+      patching = patching.then(() => draw(d)).catch((err) => console.warn('taster watch: could not draw', e.type, err));
       return;
     }
     const agent = agentOf(e.agent);
@@ -605,6 +625,7 @@
   function refreshed(c, d) {
     const stage = stages.find((s) => s.seq === d.of);
     if (!stage) return;
+    clearError(stage);
     const shotSize = d.shotSize || stage.shotSize;
     const { before, after, resolved } = compare(stage, d.findings || [], shotSize);
     stage.shot = d.shot;
@@ -664,9 +685,28 @@
     return el;
   }
 
+  // The page did not load after an edit: the line over the stage, a failed line in the log, and the editing cursor says so.
+  function broke(e, d) {
+    const stage = stages.find((s) => s.seq === d.of);
+    if (!stage) return;
+    stage.error = { status: Number.isInteger(d.status) ? d.status : null, message: String(d.message || ''), file: String(d.file || '') };
+    if (stage === current) drawError(stage);
+    const hub = agentOf(e.agent);
+    const state = h('span', { class: 'call-state' }, stage.error.status ? `HTTP ${stage.error.status}` : 'failed');
+    const el = h('li', { class: 'call', 'data-color': hub.color, 'data-state': 'failed' }, h('span', { class: 'call-what' }, h('b', null, 'reload'), ' after ', short(stage.error.file || 'an edit', 80)), state, h('span', { class: 'call-detail' }, short(stage.error.message, 160)));
+    ui.log.prepend(el);
+    while (ui.log.children.length > MAX_LOG) ui.log.lastElementChild.remove();
+    if (replaying || !d.agent || typeof d.agent.id !== 'string') return;
+    const c = cursorOf({ agent: d.agent });
+    step(c, { anchor: stage === current ? { el: ui.error } : undefined, say: [h('span', null, code(short(stage.error.file || 'a file', 48))), h('span', null, 'the page did not load')], dwell: 300 });
+    c.done = true;
+  }
+
   function patched(d) {
     const stage = stages.find((s) => s.seq === d.of);
     if (!stage) return Promise.resolve();
+    // A load that worked: the page is back.
+    clearError(stage);
     const edits = (Array.isArray(d.edits) && d.edits.length ? d.edits : [{ file: d.file, tool: d.tool, agent: d.agent }]).filter((x) => x && x.agent && typeof x.agent.id === 'string');
     const cursorFor = (i) => (edits[i] ? cursorOf({ agent: edits[i].agent }) : null);
     const fileSay = (x) => h('span', null, code(short(x.file || 'a file', 48)));
@@ -676,7 +716,7 @@
       edits.forEach((x, i) => {
         const c = cursorFor(i);
         if (!c) return;
-        step(c, { say: [fileSay(x), h('span', null, 'no visible change')], dwell: 300 });
+        step(c, { say: [fileSay(x), h('span', null, d.superseded ? 'no visible change before the next edit' : 'no visible change')], dwell: 300 });
         c.done = true;
       });
       return Promise.resolve();

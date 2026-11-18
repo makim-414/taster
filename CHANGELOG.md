@@ -87,9 +87,34 @@ All notable changes to Taster are recorded here. The format follows
   app folder, and connect the preset; the packages row lists `tailwindcss`.
 - Installed alone, the skill says where the engine comes from (the plugin, the hosted MCP server at
   `https://taster-six.vercel.app/api/mcp`, or a clone) and writes its commands as `node <clone>/packages/engine/...`.
+- `/taster <url>` (or a local address or a page file) goes straight to Diagnose instead of asking whether the site
+  already exists or is new: a URL or file is an existing site. The skill, its start guide and the MCP `start` prompt
+  ask the opening question only when the first message gives neither and does not say which. The question whether
+  the site is theirs or they may use it now comes before Brand and Rebuild, which take from the site, not before the
+  diagnosis, which only reads it.
+- The MCP `diagnose` answers with a summary: per rule its id, name, severity, counts per width, up to 3 example
+  selectors and its fix patterns, with the totals and the manual rules. On a real landing page the full answer ran to
+  about 210,000 characters, past what Claude Code takes as one tool answer, so the agent had to read it from a file;
+  the summary of the same page is about 10,000, and it stays under 16,000 however many findings a page has
+  (`compactReport` in the engine). The local server saves every finding to `report.json` next to the captures and
+  names both paths; the new `get_findings { report, rule, width, offset, limit }` reads one rule's findings from it
+  without opening the page again. `rules: [ids]` puts those rules' findings in the answer and `detail: "full"` all of
+  them, on the hosted server too.
 
 ### Fixed
 
+- The live hub no longer goes quiet when the page breaks after an edit. When the stage answers with an HTTP error
+  (a 5xx while the dev server shows its error page) or does not load at all, it stops retrying once the same error
+  comes back twice, instead of loading it up to 4 times at up to 30 seconds each, about 100 seconds of silence on a
+  real page, and sends `stage.error` with the status, a short message and the edit before it. The viewer shows it as
+  a line over the stage and a failed line in the log, cleared by the next good load, and the fix is compared with the
+  last load that worked. `engineRefresher` answers such a load with `{ error }` instead of null.
+- An edit with no visible change no longer holds up the next one in the live hub. It ran its whole retry window
+  (about 10 seconds on a real page) while the next edit waited, and the next edit's change, landing during those
+  retries, was shown for the first edit's file. Now a newer edit ends that wait: the first edit gets a `stage.patch`
+  with no change and `superseded: true` ("no visible change before the next edit" in the viewer), and the change goes
+  to the newer edit. An edit that comes in while the load showing a change runs joins that patch, and its regions are
+  matched to the edits by file name.
 - The skill no longer tells the agent to download missing component files from the main branch at run time; the code
   comes from `get_component` or from `add` in a clone.
 - `lint` no longer reports the second line of a custom property value that a formatter split over lines

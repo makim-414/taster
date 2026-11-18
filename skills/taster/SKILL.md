@@ -1,21 +1,22 @@
 ---
 name: taster
-description: Find and remove AI slop in frontends. Starts by asking whether the site already exists or is being built new. Use when the user wants to check whether a site or screen looks AI generated, review a UI for generic patterns, replace slop with better components, rebuild an existing site they only have the address for, turn a brand and reference pages into a balanced design system, or design and build a landing page, dashboard, app screen, store or editorial page that does not look generated. Triggers on "is my site slop", "does this look AI made", "de-slop", "make this less generic", "review this UI", "redesign this section", "rebuild my site", "make a design system", "redo my site built with an AI site builder", "build a landing page", "build a dashboard".
+description: Find and remove AI slop in frontends. Given a URL or a page file, diagnoses that site at once; otherwise starts by asking whether the site already exists or is being built new. Use when the user wants to check whether a site or screen looks AI generated, review a UI for generic patterns, replace slop with better components, rebuild an existing site they only have the address for, turn a brand and reference pages into a balanced design system, or design and build a landing page, dashboard, app screen, store or editorial page that does not look generated. Triggers on "is my site slop", "does this look AI made", "de-slop", "make this less generic", "review this UI", "redesign this section", "rebuild my site", "make a design system", "redo my site built with an AI site builder", "build a landing page", "build a dashboard".
 ---
 
 # Taster
 
 ## Start here: one question
 
-Before anything else, ask the user, in their language:
+When the user starts Taster with `/taster`, what they typed after it is their first message. If that message gives a
+URL, a local address (`localhost:3000`) or a page file, it is an existing site: do not ask which, say in one line that
+you are diagnosing it, and run Diagnose on it. When it says "build a landing page for ..." or the like, it is a new
+one: say so in one line and go. Only when it gives no URL or file and does not say which, ask the user, in their
+language, and make that question your whole first reply:
 
 > Is this a site that already exists, or are we building a new one?
 
-(Korean: "이미 있는 사이트인가요, 아니면 새로 지을까요?") When the user starts Taster with `/taster`, what they typed
-after it is their first message. Skip the question only when that message already says which (a URL with "fix this",
-or "build a landing page for ..."), and then name the path you are taking in one line and go. Otherwise your first
-reply is only the question. The full opening, including how to tell whether you have the source, is in
-[references/start.md](references/start.md).
+(Korean: "이미 있는 사이트인가요, 아니면 새로 지을까요?") The full opening, including how to tell whether you have the
+source, is in [references/start.md](references/start.md).
 
 Every route runs in the same order: Diagnose (an existing site only), then Brand and references, then the design
 System made with the builder, then the Screens, each rebuilt from parts that fit its purpose and all wearing that
@@ -92,8 +93,9 @@ the edit itself, so edit one section per step when the user is watching.
 
 Prefer its tools; they run the same detector in a real browser for you.
 
-- The `start` prompt asks the opening question for you.
-- `diagnose { target, widths, screenshots }`: findings grouped by rule plus one outlined capture per width (1440 and 390 unless you pass `widths`; `screenshots: false` leaves the captures out). A report with `diagnosed: false`, or an answer that starts with `not diagnosed`, means a bot check, a block, error or sign-in page came back instead of the site: say it was not diagnosed and why, report no findings, and never try to get past it.
+- The `start` prompt asks the opening question for you, or, when the user's words give a URL or a file, says to diagnose it.
+- `diagnose { target, widths, screenshots, rules, detail }`: a summary per rule (its counts per width, up to 3 example selectors and its fix patterns) plus one outlined capture per width (1440 and 390 unless you pass `widths`; `screenshots: false` leaves the captures out). Every finding, with its selector, page rect and evidence, is saved to the `report.json` the answer names; `rules: ["AC-01"]` puts those rules' findings in the answer, and `detail: "full"` all of them, which on a real page runs past what one answer can hold. A report with `diagnosed: false`, or an answer that starts with `not diagnosed`, means a bot check, a block, error or sign-in page came back instead of the site: say it was not diagnosed and why, report no findings, and never try to get past it.
+- `get_findings { report, rule, width, offset, limit }`: the findings of one rule (or all) from that `report.json`, up to 100 per call, without opening the page again.
 - `brand_theme { target }`: the site's brand absorbed into token overrides and a ready `:root` block, with a note per choice.
 - `design_system { brand, references, axes, surface, scheme, out }`: brand plus references measured into one balanced design system, with a note per axis saying where it came from and what balance moved.
 - `tune_system { system, axes }`: the builder moves a weight; the others rebalance and the reply quotes the principle.
@@ -107,7 +109,7 @@ Prefer its tools; they run the same detector in a real browser for you.
 - `list_rules`, `explain_rule { id }`.
 - `plan_screens { target, route, system, byPart, out }`, `plan_next { plan }`, `plan_update { plan, event }`: the screen by screen loop in `taster.plan.json`.
 - `check_consistency { screens, system, widths, logoFont }`: drift between screens and values off the system, at 1440 and 390.
-- The hosted server (added by its URL, nothing installed) opens public http(s) addresses only. Its `diagnose` takes `target` alone and measures 1440 and 390, and its `preview_component` returns the default still with a live link in the brand. It has no `extract_content`, `design_system`, `tune_system`, `system_for_category`, `check_consistency`, `plan_screens`, `plan_next` or `plan_update`, since those open pages in a local browser or read and write local files; use the local server for them.
+- The hosted server (added by its URL, nothing installed) opens public http(s) addresses only. Its `diagnose` takes `target`, `rules` and `detail` and measures 1440 and 390, and its `preview_component` returns the default still with a live link in the brand. It has no `get_findings` (no report is saved; pass `rules` instead), `extract_content`, `design_system`, `tune_system`, `system_for_category`, `check_consistency`, `plan_screens`, `plan_next` or `plan_update`, since those open pages in a local browser or read and write local files; use the local server for them.
 
 Without the server, follow the steps below with any browser tool and `data/detect.js`, or run
 `node <clone>/packages/engine/cli.mjs <url>` from a clone ([Where the engine comes from](#where-the-engine-comes-from)).

@@ -71,7 +71,8 @@ sentence the board writes for your agent follows your browser's language.
 
 ## What it does
 
-Every session starts with one question: **is this a site that already exists, or are we building a new one?**
+Every session starts with one question: **is this a site that already exists, or are we building a new one?** A URL
+or a page file given with it (`/taster https://your-site.example`) answers it: an existing site, diagnosed at once.
 The answer picks the route, and every route runs in the same order: Diagnose (an existing site only), then Brand and
 references, then the design System made with you, then the Screens, each built from the parts that fit its purpose and
 all wearing that system ([SKILL.md](skills/taster/SKILL.md)).
@@ -318,8 +319,8 @@ claude mcp add --transport http taster https://taster-six.vercel.app/api/mcp
 ```
 
 In Cursor, `.cursor/mcp.json`: `{ "mcpServers": { "taster": { "url": "https://taster-six.vercel.app/api/mcp" } } }`.
-claude.ai and ChatGPT take the same URL as a custom connector. The hosted server leaves out `extract_content`, the
-design system tools and the screen by screen tools. `diagnose` and `brand_theme` take public http(s) URLs only,
+claude.ai and ChatGPT take the same URL as a custom connector. The hosted server leaves out `get_findings`, `extract_content`,
+the design system tools and the screen by screen tools. `diagnose` and `brand_theme` take public http(s) URLs only,
 `preview_component` answers with a still and a live link instead of a render, and `pick_tone` opens the references
 through the same fence and links to the live parts instead of rendering them. Every tool call counts against a per
 client limit that each server instance keeps on its own. A request carries one JSON-RPC message (a batch is refused),
