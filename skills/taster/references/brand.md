@@ -21,7 +21,10 @@ Call `brand_theme { target }` on the original address (or
 returns:
 
 - `tokens`: the overrides it chose.
-  - `--brand`: the solid color the site puts on its own buttons and links. A gradient is not a brand color; when
+  - `--brand`: the site's brand color, strongest evidence first: a CSS custom property it named for its brand or
+    primary color (`--brand`, `--color-brand`, `--primary`, `--color-primary`), then the color of its logo mark and
+    focus ring, then the solid color it puts on most of its buttons and links. An accent that fills more buttons does
+    not beat a named brand token. `source.colorFrom` says which one was used. A gradient is not a brand color; when
     there is no solid one, the neutral accent stays and a note asks for the real color.
   - `--accent-fg`: white or near black, whichever reads better on the brand color.
   - `--font`: the site's typeface when it was a choice. A stock fallback (Arial, Times, system UI) or one of the

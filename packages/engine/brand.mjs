@@ -1,4 +1,4 @@
-// Brand intake: turn what extract.js read from a site (logo, solid action color, fonts, light or dark) into token
+// Brand intake: turn what extract.js read from a site (logo, brand color, fonts, light or dark) into token
 // overrides, so a swap or a rebuild keeps the owner's brand instead of the repo's neutral defaults.
 // Deterministic: the same content gives the same theme. Every choice it makes is written into `notes`. The notes never
 // quote the page: a value read from it is named by its field in `source` (source.logo.text), which carries it as data.
@@ -83,13 +83,23 @@ const quoted = (name) => `'${String(name).replace(/[\\']/g, (c) => `\\${c}`)}'`;
 const TOKEN_NAME = /^--[\w-]+$/;
 const TOKEN_VALUE = /^[^{};<>\\]*$/;
 
+// Where extract.js found the brand color, strongest evidence first. The token's own name stays in source.colorFrom.
+const COLOR_FROM = {
+  token: "from the site's own CSS custom property named for its brand or primary color (source.colorFrom.token)",
+  'logo and focus': "from the site's logo mark, the same color as its focus ring",
+  logo: "from the site's logo mark",
+  focus: "from the site's focus ring",
+  actions: "from the site's own buttons and links",
+};
+
 export function brandTheme(content) {
   const notes = [];
   const brand = content?.brand || {};
   const dark = !!brand.dark;
   const tokens = {};
 
-  // 1. Brand color: the solid color the site puts on its own actions.
+  // 1. Brand color: a token the site named for its brand, else the color of its logo and focus ring, else the solid
+  // color it puts on its own actions (extract.js picks it and says where in colorFrom).
   let brandHue = null;
   if (brand.color && /^#[0-9a-f]{6}$/i.test(brand.color)) {
     const lch = hexToOklch(brand.color);
@@ -97,7 +107,7 @@ export function brandTheme(content) {
     const onBrand = contrast(brand.color, '#ffffff') >= contrast(brand.color, '#111111') ? '#ffffff' : '#111111';
     tokens['--accent-fg'] = onBrand;
     if (lch.c >= 0.04) brandHue = lch.h;
-    notes.push(`Brand color ${brand.color} from the site's own buttons and links becomes --brand; text on it is ${onBrand} (contrast ${contrast(brand.color, onBrand).toFixed(1)}:1).`);
+    notes.push(`Brand color ${brand.color} ${COLOR_FROM[brand.colorFrom?.kind] || COLOR_FROM.actions} becomes --brand; text on it is ${onBrand} (contrast ${contrast(brand.color, onBrand).toFixed(1)}:1).`);
     if (contrast(brand.color, onBrand) < 4.5) notes.push('Text on the brand color is under 4.5:1. Use the brand color for large shapes and keep small text off it.');
   } else {
     notes.push('No solid brand color on the site\'s actions (gradients are not a brand color). The neutral accent stays; ask the owner for their brand color.');
@@ -161,5 +171,5 @@ export function brandTheme(content) {
     '}',
     '',
   ].join('\n');
-  return { source: { name: brand.name || null, logo: brand.logo || null, color: brand.color || null, fonts: brand.fonts || null, dark }, tokens, css, notes };
+  return { source: { name: brand.name || null, logo: brand.logo || null, color: brand.color || null, colorFrom: brand.colorFrom || null, fonts: brand.fonts || null, dark }, tokens, css, notes };
 }

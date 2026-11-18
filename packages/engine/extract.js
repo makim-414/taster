@@ -272,14 +272,173 @@ window.tasterExtract = function tasterExtract() {
     return (max - min) / (1 - Math.abs(2 * l - 1));
   }
 
-  // The most used saturated solid color on links and buttons. Gradients are not a brand color.
-  function brandColor(actions) {
+  // A solid color that can carry a brand: opaque and saturated, so not a gray, a black or a white.
+  const brandable = (p) => !!p && p.a >= 0.9 && saturation(p) >= 0.35;
+
+  // The brand color, strongest evidence first. 1. A CSS custom property the page named for its brand or primary color
+  // (--brand, --color-brand, --primary, --color-primary): the owner said what the brand is. 2. The colors of the logo
+  // mark and of the focus ring, the logo first: a page puts its brand there even when an accent fills more buttons.
+  // 3. The most used saturated solid color on links and buttons. Gradients are not a brand color. `from` says which.
+  function brandColor(actions, logoScope) {
     const tally = new Map();
     for (const el of actions) {
       const s = getComputedStyle(el);
       for (const c of [s.backgroundColor, s.color, s.borderTopColor]) {
         const p = parseColor(c);
-        if (!p || p.a < 0.9 || saturation(p) < 0.35) continue;
+        if (!brandable(p)) continue;
+        const key = hex(p);
+        tally.set(key, (tally.get(key) || 0) + 1);
+      }
+    }
+    const sheets = cssRules();
+    let picked = null;
+    try {
+      const named = namedBrandToken(sheets);
+      if (named) return { color: named.color, from: { kind: 'token', token: named.token } };
+      const logoAt = logoColor(logoScope);
+      const focusAt = focusColor(sheets);
+      const strong = new Map();
+      if (logoAt) strong.set(logoAt, (strong.get(logoAt) || 0) + 2);
+      if (focusAt) strong.set(focusAt, (strong.get(focusAt) || 0) + 1);
+      if (strong.size) {
+        const [color, weight] = [...strong.entries()].sort((a, b) => b[1] - a[1] || (tally.get(b[0]) || 0) - (tally.get(a[0]) || 0))[0];
+        const kind = weight === 3 ? 'logo and focus' : weight === 2 ? 'logo' : 'focus';
+        picked = { color, from: { kind } };
+      }
+    } finally {
+      if (probeBox) probeBox.remove();
+      probeBox = null;
+    }
+    if (picked) return picked;
+    const top = [...tally.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+    return { color: top, from: top ? { kind: 'actions' } : null };
+  }
+
+  // Every style rule the page's own sheets hold, nested ones too (layers, media, CSS nesting). A sheet from another
+  // origin cannot be read and is skipped. Capped so a page with a huge sheet stays quick.
+  function cssRules() {
+    const out = [];
+    const walk = (list) => {
+      for (const rule of list || []) {
+        if (out.length >= 20000) return;
+        if (rule.style) out.push(rule);
+        let inner = null;
+        try {
+          inner = rule.cssRules;
+        } catch {
+          inner = null;
+        }
+        if (inner && inner.length) walk(inner);
+      }
+    };
+    for (const sheet of document.styleSheets) {
+      try {
+        walk(sheet.cssRules);
+      } catch {
+        // cross-origin sheet
+      }
+    }
+    return out;
+  }
+
+  // Resolves a CSS color expression (a var(), oklch, a color the page computes) the way the page draws it. The probe
+  // sits in a box of a color no page uses, so a value that does not resolve to a color shows that color and is refused.
+  // It is added through the CSSOM, which a strict Content-Security-Policy allows, and removed when the pick is done.
+  let probeBox = null;
+  function resolveColor(expr) {
+    if (!document.body) return null;
+    if (!probeBox) {
+      probeBox = document.createElement('div');
+      probeBox.style.setProperty('display', 'none');
+      probeBox.style.setProperty('color', 'rgb(1, 2, 3)');
+      probeBox.appendChild(document.createElement('span'));
+      document.body.appendChild(probeBox);
+    }
+    const probe = probeBox.firstChild;
+    probe.style.removeProperty('color');
+    probe.style.setProperty('color', expr);
+    if (!probe.style.getPropertyValue('color')) return null;
+    const p = parseColor(getComputedStyle(probe).color);
+    if (!p || (p.r === 1 && p.g === 2 && p.b === 3)) return null;
+    return p;
+  }
+
+  // Custom property names that say brand or primary, best first: the plain name, then a main shade. A foreground, a
+  // hover, a soft tint or a light shade is not the brand color, so those names are not read.
+  const BRAND_TOKENS = [
+    /^--(?:colou?rs?-)?brand(?:-colou?r)?$/i,
+    /^--(?:colou?rs?-)?brand-(?:primary|base|default|main|500|600)$/i,
+    /^--(?:colou?rs?-)?primary(?:-colou?r)?$/i,
+    /^--(?:colou?rs?-)?primary-(?:base|default|main|500|600)$/i,
+  ];
+  function namedBrandToken(rules) {
+    const names = new Set();
+    const read = (style) => {
+      for (let i = 0; style && i < style.length; i++) if (style[i].startsWith('--')) names.add(style[i]);
+    };
+    for (const rule of rules) read(rule.style);
+    read(document.documentElement.style);
+    if (document.body) read(document.body.style);
+    const ranked = [...names]
+      .filter((n) => n.length <= 64 && /^--[\w-]+$/.test(n))
+      .map((n) => ({ n, rank: BRAND_TOKENS.findIndex((re) => re.test(n)) }))
+      .filter((x) => x.rank >= 0)
+      .sort((a, b) => a.rank - b.rank || a.n.localeCompare(b.n));
+    for (const { n } of ranked) {
+      // A value can be a color, or the bare channels a color function wraps (shadcn's "222 47% 11%").
+      for (const expr of [`var(${n})`, `hsl(var(${n}))`, `rgb(var(${n}))`]) {
+        const p = resolveColor(expr);
+        if (!p) continue;
+        if (brandable(p)) return { color: hex(p), token: n };
+        break;
+      }
+    }
+    return null;
+  }
+
+  // The saturated color that covers most of the logo: the fill and stroke of its drawn shapes, a badge behind it, the
+  // ink of its words. Strokes and letters count for a quarter of their box, about what they cover. An image logo's
+  // pixels are not read.
+  const SHAPES = /^(rect|circle|ellipse|path|polygon|polyline|line|text|use)$/i;
+  function logoColor(scope) {
+    if (!scope) return null;
+    const area = new Map();
+    const add = (c, w) => {
+      const p = parseColor(c);
+      if (!brandable(p) || !(w > 0)) return;
+      const key = hex(p);
+      area.set(key, (area.get(key) || 0) + w);
+    };
+    for (const el of [scope, ...scope.querySelectorAll('*')].slice(0, 300)) {
+      if (!shown(el)) continue;
+      const s = getComputedStyle(el);
+      const r = el.getBoundingClientRect();
+      const size = r.width * r.height;
+      if (el instanceof SVGElement) {
+        if (!SHAPES.test(el.tagName)) continue;
+        if (s.fill && s.fill !== 'none') add(s.fill, size);
+        if (s.stroke && s.stroke !== 'none') add(s.stroke, size / 4);
+        continue;
+      }
+      add(s.backgroundColor, size);
+      const words = [...el.childNodes].some((n) => n.nodeType === 3 && n.data.trim());
+      if (words) add(s.color, size / 4);
+    }
+    return [...area.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+  }
+
+  // The color a focus ring is drawn in, from the page's own :focus and :focus-visible rules (an outline color or a
+  // Tailwind ring color). The rules are read rather than focusing anything, so nothing on the page moves.
+  const FOCUS = /:focus(?:-visible)?(?![\w-])/;
+  function focusColor(rules) {
+    const tally = new Map();
+    for (const rule of rules) {
+      if (!FOCUS.test(rule.selectorText || '')) continue;
+      for (const prop of ['outline-color', '--tw-ring-color']) {
+        const v = rule.style.getPropertyValue(prop).trim();
+        if (!v || /^(currentcolor|inherit|initial|unset|auto|transparent)$/i.test(v)) continue;
+        const p = resolveColor(v);
+        if (!brandable(p)) continue;
         const key = hex(p);
         tally.set(key, (tally.get(key) || 0) + 1);
       }
@@ -460,6 +619,10 @@ window.tasterExtract = function tasterExtract() {
 
   const kept = sections.filter((s) => s.heading || s.text.length || s.actions.length || s.links.length || s.images.length || s.lists.length || s.forms.length);
   const logoAt = logoNode(header);
+  // Where the logo's colors are read: the logo's own link, else the first link in the header outside its nav (the
+  // home link, which holds the mark even when it is drawn in SVG with no logo class).
+  const logoScope = (logoAt && (logoAt.el.closest('a') || logoAt.el)) || (header ? [...header.querySelectorAll('a')].find((a) => !a.closest('nav, [role="navigation"]')) || null : null);
+  const brandPick = brandColor(actionEls, logoScope);
   const footerLinks = footer
     ? [...footer.querySelectorAll('a')].filter(visible).map((a) => ({ text: words(textOf(a)), href: abs(a.getAttribute('href')) })).filter((l) => l.text)
     : [];
@@ -472,7 +635,8 @@ window.tasterExtract = function tasterExtract() {
     brand: {
       name: logo(logoAt)?.text || null,
       logo: logo(logoAt),
-      color: brandColor(actionEls),
+      color: brandPick.color,
+      colorFrom: brandPick.from,
       fonts: {
         heading: headingFamily(logoAt && logoAt.el),
         body: family(bodyText(logoAt && logoAt.el)),
