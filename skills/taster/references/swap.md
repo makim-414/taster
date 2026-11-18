@@ -16,6 +16,9 @@ own code, and prove it with a second detector run.
    For icon findings (ICO-01 to ICO-04, CMP-03, AC-11, AC-03), sort every icon on the page into its slot with
    `data/patterns/icon-placement.md` before touching a glyph. Remove the icons whose slot fails its test, then bring
    the rest onto one set and one stroke weight. Restyling an icon that should not be there does not clear the rule.
+   Icons in components copied with `add` already go through one adapter, `<dir>/icons/index.tsx`, which `add`
+   points at the app's own set and stroke when it finds one (it says so in its output): change that file, not the
+   glyphs inside each component.
 3. Then copy (manual rules), last, and only where the user agrees.
 
 ## For each finding

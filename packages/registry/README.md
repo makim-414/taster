@@ -78,6 +78,14 @@ once. `--tokens taster` copies the token files and the preset as before; `--toke
 has no colors. Run `add` again after the app's theme changes: `taster.css` is the same file for the same theme, so
 a second `add` keeps the first one unless it differs.
 
+### Icons
+
+When the app has its own icon set (`lucide-react` or `@heroicons/react` imported in its code, or a local `icons.tsx`),
+`add` writes `icons/index.tsx` as an adapter to it, in either case above. `Icon` draws the app's own glyph for every
+Taster icon name it can match and Taster's glyph for the rest, and `ICON_STROKE`, the stroke the app's icons use (read
+from its code), is what every icon drawn inline in the copied files now reads. So the page keeps one set at one stroke
+weight (rule ICO-03). To switch sets, edit `HOST` and `ICON_STROKE` in that one file.
+
 ## Copy a component by hand
 
 1. Tokens first. Components read CSS variables only, so nothing renders correctly without them.

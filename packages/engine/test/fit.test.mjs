@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { loadRegistry, resolveComponents } from '../add.mjs';
-import { detectHost, fitBundle, fitMode, fitNextSteps, fitReport, planFit } from '../fit.mjs';
+import { detectHost, detectIcons, fitBundle, fitIcons, fitMode, fitNextSteps, fitReport, iconReport, planFit } from '../fit.mjs';
 
 const HOSTS = fileURLToPath(new URL('./fixtures/hosts/', import.meta.url));
 const CLI = fileURLToPath(new URL('../cli.mjs', import.meta.url));
@@ -141,4 +141,49 @@ test('add fits the copy when run in an app with its own theme', () => {
   const old = JSON.parse(execFileSync('node', [CLI, 'add', 'blocks/badge', '--json', '--tokens', 'taster', '--dir', 'src/old'], { cwd: app, encoding: 'utf8' }));
   assert.equal(old.fit.mode, 'taster');
   assert.ok(old.written.includes('tokens.css') && old.written.includes('tailwind-preset.cjs'));
+});
+
+test('detectIcons finds the set the app imports, its stroke, and the glyphs it can match', () => {
+  const lucide = detectIcons(join(HOSTS, 'v4-lucide'));
+  assert.equal(lucide.kind, 'lucide-react');
+  // Read from the app's own use (strokeWidth={1.5}), not lucide's default.
+  assert.equal(lucide.stroke, 1.5);
+  assert.equal(lucide.glyphs.close.name, 'X');
+  assert.equal(lucide.glyphs['chevron-down'].name, 'ChevronDown');
+  const hero = detectIcons(join(HOSTS, 'v3-config'));
+  assert.equal(hero.kind, '@heroicons/react');
+  assert.equal(hero.stroke, 1.5);
+  assert.equal(hero.glyphs.close.name, 'XMarkIcon');
+  const local = detectIcons(join(HOSTS, 'plain'));
+  assert.equal(local.kind, 'local');
+  assert.equal(local.stroke, 1.75);
+  assert.deepEqual(Object.fromEntries(Object.entries(local.glyphs).map(([k, g]) => [k, g.expr])), { check: 'host.Icon.Check', 'arrow-right': 'host.Icon.Arrow' });
+});
+
+test('fitIcons sends every icon of the copied files through one adapter at the app stroke', () => {
+  const host = detectHost(join(HOSTS, 'v4-lucide'));
+  const icons = detectIcons(host.root);
+  const fitted = fitBundle(resolveComponents(['marketing/pricing-cards', 'marketing/reveal-faq', 'blocks/session-list'], { tokens: false }), host);
+  const { bundle, inline, files } = fitIcons(fitted.bundle, icons, { dir: join(host.root, 'src/components/taster') });
+  assert.ok(inline >= 2);
+  assert.ok(files.includes('marketing/pricing-cards.tsx'));
+  const pricing = bundle.files.find((f) => f.path === 'marketing/pricing-cards.tsx').content;
+  assert.match(pricing, /^import \{ ICON_STROKE \} from '\.\.\/icons'$/m);
+  assert.match(pricing, /strokeWidth=\{ICON_STROKE\}/);
+  assert.doesNotMatch(pricing, /viewBox="0 0 24 24"[^>]*strokeWidth="2"/);
+  const adapter = bundle.files.find((f) => f.path === 'icons/index.tsx').content;
+  assert.match(adapter, /^import \{ [^}]*X as HostX[^}]* \} from 'lucide-react'$/m);
+  assert.match(adapter, /export const ICON_STROKE = 1\.5/);
+  assert.match(adapter, /'close': HostX,/);
+  assert.match(adapter, /strokeWidth=\{strokeWidth \?\? ICON_STROKE\}/);
+  assert.doesNotMatch(adapter, /icon-stroke/);
+  // A file that already imports Icon from the adapter gets ICON_STROKE in the same import.
+  for (const f of bundle.files.filter((x) => /from '\.\.\/icons'/.test(x.content))) assert.equal((f.content.match(/from '\.\.\/icons'/g) || []).length, 1, f.path);
+  // A local set is imported from where it is, relative to the adapter.
+  const plain = detectHost(join(HOSTS, 'plain'));
+  const local = fitIcons(resolveComponents(['marketing/audience-split']), detectIcons(plain.root), { dir: join(plain.root, 'src/components/taster') });
+  const localAdapter = local.bundle.files.find((f) => f.path === 'icons/index.tsx').content;
+  assert.match(localAdapter, /^import \* as host from '\.\.\/\.\.\/icons'$/m);
+  assert.match(localAdapter, /export const ICON_STROKE = 1\.75/);
+  assert.match(iconReport(local, 'src/components/taster').join('\n'), /src\/components\/taster\/icons\/index\.tsx/);
 });

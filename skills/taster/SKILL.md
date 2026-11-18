@@ -177,7 +177,7 @@ tone tokens) with `preview_component`, and write code only after they choose.
 
 Every route that adds, keeps or swaps an icon goes through [data/patterns/icon-placement.md](data/patterns/icon-placement.md) first:
 name the slot from `taxonomy.iconography.slots`, run its `test`, and only then pick a glyph from one set (line-icon-set,
-the registry `icons/icon` component). Icons that fail the test are removed, not restyled. Logos and partner marks are the
+the registry `icons/icon` component). Icons that fail the test are removed, not restyled. Components copied with `add` draw every icon through `<dir>/icons/index.tsx`, which `add` points at the app's own icon set and stroke when it finds one; to change their icons, edit that one file. Logos and partner marks are the
 identity slot and stay as the original files.
 
 ## Always

@@ -708,4 +708,260 @@ export function fitNextSteps(dir, host) {
   ];
 }
 
+
+// ---- Icons ----------------------------------------------------------------------------------------------------
+// The components draw icons two ways: Icon from icons/index.tsx (a name such as chevron-down), and small glyphs
+// inline in the file, stroked at 2 on the 24 grid. An app with its own icons usually draws them at another stroke, so
+// side by side they read as two sets (ICO-03). When `add` finds the app's set, it writes icons/index.tsx as an adapter:
+// Icon draws the app's own glyph for every name it can match and Taster's glyph at the app's stroke for the rest, and
+// ICON_STROKE, the app's stroke, is what every inline icon in the copied files now reads.
+
+const ICON_NAMES = {
+  search: { lucide: ['Search'], hero: 'MagnifyingGlassIcon', local: ['Search', 'MagnifyingGlass'] },
+  'chart-line': { lucide: ['ChartLine', 'LineChart'], local: ['ChartLine', 'LineChart'] },
+  'chart-bar': { lucide: ['ChartColumn', 'BarChart3'], hero: 'ChartBarIcon', local: ['ChartBar', 'BarChart'] },
+  list: { lucide: ['List'], hero: 'ListBulletIcon', local: ['List'] },
+  check: { lucide: ['Check'], hero: 'CheckIcon', local: ['Check', 'Tick'] },
+  'arrow-up-right': { lucide: ['ArrowUpRight'], hero: 'ArrowUpRightIcon', local: ['ArrowUpRight', 'External', 'ExternalLink'] },
+  close: { lucide: ['X'], hero: 'XMarkIcon', local: ['Close', 'X', 'XMark', 'Cross'] },
+  menu: { lucide: ['Menu'], hero: 'Bars3Icon', local: ['Menu', 'Bars', 'Hamburger'] },
+  'chevron-down': { lucide: ['ChevronDown'], hero: 'ChevronDownIcon', local: ['ChevronDown'] },
+  download: { lucide: ['Download'], hero: 'ArrowDownTrayIcon', local: ['Download'] },
+  file: { lucide: ['File'], hero: 'DocumentIcon', local: ['File', 'Document'] },
+  'chevron-left': { lucide: ['ChevronLeft'], hero: 'ChevronLeftIcon', local: ['ChevronLeft'] },
+  'chevron-right': { lucide: ['ChevronRight'], hero: 'ChevronRightIcon', local: ['ChevronRight'] },
+  'arrow-left': { lucide: ['ArrowLeft'], hero: 'ArrowLeftIcon', local: ['ArrowLeft'] },
+  'arrow-right': { lucide: ['ArrowRight'], hero: 'ArrowRightIcon', local: ['ArrowRight', 'Arrow'] },
+  play: { lucide: ['Play'], hero: 'PlayIcon', local: ['Play'] },
+  pause: { lucide: ['Pause'], hero: 'PauseIcon', local: ['Pause'] },
+  eye: { lucide: ['Eye'], hero: 'EyeIcon', local: ['Eye'] },
+  'eye-off': { lucide: ['EyeOff'], hero: 'EyeSlashIcon', local: ['EyeOff', 'EyeSlash'] },
+  copy: { lucide: ['Copy'], hero: 'DocumentDuplicateIcon', local: ['Copy', 'Duplicate'] },
+  monitor: { lucide: ['Monitor'], hero: 'ComputerDesktopIcon', local: ['Monitor', 'Desktop'] },
+  phone: { lucide: ['Smartphone'], hero: 'DevicePhoneMobileIcon', local: ['Phone', 'Smartphone', 'Mobile'] },
+  tablet: { lucide: ['Tablet'], hero: 'DeviceTabletIcon', local: ['Tablet'] },
+};
+// Names that every lucide-react release has had, for when node_modules is not there to check against.
+const LUCIDE_STABLE = new Set(Object.values(ICON_NAMES).flatMap((n) => n.lucide).filter((n) => !/Chart/.test(n)));
+
+const mostCommon = (values) => {
+  const count = new Map();
+  for (const v of values) count.set(v, (count.get(v) || 0) + 1);
+  return [...count].sort((a, b) => b[1] - a[1])[0]?.[0];
+};
+const strokesIn = (text) => [...text.matchAll(/stroke(?:Width|-width)\s*[:=]\s*[{"']?\s*([\d.]+)/g)].map((m) => Number(m[1])).filter((n) => n > 0 && n < 5);
+
+/** The names a local icons file exports, as expressions: Icon.Check for an object of glyphs, CheckIcon for a named export. */
+function localExports(text) {
+  const out = [];
+  const code = stripJsComments(text);
+  for (const m of code.matchAll(/export\s+const\s+(\w+)\s*(?::[^=]+)?=\s*\{/g)) {
+    const open = m.index + m[0].length - 1;
+    const end = closing(code, open);
+    if (end < 0) continue;
+    for (const { key } of objectEntries(code.slice(open + 1, end))) if (/^[A-Z]/.test(key)) out.push({ name: key, expr: `${m[1]}.${key}`, base: m[1] });
+  }
+  for (const m of code.matchAll(/export\s+(?:function|const)\s+([A-Z]\w*)/g)) if (!out.some((o) => o.base === m[1])) out.push({ name: m[1], expr: m[1], base: m[1] });
+  return out;
+}
+
+/**
+ * The app's icon set: lucide-react or Heroicons when its code imports them, else a local icons file, with its stroke.
+ * @returns {null | { kind: 'lucide-react'|'@heroicons/react'|'local', label: string, stroke: number, glyphs: Record<string,{ expr: string }>, imports: string[], file?: string }}
+ */
+export function detectIcons(root, { exclude = [] } = {}) {
+  root = resolve(root);
+  const skip = exclude.map((d) => resolve(d));
+  const pkg = readJson(join(root, 'package.json')) || {};
+  const deps = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) };
+  const sources = walk(root, (n) => /\.(tsx|jsx|ts|js)$/.test(n) && !/\.(test|spec|config)\./.test(n), skip).map((file) => ({ file, text: readFileSync(file, 'utf8') }));
+  const importing = (lib) => sources.filter((s) => new RegExp(`from\\s+['"]${lib.replace('/', '\\/')}(?:/[^'"]*)?['"]`).test(s.text));
+  const libs = [];
+  if (deps['lucide-react']) libs.push({ kind: 'lucide-react', users: importing('lucide-react') });
+  if (deps['@heroicons/react']) libs.push({ kind: '@heroicons/react', users: importing('@heroicons/react') });
+  const local = sources
+    .filter((s) => /(^|[\\/])icons?(?:[\\/]index)?\.(tsx|jsx)$/i.test(s.file) && /<svg\b/.test(s.text))
+    .sort((a, b) => a.file.length - b.file.length)[0];
+  const lib = libs.find((l) => l.users.length) || (local ? null : libs[0]);
+  if (lib?.kind === 'lucide-react') {
+    let dts = null;
+    try {
+      dts = readFileSync(join(root, 'node_modules/lucide-react/dist/lucide-react.d.ts'), 'utf8');
+    } catch {}
+    const ok = (n) => (dts ? new RegExp(`\\b${n}\\b`).test(dts) : LUCIDE_STABLE.has(n));
+    const glyphs = {};
+    for (const [taster, names] of Object.entries(ICON_NAMES)) {
+      const n = names.lucide.find(ok);
+      if (n) glyphs[taster] = { expr: `Host${n}`, name: n };
+    }
+    const stroke = mostCommon(lib.users.flatMap((u) => strokesIn(u.text))) ?? 2;
+    const names = [...new Set(Object.values(glyphs).map((g) => g.name))];
+    return { kind: lib.kind, label: 'lucide-react', stroke, glyphs, imports: [`import { ${names.map((n) => `${n} as Host${n}`).join(', ')} } from 'lucide-react'`] };
+  }
+  if (lib?.kind === '@heroicons/react') {
+    let dts = null;
+    try {
+      dts = readFileSync(join(root, 'node_modules/@heroicons/react/24/outline/index.d.ts'), 'utf8');
+    } catch {}
+    const glyphs = {};
+    for (const [taster, names] of Object.entries(ICON_NAMES)) if (names.hero && (!dts || dts.includes(names.hero))) glyphs[taster] = { expr: `Host${names.hero}`, name: names.hero };
+    const stroke = mostCommon(lib.users.flatMap((u) => strokesIn(u.text))) ?? 1.5;
+    const names = [...new Set(Object.values(glyphs).map((g) => g.name))];
+    return { kind: lib.kind, label: '@heroicons/react/24/outline', stroke, glyphs, imports: [`import { ${names.map((n) => `${n} as Host${n}`).join(', ')} } from '@heroicons/react/24/outline'`] };
+  }
+  if (local) {
+    const exported = localExports(local.text);
+    const glyphs = {};
+    for (const [taster, names] of Object.entries(ICON_NAMES)) {
+      const hit = names.local.flatMap((n) => [n, `${n}Icon`, `Icon${n}`]).map((n) => exported.find((e) => e.name === n)).find(Boolean);
+      if (hit) glyphs[taster] = { expr: `host.${hit.expr}`, name: hit.expr };
+    }
+    const stroke = mostCommon(strokesIn(local.text)) ?? 2;
+    return { kind: 'local', label: relative(root, local.file).split(sep).join('/'), file: local.file, stroke, glyphs, imports: [] };
+  }
+  return null;
+}
+
+const relImport = (fromFile, toFile) => {
+  const r = posix.relative(posix.dirname(fromFile), toFile).replace(/\.(tsx|ts|jsx|js)$/, '').replace(/\/index$/, '');
+  return r.startsWith('.') ? r : `./${r}`;
+};
+
+/** icons/index.tsx as an adapter to the app's icon set, made from the registry's own icons file. */
+export function iconAdapter(icons, source, { dir } = {}) {
+  let out = source;
+  const imports = [...icons.imports];
+  if (icons.kind === 'local' && dir) {
+    const adapter = join(resolve(dir), 'icons', 'index.tsx').split(sep).join('/');
+    imports.push(`import * as host from '${relImport(adapter, icons.file.split(sep).join('/'))}'`);
+  }
+  const map = Object.entries(icons.glyphs).map(([taster, g]) => `  '${taster}': ${g.expr},`);
+  const head = [
+    '',
+    `// Icon adapter written by taster add for this app. Every copied component draws its icons through this file: Icon`,
+    `// for named glyphs, and ICON_STROKE for the few glyphs drawn inline in a component. Your set: ${icons.label}, stroke`,
+    `// ${icons.stroke}. HOST maps Taster's icon names onto it; a name not in HOST is drawn from Taster's paths below at`,
+    '// ICON_STROKE. To use another set, change the import, HOST and ICON_STROKE here; no component needs to change.',
+    '',
+    `/** Stroke width on the 24 grid of every icon the copied components draw: the one your icons use. */`,
+    `export const ICON_STROKE = ${icons.stroke}`,
+    '',
+    `const HOST: Partial<Record<string, React.ElementType>> = {`,
+    ...map,
+    '}',
+    '',
+  ].join('\n');
+  const reactImport = /import \* as React from 'react'\n/;
+  if (!reactImport.test(out) || !/const paths = \{/.test(out)) throw new Error('icons/index.tsx changed shape: update iconAdapter in packages/engine/fit.mjs');
+  out = out.replace(reactImport, (m) => `${m}${imports.map((i) => `${i}\n`).join('')}`);
+  out = out.replace(/\nconst paths = \{/, `${head}\nconst paths = {`);
+  out = out.replace(/strokeWidth \?\? 'var\(--(?:tst-)?icon-stroke, 2\)'/, 'strokeWidth ?? ICON_STROKE');
+  out = out.replace(/Default --(?:tst-)?icon-stroke \(2\)\./, 'Default ICON_STROKE, the stroke of your set.');
+  const glyph = [
+    '  const Glyph = HOST[name]',
+    '  if (Glyph) {',
+    '    return (',
+    '      <Glyph',
+    "        role={title ? 'img' : undefined}",
+    '        aria-hidden={title ? undefined : true}',
+    '        aria-label={title}',
+    '        data-icon={name}',
+    '        {...rest}',
+    '        strokeWidth={strokeWidth ?? ICON_STROKE}',
+    "        style={{ width: px(width) ?? box, height: px(height) ?? box, flex: 'none', ...style }}",
+    '      />',
+    '    )',
+    '  }',
+    '  return (\n    <svg',
+  ].join('\n');
+  if (!/\n  return \(\n    <svg/.test(out) || !/strokeWidth \?\? ICON_STROKE/.test(out)) throw new Error('icons/index.tsx changed shape: update iconAdapter in packages/engine/fit.mjs');
+  out = out.replace(/\n  return \(\n    <svg/, `\n${glyph}`);
+  return out;
+}
+
+/** The end of an opening JSX tag that starts at `start` (`<svg`), skipping braces and strings. */
+function tagEnd(text, start) {
+  for (let i = start; i < text.length; i++) {
+    const c = text[i];
+    if (c === '{') i = closing(text, i);
+    else if (c === '"' || c === "'") i = text.indexOf(c, i + 1);
+    if (i < 0) return -1;
+    if (text[i] === '>') return i;
+  }
+  return -1;
+}
+
+/** Inline 24-grid line icons in one copied file read ICON_STROKE from the adapter. Returns the text and how many. */
+export function inlineIconStroke(text, path) {
+  let count = 0;
+  let out = '';
+  let last = 0;
+  for (const m of text.matchAll(/<svg\b/g)) {
+    if (m.index < last) continue;
+    const end = tagEnd(text, m.index);
+    if (end < 0) break;
+    const tag = text.slice(m.index, end + 1);
+    let next = tag;
+    if (/viewBox=["']0 0 24 24["']/.test(tag) && /stroke=["']currentColor["']/.test(tag)) {
+      next = tag.replace(/strokeWidth=(?:"[\d.]+"|'[\d.]+'|\{[\d.]+\})/, () => {
+        count++;
+        return 'strokeWidth={ICON_STROKE}';
+      });
+    }
+    out += text.slice(last, m.index) + next;
+    last = end + 1;
+  }
+  out += text.slice(last);
+  if (!count) return { text, count };
+  const from = relImport(path, 'icons/index.tsx');
+  const existing = new RegExp(`import \\{([^}]*)\\} from '${from.replace(/\./g, '\\.')}'`);
+  if (existing.test(out)) out = out.replace(existing, (all, names) => `import {${names.trimEnd()}, ICON_STROKE } from '${from}'`);
+  else {
+    const imports = [...out.matchAll(/^import [^\n]*\n/gm)];
+    const at = imports.length ? imports[imports.length - 1].index + imports[imports.length - 1][0].length : 0;
+    out = `${out.slice(0, at)}import { ICON_STROKE } from '${from}'\n${out.slice(at)}`;
+  }
+  return { text: out, count };
+}
+
+/**
+ * Point a bundle's icons at the app's set: the adapter in icons/index.tsx and ICON_STROKE in every inline icon.
+ * @returns {{ bundle: object, icons: object, inline: number, files: string[] }}
+ */
+export function fitIcons(bundle, icons, { dir } = {}) {
+  let inline = 0;
+  const touched = [];
+  const files = bundle.files.map((f) => {
+    if (!/\.(tsx|jsx)$/.test(f.path) || f.path === 'icons/index.tsx') return f;
+    const r = inlineIconStroke(f.content, f.path);
+    if (!r.count) return f;
+    inline += r.count;
+    touched.push(f.path);
+    return { ...f, content: r.text };
+  });
+  const named = files.some((f) => /from '(?:\.\.\/)+icons'/.test(f.content));
+  if (named || inline) {
+    const at = files.findIndex((f) => f.path === 'icons/index.tsx');
+    // The registry's file, with the same renames as the rest when the bundle was fitted to the app's tokens.
+    const base = at >= 0 ? files[at].content : readFileSync(join(REGISTRY_SRC, 'icons/index.tsx'), 'utf8');
+    const adapter = { path: 'icons/index.tsx', content: iconAdapter(icons, base, { dir }) };
+    if (at >= 0) files[at] = adapter;
+    else files.push(adapter);
+  }
+  return { bundle: { ...bundle, files }, icons, inline, files: touched };
+}
+
+/** The lines `add` prints about icons. */
+export function iconReport({ icons, inline, files }, dir) {
+  const matched = Object.keys(icons.glyphs);
+  const adapter = `${dir.split(/[\\/]/).join('/')}/icons/index.tsx`;
+  const lines = [
+    `Icons: your set is ${icons.label} at stroke ${icons.stroke}. Every icon in the copied files now goes through one adapter, ${adapter}:`,
+    `  Icon draws your glyph for ${matched.length ? matched.join(', ') : 'no name yet'}; any other name is Taster's glyph at stroke ${icons.stroke}.`,
+  ];
+  if (inline) lines.push(`  ${inline} icon${inline === 1 ? '' : 's'} drawn inline (${files.join(', ')}) now read ICON_STROKE, ${icons.stroke}, from it.`);
+  lines.push('  To draw with a different set, edit HOST and ICON_STROKE in that file; no component needs to change.');
+  return lines;
+}
+
 export const _test = { objectEntries, objectAfter, parseColor, ratio, posix };

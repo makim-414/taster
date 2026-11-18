@@ -117,6 +117,10 @@ async function add(argv) {
     fitted = fit.fitBundle(bundle, host);
     bundle = fitted.bundle;
   }
+  // The app's own icon set, in either mode: one adapter file and the app's stroke for every icon the files draw.
+  const icons = fit.detectIcons(host.root, { exclude: [dir] });
+  const iconFit = icons ? fit.fitIcons(bundle, icons, { dir }) : null;
+  if (iconFit) bundle = iconFit.bundle;
   const { written, skipped } = await live.tracked('add', async () => {
     const result = writeBundle(bundle, dir, { overwrite: values.overwrite });
     // File names only, relative to the folder; never what is in them.
@@ -126,11 +130,11 @@ async function add(argv) {
     if (result.written.length) live.emit('edit', { file: `${shown}/${result.written[0]}`.replace(/\\/g, '/'), tool: 'add', ...(result.written.length > 1 && { files: result.written.slice(0, 20).map((f) => `${shown}/${f}`.replace(/\\/g, '/')) }) });
     return result;
   })({ ids: positionals, dir }, null);
-  const report = fitted ? fit.fitReport(fitted, host) : [];
+  const report = [...(fitted ? fit.fitReport(fitted, host) : []), ...(iconFit && (iconFit.inline || bundle.files.some((f) => f.path === 'icons/index.tsx')) ? ['', ...fit.iconReport(iconFit, dir)] : [])];
   const setup = fitted ? fit.fitNextSteps(dir, host) : nextSteps(dir);
   if (values.json) {
     const mapping = fitted ? [...fitted.used].map(([from, hit]) => ({ from, to: hit.to, kind: hit.token.kind, via: hit.token.via || null })) : [];
-    console.log(JSON.stringify({ dir, written, skipped, npm: bundle.npm, credits: bundle.credits, fit: { mode, tailwind: host.tailwind, mapping }, setup }, null, 2));
+    console.log(JSON.stringify({ dir, written, skipped, npm: bundle.npm, credits: bundle.credits, fit: { mode, tailwind: host.tailwind, mapping }, icons: icons && { set: icons.label, stroke: icons.stroke, glyphs: Object.keys(icons.glyphs), inline: iconFit.inline }, setup }, null, 2));
     return 0;
   }
   console.log(`Added to ${dir}:`);
