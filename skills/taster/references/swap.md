@@ -21,6 +21,14 @@ own code, and prove it with a second detector run.
    glyphs inside each component.
 3. Then copy (manual rules), last, and only where the user agrees.
 
+## When there is nothing left to fix
+
+A page that diagnoses with 0 findings gives `suggest_swaps` no rule ids, and rule ids from an earlier report do not
+describe this page. When the user still wants parts replaced, call `suggest_swaps { ruleIds: [], sections: [...] }`
+with the page's own sections in order (their headings or names, such as "Pricing" or "Questions"). It answers with
+the taxonomy category of each section and the registry parts for it. Then follow [choose.md](choose.md): show them
+with `browse_components { category }`, one section at a time, and wait for the pick.
+
 ## For each finding
 
 1. Look up the rule in `data/rules.json`, read `fix_patterns`.
