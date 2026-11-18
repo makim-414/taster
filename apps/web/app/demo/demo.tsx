@@ -12,7 +12,7 @@
    window.__TASTER_DEMO__ before the page loads to point the same overlay at two other pages. */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { layersOf, pageHeight, spotsOf, tokenBase, type Rebuild, type Report, type TokenBase } from './measure.ts';
+import { layersOf, pageHeight, settled, spotsOf, tokenBase, type Rebuild, type Report, type TokenBase } from './measure.ts';
 import { ARROW_PATH, ARROW_TIP } from './stageshow.ts';
 import {
   TOKEN_RANGE,
@@ -201,6 +201,8 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
       await addScript(bw.document, rules);
       await Promise.all([bw, aw, bn, an].map((w) => addScript(w.document, detect)));
       await Promise.all([bw, aw, bn, an].map((w) => w.document.fonts.ready));
+      // A page that renders or reveals itself after load is measured once it has stopped changing.
+      await Promise.all([bw, aw, bn, an].map((w) => settled(w)));
       for (const w of [bw, aw]) w.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       if (!bw.tasterDetect || !aw.tasterDetect) throw new Error('the detector did not start');
       const rb = bw.tasterDetect({ maxPerRule: 40 });

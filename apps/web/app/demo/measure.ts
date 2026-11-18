@@ -27,6 +27,30 @@ export function spotsOf(report: Report, pageH: number): Spot[] {
 /** The page's full height in the frame. */
 export const pageHeight = (doc: Document): number => Math.max(VIEW.h, doc.documentElement.scrollHeight, doc.body?.scrollHeight ?? 0);
 
+/** Waits until the frame's page stops changing: no DOM change for `quiet` ms, or `max` ms at most. A page that fills
+ * or shows itself only after load (hydration, a client-only section, a body hidden until the language is known) is
+ * then measured as it looks, the way the CLI measures after network idle, and not as the blank it was at load. */
+export function settled(win: Window, quiet = 600, max = 5000): Promise<void> {
+  return new Promise((resolve) => {
+    let timer = 0;
+    let cap = 0;
+    // The frame's own constructor, so the observer belongs to the frame's page.
+    const observer = new (win as typeof window).MutationObserver(() => {
+      win.clearTimeout(timer);
+      timer = win.setTimeout(done, quiet);
+    });
+    function done() {
+      observer.disconnect();
+      win.clearTimeout(timer);
+      win.clearTimeout(cap);
+      resolve();
+    }
+    observer.observe(win.document.documentElement, { subtree: true, childList: true, attributes: true, characterData: true });
+    timer = win.setTimeout(done, quiet);
+    cap = win.setTimeout(done, max);
+  });
+}
+
 /** The after page, ready to be rebuilt: its layers, and the calls that show a layer or type a line. */
 export type Rebuild = {
   layers: Layer[];
