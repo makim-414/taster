@@ -641,7 +641,7 @@ export function createServer({ remote } = {}) {
       description:
         'For rule ids found by diagnose, return the patterns that fix each rule and the registry components for each pattern. Next, call get_pattern for the swap recipe and get_component for code. A page with no findings has no rule ids: pass an empty ruleIds with sections (the page\'s sections in order, by name or heading, such as "Pricing" or "Questions") for the parts that could replace each one; never reuse rule ids from an earlier report.',
       inputSchema: {
-        ruleIds: z.array(z.string()).max(60).optional().describe('rule ids from the current diagnose, such as AC-01, CMP-04; empty or left out when it found nothing'),
+        ruleIds: z.array(z.string()).max(200).optional().describe('rule ids from the current diagnose, such as AC-01, CMP-04; empty or left out when it found nothing'),
         sections: z.array(z.string().max(80)).max(20).optional().describe('the page sections in order, by name or heading; used when there are no rule ids, default the usual landing order'),
       },
       annotations: readOnly,
