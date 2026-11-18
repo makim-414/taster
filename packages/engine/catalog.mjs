@@ -49,6 +49,47 @@ export function suggestSwaps(ruleIds) {
   });
 }
 
+// Words a page section's heading or name tends to carry, per taxonomy category, for suggesting parts on a page
+// with no findings (nothing for suggest_swaps to start from). Checked in this order, so "pricing FAQ" is a FAQ.
+const SECTION_WORDS = [
+  ['faq', /\b(faq|faqs|questions?|q ?& ?a|asked)\b/i],
+  ['pricing', /\b(pric(e|es|ing)|plans?|billing|cost|tiers?)\b/i],
+  ['testimonial', /\b(testimonials?|reviews?|quotes?|customers? say|social proof|case stud(y|ies)|logos?|trusted)\b/i],
+  ['footer', /\bfooter\b/i],
+  ['nav-header', /\b(header|nav|navigation|menu|top ?bar)\b/i],
+  ['hero', /\b(hero|banner|intro|above the fold|first screen|headline|masthead)\b/i],
+  ['cta', /\b(cta|call to action|get started|sign ?up|start|contact|closing|ready|try|join|demo)\b/i],
+  ['feature-section', /\b(features?|how it works|benefits?|why|capabilit(y|ies)|steps?|workflow|product|integrations?|overview)\b/i],
+];
+export const LANDING_SECTIONS = ['hero', 'feature-section', 'pricing', 'testimonial', 'faq', 'cta', 'footer'];
+
+/** The taxonomy category a page section is, from its id, name or heading, or null. */
+export function sectionCategory(text, tax = loadTaxonomy()) {
+  const t = String(text || '').trim().toLowerCase();
+  if (tax.categories.some((c) => c.id === t)) return t;
+  return SECTION_WORDS.find(([, re]) => re.test(t))?.[0] || null;
+}
+
+/**
+ * Replacement parts per page section, for a page that has no findings left (suggest_swaps has no rule to start
+ * from). Sections are the page's sections in order, by name or heading; without them, the usual landing order.
+ */
+export function suggestForSections(sections = LANDING_SECTIONS, { limit = 4 } = {}) {
+  const tax = loadTaxonomy();
+  return sections.map((section) => {
+    const category = sectionCategory(section, tax);
+    if (!category) return { section, category: null, browse: { query: String(section) }, components: [] };
+    const found = browseComponents({ category, limit });
+    return {
+      section,
+      category,
+      categoryName: tax.categories.find((c) => c.id === category)?.name || category,
+      browse: { category },
+      components: found.map((c) => ({ id: c.id, summary: c.summary })),
+    };
+  });
+}
+
 export function listPatterns({ family, category, use, surface, rule } = {}) {
   const tax = loadTaxonomy();
   let list = loadPatterns();

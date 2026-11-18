@@ -16,7 +16,18 @@ own code, and prove it with a second detector run.
    For icon findings (ICO-01 to ICO-04, CMP-03, AC-11, AC-03), sort every icon on the page into its slot with
    `data/patterns/icon-placement.md` before touching a glyph. Remove the icons whose slot fails its test, then bring
    the rest onto one set and one stroke weight. Restyling an icon that should not be there does not clear the rule.
+   Icons in components copied with `add` already go through one adapter, `<dir>/icons/index.tsx`, which `add`
+   points at the app's own set and stroke when it finds one (it says so in its output): change that file, not the
+   glyphs inside each component.
 3. Then copy (manual rules), last, and only where the user agrees.
+
+## When there is nothing left to fix
+
+A page that diagnoses with 0 findings gives `suggest_swaps` no rule ids, and rule ids from an earlier report do not
+describe this page. When the user still wants parts replaced, call `suggest_swaps { ruleIds: [], sections: [...] }`
+with the page's own sections in order (their headings or names, such as "Pricing" or "Questions"). It answers with
+the taxonomy category of each section and the registry parts for it. Then follow [choose.md](choose.md): show them
+with `browse_components { category }`, one section at a time, and wait for the pick.
 
 ## For each finding
 
@@ -24,11 +35,18 @@ own code, and prove it with a second detector run.
 2. Open each `data/patterns/<id>.md`. Pick the one whose "When to use" matches this spot.
 3. Apply the "Swap recipe". It is written at the CSS or JSX level. Keep the user's content, brand color and
    framework.
-4. If the pattern lists `components`, get each one with `get_component { id }`, or copy it from a clone with
-   `node <clone>/packages/engine/cli.mjs add <id> --dir <folder>`, which brings every file it imports and the tokens.
-   Never download component files from a URL yourself. The components need Tailwind with the Taster preset
-   (`tailwind-preset.cjs`); if the app has no Tailwind, say so before you copy one. Rename classes to the user's
-   conventions if they have them.
+4. If the pattern lists `components`, copy each one with `node <clone>/packages/engine/cli.mjs add <id> --dir <folder>`
+   from the app folder, which brings every file it imports. Never download component files from a URL yourself.
+   `get_component { id }` returns the code in Taster's own token names, so in an app with its own theme prefer
+   `add`. The components need Tailwind; if the app
+   has none, say so before you copy one. When the app has its own Tailwind theme, `add` maps the component classes
+   onto the app's tokens (and prints each mapping), moves the rest under `tst-` in one `taster.css`, and leaves
+   Taster's `tokens.css` and preset out: do not add them, and do not rename the classes by hand. Check the mapping
+   it printed against the app (an `accent` of the app that is a highlight, not the brand, is the usual surprise).
+   Then wire it in with your Edit tool, one file per edit: `add` ends with the import line and the JSX for each
+   component (`--into <page file>` writes the import path for that file). Fill the props with the user's real
+   content from the section you replace. Never write component or page files with a shell heredoc, `sed`, `python`
+   or a script: it asks the user for permission, and the live viewer only follows Edit and Write.
 5. Re run detect.js at both widths. The finding must be gone. If a new finding appears, you introduced it; fix it
    before moving on.
 

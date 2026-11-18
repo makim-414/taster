@@ -172,3 +172,113 @@ export async function fetchBundle(ids, from) {
   }
   return { ids, files: [...files].map(([path, content]) => ({ path, content })), npm: [...npm].sort(), credits };
 }
+
+// ---- Wiring: the import line and the JSX for each component, so an agent places it with one edit per file -------
+
+/** Top-level members of a TypeScript object type body: [{ name, optional, type }]. */
+function members(body) {
+  const out = [];
+  const text = body.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+  let depth = 0;
+  let cur = '';
+  const flush = () => {
+    const m = /^\s*(?:readonly\s+)?(['"]?)([\w$-]+)\1(\?)?\s*:\s*([\s\S]+?)\s*[;,]?\s*$/.exec(cur);
+    if (m) out.push({ name: m[2], optional: Boolean(m[3]), type: m[4].replace(/\s+/g, ' ') });
+    cur = '';
+  };
+  for (const c of text) {
+    if ('{(<['.includes(c)) depth++;
+    else if ('})>]'.includes(c) && depth > 0) depth--;
+    if (depth === 0 && (c === '\n' || c === ';')) {
+      if (cur.trim()) flush();
+      continue;
+    }
+    cur += c;
+  }
+  if (cur.trim()) flush();
+  return out;
+}
+
+/** The body of `interface Name ... {}` or `type Name = {}` (or `... & {}`) in a file, or null. */
+function typeBody(source, name) {
+  const m = new RegExp(`(?:interface\\s+${name}\\b[^{]*|type\\s+${name}\\s*=[^{;]*)\\{`).exec(source);
+  if (!m) return null;
+  let depth = 0;
+  for (let i = m.index + m[0].length - 1; i < source.length; i++) {
+    if (source[i] === '{') depth++;
+    else if (source[i] === '}' && --depth === 0) return source.slice(m.index + m[0].length, i);
+  }
+  return null;
+}
+
+const pascal = (file) => posix.basename(file).replace(/\.[jt]sx?$/, '').split(/[-_]/).filter(Boolean).map((w) => w[0].toUpperCase() + w.slice(1)).join('');
+
+/**
+ * How to use a copied component: its main export, the import line from `fromFile` and a JSX snippet with the props
+ * it needs. `filePath` is where the component is in the app, `fromFile` the file that will import it.
+ */
+export function usageFor(content, filePath, fromFile) {
+  const src = code(content);
+  const exports = [...src.matchAll(/export\s+(?:function|const)\s+([A-Z]\w*)/g)].map((m) => m[1]);
+  if (!exports.length) {
+    // A hook or a helper: the import, and a call.
+    const fn = /export\s+function\s+(\w+)/.exec(src)?.[1];
+    if (!fn) return null;
+    let spec = posix.relative(posix.dirname(fromFile), filePath).replace(/\.[jt]sx?$/, '');
+    if (!spec.startsWith('.')) spec = `./${spec}`;
+    return { name: fn, import: `import { ${fn} } from '${spec}'`, jsx: `${fn}(...)`, props: [], optional: [] };
+  }
+  const name = exports.includes(pascal(filePath)) ? pascal(filePath) : exports[0];
+  const sig = new RegExp(`export\\s+function\\s+${name}\\s*\\([^)]*?:\\s*(\\w+)\\s*\\)|export\\s+const\\s+${name}\\s*=\\s*React\\.forwardRef<[^,>]+(?:<[^>]*>)?\\s*,\\s*(\\w+)`).exec(src);
+  const propsName = sig && (sig[1] || sig[2]);
+  const props = propsName ? members(typeBody(src, propsName) || '') : [];
+  const required = props.filter((p) => !p.optional);
+  const localTypes = new Set([...src.matchAll(/export\s+(?:interface|type)\s+(\w+)/g)].map((m) => m[1]));
+  const types = [];
+  const propLines = [];
+  const notes = [];
+  for (const p of required) {
+    const used = [...localTypes].filter((t) => new RegExp(`\\b${t}\\b`).test(p.type) && t !== propsName);
+    for (const t of used) {
+      if (!types.includes(t)) types.push(t);
+      const fields = members(typeBody(src, t) || '');
+      const field = (f) => {
+        const inner = /^\{([\s\S]*)\}$/.exec(f.type.trim());
+        const sub = inner ? members(inner[1]) : [];
+        return `${f.name}${f.optional ? '?' : ''}${sub.length ? `: { ${sub.map((x) => `${x.name}${x.optional ? '?' : ''}`).join(', ')} }` : ''}`;
+      };
+      if (fields.length) notes.push(`${t} is { ${fields.map(field).join(', ')} }`);
+    }
+    propLines.push(`${p.name}: ${p.type}`);
+  }
+  let spec = posix.relative(posix.dirname(fromFile), filePath).replace(/\.[jt]sx?$/, '');
+  if (!spec.startsWith('.')) spec = `./${spec}`;
+  const importLine = `import { ${[name, ...types.map((t) => `type ${t}`)].join(', ')} } from '${spec}'`;
+  const attrs = required.filter((p) => p.name !== 'children').map((p) => ` ${p.name}={${p.name}}`).join('');
+  const jsx = required.some((p) => p.name === 'children') ? `<${name}${attrs}>...</${name}>` : `<${name}${attrs} />`;
+  return { name, import: importLine, jsx, props: [...propLines, ...notes], optional: props.filter((p) => p.optional).map((p) => p.name) };
+}
+
+/** Wiring lines for the components asked for: the guidance, then per component the import, the JSX and its props. */
+export function wiringSteps(ids, bundle, dir, fromFile) {
+  const slash = (p) => p.split(/[\\/]/).join('/');
+  const registry = loadRegistry();
+  const lines = [
+    `Wire each one in with your Edit tool, one file per edit: the import line at the top of ${fromFile}, then the JSX where the section goes.`,
+    'Do not write these files with a shell heredoc, sed or a script: that asks the user for permission, and the live viewer only sees edits made with Edit or Write.',
+  ];
+  const usage = [];
+  for (const id of ids) {
+    const c = registry.components.find((x) => x.id === id);
+    const rel = c ? c.file.replace(/^src\//, '') : null;
+    const f = rel && bundle.files.find((x) => x.path === rel);
+    if (!f) continue;
+    const u = usageFor(f.content, slash(join(dir, rel)), slash(fromFile));
+    if (!u) continue;
+    usage.push({ id, ...u });
+    lines.push(`  ${id}:`, `    ${u.import}`, `    ${u.jsx}`);
+    for (const n of u.props) lines.push(`    ${n}`);
+    if (u.optional.length) lines.push(`    optional: ${u.optional.join(', ')}`);
+  }
+  return { lines, usage };
+}

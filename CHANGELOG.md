@@ -8,6 +8,28 @@ All notable changes to Taster are recorded here. The format follows
 
 ### Added
 
+- `add` fits the components to an app that has its own Tailwind theme (a v4 `@theme` in its CSS, or a v3
+  `tailwind.config`), so the app looks the same after it (`packages/engine/fit.mjs`). Before, the copy brought
+  `tokens.css` and the v3 preset, which redefine names such an app has already (`--accent`, `--border`, `--radius`,
+  `rounded-lg`, `ease-out`), and an agent skipped them and renamed classes by hand. Now `add` reads the app's Tailwind
+  version and tokens without running its config, and rewrites each Taster token class to the app's class that plays
+  the same part (`bg-accent` to `bg-brand` when the app's `accent` is a highlight, `text-text-muted` to
+  `text-ink-muted`, text on the brand to the app color with the best contrast on it) or to the stock class of the same
+  value (`text-h2` to `text-2xl`, `font-med` to `font-medium`). The rest moves under a `tst-` prefix, every custom
+  property the components read is renamed `--tst-*`, and one generated `taster.css` (plus an extend-only
+  `taster-tailwind.cjs` for v3) defines only `tst-` names, pointing at the app's tokens where they map. It prints each
+  mapping and the one line to add. `--tokens taster` keeps the old copy; an app with no theme of its own gets it by
+  default.
+- `add` sends every icon of the copied files through one adapter to the app's own set. It finds `lucide-react` or
+  Heroicons imported in the app's code, or a local icons file, and the stroke the app draws them at, writes
+  `icons/index.tsx` so `Icon` draws the app's glyph for each name it can match (Taster's glyph at the app's stroke for
+  the rest), and points every icon drawn inline in the copied files at its `ICON_STROKE`, so the page keeps one stroke
+  weight (ICO-03). It says so in its output; changing sets is an edit to that one file.
+- `suggest_swaps` answers for a page with no findings: `ruleIds` may be empty, with `sections`, the page's own
+  sections in order by name or heading, and the answer gives each section's taxonomy category, the registry parts for
+  it and the `browse_components` call to show them (the usual landing order without `sections`). A diagnose with no
+  findings says so in its first line. Before, the tool needed a rule id, and an agent passed ids from an earlier report.
+
 - `taster watch`, a live viewer: a local page that draws what agents do with Taster while they do it. Start it in a
   second terminal (`node packages/engine/taster.mjs watch`, or `start.mjs watch` for a plugin install) and open the
   address it prints. The local MCP server, the ACP agent and the CLI then report each call (`packages/engine/live.mjs`,
@@ -102,6 +124,15 @@ All notable changes to Taster are recorded here. The format follows
   them, on the hosted server too.
 
 ### Fixed
+
+- After `add`, an agent wired the components into the page with a python heredoc, which asks the user for permission
+  and bypasses the live viewer's edit hook. `add` now ends with the import line and the JSX for each component, its
+  required props and the shape of their types, written for `--into` (default `src/App.tsx`), and says to place them
+  with the Edit tool, one file per edit. `get_component` and `suggest_swaps` say the same, `get_component` with the exact
+  `add` command since its code is in Taster's own token names, and the skill says it under Always and in the swap
+  steps. `add` reports every file it writes to the live viewer as one edit, `taster.css` and the icon adapter included.
+- `useInViewOnce` and `useToc` take `RefObject<T | null>`, so a copied `marketing/pricing-cards` passes `tsc` in a
+  React 19 app, where `useRef<T>(null)` is typed that way. Types only; the stage page is the same.
 
 - The live hub no longer goes quiet when the page breaks after an edit. When the stage answers with an HTTP error
   (a 5xx while the dev server shows its error page) or does not load at all, it stops retrying once the same error

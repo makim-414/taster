@@ -225,6 +225,11 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
     const component = await client.callTool({ name: 'get_component', arguments: { id: 'blocks/badge' } });
     assert.match(component.content[0].text, /export/);
     assert.match(component.content[0].text, /registry\/src\/tokens\.css/);
+    // After the code: copy it with add (fitted to the app), then wire it in with Edit, one file per edit.
+    assert.match(component.content[1].text, /cli\.mjs add blocks\/badge --dir/);
+    assert.match(component.content[1].text, /Edit tool, one file per edit/);
+    assert.match(component.content[1].text, /import \{ Badge \} from '\.\/components\/taster\/blocks\/badge'/);
+    assert.match((await client.callTool({ name: 'suggest_swaps', arguments: { ruleIds: [ids[0]] } })).content[1].text, /heredoc/);
     const hero = JSON.parse((await client.callTool({ name: 'list_patterns', arguments: { category: 'hero', surface: 'landing' } })).content[0].text);
     assert.ok(hero.length >= 2);
     assert.ok((await client.callTool({ name: 'get_pattern', arguments: { id: '../etc' } })).isError);

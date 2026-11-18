@@ -1,0 +1,5 @@
+{
+  "name": "fixture-v3-config",
+  "private": true,
+  "dependencies": { "@heroicons/react": "^2.1.0", "react": "^18.3.1", "tailwindcss": "^3.4.13" }
+}

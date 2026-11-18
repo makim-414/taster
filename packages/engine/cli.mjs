@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, isAbsolute, join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, formatText, viewportFor } from './diagnose.mjs';
@@ -18,7 +18,7 @@ const HELP = `Usage
   taster --plan <url-or-file> --out <dir> [--route rebuild] [--system <file>] [--by-part]
   taster --rules
   taster --explain <rule-id>
-  taster add <component-id>... [--dir <dir>] [--from <url>] [--overwrite]
+  taster add <component-id>... [--dir <dir>] [--from <url>] [--overwrite] [--tokens auto|host|taster] [--into <file>]
   taster add --list
   taster export <agents|claude|cursor|windsurf|cline|copilot|gemini|all> [--dir <project>]
   taster lint [paths...] [--json] [--baseline <file>] [--write-baseline] [--selftest]
@@ -57,10 +57,16 @@ Options
                     'responsive' runs ${RESPONSIVE_WIDTHS.join(',')}
   --version         print the version
 
-add copies registry components into your app with every helper they import and the token files, no shadcn
-needed. The components are styled with Tailwind CSS and the Taster preset (tailwind-preset.cjs, Tailwind v3 or v4);
-add prints the setup when it is done. --dir defaults to src/components/taster. --from reads a hosted copy (https://taster-six.vercel.app)
-instead of this repository. Files you changed are left alone unless --overwrite.
+add copies registry components into your app with every helper they import, no shadcn needed, and fits them to
+the app first. When the app has its own Tailwind theme (v4 @theme in its CSS, or a v3 tailwind.config), each Taster
+token class becomes the app's own class where a token plays the same part (text-text-muted -> text-ink-muted), or a
+stock class of the same value (text-h2 -> text-2xl); the rest move under a tst- prefix, defined in one taster.css,
+and Taster's tokens.css and preset are left out, so the app looks the same. It prints what it mapped. An app with
+no theme of its own gets the token files and the Taster preset (tailwind-preset.cjs, Tailwind v3 or v4) as before;
+--tokens host or taster forces one way. --dir defaults to src/components/taster. --from reads a hosted copy
+(https://taster-six.vercel.app) instead of this repository. Files you changed are left alone unless --overwrite.
+It ends with the import line and the JSX for each component, written for --into (default src/App.tsx), to place
+with an editor's Edit tool, one file per edit.
 
 lint reads source files (tsx, jsx, vue, svelte, html, css, md) for the code form of the rules: tinted and outlined
 pills, thick left bars, caps with wide tracking, long dashes, emoji, transition-all, ease-in, hard-coded colors,
@@ -92,16 +98,31 @@ async function add(argv) {
   const { values, positionals } = parseArgs({
     args: argv,
     allowPositionals: true,
-    options: { dir: { type: 'string' }, from: { type: 'string' }, overwrite: { type: 'boolean' }, list: { type: 'boolean' }, json: { type: 'boolean' } },
+    options: { dir: { type: 'string' }, from: { type: 'string' }, overwrite: { type: 'boolean' }, list: { type: 'boolean' }, json: { type: 'boolean' }, tokens: { type: 'string' }, into: { type: 'string' } },
   });
-  const { fetchBundle, loadRegistry, nextSteps, resolveComponents, writeBundle } = await import('./add.mjs');
+  const { fetchBundle, loadRegistry, nextSteps, resolveComponents, wiringSteps, writeBundle } = await import('./add.mjs');
+  const fit = await import('./fit.mjs');
   if (values.list) {
     for (const c of loadRegistry().components) console.log(`${c.id.padEnd(30)} ${c.category}`);
     return 0;
   }
   if (!positionals.length) throw new Error('add needs at least one component id, for example: add blocks/button');
-  const bundle = values.from ? await fetchBundle(positionals, values.from) : resolveComponents(positionals);
+  if (values.tokens && !['auto', 'host', 'taster'].includes(values.tokens)) throw new Error('--tokens is auto, host or taster');
   const dir = values.dir || join('src', 'components', 'taster');
+  // The app is the folder with package.json at or above where add runs; its own theme decides how the files are fitted.
+  const host = fit.detectHost(fit.findAppRoot(process.cwd()), { exclude: [dir] });
+  const mode = fit.fitMode(host, values.tokens);
+  let bundle = values.from ? await fetchBundle(positionals, values.from) : resolveComponents(positionals, { tokens: mode !== 'host' });
+  let fitted = null;
+  if (mode === 'host') {
+    if (!host.tailwind) throw new Error('--tokens host needs Tailwind CSS in the app (tailwindcss in package.json, or a stylesheet that loads it)');
+    fitted = fit.fitBundle(bundle, host);
+    bundle = fitted.bundle;
+  }
+  // The app's own icon set, in either mode: one adapter file and the app's stroke for every icon the files draw.
+  const icons = fit.detectIcons(host.root, { exclude: [dir] });
+  const iconFit = icons ? fit.fitIcons(bundle, icons, { dir }) : null;
+  if (iconFit) bundle = iconFit.bundle;
   const { written, skipped } = await live.tracked('add', async () => {
     const result = writeBundle(bundle, dir, { overwrite: values.overwrite });
     // File names only, relative to the folder; never what is in them.
@@ -111,8 +132,14 @@ async function add(argv) {
     if (result.written.length) live.emit('edit', { file: `${shown}/${result.written[0]}`.replace(/\\/g, '/'), tool: 'add', ...(result.written.length > 1 && { files: result.written.slice(0, 20).map((f) => `${shown}/${f}`.replace(/\\/g, '/')) }) });
     return result;
   })({ ids: positionals, dir }, null);
+  const report = [...(fitted ? fit.fitReport(fitted, host) : []), ...(iconFit && (iconFit.inline || bundle.files.some((f) => f.path === 'icons/index.tsx')) ? ['', ...fit.iconReport(iconFit, dir)] : [])];
+  const setup = fitted ? fit.fitNextSteps(dir, host) : nextSteps(dir);
+  // The file that will import the components: --into, else the app's usual root component.
+  const into = values.into || ['src/App.tsx', 'src/App.jsx', 'app/page.tsx', 'src/app/page.tsx', 'pages/index.tsx'].find((f) => existsSync(f)) || 'src/App.tsx';
+  const wiring = wiringSteps(positionals, bundle, dir, into);
   if (values.json) {
-    console.log(JSON.stringify({ dir, written, skipped, npm: bundle.npm, credits: bundle.credits }, null, 2));
+    const mapping = fitted ? [...fitted.used].map(([from, hit]) => ({ from, to: hit.to, kind: hit.token.kind, via: hit.token.via || null })) : [];
+    console.log(JSON.stringify({ dir, written, skipped, npm: bundle.npm, credits: bundle.credits, fit: { mode, tailwind: host.tailwind, mapping }, icons: icons && { set: icons.label, stroke: icons.stroke, glyphs: Object.keys(icons.glyphs), inline: iconFit.inline }, setup, usage: wiring.usage.map((u) => ({ ...u, into })) }, null, 2));
     return 0;
   }
   console.log(`Added to ${dir}:`);
@@ -121,7 +148,10 @@ async function add(argv) {
   if (bundle.npm.length) console.log(`\nInstall: npm install ${bundle.npm.join(' ')}`);
   const upstream = bundle.credits.filter((c) => /MIT|Apache|BSD/i.test(c.credit || ''));
   if (upstream.length) console.log(`\nKeep the "Upstream license" lines at the top of copied files; the full texts are in ${join(dir, 'THIRD_PARTY_NOTICES.md')}.`);
-  console.log(`\n${nextSteps(dir).join('\n')}`);
+  if (report.length) console.log(`\n${report.join('\n')}`);
+  if (mode === 'taster' && !host.tailwind) console.log('\nNo Tailwind CSS found in this app. The components are styled with Tailwind classes: add Tailwind first, or they render unstyled.');
+  console.log(`\n${setup.join('\n')}`);
+  if (wiring.usage.length) console.log(`\n${wiring.lines.join('\n')}`);
   return 0;
 }
 
