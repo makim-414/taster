@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -87,6 +88,49 @@ test('brand colors and the page background are read from oklch too', { timeout: 
   // A dark page whose background is written in oklch is dark.
   const dark = await served(page('body { background: oklch(0.18 0.02 260); color: oklch(0.96 0 0); }'), (url) => extract(url));
   assert.equal(dark.brand.dark, true);
+});
+
+test('a token named for the brand wins over an accent that fills more buttons, then the logo and focus ring do', { timeout: 90000 }, async () => {
+  const page = readFileSync(fileURLToPath(new URL('./fixtures/brand-token.html', import.meta.url)), 'utf8');
+  const GREEN = '#0f6b4f';
+  const LIME = '#c8f169';
+  // The fixture: --color-brand is the green on the logo mark, the highlights and the focus ring; the lime accent fills
+  // seven of the eight buttons.
+  const named = await served(page, (url) => extract(url));
+  assert.equal(named.brand.color, GREEN);
+  assert.deepEqual(named.brand.colorFrom, { kind: 'token', token: '--color-brand' });
+  const theme = brandTheme(named);
+  assert.equal(theme.tokens['--brand'], GREEN);
+  assert.equal(theme.source.colorFrom.token, '--color-brand');
+  assert.ok(theme.notes.some((n) => /custom property named for its brand/.test(n) && /source\.colorFrom\.token/.test(n)));
+  assert.ok(!theme.notes.join('\n').includes('--color-brand'), 'a note quotes the page\'s token name');
+  // The probe that resolves tokens is gone, and the extract left the page as it was.
+  assert.ok(!JSON.stringify(named).includes('rgb(1, 2, 3)'));
+
+  // No token says brand: the logo mark and the focus ring are both green, and they outweigh the lime buttons.
+  const unnamed = page.replaceAll('--color-brand', '--color-forest').replaceAll('--color-accent', '--color-lime');
+  const marked = await served(unnamed, (url) => extract(url));
+  assert.equal(marked.brand.color, GREEN);
+  assert.deepEqual(marked.brand.colorFrom, { kind: 'logo and focus' });
+  assert.ok(brandTheme(marked).notes.some((n) => /logo mark, the same color as its focus ring/.test(n)));
+  // The focus ring alone still counts.
+  const ringOnly = await served(unnamed.replace(/<svg[\s\S]*?<\/svg>/, ''), (url) => extract(url));
+  assert.deepEqual([ringOnly.brand.color, ringOnly.brand.colorFrom], [GREEN, { kind: 'focus' }]);
+
+  // Negative control: no token, no colored logo, no focus rule. The old reading stands, the most used action color.
+  const plain = unnamed.replace(/<svg[\s\S]*?<\/svg>/, '').replace(/:focus-visible \{[^}]*\}/, '');
+  const frequent = await served(plain, (url) => extract(url));
+  assert.equal(frequent.brand.color, LIME);
+  assert.deepEqual(frequent.brand.colorFrom, { kind: 'actions' });
+  assert.ok(brandTheme(frequent).notes.some((n) => /from the site's own buttons and links/.test(n)));
+
+  // A neutral --brand is not a brand color, so the next name is read; a primary written as bare hsl channels (shadcn)
+  // resolves through hsl().
+  const shadcn = plain.replace('--color-ink: #0e1a17;', '--color-ink: #0e1a17; --brand: #111111; --brand-foreground: #c8f169; --primary: 160 75% 24%;');
+  const channels = await served(shadcn, (url) => extract(url));
+  assert.equal(channels.brand.colorFrom?.token, '--primary');
+  const lch = hexToOklch(channels.brand.color);
+  assert.ok(Math.abs(lch.h - hexToOklch(GREEN).h) < 8, `hue ${lch.h}`);
 });
 
 test('extract reads the words as written, without the decoration', { timeout: 60000 }, async () => {

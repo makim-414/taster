@@ -125,6 +125,14 @@ All notable changes to Taster are recorded here. The format follows
 
 ### Fixed
 
+- `brand_theme` and `--brand` no longer take an accent for the brand. On a landing whose `--color-brand` dark green
+  was on the logo, the highlights and the focus ring, the lime accent that filled more buttons came back as the
+  brand. The brand color is now read strongest evidence first: a CSS custom property named for the brand or primary
+  color (`--brand`, `--color-brand`, `--primary`, `--color-primary`, and their main shade), resolved the way the page
+  draws it (bare hsl channels too); then the color of the logo mark and of the focus ring; then, as before, the most
+  used saturated color on buttons and links. A neutral token is skipped. `brand.colorFrom` (and `source.colorFrom`)
+  says which one was used, and the note names it without quoting the page.
+
 - After `add`, an agent wired the components into the page with a python heredoc, which asks the user for permission
   and bypasses the live viewer's edit hook. `add` now ends with the import line and the JSX for each component, its
   required props and the shape of their types, written for `--into` (default `src/App.tsx`), and says to place them
