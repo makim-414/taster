@@ -171,6 +171,21 @@ test('a long page moves the camera down with the work and back to the top', () =
   assert.equal(cameraAt(q, q.end), 0);
 });
 
+test('a big finding low on a long page waits for its turn, so the camera does not start at the bottom', () => {
+  const H = 6000;
+  const cards = Array.from({ length: 30 }, (_, i) => spot(100 + (i % 3) * 400, 300 + Math.floor(i / 3) * 500, 360, 220, 'AC-03'));
+  const band = spot(50, 5000, 1200, 600, 'COL-01');
+  const spots = orderSpots([spot(0, 0, 1300, H, 'CMP-11'), band, ...cards], H);
+  assert.equal(spots[0].rules[0], 'CMP-11', 'the whole page finding still goes first');
+  assert.ok(spots.indexOf(band) > spots.length / 2, `the low band is spot ${spots.indexOf(band)} of ${spots.length}`);
+  const q = plan({ ...INPUT, spots, beforeH: H });
+  const early = q.diag.start + (q.diag.end - q.diag.start) / 4;
+  for (let t = q.diag.start; t <= early; t += 0.1) assert.ok(cameraAt(q, t) < H / 2, `camera ${cameraAt(q, t)} at ${t}`);
+  let most = 0;
+  for (let t = q.diag.start; t <= q.diag.end; t += 0.1) most = Math.max(most, cameraAt(q, t));
+  assert.ok(most > H / 2, `the camera reached ${most}`);
+});
+
 test('the tokens move and come back to the page theme, and stay put without tokens', () => {
   const seen = { radius: new Set<number>(), density: new Set<number>() };
   for (let t = 0; t <= p.end; t += 0.25) {
