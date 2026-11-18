@@ -47,7 +47,7 @@ function slug(s: string) {
   )
 }
 
-function useToc(body: React.RefObject<HTMLDivElement>, deps: unknown[]) {
+function useToc(body: React.RefObject<HTMLDivElement | null>, deps: unknown[]) {
   const [entries, setEntries] = React.useState<TocEntry[]>([])
   const [active, setActive] = React.useState<string | null>(null)
 

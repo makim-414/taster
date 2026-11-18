@@ -19,7 +19,7 @@ export function useReducedMotion(): boolean {
 
 // Becomes true the first time the element scrolls into view, then stays true.
 // Without IntersectionObserver (old browsers, some test runners) it is true at once.
-export function useInViewOnce<T extends Element>(ref: React.RefObject<T>, rootMargin = '0px', threshold = 0): boolean {
+export function useInViewOnce<T extends Element>(ref: React.RefObject<T | null>, rootMargin = '0px', threshold = 0): boolean {
   const [seen, setSeen] = React.useState(false)
   React.useEffect(() => {
     const el = ref.current
