@@ -63,6 +63,9 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
     assert.match(startText, /Is this a site that already exists, or are we building a new one\?/);
     assert.match(startText, /이미 있는 사이트인가요, 아니면 새로 지을까요\?/);
     assert.match(startText, /The user said: check my site/);
+    // A URL or a file is an existing site: diagnose it, no question first.
+    assert.match(startText, /A URL, a local address or a page file in the user's words is a site that already exists: say you are diagnosing it and run diagnose on it, without the opening question\./);
+    assert.match(startText, /Do not ask which: say in one line that you are\s+diagnosing it/);
 
     const extracted = await client.callTool({ name: 'extract_content', arguments: { target: fixture } });
     assert.ok(!extracted.isError, extracted.content[0].text);

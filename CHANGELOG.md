@@ -87,6 +87,11 @@ All notable changes to Taster are recorded here. The format follows
   app folder, and connect the preset; the packages row lists `tailwindcss`.
 - Installed alone, the skill says where the engine comes from (the plugin, the hosted MCP server at
   `https://taster-six.vercel.app/api/mcp`, or a clone) and writes its commands as `node <clone>/packages/engine/...`.
+- `/taster <url>` (or a local address or a page file) goes straight to Diagnose instead of asking whether the site
+  already exists or is new: a URL or file is an existing site. The skill, its start guide and the MCP `start` prompt
+  ask the opening question only when the first message gives neither and does not say which. The question whether
+  the site is theirs or they may use it now comes before Brand and Rebuild, which take from the site, not before the
+  diagnosis, which only reads it.
 - The MCP `diagnose` answers with a summary: per rule its id, name, severity, counts per width, up to 3 example
   selectors and its fix patterns, with the totals and the manual rules. On a real landing page the full answer ran to
   about 210,000 characters, past what Claude Code takes as one tool answer, so the agent had to read it from a file;

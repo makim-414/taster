@@ -234,7 +234,7 @@ export function createServer({ remote } = {}) {
     'start',
     {
       title: 'Start Taster',
-      description: 'Ask whether the site already exists or is being built new, then take the matching route (diagnose and swap, diagnose and rebuild, or build).',
+      description: 'Diagnose the URL or file the user gave, or, when they gave none, ask whether the site already exists or is being built new; then take the matching route (diagnose and swap, diagnose and rebuild, or build).',
       argsSchema: { request: z.string().optional().describe('what the user asked for, if anything') },
     },
     ({ request }) => ({
@@ -243,7 +243,7 @@ export function createServer({ remote } = {}) {
           role: 'user',
           content: {
             type: 'text',
-            text: `${readFileSync(START_GUIDE, 'utf8')}\n---\n${request ? `The user said: ${request}\n\n` : ''}Follow the guide above. Your first reply is the opening question, unless the user's words already answer it.`,
+            text: `${readFileSync(START_GUIDE, 'utf8')}\n---\n${request ? `The user said: ${request}\n\n` : ''}Follow the guide above. A URL, a local address or a page file in the user's words is a site that already exists: say you are diagnosing it and run diagnose on it, without the opening question. Otherwise your first reply is the opening question, unless the user's words already say the site is new.`,
           },
         },
       ],

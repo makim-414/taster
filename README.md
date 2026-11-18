@@ -71,7 +71,8 @@ sentence the board writes for your agent follows your browser's language.
 
 ## What it does
 
-Every session starts with one question: **is this a site that already exists, or are we building a new one?**
+Every session starts with one question: **is this a site that already exists, or are we building a new one?** A URL
+or a page file given with it (`/taster https://your-site.example`) answers it: an existing site, diagnosed at once.
 The answer picks the route, and every route runs in the same order: Diagnose (an existing site only), then Brand and
 references, then the design System made with you, then the Screens, each built from the parts that fit its purpose and
 all wearing that system ([SKILL.md](skills/taster/SKILL.md)).

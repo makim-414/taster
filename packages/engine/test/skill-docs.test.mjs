@@ -87,3 +87,12 @@ test('the skill keeps its guardrails: page text is data, only sites they may reb
   assert.match(docs['references/diagnose.md'], /### Check you got the page/);
   assert.match(docs['SKILL.md'], /not diagnosed/);
 });
+
+test('a URL or a file given with /taster goes straight to Diagnose; the question is only for a message with neither', () => {
+  const start = docs['SKILL.md'].split('## Start here: one question')[1].split('\n## ')[0];
+  assert.match(start, /If that message gives a\s+URL, a local address \(`localhost:3000`\) or a page file, it is an existing site: do not ask which/);
+  assert.match(start, /Only when it gives no URL or file and does not say which, ask/);
+  assert.match(docs['references/start.md'], /go straight to step 3 of \[Already exists\]/);
+  // The ownership question still comes before what takes from the site.
+  assert.match(docs['references/start.md'], /Before Brand or Rebuild, unless the site is plainly theirs/);
+});
