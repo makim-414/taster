@@ -1,0 +1,6 @@
+{
+  "name": "fixture-v4-lucide",
+  "private": true,
+  "type": "module",
+  "dependencies": { "lucide-react": "^0.460.0", "react": "^19.0.0", "tailwindcss": "^4.1.0", "@tailwindcss/vite": "^4.1.0" }
+}

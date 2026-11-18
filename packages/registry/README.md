@@ -54,6 +54,30 @@ Without the preset the build still passes and the components show up unstyled. `
 the same names and loads after it wins and the components take its colors. The starter CSS of a new
 Vite app does exactly that: remove those variables from it or rename them.
 
+## An app with its own theme
+
+When the app already has a Tailwind theme (a v4 `@theme` block in its CSS, or colors in a v3 `tailwind.config`),
+`add` does not copy `tokens.css` or the preset: both define names such an app usually has already (`--accent`,
+`--border`, `--radius`, `rounded-lg`, `ease-out`), and loading them would change how the app looks. It fits the copy
+instead and prints what it did:
+
+- A Taster token class becomes the app's own class where a token plays the same part: `bg-accent` becomes
+  `bg-brand` when the app has `--color-brand` (an app's `accent` is often a highlight, Taster's is the brand's solid
+  color), `text-text-muted` becomes `text-ink-muted`, `border-border` becomes `border-line`. Text on the brand color
+  with no token of its own goes to the app color with the best contrast on it.
+- Sizes and weights go to the Tailwind class of the same value, which is the app's scale wherever it set one:
+  `text-h2` becomes `text-2xl`, `text-body` becomes `text-sm`, `font-med` becomes `font-medium`.
+- Everything else moves under a `tst-` prefix (`text-tst-caption`, `duration-[var(--tst-dur-press)]`, the `tst-desk:`
+  variant), and every custom property the components read is renamed `--tst-*`. One generated `taster.css` in
+  `--dir` defines them: pointing at the app's tokens where they map, Taster's values (light or dark, after the app's
+  page color) where they do not. It defines no name of the app.
+
+The last lines say where `taster.css` goes: for Tailwind v4 one `@import` right after `@import "tailwindcss";`; for v3
+the generated `taster-tailwind.cjs` (only `tst-` names, added with `extend`) in `presets`, and `taster.css` imported
+once. `--tokens taster` copies the token files and the preset as before; `--tokens host` fits even an app whose theme
+has no colors. Run `add` again after the app's theme changes: `taster.css` is the same file for the same theme, so
+a second `add` keeps the first one unless it differs.
+
 ## Copy a component by hand
 
 1. Tokens first. Components read CSS variables only, so nothing renders correctly without them.

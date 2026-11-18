@@ -244,6 +244,13 @@ Tailwind (for example `src/index.css`):
 defines the same names and loads after it wins, and the components take its colors; the starter CSS of a new Vite app
 does exactly that. Remove those variables from the starter CSS or rename them.
 
+An app that already has its own Tailwind theme (a v4 `@theme`, or colors in a v3 config) does not get `tokens.css`
+or the preset at all, since they would redefine names such as `--accent` and `rounded-lg` and change how it looks.
+`add` maps the components' classes onto the app's own tokens instead (`bg-accent` to `bg-brand`, `text-text-muted` to
+`text-ink-muted`, `text-h2` to `text-2xl`), puts the rest under a `tst-` prefix defined in one generated `taster.css`,
+and prints each mapping and the one line to add
+([packages/registry/README.md](packages/registry/README.md#an-app-with-its-own-theme)).
+
 ### Choose by eye with your agent
 
 Your agent does not have to pick the look alone. Ask it for a hero or a pricing section and the `browse_components` tool

@@ -240,6 +240,12 @@ Tailwind v3 는 이 파일을 그대로 읽습니다. Tailwind v4 는 `@config` 
 정의하고 그 뒤에 불러오면 그쪽이 이기고, 부품이 그 색을 씁니다. 새로 만든 Vite 앱의 스타터 CSS 가 바로 그렇습니다.
 스타터 CSS 에서 그 변수들을 지우거나 이름을 바꾸세요.
 
+이미 자기 Tailwind 테마가 있는 앱(v4 `@theme`, 또는 v3 설정의 colors)에는 `tokens.css` 와 프리셋을 넣지 않습니다.
+`--accent`, `rounded-lg` 같은 이름을 다시 정의해 앱 모습이 바뀌기 때문입니다. 대신 `add` 가 부품 클래스를 앱의 토큰으로
+옮기고(`bg-accent` 는 `bg-brand`, `text-text-muted` 는 `text-ink-muted`, `text-h2` 는 `text-2xl`), 나머지는 `tst-`
+접두사로 묶어 생성한 `taster.css` 한 파일에 정의하며, 옮긴 내역과 추가할 한 줄을 출력합니다
+([packages/registry/README.md](packages/registry/README.md#an-app-with-its-own-theme)).
+
 ### 에이전트와 함께 눈으로 고르기
 
 모양을 에이전트 혼자 고르지 않아도 됩니다. "히어로 보여줘"라고 하면 `browse_components` 도구가 그림, 부품별 실행 링크,

@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/* A host app's own tokens: names that Taster's preset also defines (accent, the radius scale) on purpose. */
+@theme {
+  --font-sans: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --color-canvas: #fbfaf7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f4f2ec;
+  --color-line: #e6e3dc;
+  --color-line-strong: #d4d0c6;
+  --color-ink: #0e1a17;
+  --color-ink-muted: #4a5753;
+  --color-ink-subtle: #566360;
+  --color-brand: #0f6b4f;
+  --color-brand-soft: #e4f1eb;
+  --color-accent: #c8f169;
+  --radius-card: 1.25rem;
+  --radius-lg: 0.875rem;
+  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.08);
+}
+
+body {
+  background: var(--color-canvas);
+}
