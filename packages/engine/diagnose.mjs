@@ -207,7 +207,8 @@ function emitRun(url, run, viewport, colorScheme) {
   delete run.stage;
   live.emit('stage', { ...liveStage(url, run, viewport, { shot, colorScheme }), shotSize: size });
   if (run.load?.diagnosed === false) return;
-  live.emit('findings', { width: viewport.width, findings: liveFindings(run), counts: run.counts || {} });
+  const names = Object.fromEntries(Object.keys(run.counts || {}).map((id) => [id, RULE_BY_ID.get(id)?.name || id]));
+  live.emit('findings', { width: viewport.width, findings: liveFindings(run), counts: run.counts || {}, names });
 }
 
 const liveRules = (report) => ({

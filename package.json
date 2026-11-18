@@ -34,6 +34,7 @@
     "packages/engine/*.js",
     "packages/engine/package.json",
     "packages/engine/README.md",
+    "packages/engine/viewer/",
     "data/rules/detect.js",
     "data/rules/rules.json",
     "data/rules/RULES.md",
