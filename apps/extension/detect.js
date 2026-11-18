@@ -1354,10 +1354,22 @@
           return h.s >= 0.35 && h.chroma >= 0.12 && h.l < 0.97;
         });
       }
+      // A gradient border: two mask layers composited with exclude (xor), one clipped to the content box, so only the
+      // padding ring paints (a cursor spotlight on a card's edge). It covers the ring, not the box.
+      function paintedArea(it) {
+        var cs = it.cs;
+        var comp = cs.maskComposite || cs.webkitMaskComposite || '';
+        var img = cs.maskImage || cs.webkitMaskImage || '';
+        var layers = (img.match(/(gradient|url)\(/g) || []).length;
+        if (!/exclude|xor/.test(comp) || layers < 2) return it.r.w * it.r.h;
+        var inW = Math.max(0, it.el.clientWidth - px(cs.paddingLeft) - px(cs.paddingRight));
+        var inH = Math.max(0, it.el.clientHeight - px(cs.paddingTop) - px(cs.paddingBottom));
+        return Math.max(0, it.r.w * it.r.h - inW * inH);
+      }
       I.forEach(function (it) {
         var b = blurOf(it.cs);
         var radial = coloredRadial(it.cs.backgroundImage);
-        var cover = (it.r.w * it.r.h) / (vw * vh);
+        var cover = (radial ? paintedArea(it) : it.r.w * it.r.h) / (vw * vh);
         // A blur is a blob only when the box is blob sized; small blurred things are glows on icons or text.
         if (b >= 40 && it.r.w >= 200 && it.r.h >= 200) add('BG-01', it.el, { blurPx: b });
         else if (radial && cover >= 0.3) add('BG-01', it.el, { radialGradient: true, viewportAreaRatio: rn(cover) });
@@ -1792,9 +1804,11 @@
       return false;
     }
     // The part of a rect left after every clipping ancestor, or null when nothing is left.
+    // Clips a text rect to the boxes that hide overflow, starting with the text's own element: a label cut by its own
+    // overflow (text-overflow: ellipsis) ends at its box, so the cut tail does not overlap the next label.
     function clipToAncestors(el, r) {
       var l = r.left, t = r.top, rt = r.right, b = r.bottom;
-      for (var a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+      for (var a = el; a && a !== document.body; a = a.parentElement) {
         var cs = getComputedStyle(a);
         if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
         var c = a.getBoundingClientRect();

@@ -125,6 +125,13 @@ All notable changes to Taster are recorded here. The format follows
 
 ### Fixed
 
+- BG-01 no longer reports a cursor spotlight drawn on a card's edge as an aurora background. Such a gradient border
+  masks a radial gradient to the padding ring (two mask layers composited with `exclude`, one clipped to the content
+  box), so it paints a 1px line, yet the rule measured the whole card against the viewport and flagged every card of
+  a page on a phone. The rule now measures only the painted ring when the element is masked that way.
+- RSP-04 no longer reports a label cut by its own `text-overflow: ellipsis` as overlapping the label next to it. The
+  text was clipped to its ancestors' boxes but not to its own, so the hidden tail of a truncated title in a flex row
+  counted as overlapping the badge beside it.
 - The ACP agent ends a cancelled tool call. After `session/cancel` the running `/diagnose` or `/brand` tool call was
   left `in_progress`, so an editor showed it running for the rest of the session; it now gets a last
   `tool_call_update` with status `failed` ("Cancelled.") before the turn answers `cancelled`. The run that goes on in
