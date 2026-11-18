@@ -82,6 +82,12 @@ Every tool you call through the local MCP server then shows on that page as it h
 for you on each finding, swap, component and token change. Nothing changes in how you call the tools, and nothing is
 sent while it is not running.
 
+With the plugin, your own edits show too: a hook tells the viewer which file each Edit or Write changed, the viewer
+loads the page again after the dev server reloads, and your cursor shows the regions that changed, one edit at a time.
+Without the plugin (Codex, an editor), run `node <clone>/packages/engine/taster.mjs live edit --file <path> --client
+<your name>` after each edit to a page's source. The regions come from comparing the page before and after, not from
+the edit itself, so edit one section per step when the user is watching.
+
 ## If the taster MCP server is connected
 
 Prefer its tools; they run the same detector in a real browser for you.

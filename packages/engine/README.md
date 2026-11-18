@@ -187,13 +187,27 @@ node packages/engine/start.mjs watch             # the same from a plugin instal
   the calls of one agent that run at the same time. Types: `call.start` (`args`, with URLs cut to scheme, host and
   path, and secret looking keys hidden), `call.end` (`ok`, `ms`, `error`, `cancelled`), `stage`, `findings` (rule,
   severity, selector up to 200 characters, text up to 60, page rect), `rules`, `swaps`, `component`,
-  `component.add` (file names, never contents), `system`, `system.tuned` (token `diff`), `consistency`, `plan`, and
-  the hub's own `stage.refresh`.
+  `component.add` (file names, never contents), `edit`, `system`, `system.tuned` (token `diff`), `consistency`,
+  `plan`, and the hub's own `stage.refresh` and `stage.patch`.
 - **The stage.** While a hub listens, `diagnose()` passes `stageShot` to `detectOnce`, which takes a JPEG of the page
   from the same load before the detector runs, so the rects line up. The picture goes to `/ingest/shot` ahead of the
   `stage` event that names it and never into the report. After `component.add`, `system.tuned` or a plan check, the
   hub opens the last local stage again (file, localhost, 127.0.0.1) every 2.5 seconds, up to 8 times, until the picture
   differs, and sends `stage.refresh` with the findings measured on it.
+- **Per edit.** `taster live edit` (`edit.mjs`) posts an `edit` event (`file` relative to the agent's folder, `tool`).
+  The plugin's `hooks/hooks.json` runs it on Claude Code's PostToolUse for Edit, Write, MultiEdit and NotebookEdit with
+  the hook JSON on stdin (`tool_input.file_path`, `cwd`, `session_id`, and `agent_id` and `agent_type` in a subagent,
+  hashed into the agent id); other agents pass `--file`, `--tool`, `--agent` and `--client`; `add` reports the files it
+  wrote. With no hub in the discovery file it exits 0 before reading stdin (about 25ms over Node's own start), and it
+  always exits 0. On `edit` the hub waits 400ms for more, loads the stage again with `detectOnce({ stageShot, domShot })`
+  and compares the element list (`domdiff.mjs`: path, rect, and a hash of own text and visible computed styles) with the
+  load before, loading again up to 4 times while nothing changed (a dev server still rebuilding). It sends `stage.patch`
+  with the new picture, `changed` regions (`rect`, `kind` added, removed or changed, `label`, `edit`, `guessed`), the
+  `edits` they go with, and the findings of the same load. Regions are the topmost changed elements, merged with
+  their neighbours, at most 10. They come from the comparison after the reload, not from tracing the edit; edits that
+  land between two loads are matched to regions by file name words, marked `guessed`. The viewer flies each region's
+  agent cursor to it, draws its box and size, crossfades only that region, resolves findings inside it, then settles
+  the full picture.
 - **Honest order.** The detector is one `page.evaluate`, so findings are not found one by one. The viewer chooses the
   order its cursors visit them in from their real rects (the 30 most severe, top to bottom) and says so on the page.
 - **Hub routes.** `GET /api/hello`, `POST /ingest` and `POST /ingest/shot?id=` (token header), `GET /events?k=` (SSE,
@@ -202,8 +216,8 @@ node packages/engine/start.mjs watch             # the same from a plugin instal
   refused, and there are no CORS headers.
 
 `node packages/engine/scripts/check-live-viewer.mjs` runs a real diagnose against a hub on a free port, adds a second
-agent and a refresh, and opens the viewer in headless Chromium at 1440 and 390: marks, cursors, resolved marks, and no
-page error, console error or CSP violation.
+agent, a refresh, an edit and two patches, and opens the viewer in headless Chromium at 1440 and 390: marks, cursors,
+resolved marks, the region crossfade with its size, and no page error, console error or CSP violation.
 
 ## Checks
 
