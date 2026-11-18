@@ -378,3 +378,92 @@ test('elements that change by themselves are learned after the diagnose and left
     await hub.close();
   }
 });
+
+// A broken page after an edit (a 5xx, a dev server that is down): the hub stops once the same error comes back twice,
+// sends stage.error with the status, a short message and the edit, and compares the fix with the last good load.
+test('after an edit that breaks the page the hub sends stage.error soon, and the fix is compared with the last good load', async () => {
+  const el = (k, p, r, s, extra = {}) => ({ k, p, t: 'div', id: '', c: [], r, s, x: '', ...extra });
+  const dom = (hero) => ({ width: 1440, height: 1600, truncated: false, nodes: [el('html>body:0', -1, [0, 0, 1440, 1600], 'b'), el('html>body:0>header#hero', 0, [0, 0, 1440, 500], hero, { id: 'hero' })] });
+  const good = (hero) => ({ image: Buffer.from(`img-${hero}`), type: 'image/jpeg', shotSize: { width: 1440, height: 1600 }, dom: dom(hero), findings: [], counts: {} });
+  let mode = 'good';
+  let hero = 'h1';
+  const asked = [];
+  const refresher = {
+    run: async () => null,
+    snapshot: async () => {
+      asked.push(mode);
+      if (mode === '500') return { error: { status: 500, reason: 'http-error', message: 'not diagnosed: got a server error page (HTTP 500, title "Error") instead of the site at http://localhost:5190/' } };
+      if (mode === 'down') throw new Error('page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5190/\nCall log:\n  - navigating');
+      return good(hero);
+    },
+  };
+  const hub = await startHub({ port: 0, discovery: discovery(), viewerDir, refresher, editDebounce: 30, editRetry: 20, editTries: 6, baselineDelay: 10, baselineLoads: 1 });
+  const hook = (file) => event('edit', { file, tool: 'Edit' }, { agent: { id: 'cc-a', kind: 'hook', client: 'claude-code', label: 'site', lane: 0 }, call: null, tool: null });
+  const until = async (fn) => {
+    for (let i = 0; i < 200 && !fn(); i++) await new Promise((r) => setTimeout(r, 10));
+    await hub.idle();
+  };
+  try {
+    await fetch(`${hub.url}ingest/shot?id=stage0003`, { method: 'POST', headers: { 'content-type': 'image/jpeg', [live.TOKEN_HEADER]: hub.token }, body: Buffer.from('img-h1') });
+    await ingest(hub, event('stage', { url: 'http://localhost:5190/', width: 1440, height: 900, shot: 'stage0003', diagnosed: true }));
+    await until(() => asked.length >= 1);
+
+    mode = '500';
+    const before = asked.length;
+    await ingest(hub, hook('app/page.tsx'));
+    await until(() => hub.events.some((e) => e.type === 'stage.error'));
+    const err = hub.events.find((e) => e.type === 'stage.error');
+    assert.ok(err, 'a stage.error was sent');
+    assert.equal(asked.length - before, 2, 'it stopped at the second load with the same error, not after editTries');
+    assert.equal(err.agent.id, 'hub');
+    assert.equal(err.data.of, hub.events.find((e) => e.type === 'stage').seq);
+    assert.equal(err.data.status, 500);
+    assert.equal(err.data.message, 'got a server error page (HTTP 500, title "Error") instead of the site at http://localhost:5190/');
+    assert.deepEqual([err.data.file, err.data.tool, err.data.agent.id], ['app/page.tsx', 'Edit', 'cc-a']);
+    assert.deepEqual(err.data.edits.map((x) => x.file), ['app/page.tsx']);
+    assert.ok(!hub.events.some((e) => e.type === 'stage.patch'), 'no patch for a page that did not load');
+
+    // A dev server that is down: the browser's error, short.
+    mode = 'down';
+    await ingest(hub, hook('app/layout.tsx'));
+    await until(() => hub.events.filter((e) => e.type === 'stage.error').length >= 2);
+    const down = hub.events.filter((e) => e.type === 'stage.error')[1];
+    assert.deepEqual([down.data.status, down.data.message, down.data.file], [null, 'net::ERR_CONNECTION_REFUSED at http://localhost:5190/', 'app/layout.tsx']);
+
+    // The fix: compared with the load before the page broke, so the region is the change since then.
+    mode = 'good';
+    hero = 'h2';
+    await ingest(hub, hook('app/page.tsx'));
+    await until(() => hub.events.some((e) => e.type === 'stage.patch'));
+    const patch = hub.events.find((e) => e.type === 'stage.patch');
+    assert.ok(patch?.data.shot, 'the page that loads again is a patch with its picture');
+    assert.deepEqual(patch.data.changed.map((r) => [r.rect.y, r.kind]), [[0, 'changed']]);
+  } finally {
+    await hub.close();
+  }
+});
+
+test('the engine refresher answers an error page and a server that is down with the error, not a picture', { timeout: 60000 }, async () => {
+  const page503 = readFileSync(new URL('./fixtures/load-503.html', import.meta.url));
+  const { createServer } = await import('node:http');
+  const srv = createServer((req, res) => res.writeHead(503, { 'content-type': 'text/html; charset=utf-8' }).end(page503));
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const refresher = engineRefresher();
+  try {
+    const broken = await refresher.snapshot({ url: `http://127.0.0.1:${srv.address().port}/`, width: 1440, height: 900 });
+    assert.equal(broken.image, undefined);
+    assert.equal(broken.error.status, 503);
+    assert.equal(broken.error.reason, 'http-error');
+    assert.match(broken.error.message, /^got a server error page \(HTTP 503/);
+    assert.ok(broken.error.message.length <= 160);
+    const port = srv.address().port;
+    await new Promise((r) => srv.close(r));
+    const down = await refresher.snapshot({ url: `http://127.0.0.1:${port}/`, width: 1440, height: 900 });
+    assert.equal(down.error.status, null);
+    assert.match(down.error.message, /ERR_CONNECTION_REFUSED/);
+    assert.doesNotMatch(down.error.message, /\n|^page\.goto/);
+  } finally {
+    srv.close();
+    await refresher.close();
+  }
+});

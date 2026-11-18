@@ -98,6 +98,12 @@ All notable changes to Taster are recorded here. The format follows
 
 ### Fixed
 
+- The live hub no longer goes quiet when the page breaks after an edit. When the stage answers with an HTTP error
+  (a 5xx while the dev server shows its error page) or does not load at all, it stops retrying once the same error
+  comes back twice, instead of loading it up to 4 times at up to 30 seconds each, about 100 seconds of silence on a
+  real page, and sends `stage.error` with the status, a short message and the edit before it. The viewer shows it as
+  a line over the stage and a failed line in the log, cleared by the next good load, and the fix is compared with the
+  last load that worked. `engineRefresher` answers such a load with `{ error }` instead of null.
 - The skill no longer tells the agent to download missing component files from the main branch at run time; the code
   comes from `get_component` or from `add` in a clone.
 - `lint` no longer reports the second line of a custom property value that a formatter split over lines

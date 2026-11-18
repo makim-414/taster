@@ -239,6 +239,27 @@ code {
   border: 1px solid var(--border);
   border-radius: var(--r-md);
 }
+/* The page did not load after an edit: a line over the stage until the next good load. */
+.stage-error {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg-elev);
+  border-bottom: var(--mark-width) solid var(--danger);
+  color: var(--text);
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  overflow-wrap: anywhere;
+}
+.stage-error[hidden] {
+  display: none;
+}
+.stage-error b {
+  color: var(--danger);
+  font-weight: var(--w-semi);
+}
 .stage-inner {
   position: relative;
   width: 100%;

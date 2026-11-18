@@ -188,7 +188,7 @@ node packages/engine/start.mjs watch             # the same from a plugin instal
   path, and secret looking keys hidden), `call.end` (`ok`, `ms`, `error`, `cancelled`), `stage`, `findings` (rule,
   severity, selector up to 200 characters, text up to 60, page rect), `rules`, `swaps`, `component`,
   `component.add` (file names, never contents), `edit`, `system`, `system.tuned` (token `diff`), `consistency`,
-  `plan`, and the hub's own `stage.refresh` and `stage.patch`.
+  `plan`, and the hub's own `stage.refresh`, `stage.patch` and `stage.error`.
 - **The stage.** While a hub listens, `diagnose()` passes `stageShot` to `detectOnce`, which takes a JPEG of the page
   from the same load before the detector runs, so the rects line up. The picture goes to `/ingest/shot` ahead of the
   `stage` event that names it and never into the report. After `component.add`, `system.tuned` or a plan check, the
@@ -211,7 +211,11 @@ node packages/engine/start.mjs watch             # the same from a plugin instal
   their neighbours, at most 10. They come from the comparison after the reload, not from tracing the edit; edits that
   land between two loads are matched to regions by file name words, marked `guessed`. The viewer flies each region's
   agent cursor to it, draws its box and size, crossfades only that region, resolves findings inside it, then settles
-  the full picture.
+  the full picture. When a load after an edit answers with an error (an HTTP error page such as a 5xx, a dev server
+  that is down), the hub stops once the same error comes back twice in a row and sends `stage.error` (`status`,
+  `reason`, a `message` of at most 160 characters, and the `file`, `tool`, `agent` and `edits` before it); it keeps
+  the last good load to compare the fix with. The viewer shows a line over the stage with the status and the edit,
+  and a failed line in the log, until the next `stage.patch` or `stage.refresh` of that stage.
 - **Honest order.** The detector is one `page.evaluate`, so findings are not found one by one. The viewer chooses the
   order its cursors visit them in from their real rects (the 30 most severe, top to bottom) and says so on the page.
 - **Hub routes.** `GET /api/hello`, `POST /ingest` and `POST /ingest/shot?id=` (token header), `GET /events?k=` (SSE,
@@ -220,8 +224,9 @@ node packages/engine/start.mjs watch             # the same from a plugin instal
   refused, and there are no CORS headers.
 
 `node packages/engine/scripts/check-live-viewer.mjs` runs a real diagnose against a hub on a free port, adds a second
-agent, a refresh, an edit and two patches, and opens the viewer in headless Chromium at 1440 and 390: marks, cursors,
-resolved marks, the region crossfade with its size, and no page error, console error or CSP violation.
+agent, a refresh, an edit, two patches and a page that broke after an edit, and opens the viewer in headless Chromium
+at 1440 and 390: marks, cursors, resolved marks, the region crossfade with its size, the error line over the stage and
+its clearing, and no page error, console error or CSP violation.
 
 ## Checks
 
