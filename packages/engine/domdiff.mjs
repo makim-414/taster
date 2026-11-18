@@ -67,7 +67,7 @@ const union = (a, b) => {
   const y = Math.min(a.y, b.y);
   return { x, y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y };
 };
-const near = (a, b, gap) => a.x - gap < b.x + b.w && b.x - gap < a.x + a.w && a.y - gap < b.y + b.h && b.y - gap < a.y + a.h;
+const near = (a, b, gap) => a.x - gap <= b.x + b.w && b.x - gap <= a.x + a.w && a.y - gap <= b.y + b.h && b.y - gap <= a.y + a.h;
 
 /** A short label for an element: tag#id or tag.class, and the start of its own text. */
 export function labelOf(node) {
