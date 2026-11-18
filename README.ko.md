@@ -309,7 +309,7 @@ claude mcp add --transport http taster https://taster-six.vercel.app/api/mcp
 ```
 
 Cursor 는 `.cursor/mcp.json` 에 `{ "mcpServers": { "taster": { "url": "https://taster-six.vercel.app/api/mcp" } } }`.
-claude.ai 와 ChatGPT 는 같은 주소를 사용자 지정 커넥터로 넣습니다. 원격 서버에는 `extract_content`, 디자인 시스템
+claude.ai 와 ChatGPT 는 같은 주소를 사용자 지정 커넥터로 넣습니다. 원격 서버에는 `get_findings`, `extract_content`, 디자인 시스템
 도구, 화면 단위 도구가 없습니다. `diagnose` 와 `brand_theme` 는 공개 http(s) 주소만 받고, `preview_component` 는 그리는
 대신 정지 화면과 실행 링크를 돌려주며, `pick_tone` 은 같은 울타리를 거쳐 레퍼런스를 열고 부품은 그리는 대신 실행
 링크로 줍니다. 모든 도구 호출은 사용자별 한도에 들어가고, 이 한도는 서버 인스턴스마다 따로 셉니다. 요청 하나에는

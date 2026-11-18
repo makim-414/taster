@@ -282,6 +282,57 @@ export function summarize(url, runs) {
   };
 }
 
+// What an agent gets back by default: per rule its counts and a few example selectors, not every finding. A real
+// landing page answers with hundreds of findings, each with a rect and evidence, which ran past the size an MCP client
+// takes as one tool answer. Every finding stays in the full report (summarize).
+export const COMPACT_MAX_CHARS = 16000;
+const COMPACT_STEPS = [
+  { examples: 3, selector: 100 },
+  { examples: 2, selector: 80 },
+  { examples: 1, selector: 60 },
+  { examples: 0, selector: 0 },
+  // Nearly every rule hit: suggest_swaps gives the fix patterns.
+  { examples: 0, selector: 0, patterns: false },
+];
+const trimText = (s, n) => {
+  const chars = Array.from(String(s || ''));
+  return chars.length > n ? `${chars.slice(0, n - 3).join('')}...` : chars.join('');
+};
+/**
+ * The report with each rule cut down to id, name, severity, counts per width, up to 3 example selectors and its fix
+ * patterns. Rules named in `rules` keep every finding. The examples shrink until compactJson's text is under `max`
+ * characters (rules kept in full aside).
+ * @param {object} report summarize's report, or a host's trimmed one
+ * @param {{ rules?: string[], max?: number }} [options]
+ */
+export function compactReport(report, { rules: keep = [], max = COMPACT_MAX_CHARS } = {}) {
+  const full = new Set(keep.map((id) => String(id).toUpperCase()));
+  const { rules = [], screenshots, ...rest } = report || {};
+  let out = null;
+  for (const step of COMPACT_STEPS) {
+    out = {
+      ...rest,
+      rules: rules.map((r) => {
+        const findings = Array.isArray(r.findings) ? r.findings : [];
+        if (full.has(r.ruleId)) return { ...r, findings };
+        const examples = [...new Set(findings.map((f) => String(f.selector || '')).filter(Boolean))].slice(0, step.examples).map((s) => trimText(s, step.selector));
+        return { ruleId: r.ruleId, name: r.name, severity: r.severity, counts: r.counts, ...(examples.length && { examples }), ...(step.patterns !== false && { fix_patterns: r.fix_patterns }) };
+      }),
+    };
+    if (compactJson(out).length <= max) break;
+  }
+  return out;
+}
+
+/** The summary as the MCP server sends it: indented, with each summarized rule on one line. Still JSON. */
+export function compactJson(summary) {
+  const { rules = [], ...rest } = summary;
+  const head = JSON.stringify({ ...rest, rules: [] }, null, 2);
+  if (!rules.length) return head;
+  const lines = rules.map((r) => `    ${Array.isArray(r.findings) ? JSON.stringify(r, null, 2).replace(/\n/g, '\n    ') : JSON.stringify(r)}`);
+  return head.replace(/"rules": \[\]/, () => `"rules": [\n${lines.join(',\n')}\n  ]`);
+}
+
 export function formatText(report) {
   if (report.diagnosed === false) return report.notDiagnosed.message;
   const out = [report.redirected ? `${report.url} (redirected to ${report.finalUrl})` : report.url, `${report.rulesHit} of ${report.measured} measured rules hit at ${report.widths.join(' and ')} wide`];

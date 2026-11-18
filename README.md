@@ -318,8 +318,8 @@ claude mcp add --transport http taster https://taster-six.vercel.app/api/mcp
 ```
 
 In Cursor, `.cursor/mcp.json`: `{ "mcpServers": { "taster": { "url": "https://taster-six.vercel.app/api/mcp" } } }`.
-claude.ai and ChatGPT take the same URL as a custom connector. The hosted server leaves out `extract_content`, the
-design system tools and the screen by screen tools. `diagnose` and `brand_theme` take public http(s) URLs only,
+claude.ai and ChatGPT take the same URL as a custom connector. The hosted server leaves out `get_findings`, `extract_content`,
+the design system tools and the screen by screen tools. `diagnose` and `brand_theme` take public http(s) URLs only,
 `preview_component` answers with a still and a live link instead of a render, and `pick_tone` opens the references
 through the same fence and links to the live parts instead of rendering them. Every tool call counts against a per
 client limit that each server instance keeps on its own. A request carries one JSON-RPC message (a batch is refused),

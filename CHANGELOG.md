@@ -87,6 +87,14 @@ All notable changes to Taster are recorded here. The format follows
   app folder, and connect the preset; the packages row lists `tailwindcss`.
 - Installed alone, the skill says where the engine comes from (the plugin, the hosted MCP server at
   `https://taster-six.vercel.app/api/mcp`, or a clone) and writes its commands as `node <clone>/packages/engine/...`.
+- The MCP `diagnose` answers with a summary: per rule its id, name, severity, counts per width, up to 3 example
+  selectors and its fix patterns, with the totals and the manual rules. On a real landing page the full answer ran to
+  about 210,000 characters, past what Claude Code takes as one tool answer, so the agent had to read it from a file;
+  the summary of the same page is about 10,000, and it stays under 16,000 however many findings a page has
+  (`compactReport` in the engine). The local server saves every finding to `report.json` next to the captures and
+  names both paths; the new `get_findings { report, rule, width, offset, limit }` reads one rule's findings from it
+  without opening the page again. `rules: [ids]` puts those rules' findings in the answer and `detail: "full"` all of
+  them, on the hosted server too.
 
 ### Fixed
 

@@ -1,15 +1,16 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer as createHttpServer } from 'node:http';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { browseComponents } from '../catalog.mjs';
-import { MAX_SHOT_BYTES, RULES } from '../diagnose.mjs';
+import { COMPACT_MAX_CHARS, MAX_SHOT_BYTES, RULES, compactJson, compactReport } from '../diagnose.mjs';
 import { PAGE_DATA, captureContent } from '../server.mjs';
+import { syntheticReport } from './fixtures/synthetic-report.mjs';
 
 const server = fileURLToPath(new URL('../mcp.mjs', import.meta.url));
 const fixture = fileURLToPath(new URL('../../../data/rules/fixtures/slop.html', import.meta.url));
@@ -37,7 +38,7 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
   try {
     assert.equal(client.getServerVersion().version, VERSION, 'the version is the package version');
     const { tools } = await client.listTools();
-    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,browse_components,check_consistency,design_system,diagnose,explain_rule,extract_content,get_component,get_pattern,list_patterns,list_rules,pick_tone,plan_next,plan_screens,plan_update,preview_component,suggest_swaps,system_for_category,taxonomy,tune_system');
+    assert.equal(tools.map((t) => t.name).sort().join(','), 'brand_theme,browse_components,check_consistency,design_system,diagnose,explain_rule,extract_content,get_component,get_findings,get_pattern,list_patterns,list_rules,pick_tone,plan_next,plan_screens,plan_update,preview_component,suggest_swaps,system_for_category,taxonomy,tune_system');
     const tool = Object.fromEntries(tools.map((t) => [t.name, t]));
     // The tools that read a page say its text is data; the ones that only read Taster's files say they change nothing.
     for (const name of ['diagnose', 'extract_content', 'brand_theme']) {
@@ -165,6 +166,50 @@ test('the MCP server diagnoses over stdio and suggests swaps', { timeout: 120000
     assert.equal(images.length, 2);
     for (const img of images) assert.ok(img.mimeType === 'image/jpeg' && Buffer.from(img.data, 'base64').subarray(0, 3).toString('hex') === 'ffd8ff');
 
+    // A summary by default: per rule its counts, a few example selectors and its fix patterns, no finding list.
+    for (const r of report.rules) {
+      assert.equal(r.findings, undefined, `${r.ruleId} carries its findings in the summary`);
+      assert.ok(r.counts && r.fix_patterns && r.name && r.severity, r.ruleId);
+      assert.ok(!r.examples || (r.examples.length <= 3 && r.examples.every((x) => x.length <= 100)), r.ruleId);
+    }
+    assert.equal(report.screenshots, undefined);
+    // Every finding is in the report file the answer names, with the captures next to it.
+    const note = result.content.find((c) => c.type === 'text' && /get_findings/.test(c.text)).text;
+    const file = /is in (\S+report\.json):/.exec(note)?.[1];
+    assert.ok(file && existsSync(file), note);
+    const saved = JSON.parse(readFileSync(file, 'utf8'));
+    assert.equal(saved.rules.length, report.rules.length);
+    assert.match(note, /Annotated captures: \S+annotated-1440\.jpg, \S+annotated-390\.jpg\./);
+    const top = saved.rules[0];
+    const found = await client.callTool({ name: 'get_findings', arguments: { report: file, rule: top.ruleId.toLowerCase(), limit: 2 } });
+    assert.ok(!found.isError, found.content[0].text);
+    const got = pageData(found);
+    assert.equal(got.total, top.findings.length);
+    assert.deepEqual(got.findings.map((f) => f.selector), top.findings.slice(0, 2).map((f) => f.selector));
+    assert.ok(got.findings.every((f) => f.ruleId === top.ruleId && f.width && f.rect));
+    assert.equal(got.rules[0].fix, top.fix);
+    if (top.findings.length > 2) assert.match(found.content[0].text, /^Findings 1 to 2 of \d+ for [A-Z]+-\d+ .*offset 2/);
+    const at390 = pageData(await client.callTool({ name: 'get_findings', arguments: { report: file, width: 390, limit: 100 } }));
+    assert.ok(at390.findings.every((f) => f.width === 390));
+    assert.ok((await client.callTool({ name: 'get_findings', arguments: { report: file, rule: 'NOPE-01' } })).isError);
+    // It reads only the report files diagnose saves.
+    const elsewhere = mkdtempSync(join(tmpdir(), 'other-'));
+    try {
+      writeFileSync(join(elsewhere, 'report.json'), '{}');
+      for (const path of [join(elsewhere, 'report.json'), join(dirname(file), 'annotated-1440.jpg'), '/etc/hosts', join(dirname(file), '..', 'nothing.json')]) {
+        const refused = await client.callTool({ name: 'get_findings', arguments: { report: path } });
+        assert.equal(refused.isError, true, path);
+      }
+    } finally {
+      rmSync(elsewhere, { recursive: true, force: true });
+    }
+    // rules: those rules in full; detail: "full" for all of them.
+    const one = pageData(await client.callTool({ name: 'diagnose', arguments: { target: fixture, screenshots: false, rules: [top.ruleId] } }));
+    assert.equal(one.rules.find((r) => r.ruleId === top.ruleId).findings.length, top.findings.length);
+    assert.ok(one.rules.filter((r) => r.ruleId !== top.ruleId).every((r) => r.findings === undefined));
+    const all = pageData(await client.callTool({ name: 'diagnose', arguments: { target: fixture, screenshots: false, detail: 'full' } }));
+    assert.ok(all.rules.every((r) => Array.isArray(r.findings) && r.findings.length && r.fix));
+
     // Every rule found has at least one fix pattern, and its components resolve to registry files.
     const ids = report.rules.map((g) => g.ruleId);
     const swaps = JSON.parse((await client.callTool({ name: 'suggest_swaps', arguments: { ruleIds: ids } })).content[0].text);
@@ -275,4 +320,33 @@ test('browse_components ranks what a part is above what it is only part of', () 
   assert.ok(button === -1 || button > hero.indexOf('motion/wireframe-form'), hero.join(', '));
   // Asked for by name, the button still comes first.
   assert.equal(browseComponents({ query: 'button' })[0].id, 'blocks/button');
+});
+
+// A real landing page answered with 180 findings over 16 rules, about 210,000 characters in full: past what an MCP
+// client takes as one tool answer. The summary stays under the cap even for many more findings and long selectors.
+test('the diagnose summary of a large report stays far under the MCP answer limit', () => {
+  for (const shape of [{ rules: 40, perRule: 7 }, { rules: 85, perRule: 25 }]) {
+    const report = syntheticReport(shape);
+    const full = JSON.stringify(report, null, 2).length;
+    const summary = compactReport(report);
+    const text = compactJson(summary);
+    const size = text.length;
+    assert.deepEqual(JSON.parse(text), JSON.parse(JSON.stringify(summary)), 'the text is the summary as JSON');
+    assert.ok(full > 150000, `the synthetic report is ${full} characters`);
+    console.log(`${shape.rules} rules: ${full} characters in full, ${size} in the summary`);
+    assert.ok(size < 20000, `${shape.rules} rules, ${report.rules.length * shape.perRule * 2} findings: the summary is ${size} characters`);
+    assert.ok(size <= COMPACT_MAX_CHARS);
+    assert.equal(summary.rules.length, report.rules.length, 'every rule is still listed');
+    assert.ok(summary.rules.every((r) => r.counts && r.name && r.severity && r.findings === undefined));
+    if (shape.rules === 40) assert.ok(summary.rules.every((r) => r.fix_patterns && r.examples?.length), 'forty rules still get examples and fix patterns');
+    assert.equal(summary.findings, report.findings);
+    assert.equal(summary.screenshots, undefined);
+  }
+  // With room, three example selectors per rule, trimmed.
+  const small = compactReport(syntheticReport({ rules: 10, perRule: 7 }));
+  assert.ok(small.rules.every((r) => r.examples.length === 3 && r.examples.every((x) => x.length <= 100 && x.endsWith('...'))));
+  // A rule asked for by id keeps every finding.
+  const report = syntheticReport({ rules: 40, perRule: 7 });
+  const kept = compactReport(report, { rules: [report.rules[5].ruleId.toLowerCase()] });
+  assert.equal(kept.rules[5].findings.length, 14);
 });
