@@ -9,10 +9,14 @@
 //   GET  /events?k=        the event stream (SSE) for the viewer, replaying recent events to a late tab
 //   GET  /shot/<id>?k=     a stage picture
 //   GET  /                 the viewer (packages/engine/viewer/), under a strict content security policy
+// After a change (component.add, system.tuned, a plan check) the hub opens the last local stage again every 2.5
+// seconds, up to 8 times, until the picture differs, and sends it as stage.refresh with the findings measured on it; the
+// viewer crossfades and marks the rules that are gone as resolved. Only local pages (file:, localhost, 127.0.0.1) are
+// opened again: that is where the edits land, and a public site is not loaded over and over.
 // The ingest token is in the discovery file only (os.tmpdir()/taster-live-<uid>.json, mode 0600, removed on exit);
 // the viewer key is in the URL the hub prints. Every request must name this host and port in Host (DNS rebinding), a
 // request from any other origin is refused, and no response carries CORS headers. SECURITY.md has the threat model.
-import { randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import http from 'node:http';
 import { fileURLToPath } from 'node:url';
@@ -28,6 +32,11 @@ const MAX_SHOT = 8 * 1024 * 1024;
 const MAX_SHOTS = 40;
 const MAX_CLIENTS = 16;
 const HEARTBEAT_MS = 15000;
+const REFRESH_EVERY = 2500;
+const REFRESH_TRIES = 8;
+const BROWSER_IDLE = 60000;
+// The events after which the page on the stage has probably changed.
+const CHANGES = (e) => e.type === 'component.add' || e.type === 'system.tuned' || (e.type === 'plan' && (e.data?.event === 'check' || e.data?.recorded?.type === 'check'));
 
 // The viewer's own files, and nothing else from disk.
 const STATIC = {
@@ -84,6 +93,51 @@ function readBody(req, max) {
   });
 }
 
+/** A page the hub may open again: a local file or a server on this machine. */
+export function isLocalPage(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === 'file:' || (/^https?:$/.test(u.protocol) && ['localhost', '127.0.0.1', '[::1]'].includes(u.hostname));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The default stage refresher: the engine's own browser and detector (packages/engine/diagnose.mjs), loaded on first
+ * use, with the browser closed after a minute without work. run() answers { image, type, findings, counts, page }, or
+ * null for a page that did not open as the site.
+ */
+export function engineRefresher() {
+  let browser = null;
+  let idle = null;
+  let engine = null;
+  const close = async () => {
+    clearTimeout(idle);
+    const b = browser;
+    browser = null;
+    await b?.close().catch(() => {});
+  };
+  return {
+    async run({ url, width, height, colorScheme }) {
+      engine ||= await import('./diagnose.mjs');
+      // The same checks a target passes in the engine (local files: pages only, inside TASTER_ROOT when set).
+      const target = engine.toUrl(url);
+      clearTimeout(idle);
+      browser ||= await engine.launch();
+      try {
+        const run = await engine.detectOnce(browser, target, { width, height: height || (width < 768 ? 844 : 900) }, { stageShot: true, ...(colorScheme ? { colorScheme } : {}) });
+        if (!run.load?.diagnosed || !run.stage) return null;
+        return { image: run.stage.image, type: run.stage.type, shotSize: { width: run.stage.width, height: run.stage.height }, findings: engine.liveFindings(run), counts: run.counts || {}, page: run.page };
+      } finally {
+        idle = setTimeout(close, BROWSER_IDLE);
+        idle.unref();
+      }
+    },
+    close,
+  };
+}
+
 /** An event from the engine as the hub keeps it, or null when it is not one. */
 export function cleanEvent(e) {
   if (!e || typeof e !== 'object' || Array.isArray(e) || e.v !== VERSION) return null;
@@ -106,11 +160,12 @@ export function cleanEvent(e) {
 
 /**
  * Start the hub. Resolves once it listens and the discovery file is written.
- * @param {{ port?: number, discovery?: string, viewerDir?: string, onEvent?: (event: object) => void }} [options]
- *   discovery: where to write the discovery file (default live.mjs discoveryFile()); onEvent sees every event kept.
+ * @param {{ port?: number, discovery?: string, viewerDir?: string, onEvent?: (event: object) => void, refresher?: { run: Function, close?: Function } | null, refreshEvery?: number, refreshTries?: number }} [options]
+ *   discovery: where to write the discovery file (default live.mjs discoveryFile()); onEvent sees every event kept;
+ *   refresher: opens the last stage again after a change (engineRefresher(); null turns refreshing off).
  * @returns {Promise<{ port: number, url: string, viewUrl: string, key: string, token: string, publish: (type: string, data: object) => object, shot: (image: Buffer, type?: string) => string, close: () => Promise<void>, events: object[] }>}
  */
-export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(), viewerDir = VIEWER_DIR, onEvent } = {}) {
+export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(), viewerDir = VIEWER_DIR, onEvent, refresher = engineRefresher(), refreshEvery = REFRESH_EVERY, refreshTries = REFRESH_TRIES } = {}) {
   const other = await running(discovery);
   if (other) throw Object.assign(new Error(`taster watch is already running at http://127.0.0.1:${other.port}/ (pid ${other.pid})`), { code: 'RUNNING' });
 
@@ -126,6 +181,49 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
   const allowedHosts = () => new Set([`127.0.0.1:${bound}`, `localhost:${bound}`]);
   const allowedOrigins = () => new Set([`http://127.0.0.1:${bound}`, `http://localhost:${bound}`]);
 
+  // ---- the stage refresh: the last local stage, opened again after a change until its picture differs ----
+  const hashOf = (image) => createHash('sha256').update(image).digest('hex');
+  let stage = null;
+  const refresh = { tries: 0, running: null, closed: false };
+  const refreshLoop = async () => {
+    while (!refresh.closed && stage && refresh.tries < refreshTries) {
+      refresh.tries++;
+      await new Promise((r) => setTimeout(r, refreshEvery).unref?.());
+      if (refresh.closed || !stage) return;
+      const target = stage;
+      let got = null;
+      try {
+        got = await refresher.run({ url: target.url, width: target.width, height: target.height, colorScheme: target.colorScheme });
+      } catch {
+        got = null;
+      }
+      if (!got?.image || refresh.closed) continue;
+      const hash = hashOf(got.image);
+      if (hash === target.hash) continue;
+      target.hash = hash;
+      const id = storeShot(`h${Date.now().toString(36)}${randomBytes(6).toString('hex')}`, got.image, got.type || 'image/jpeg');
+      publishHub('stage.refresh', { of: target.seq, url: target.url, width: target.width, shot: id, shotSize: got.shotSize || null, page: got.page || null, findings: got.findings || [], counts: got.counts || {}, attempt: refresh.tries });
+      return;
+    }
+  };
+  const scheduleRefresh = () => {
+    if (!refresher || !stage) return;
+    refresh.tries = 0;
+    refresh.running ||= refreshLoop().finally(() => {
+      refresh.running = null;
+    });
+  };
+  const watchStage = (event) => {
+    const d = event.data;
+    if (event.type === 'stage') {
+      // The widest width of a diagnose is the one the viewer shows first, so it is the one refreshed. A newer
+      // diagnose of a page that is not local, or not the site, leaves nothing to refresh.
+      if (stage && stage.call === event.call && stage.width >= d.width) return;
+      const shot = typeof d.shot === 'string' ? shots.get(d.shot) : null;
+      stage = d.diagnosed !== false && shot && isLocalPage(d.url) ? { seq: event.seq, call: event.call, url: d.url, width: d.width, height: d.height, colorScheme: d.colorScheme || null, hash: hashOf(shot.image) } : null;
+    } else if (CHANGES(event)) scheduleRefresh();
+  };
+
   const keep = (event) => {
     event.seq = ++seq;
     const text = JSON.stringify(event);
@@ -133,6 +231,7 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
     bytes += text.length;
     while (events.length > MAX_EVENTS || bytes > MAX_REPLAY_BYTES) bytes -= events.shift().text.length;
     for (const res of clients) res.write(`id: ${event.seq}\ndata: ${text}\n\n`);
+    if (event.agent.id !== 'hub') watchStage(event);
     try {
       onEvent?.(event);
     } catch {
@@ -146,6 +245,7 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
     return id;
   };
   const hubAgent = { id: 'hub', kind: 'hub', client: null, label: 'taster watch', lane: 0 };
+  const publishHub = (type, data) => keep({ v: VERSION, n: 0, t: Date.now(), agent: hubAgent, call: null, tool: null, type, data });
 
   const send = (res, status, body, type = 'application/json; charset=utf-8', extra = {}) => {
     res.writeHead(status, { ...HEADERS, 'content-type': type, 'cache-control': 'no-store', ...extra });
@@ -271,7 +371,9 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
   const close = async () => {
     if (closed) return;
     closed = true;
+    refresh.closed = true;
     forget();
+    await refresher?.close?.();
     for (const res of clients) res.end();
     clients.clear();
     await new Promise((r) => server.close(r));
@@ -289,7 +391,7 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
     },
     forget,
     /** An event from the hub itself (agent id "hub"), such as a refreshed stage. */
-    publish: (type, data) => keep({ v: VERSION, n: 0, t: Date.now(), agent: hubAgent, call: null, tool: null, type, data }),
+    publish: publishHub,
     /** Keep a picture taken by the hub; returns its id. */
     shot: (image, type = 'image/jpeg') => storeShot(`h${Date.now().toString(36)}${randomBytes(6).toString('hex')}`, image, type),
     getShot: (id) => shots.get(id) || null,

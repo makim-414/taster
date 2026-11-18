@@ -3,9 +3,10 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, wri
 import { request } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { test } from 'node:test';
 import * as live from '../live.mjs';
-import { CSP, cleanEvent, startHub } from '../watch.mjs';
+import { CSP, cleanEvent, engineRefresher, startHub } from '../watch.mjs';
 
 // `taster watch`: the hub's address checks, its token and key, the event stream with replay, and the discovery file.
 const dir = mkdtempSync(join(tmpdir(), 'taster-watch-test-'));
@@ -180,4 +181,67 @@ test('cleanEvent keeps the envelope and cuts what does not belong', () => {
   assert.equal(e.agent.lane, 0);
   assert.equal(cleanEvent({ ...event('x'), data: { big: 'x'.repeat(2 * 1024 * 1024) } }), null);
   assert.equal(cleanEvent(null), null);
+});
+
+test('after a change the hub opens the last local stage again until its picture differs, then sends it', async () => {
+  const pictures = [Buffer.from('same'), Buffer.from('same'), Buffer.from('changed')];
+  const asked = [];
+  const refresher = {
+    run: async (stage) => {
+      asked.push(stage);
+      return { image: pictures.shift() || Buffer.from('changed'), findings: [{ id: 0, ruleId: 'AC-01' }], counts: { 'AC-01': 1 } };
+    },
+  };
+  const hub = await startHub({ port: 0, discovery: discovery(), viewerDir, refresher, refreshEvery: 20, refreshTries: 8 });
+  try {
+    const put = (id, body) => fetch(`${hub.url}ingest/shot?id=${id}`, { method: 'POST', headers: { 'content-type': 'image/jpeg', [live.TOKEN_HEADER]: hub.token }, body });
+    await put('first0001', Buffer.from('same'));
+    await put('remote001', Buffer.from('other'));
+    await ingest(hub, [event('stage', { url: 'http://localhost:3000/', width: 1440, height: 900, shot: 'first0001', diagnosed: true }), event('stage', { url: 'http://localhost:3000/', width: 390, height: 844, shot: 'remote001', diagnosed: true })]);
+    await ingest(hub, event('component.add', { ids: ['blocks/button'] }, { tool: 'add', call: 'c2' }));
+    for (let i = 0; i < 100 && !hub.events.some((e) => e.type === 'stage.refresh'); i++) await new Promise((r) => setTimeout(r, 20));
+    const refreshed = hub.events.find((e) => e.type === 'stage.refresh');
+    assert.ok(refreshed, 'a refreshed stage was sent');
+    assert.equal(refreshed.agent.id, 'hub');
+    assert.equal(refreshed.data.of, 1, 'it refreshes the widest stage of the diagnose');
+    assert.equal(refreshed.data.attempt, 3, 'unchanged pictures are not sent');
+    assert.deepEqual(asked[0], { url: 'http://localhost:3000/', width: 1440, height: 900, colorScheme: null });
+    assert.equal(hub.getShot(refreshed.data.shot).image.toString(), 'changed');
+    assert.equal(refreshed.data.findings[0].ruleId, 'AC-01');
+
+    // A public page is never opened again.
+    await put('public001', Buffer.from('x'));
+    await ingest(hub, event('stage', { url: 'https://example.com/', width: 1440, shot: 'public001', diagnosed: true }, { call: 'c3' }));
+    const before = asked.length;
+    await ingest(hub, event('system.tuned', { diff: [] }, { call: 'c4' }));
+    await new Promise((r) => setTimeout(r, 120));
+    assert.equal(asked.length, before);
+  } finally {
+    await hub.close();
+  }
+});
+
+test('isLocalPage opens only local files and servers on this machine', async () => {
+  const { isLocalPage } = await import('../watch.mjs');
+  assert.ok(isLocalPage('file:///tmp/a.html'));
+  assert.ok(isLocalPage('http://localhost:3000/'));
+  assert.ok(isLocalPage('http://127.0.0.1:8080/x'));
+  assert.ok(!isLocalPage('https://example.com/'));
+  assert.ok(!isLocalPage('http://localhost.example.com/'));
+  assert.ok(!isLocalPage('not a url'));
+});
+
+test("the engine refresher takes a clean picture of a local page and measures it", { timeout: 60000 }, async () => {
+  const refresher = engineRefresher();
+  try {
+    const url = pathToFileURL(new URL('../../../data/rules/fixtures/slop.html', import.meta.url).pathname).href;
+    const got = await refresher.run({ url, width: 1440, height: 900 });
+    assert.ok(got.image.length > 1000);
+    assert.deepEqual([...got.image.subarray(0, 2)], [0xff, 0xd8], 'a JPEG');
+    assert.equal(got.shotSize.width, 1440);
+    assert.ok(got.findings.length > 5 && got.findings.every((f) => f.rect && f.severity));
+    await assert.rejects(refresher.run({ url: pathToFileURL(join(dir, 'notes.txt')).href, width: 1440 }), /File not found|Only local/);
+  } finally {
+    await refresher.close();
+  }
 });

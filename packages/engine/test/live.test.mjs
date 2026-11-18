@@ -189,12 +189,22 @@ test('the local MCP server reports each call and what the tools found', { timeou
     await client.callTool({ name: 'get_component', arguments: { id: 'blocks/button' } });
     await live.flush();
 
-    const types = hub.got.map((e) => `${e.tool}:${e.type}`);
+    const types = hub.got.filter((e) => !e.shot).map((e) => `${e.tool}:${e.type}`);
     assert.deepEqual(types.filter((t) => t.startsWith('diagnose:')), ['diagnose:call.start', 'diagnose:stage', 'diagnose:findings', 'diagnose:rules', 'diagnose:call.end']);
     assert.deepEqual(types.filter((t) => !t.startsWith('diagnose:')), ['suggest_swaps:call.start', 'suggest_swaps:swaps', 'suggest_swaps:call.end', 'get_component:call.start', 'get_component:component', 'get_component:call.end']);
     const first = hub.got[0];
     assert.equal(first.agent.kind, 'mcp');
     assert.equal(first.agent.client, 'watch-test-client');
+    // The stage names a clean picture of the page, sent before it.
+    const stageAt = hub.got.findIndex((e) => e.type === 'stage');
+    const stage = hub.got[stageAt].data;
+    const shotAt = hub.got.findIndex((e) => e.shot === stage.shot);
+    assert.ok(shotAt >= 0 && shotAt < stageAt, 'the picture arrives before the stage that names it');
+    assert.ok(hub.got[shotAt].bytes > 1000);
+    assert.equal(hub.got[shotAt].type, 'image/jpeg');
+    assert.equal(stage.width, 1440);
+    assert.equal(stage.shotSize.width, 1440);
+    assert.ok(stage.url.startsWith('file://'));
     const findings = hub.got.find((e) => e.type === 'findings').data;
     assert.equal(findings.width, 1440);
     assert.ok(findings.findings.length > 5);
