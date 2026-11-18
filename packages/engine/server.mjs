@@ -24,7 +24,8 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { MAX_SHOT_BYTES, RESPONSIVE_WIDTHS, RULES, VIEWPORTS, compactJson, compactReport, diagnose, explainRule, extract, launch, viewportFor } from './diagnose.mjs';
 import { brandTheme } from './brand.mjs';
-import { WEB_URL, boardUrl, browseComponents, componentUrl, getComponent, getPattern, listPatterns, loadTaxonomy, loadToneRefs, previewPath, stagePath, suggestSwaps } from './catalog.mjs';
+import { WEB_URL, boardUrl, browseComponents, componentUrl, getComponent, getPattern, listPatterns, loadRegistry, loadTaxonomy, loadToneRefs, previewPath, stagePath, suggestSwaps } from './catalog.mjs';
+import { usageFor } from './add.mjs';
 import { checkConsistency, formatConsistencyText } from './consistency.mjs';
 import * as live from './live.mjs';
 import { applyStep, checkScreen, nextStep, planFromExtract, planPath, planRelative, readPlan, writePlan } from './plan.mjs';
@@ -134,6 +135,29 @@ export function swapsEvent(items) {
       components: [...new Set((r.patterns || []).flatMap((p) => (p.components || []).map((c) => c.id)))].slice(0, 8),
     })),
   };
+}
+
+// How an agent puts a component into the page: add copies it fitted to the app, then one Edit per file. A heredoc or a
+// script that writes the files asks the user for permission and bypasses the live viewer's edit hook.
+const ENGINE_CLI = fileURLToPath(new URL('./cli.mjs', import.meta.url));
+export const WIRING =
+  'To put a component in the page: copy it with `add` from the app folder (it fits the classes to the app\'s own Tailwind tokens and icons, and prints the import line and the JSX), then wire it in with your Edit tool, one file per edit: the import at the top of the page file, then the JSX where the section goes. Do not write component or page files with a shell heredoc, sed, python or any script: that asks the user for permission and the live viewer only sees edits made with Edit or Write.';
+
+/** The copy command and the import and JSX for one component, after its code in get_component. */
+export function wiringNote(id, { remote = false } = {}) {
+  const c = loadRegistry().components.find((x) => x.id === id);
+  const rel = c.file.replace(/^src\//, '');
+  const u = usageFor(readFileSync(fileURLToPath(new URL(`../registry/${c.file}`, import.meta.url)), 'utf8'), `src/components/taster/${rel}`, 'src/App.tsx');
+  const cmd = remote
+    ? `node <clone>/packages/engine/cli.mjs add ${id} --from ${WEB_URL} --dir src/components/taster`
+    : `node ${ENGINE_CLI} add ${id} --dir src/components/taster`;
+  const lines = [
+    'This code is in Taster\'s own token names (bg-bg-elev, text-text-muted). In an app with its own Tailwind theme, do not paste it: copy it with add, run from the app folder, which maps the classes onto the app\'s tokens and icons and prints what it mapped:',
+    `  ${cmd}`,
+    WIRING,
+  ];
+  if (u) lines.push(`For a page at src/App.tsx with the default --dir:`, `  ${u.import}`, `  ${u.jsx}`, ...u.props.map((p) => `  ${p}`));
+  return lines.join('\n');
 }
 
 /** Tokens whose value changed from one system to the next, as { name, from, to }. */
@@ -620,7 +644,7 @@ export function createServer({ remote } = {}) {
     guard(async ({ ruleIds }) => {
       const items = suggestSwaps(ruleIds);
       live.emit('swaps', swapsEvent(items));
-      return { content: [json(items)] };
+      return { content: [json(items), { type: 'text', text: WIRING }] };
     }),
   );
 
@@ -663,7 +687,7 @@ export function createServer({ remote } = {}) {
     guard(async ({ id }) => {
       const text = getComponent(id);
       live.emit('component', { id, fixes: fixesOf(id) });
-      return { content: [{ type: 'text', text }] };
+      return { content: [{ type: 'text', text }, { type: 'text', text: wiringNote(id, { remote: Boolean(remote) }) }] };
     }),
   );
 

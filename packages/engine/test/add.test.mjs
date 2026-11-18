@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { GROUPS, fetchBundle, isRegistryPath, loadRegistry, nextSteps, resolveComponents, writeBundle } from '../add.mjs';
+import { GROUPS, fetchBundle, isRegistryPath, loadRegistry, nextSteps, resolveComponents, usageFor, wiringSteps, writeBundle } from '../add.mjs';
 
 test('add pulls in every relative import, the token files and the notices', () => {
   const b = resolveComponents(['blocks/session-list']);
@@ -110,5 +110,27 @@ test('a hosted bundle may only name registry paths', async () => {
     }
   } finally {
     server.close();
+  }
+});
+
+test('add gives the import line and the JSX for each component, for the file that will import it', () => {
+  const b = resolveComponents(['marketing/pricing-cards', 'marketing/reveal-faq']);
+  const { lines, usage } = wiringSteps(['marketing/pricing-cards', 'marketing/reveal-faq'], b, 'src/components/taster', 'src/components/Pricing.tsx');
+  assert.deepEqual(usage.map((u) => u.import), [
+    "import { PricingCards, type PricingPlan } from './taster/marketing/pricing-cards'",
+    "import { RevealFaq, type FaqItem } from './taster/marketing/reveal-faq'",
+  ]);
+  assert.equal(usage[0].jsx, '<PricingCards plans={plans} />');
+  assert.equal(usage[1].jsx, '<RevealFaq title={title} items={items} />');
+  assert.ok(usage[0].props.includes('PricingPlan is { id, name, blurb, price, period?, note?, features, cta: { label, href }, recommended? }'));
+  const text = lines.join('\n');
+  assert.match(text, /Edit tool, one file per edit/);
+  assert.match(text, /heredoc/);
+  // Every registry component gets an import line from the app root.
+  for (const c of loadRegistry().components) {
+    const rel = c.file.replace(/^src\//, '');
+    const u = usageFor(resolveComponents([c.id]).files.find((f) => f.path === rel).content, `src/components/taster/${rel}`, 'src/App.tsx');
+    assert.ok(u, `${c.id} has no usage`);
+    assert.match(u.import, new RegExp(`from '\\./components/taster/${rel.replace(/\.tsx?$/, '')}'$`), c.id);
   }
 });

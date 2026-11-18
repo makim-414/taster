@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, isAbsolute, join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, formatText, viewportFor } from './diagnose.mjs';
@@ -18,7 +18,7 @@ const HELP = `Usage
   taster --plan <url-or-file> --out <dir> [--route rebuild] [--system <file>] [--by-part]
   taster --rules
   taster --explain <rule-id>
-  taster add <component-id>... [--dir <dir>] [--from <url>] [--overwrite] [--tokens auto|host|taster]
+  taster add <component-id>... [--dir <dir>] [--from <url>] [--overwrite] [--tokens auto|host|taster] [--into <file>]
   taster add --list
   taster export <agents|claude|cursor|windsurf|cline|copilot|gemini|all> [--dir <project>]
   taster lint [paths...] [--json] [--baseline <file>] [--write-baseline] [--selftest]
@@ -65,6 +65,8 @@ and Taster's tokens.css and preset are left out, so the app looks the same. It p
 no theme of its own gets the token files and the Taster preset (tailwind-preset.cjs, Tailwind v3 or v4) as before;
 --tokens host or taster forces one way. --dir defaults to src/components/taster. --from reads a hosted copy
 (https://taster-six.vercel.app) instead of this repository. Files you changed are left alone unless --overwrite.
+It ends with the import line and the JSX for each component, written for --into (default src/App.tsx), to place
+with an editor's Edit tool, one file per edit.
 
 lint reads source files (tsx, jsx, vue, svelte, html, css, md) for the code form of the rules: tinted and outlined
 pills, thick left bars, caps with wide tracking, long dashes, emoji, transition-all, ease-in, hard-coded colors,
@@ -96,9 +98,9 @@ async function add(argv) {
   const { values, positionals } = parseArgs({
     args: argv,
     allowPositionals: true,
-    options: { dir: { type: 'string' }, from: { type: 'string' }, overwrite: { type: 'boolean' }, list: { type: 'boolean' }, json: { type: 'boolean' }, tokens: { type: 'string' } },
+    options: { dir: { type: 'string' }, from: { type: 'string' }, overwrite: { type: 'boolean' }, list: { type: 'boolean' }, json: { type: 'boolean' }, tokens: { type: 'string' }, into: { type: 'string' } },
   });
-  const { fetchBundle, loadRegistry, nextSteps, resolveComponents, writeBundle } = await import('./add.mjs');
+  const { fetchBundle, loadRegistry, nextSteps, resolveComponents, wiringSteps, writeBundle } = await import('./add.mjs');
   const fit = await import('./fit.mjs');
   if (values.list) {
     for (const c of loadRegistry().components) console.log(`${c.id.padEnd(30)} ${c.category}`);
@@ -132,9 +134,12 @@ async function add(argv) {
   })({ ids: positionals, dir }, null);
   const report = [...(fitted ? fit.fitReport(fitted, host) : []), ...(iconFit && (iconFit.inline || bundle.files.some((f) => f.path === 'icons/index.tsx')) ? ['', ...fit.iconReport(iconFit, dir)] : [])];
   const setup = fitted ? fit.fitNextSteps(dir, host) : nextSteps(dir);
+  // The file that will import the components: --into, else the app's usual root component.
+  const into = values.into || ['src/App.tsx', 'src/App.jsx', 'app/page.tsx', 'src/app/page.tsx', 'pages/index.tsx'].find((f) => existsSync(f)) || 'src/App.tsx';
+  const wiring = wiringSteps(positionals, bundle, dir, into);
   if (values.json) {
     const mapping = fitted ? [...fitted.used].map(([from, hit]) => ({ from, to: hit.to, kind: hit.token.kind, via: hit.token.via || null })) : [];
-    console.log(JSON.stringify({ dir, written, skipped, npm: bundle.npm, credits: bundle.credits, fit: { mode, tailwind: host.tailwind, mapping }, icons: icons && { set: icons.label, stroke: icons.stroke, glyphs: Object.keys(icons.glyphs), inline: iconFit.inline }, setup }, null, 2));
+    console.log(JSON.stringify({ dir, written, skipped, npm: bundle.npm, credits: bundle.credits, fit: { mode, tailwind: host.tailwind, mapping }, icons: icons && { set: icons.label, stroke: icons.stroke, glyphs: Object.keys(icons.glyphs), inline: iconFit.inline }, setup, usage: wiring.usage.map((u) => ({ ...u, into })) }, null, 2));
     return 0;
   }
   console.log(`Added to ${dir}:`);
@@ -146,6 +151,7 @@ async function add(argv) {
   if (report.length) console.log(`\n${report.join('\n')}`);
   if (mode === 'taster' && !host.tailwind) console.log('\nNo Tailwind CSS found in this app. The components are styled with Tailwind classes: add Tailwind first, or they render unstyled.');
   console.log(`\n${setup.join('\n')}`);
+  if (wiring.usage.length) console.log(`\n${wiring.lines.join('\n')}`);
   return 0;
 }
 

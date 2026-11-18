@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { chmodSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, cpSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -126,6 +126,24 @@ test('with a hub the hook command posts one edit event, and bad input still exit
     assert.equal(c.agent.client, 'codex');
     assert.equal(c.agent.label, 'builder');
     assert.equal(c.agent.kind, 'cli');
+  } finally {
+    await hub.close();
+    rmSync(file, { force: true });
+  }
+});
+
+test('add reports the files it wrote as one edit, the fitted taster.css and icon adapter included', async () => {
+  const file = join(dir, 'hub-add.json');
+  const hub = await fakeHub(file);
+  const app = join(dir, 'app');
+  cpSync(fileURLToPath(new URL('./fixtures/hosts/v4-lucide/', import.meta.url)), app, { recursive: true });
+  try {
+    const r = await run(['add', 'marketing/audience-split'], { env: { TASTER_LIVE_FILE: file }, cwd: app });
+    assert.equal(r.code, 0, r.out);
+    const edit = hub.got.find((e) => e.type === 'edit');
+    assert.equal(edit.data.tool, 'add');
+    for (const f of ['src/components/taster/marketing/audience-split.tsx', 'src/components/taster/taster.css', 'src/components/taster/icons/index.tsx']) assert.ok(edit.data.files.includes(f), `edit does not name ${f}`);
+    assert.ok(!JSON.stringify(hub.got).includes(dir), 'no absolute path leaves the process');
   } finally {
     await hub.close();
     rmSync(file, { force: true });

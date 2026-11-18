@@ -182,6 +182,7 @@ identity slot and stay as the original files.
 
 ## Always
 
+- Change the user's files with your Edit (or Write) tool, one file per edit, never with a shell heredoc, `sed`, `python` or a script: those ask the user for permission, and the live viewer's hook only sees Edit and Write. `add` prints the import line and the JSX for each component it copies; place them with two edits, the import, then the JSX.
 - Tokens only for color, spacing, radius and type. Start from the registry's `tokens.css` (it comes with `get_component` and `add`) and the system's `theme.css`, or the user's existing tokens.
 - Sentence case labels. No all caps with wide letter spacing (navigation labels are the one exception).
 - Icons only where their slot needs one, from one set at one stroke weight. No emoji as icons or bullets, no long dashes in UI copy, no tinted pill badges, no thick colored left borders on cards, no purple gradient text, no glow on everything. The full list is the rules file; these are the ones people notice first.

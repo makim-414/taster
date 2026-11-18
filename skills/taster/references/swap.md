@@ -35,6 +35,10 @@ own code, and prove it with a second detector run.
    onto the app's tokens (and prints each mapping), moves the rest under `tst-` in one `taster.css`, and leaves
    Taster's `tokens.css` and preset out: do not add them, and do not rename the classes by hand. Check the mapping
    it printed against the app (an `accent` of the app that is a highlight, not the brand, is the usual surprise).
+   Then wire it in with your Edit tool, one file per edit: `add` ends with the import line and the JSX for each
+   component (`--into <page file>` writes the import path for that file). Fill the props with the user's real
+   content from the section you replace. Never write component or page files with a shell heredoc, `sed`, `python`
+   or a script: it asks the user for permission, and the live viewer only follows Edit and Write.
 5. Re run detect.js at both widths. The finding must be gone. If a new finding appears, you introduced it; fix it
    before moving on.
 
