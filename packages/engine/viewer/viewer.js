@@ -33,6 +33,13 @@
   const MAX_TOKENS = 14;
   const MOVE_MS = 520;
   const DWELL_MS = 420;
+  // After a cursor's call ends and its queue is empty, its last label stays this long, then only the name is left.
+  const QUIET_MS = 2500;
+  const FADE_MS = 600;
+  // A resolved mark plays its turn (green, then fading out) and is removed after this long.
+  const RESOLVED_MS = 2800;
+  // How many resolved elements the hub cursor visits after a refresh; the rest resolve where they are.
+  const RESOLVED_VISITS = 6;
 
   // ---- small DOM helpers: every string goes in as text ----
   function h(tag, attrs, ...children) {
@@ -50,6 +57,7 @@
     const str = String(s ?? '');
     return str.length > n ? `${str.slice(0, n - 3)}...` : str;
   };
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
   const tail = (url) => {
     const s = String(url || '');
     const m = /^file:\/\/.*\/([^/]+)$/.exec(s);
@@ -173,6 +181,28 @@
     if (say === undefined) return;
     c.say.replaceChildren(...(Array.isArray(say) ? say : [say]).filter((x) => x !== null && x !== undefined));
   }
+  // A cursor whose call is over and whose queue is empty goes idle; a moment later its last label fades and only the
+  // arrow and the agent's name stay. A new step wakes it again.
+  function rest(c) {
+    c.el.setAttribute('data-idle', '');
+    clearTimeout(c.quiet);
+    if (replaying) {
+      c.say.replaceChildren();
+      return;
+    }
+    c.quiet = setTimeout(() => {
+      c.el.setAttribute('data-quiet', '');
+      c.quiet = setTimeout(() => {
+        c.say.replaceChildren();
+        c.el.removeAttribute('data-quiet');
+      }, reducedMotion.matches ? 0 : FADE_MS);
+    }, QUIET_MS);
+  }
+  function wake(c) {
+    clearTimeout(c.quiet);
+    c.el.removeAttribute('data-quiet');
+    c.el.removeAttribute('data-idle');
+  }
   // Keep a stage point in view while the followed cursor flies to it.
   function reveal(anchor) {
     if (!anchor.stage || !current?.shotSize) return;
@@ -185,7 +215,7 @@
 
   /** Queue a move: { anchor, say, arrive, dwell }. While the stream replays, it lands at once. */
   function step(c, s) {
-    c.el.removeAttribute('data-idle');
+    wake(c);
     if (replaying) {
       c.target = s.anchor || c.target;
       c.anim = null;
@@ -200,7 +230,7 @@
     if (c.busy) return;
     const s = c.queue.shift();
     if (!s) {
-      if (c.done) c.el.setAttribute('data-idle', '');
+      if (c.done) rest(c);
       return;
     }
     c.busy = true;
@@ -265,7 +295,7 @@
     );
   }
 
-  function drawCounts(extra) {
+  function drawCounts() {
     const s = current;
     if (!s) return;
     if (s.diagnosed === false) {
@@ -274,7 +304,10 @@
     }
     const spots = s.spots ? s.spots.size : 0;
     const rules = s.findings ? new Set(s.findings.map((f) => f.ruleId)).size : 0;
-    ui.counts.textContent = s.findings ? `${rules} rules, ${s.findings.length} findings at ${s.width}${spots < s.findings.length ? ` on ${spots} elements` : ''}${extra ? `, ${extra}` : ''}` : `measuring at ${s.width}`;
+    const after = s.refreshed ? (s.resolvedCount ? `${s.resolvedCount} resolved after the change` : 'the page changed') : '';
+    ui.counts.textContent = s.findings
+      ? `${plural(rules, 'rule')}, ${plural(s.findings.length, 'finding')} at ${s.width}${s.spots && spots < s.findings.length ? ` on ${plural(spots, 'element')}` : ''}${after ? `, ${after}` : ''}`
+      : `measuring at ${s.width}`;
   }
 
   // One mark per element, with every rule it hit; the most severe rule sets its style.
@@ -296,7 +329,8 @@
     const W = stage.shotSize.width;
     const H = stage.shotSize.height;
     const r = spot.rect;
-    const el = h('span', { class: 'mark', 'data-sev': spot.sev });
+    const el = spot.el || h('span', { class: 'mark' });
+    el.setAttribute('data-sev', spot.sev);
     el.style.left = `${(Math.max(0, r.x) / W) * 100}%`;
     el.style.top = `${(Math.max(0, r.y) / H) * 100}%`;
     el.style.width = `${(Math.min(r.w, W - Math.max(0, r.x)) / W) * 100}%`;
@@ -402,7 +436,7 @@
       case 'call.end':
         endCall(e);
         c.done = true;
-        if (!c.queue.length && !c.busy) c.el.setAttribute('data-idle', '');
+        if (!c.queue.length && !c.busy) rest(c);
         break;
       case 'stage': {
         const stage = { seq: e.seq, call: e.call, agent: agent.id, url: d.url, finalUrl: d.finalUrl, width: d.width, shot: d.shot || null, shotSize: d.shotSize || null, diagnosed: d.diagnosed !== false, reason: d.reason || null, findings: null };
@@ -411,7 +445,7 @@
         const firstOfCall = !current || current.call !== e.call;
         if (firstOfCall) show(stage);
         else drawWidths();
-        step(c, { anchor: { home: 0, ...(current === stage ? { stage: { x: 40, y: 40 } } : {}) }, say: stage.diagnosed ? `opened at ${stage.width}` : `not diagnosed${stage.reason ? `: ${stage.reason}` : ''}` });
+        step(c, { anchor: { home: 0, ...(current === stage ? { stage: { x: 40, y: 40 } } : {}) }, say: stage.diagnosed ? `${firstOfCall ? 'opened' : 'also measured'} at ${stage.width}` : `not diagnosed${stage.reason ? `: ${stage.reason}` : ''}` });
         break;
       }
       case 'findings': {
@@ -451,7 +485,7 @@
       case 'system': {
         const rows = tokenRows(Object.entries(d.steps || {}).map(([name, s]) => ({ name, from: s, to: s })));
         rows.forEach((r) => r.row.setAttribute('data-on', ''));
-        step(c, { anchor: rows[0] ? { el: rows[0].row } : undefined, say: `design system, ${d.tokens || 0} tokens` });
+        step(c, { anchor: rows[0] ? { el: rows[0].row } : undefined, say: `design system, ${plural(d.tokens || 0, 'token')}` });
         break;
       }
       case 'system.tuned': {
@@ -480,7 +514,7 @@
         break;
       }
       case 'consistency':
-        step(c, { anchor: { el: ui.counts, dx: 0 }, say: d.ok ? `consistent across ${d.screens} screens` : `${d.drift} drift, ${d.offSystem} off the system` });
+        step(c, { anchor: { el: ui.counts, dx: 0 }, say: d.ok ? `consistent across ${plural(d.screens || 0, 'screen')}` : `${d.drift} drift, ${d.offSystem} off the system` });
         break;
       case 'plan':
         step(c, { anchor: { el: ui.counts, dx: 0 }, say: `plan: ${d.action || ''} ${d.screen || ''}`.trim() });
@@ -502,46 +536,54 @@
     const before = stage.spots || spotsOf(stage);
     stage.findings = d.findings || [];
     const after = spotsOf(stage);
-    if (stage !== current) return;
-    if (stage.shotSize) ui.inner.style.aspectRatio = `${stage.shotSize.width} / ${stage.shotSize.height}`;
-    showPicture(stage);
     const resolved = [];
     for (const spot of before.values()) {
       const now = after.get(spot.key);
       const gone = [...spot.rules].filter((r) => !now?.rules.has(r));
       if (gone.length === spot.rules.size) resolved.push({ spot, gone });
     }
-    // New spots are drawn now; resolved ones stay until the cursor has been there.
+    stage.refreshed = true;
+    stage.resolvedCount = resolved.length;
+    if (stage !== current) return;
+    if (stage.shotSize) ui.inner.style.aspectRatio = `${stage.shotSize.width} / ${stage.shotSize.height}`;
+    showPicture(stage);
+    // Elements still found keep their mark, moved to where they are on the new picture; new ones get a mark.
     for (const spot of after.values()) {
       const old = before.get(spot.key);
-      if (old && old.el) {
-        spot.el = old.el;
-        continue;
-      }
-      ui.pins.append(placeMark(stage, spot));
+      if (old?.el?.isConnected) spot.el = old.el;
+      if (!spot.el) ui.pins.append(placeMark(stage, spot));
+      else placeMark(stage, spot);
       spot.el.setAttribute('data-on', '');
+      spot.el.removeAttribute('data-gone');
     }
     stage.spots = after;
     stage.visited = new Set(after.keys());
-    // Resolved marks turn at once, so they never read as findings on the new picture; the cursor then clears them.
-    for (const { spot } of resolved) spot.el?.setAttribute('data-gone', '');
-    for (const { spot, gone } of resolved.slice(0, 12)) {
+    // Resolved marks are hidden at once, so they never read as findings on the new picture. Each one then plays its
+    // turn (green, then fading out) and is removed: the first few when the hub cursor gets there, the rest at once.
+    for (const { spot } of resolved) {
       spot.resolved = true;
-      step(c, {
-        anchor: pointOf(spot),
-        say: ['resolved ', ...ruleSay(gone)],
-        arrive: () => {
-          spot.el?.setAttribute('data-resolved', '');
-          setTimeout(() => spot.el?.remove(), 2600);
-        },
-        dwell: 320,
-      });
+      spot.el?.setAttribute('data-gone', '');
     }
-    for (const { spot } of resolved.slice(12)) {
-      spot.el?.setAttribute('data-resolved', '');
-      setTimeout(() => spot.el?.remove(), 2600);
+    const settle = (spot) => {
+      if (!spot.el) return;
+      spot.el.removeAttribute('data-gone');
+      spot.el.setAttribute('data-resolved', '');
+      const el = spot.el;
+      setTimeout(() => el.remove(), reducedMotion.matches ? 0 : RESOLVED_MS);
+    };
+    for (const { spot } of resolved.slice(RESOLVED_VISITS)) settle(spot);
+    for (const { spot, gone } of resolved.slice(0, RESOLVED_VISITS)) {
+      step(c, { anchor: pointOf(spot), say: ['resolved ', ...ruleSay(gone)], arrive: () => settle(spot), dwell: 320 });
     }
-    drawCounts(resolved.length ? `${resolved.length} resolved after the change` : 'the page changed');
+    // The hub has no call to end: once it has shown the change, its label fades like any finished call's.
+    step(c, {
+      anchor: { el: ui.counts, dx: 0 },
+      say: resolved.length ? `${resolved.length} resolved after the change` : 'the page changed',
+      arrive: () => {
+        c.done = true;
+      },
+    });
+    drawCounts();
   }
 
   // ---- the stream ----
