@@ -134,7 +134,8 @@ anything over 4 MB (`apps/web/README.md`).
 (JSON-RPC on stdio, protocol version 1, `@agentclientprotocol/sdk`). There is no model inside, so it answers slash
 commands, which it advertises with `available_commands_update` after `session/new`:
 
-- `/start`: the opening question, read from `skills/taster/references/start.md`.
+- `/start [url or file]` (also `/taster`): with a URL or a file, diagnoses it at once, as the MCP `start` prompt
+  does; with nothing, the opening question, read from `skills/taster/references/start.md`.
 - `/diagnose <url or file>`: one `tool_call` for the browser run (the annotated captures as its locations), then the
   findings as text. A relative path is read from the session's `cwd`. The captures go to a `taster-acp-` folder in the
   system temporary folder, so the editor can open them, and are deleted at the next `/diagnose` in the same session or
@@ -142,8 +143,10 @@ commands, which it advertises with `available_commands_update` after `session/ne
 - `/extract <url>`, `/brand <url>`: content JSON, or the theme CSS and notes.
 - `/explain <rule id>`, `/rules`, `/help`.
 
-Plain text gets a short help reply. `session/cancel` ends the turn with `stopReason: "cancelled"`; a browser run already
-started finishes in the background and its result is dropped.
+Plain text gets a short help reply. `session/cancel` ends the turn with `stopReason: "cancelled"`, after a last
+`tool_call_update` that marks the running tool call `failed` ("Cancelled."; ACP has no cancelled status for a tool call);
+a browser run already started finishes in the background, its result is dropped, and `taster watch` hears nothing more
+from it after its `call.end`.
 
 Zed, in `settings.json`:
 

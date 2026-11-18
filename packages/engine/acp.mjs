@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // ACP agent over stdio (Agent Client Protocol, https://agentclientprotocol.com), so editors such as Zed and
 // JetBrains IDEs can run Taster from their agent panel. No language model inside: every reply is computed.
-// Slash commands: /start, /diagnose, /extract, /brand, /explain, /rules, /help. The same functions as the MCP server.
+// Slash commands: /start (also /taster), /diagnose, /extract, /brand, /explain, /rules, /help. The same functions as the
+// MCP server.
 import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { tmpdir } from 'node:os';
@@ -17,7 +18,7 @@ const VERSION = JSON.parse(readFileSync(new URL('./package.json', import.meta.ur
 const START_GUIDE = fileURLToPath(new URL('../../skills/taster/references/start.md', import.meta.url));
 
 export const COMMANDS = [
-  { name: 'start', description: 'The opening question: does the site already exist, or are we building a new one?' },
+  { name: 'start', description: 'Diagnose the URL or file given; with none, the opening question: does the site already exist, or are we building a new one?', input: { hint: 'optional URL or path to an HTML file' } },
   { name: 'diagnose', description: 'Open a page in a real browser at 1440 and 390 wide and list every slop finding by rule', input: { hint: 'URL or path to an HTML file' } },
   { name: 'extract', description: "Read a page's content in reading order, for a rebuild", input: { hint: 'URL or path to an HTML file' } },
   { name: 'brand', description: "Read a site's brand color, typeface and logo and return a token theme fitted to it", input: { hint: 'URL or path to an HTML file' } },
@@ -205,7 +206,12 @@ export function createAgent() {
         } catch (err) {
           const cancelled = err instanceof Cancelled;
           live.emit('call.end', { ok: false, ms: Date.now() - started, ...(cancelled ? { cancelled: true } : { error: live.stripUrls(String(err.message).split('\n')[0]).slice(0, 200) }) });
-          if (cancelled) throw err;
+          if (cancelled) {
+            // The editor still shows the tool call: end it, or it spins until the session closes. ACP has no
+            // cancelled status for a tool call, so it is failed, and says why.
+            await update({ sessionUpdate: 'tool_call_update', toolCallId, status: 'failed', content: [{ type: 'content', content: { type: 'text', text: 'Cancelled.' } }] }).catch(() => {});
+            throw err;
+          }
           await update({ sessionUpdate: 'tool_call_update', toolCallId, status: 'failed', content: [{ type: 'content', content: { type: 'text', text: err.message } }] });
           await say(`${title} failed: ${err.message}`);
           return;
@@ -223,7 +229,12 @@ export function createAgent() {
       });
 
       try {
-        const { command, arg } = parseCommand(promptText(params.prompt));
+        const parsed = parseCommand(promptText(params.prompt));
+        // /taster is what the skill and the MCP prompt are called in other agents, so it is /start here too. /start with
+        // a URL or a file diagnoses it at once, as the MCP start prompt does; with nothing it asks the opening question.
+        const named = parsed.command === 'taster' ? 'start' : parsed.command;
+        const command = named === 'start' && parsed.arg ? 'diagnose' : named;
+        const { arg } = parsed;
         const target = arg ? resolveTarget(arg, session.cwd) : '';
         const needsTarget = (name) => say(`Usage: /${name} <URL or path to an HTML file>`);
         const fileLocation = target && isAbsolute(target) && existsSync(target) ? [{ path: target }] : undefined;

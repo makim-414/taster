@@ -337,7 +337,7 @@ and an answer over 4 MB comes back as an error instead. For local files and the 
 
 `packages/engine/acp.mjs` speaks the [Agent Client Protocol](https://agentclientprotocol.com), so editors with an agent
 panel can run Taster directly. It has no model inside: it answers slash commands with the engine's results
-(`/start`, `/diagnose <url or file>`, `/extract <url>`, `/brand <url>`, `/explain <rule id>`, `/rules`, `/help`).
+(`/start [url or file]`, also `/taster`, `/diagnose <url or file>`, `/extract <url>`, `/brand <url>`, `/explain <rule id>`, `/rules`, `/help`).
 For swaps and rebuilds, use the skill inside an agent that speaks MCP. Point the editor at
 `packages/engine/start.mjs acp`, which installs the engine's dependencies on first start. In Zed's `settings.json`:
 

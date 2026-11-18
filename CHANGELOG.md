@@ -125,6 +125,16 @@ All notable changes to Taster are recorded here. The format follows
 
 ### Fixed
 
+- The ACP agent ends a cancelled tool call. After `session/cancel` the running `/diagnose` or `/brand` tool call was
+  left `in_progress`, so an editor showed it running for the rest of the session; it now gets a last
+  `tool_call_update` with status `failed` ("Cancelled.") before the turn answers `cancelled`. The run that goes on in
+  the background no longer reaches `taster watch` either: a call sends nothing after its `call.end`
+  (`packages/engine/live.mjs`), where the viewer used to draw the cancelled run's page and findings.
+
+- `/start <url or file>` in the ACP agent diagnoses it at once, as the MCP `start` prompt does, instead of asking the
+  opening question about a site the user just named, and `/taster` is the same command, since that is what the skill
+  is called in other agents. An editor user typing `/taster http://localhost:5173` got "Unknown command".
+
 - `brand_theme` and `--brand` no longer take an accent for the brand. On a landing whose `--color-brand` dark green
   was on the logo, the highlights and the focus ring, the lime accent that filled more buttons came back as the
   brand. The brand color is now read strongest evidence first: a CSS custom property named for the brand or primary

@@ -130,6 +130,34 @@ test('tracked wraps a handler with call.start and call.end and passes its result
   }
 });
 
+test('a call says nothing after its call.end, so a cancelled run still working in the background stays off the viewer', async () => {
+  const hub = await fakeHub();
+  try {
+    let finish;
+    const background = new Promise((r) => (finish = r));
+    let late;
+    await live.withCall({ tool: 'diagnose', agent: { id: 'acp-2', kind: 'acp' } }, async () => {
+      live.emit('call.start', {});
+      // The run goes on after the turn was cancelled, in the same call.
+      late = (async () => {
+        await background;
+        assert.equal(live.sendShot(Buffer.alloc(4, 1)), null, 'no picture for an ended call');
+        live.emit('stage', { width: 1440 });
+        live.emit('findings', { width: 1440 });
+      })();
+      live.emit('call.end', { ok: false, cancelled: true });
+    });
+    finish();
+    await late;
+    // Negative control: a new call after it is heard.
+    await live.withCall({ tool: 'brand', agent: { id: 'acp-2', kind: 'acp' } }, async () => live.emit('call.start', {}));
+    await live.flush();
+    assert.deepEqual(hub.got.map((e) => e.shot ? 'shot' : `${e.tool}:${e.type}`), ['diagnose:call.start', 'diagnose:call.end', 'brand:call.start']);
+  } finally {
+    await hub.close();
+  }
+});
+
 test('a hub that stops answering never throws into a call or slows it down', async () => {
   const hub = await fakeHub();
   await hub.close();
