@@ -35,6 +35,7 @@ In scope:
 
 - The local MCP server and ACP agent (`packages/engine/mcp.mjs`, `packages/engine/acp.mjs`, both started by `packages/engine/start.mjs`).
 - The command line (`packages/engine/cli.mjs`, `packages/engine/taster.mjs`), including `lint`, `add` and `export`.
+- The live viewer hub, `taster watch` (`packages/engine/watch.mjs`, `packages/engine/live.mjs`, `packages/engine/viewer/`).
 - The hosted site at https://taster-six.vercel.app and its routes `/api/diagnose`, `/api/brand` and `/api/mcp`.
 - The bookmarklet (https://taster-six.vercel.app/bookmarklet) and the browser extension (`apps/extension/`).
 - The GitHub Action (`action.yml`).
@@ -69,6 +70,34 @@ them check a dev server, and it is worth knowing before you connect them to an a
   `export --dir` and `lint --write-baseline`. Captures go to the system temporary folder.
 - **Network beyond the page.** There is no telemetry. `add --from <url>` downloads components from that host. The
   gallery and board links in `browse_components` answers are only links; the local server does not fetch them.
+
+## Live viewer (`taster watch`)
+
+`taster watch` is a small HTTP server on your machine that the local tools report to while it runs. What it guards
+against, and how:
+
+- **Other machines.** It listens on 127.0.0.1 only.
+- **Web pages in your browser** (a site that posts to it, or reads it through DNS rebinding). Every request must carry
+  `127.0.0.1:<port>` or `localhost:<port>` in Host, a request with an Origin other than the hub's own, or marked
+  cross-site, is refused, and no response has CORS headers. Reports need the ingest token, and the event stream and the
+  pictures need the viewer key from the printed address, neither of which a page can learn.
+- **Other accounts on the same machine.** The ingest token is only in the discovery file
+  (`os.tmpdir()/taster-live-<uid>.json`), written with mode 0600 and never through an existing file. The engine
+  ignores a discovery file that another user owns or that others can read, and checks with `/api/hello` that the hub
+  answering is the process the file names, so another account cannot point your tools at its own hub. On Windows the
+  file is in your own temporary folder.
+- **What leaves the tools.** Tool arguments with URLs cut to scheme, host and path and secret looking keys hidden,
+  finding labels (selector up to 200 characters, page text up to 60), rects, rule ids, token names and values, file
+  names that `add` wrote, and pictures of the page each diagnose opened. No file contents, no page text beyond those
+  labels, nothing sent anywhere but the hub. With no hub running nothing is sent and no connection is opened.
+- **The viewer.** It sets page text with `textContent` only, and runs under `default-src 'self'` (pictures from the
+  hub or `data:`), with `frame-ancestors 'none'`. The key stays in the address after `#`, which browsers do not send.
+- **Pages opened again.** After a change, the hub opens the last diagnosed page again to refresh its picture, only when
+  it is a local file or a server on localhost, with the same checks a target gets in the engine (`TASTER_ROOT`
+  included), and closes its browser after a minute without work.
+
+Anyone who can run code as your user can already read the discovery file and the viewer key; the hub does not protect
+against that.
 
 ## Hosted site
 

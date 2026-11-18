@@ -2,6 +2,7 @@
 // Launcher for plugin and editor installs: neither runs npm install, so do it once on first start.
 //   node packages/engine/start.mjs        MCP server (agents: Claude Code, Codex, Cursor)
 //   node packages/engine/start.mjs acp    ACP agent (editors: Zed, JetBrains IDEs)
+//   node packages/engine/start.mjs watch  live viewer for the two above (taster watch), in a terminal of its own
 // stdout carries the protocol, so all install output goes to stderr.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -9,7 +10,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const mode = process.argv[2] === 'acp' ? 'acp' : 'mcp';
+const mode = ['acp', 'watch'].includes(process.argv[2]) ? process.argv[2] : 'mcp';
 // Both SDKs are checked, so an install made before the ACP agent existed gets topped up.
 const needed = [['@modelcontextprotocol', 'sdk'], ['@agentclientprotocol', 'sdk'], ['playwright']];
 if (needed.some((parts) => !fs.existsSync(path.join(here, 'node_modules', ...parts)))) {
@@ -25,4 +26,5 @@ if (needed.some((parts) => !fs.existsSync(path.join(here, 'node_modules', ...par
   }
 }
 if (mode === 'acp') (await import(pathToFileURL(path.join(here, 'acp.mjs')).href)).serve();
+else if (mode === 'watch') process.exit(await (await import(pathToFileURL(path.join(here, 'watch.mjs')).href)).watchCommand(process.argv.slice(3)));
 else await import(pathToFileURL(path.join(here, 'mcp.mjs')).href);

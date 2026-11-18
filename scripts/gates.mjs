@@ -34,6 +34,7 @@ export const JOBS = {
     { name: 'Engine CLI and MCP', cmd: 'npm --prefix packages/engine test' },
     { name: 'Rebuild example stays clean and keeps its content', cmd: 'node packages/engine/scripts/check-rebuild-example.mjs' },
     { name: 'Icon slot variations match the taxonomy and stay clean', cmd: 'node packages/engine/scripts/check-icon-slots-example.mjs' },
+    { name: 'The live viewer draws real agent events with no page error or CSP violation', cmd: 'node packages/engine/scripts/check-live-viewer.mjs' },
     { name: 'Every component renders at 1440 and 390 with no page or console error', cmd: 'npm --prefix packages/registry run test-render' },
     { name: 'Component keyboard, names and reduced motion', cmd: 'node packages/registry/test-a11y.mjs' },
     { name: 'No component runs what its props hold', cmd: 'node packages/registry/test-injection.mjs' },

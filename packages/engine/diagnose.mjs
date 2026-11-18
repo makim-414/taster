@@ -5,6 +5,7 @@ import { isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 import { NotDiagnosedError, classifyLoad } from './blocked.mjs';
+import * as live from './live.mjs';
 
 export { NotDiagnosedError } from './blocked.mjs';
 
@@ -105,18 +106,35 @@ async function capture(page, file, width, height) {
   return files;
 }
 
+// The page as it is, before the detector or its outlines touch it, for the live viewer to draw findings over: the
+// same width rule and height cap as the annotated capture, one JPEG, quality stepped down until it fits MAX_SHOT_BYTES.
+async function stagePicture(page, viewport) {
+  const size = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight }));
+  const width = Math.min(Math.max(size.width, viewport.width), Math.round(viewport.width * 1.5));
+  const height = Math.max(1, Math.min(size.height, MAX_SHOT_HEIGHT));
+  let image = null;
+  for (const quality of [70, 45, 25]) {
+    image = await page.screenshot({ type: 'jpeg', quality, fullPage: true, clip: { x: 0, y: 0, width, height } });
+    if (image.length <= MAX_SHOT_BYTES) break;
+  }
+  return { image, type: 'image/jpeg', width, height };
+}
+
 // One page load at one viewport. Returns the raw detect.js report with `load` (classifyLoad's verdict) added.
 // A page that is not the site (a bot check, an error or sign-in page) is not measured: no findings, no capture.
 // bypassCSP: many large sites forbid inline scripts, which would block the injected detector.
 // colorScheme ('light' or 'dark') sets prefers-color-scheme for the load; left out, the browser's own default (light).
-export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50, colorScheme } = {}) {
+// stageShot: also take the page as it is, from the same load, before the detector runs (report.stage, see stagePicture).
+export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50, colorScheme, stageShot = false } = {}) {
   const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true, ...(colorScheme ? { colorScheme } : {}) });
   try {
     const load = await open(page, url, timeout);
     if (!load.diagnosed) return { url: load.finalUrl, viewport, page: { width: viewport.width, height: 0 }, counts: {}, findings: [], load };
+    const stage = stageShot ? await stagePicture(page, viewport).catch(() => null) : null;
     await page.addScriptTag({ content: DETECT_SOURCE });
     const report = await page.evaluate((o) => window.tasterDetect(o), { highlight: highlight || !!screenshot, maxPerRule });
     report.load = load;
+    if (stage) report.stage = stage;
     if (screenshot) {
       // Wide overflow is shown up to half a screen past the viewport, the way the web capture does.
       const width = Math.min(Math.max(report.page.width, viewport.width), Math.round(viewport.width * 1.5));
@@ -131,20 +149,77 @@ export async function detectOnce(browser, url, viewport, { highlight = false, sc
 
 export async function diagnose(target, { viewports = VIEWPORTS, outDir = null, timeout = 30000, maxPerRule = 50, colorScheme } = {}) {
   const url = toUrl(target);
+  // Only with `taster watch` running: the viewer is told about each width as it is measured (packages/engine/live.mjs).
+  const watched = await live.active();
   const browser = await launch();
   try {
     const runs = [];
     for (const viewport of viewports) {
       const screenshot = outDir ? join(outDir, `annotated-${viewport.width}.jpg`) : null;
-      runs.push(await detectOnce(browser, url, viewport, { screenshot, timeout, maxPerRule, colorScheme }));
+      runs.push(await detectOnce(browser, url, viewport, { screenshot, timeout, maxPerRule, colorScheme, stageShot: watched }));
+      if (watched) emitRun(url, runs.at(-1), viewport, colorScheme);
       // A block or error page is not loaded again at the next width.
       if (!runs.at(-1).load.diagnosed) break;
     }
-    return summarize(url, runs);
+    const report = summarize(url, runs);
+    if (watched) live.emit('rules', liveRules(report));
+    return report;
   } finally {
     await browser.close();
   }
 }
+
+// ---- what the live viewer gets (packages/engine/live.mjs): rects, rule ids and short labels, never page contents ----
+
+const MAX_LIVE_FINDINGS = 600;
+/** One width's findings as the viewer draws them: selector up to 200 characters, text up to 60, the page rect. */
+export function liveFindings(run) {
+  return (run.findings || []).slice(0, MAX_LIVE_FINDINGS).map((f, i) => ({
+    id: i,
+    ruleId: f.ruleId,
+    severity: RULE_BY_ID.get(f.ruleId)?.severity || 'low',
+    selector: String(f.selector || '').slice(0, 200),
+    text: Array.from(String(f.text || '')).slice(0, 60).join(''),
+    rect: f.rect ? { x: f.rect.x, y: f.rect.y, w: f.rect.w, h: f.rect.h } : null,
+  }));
+}
+
+/** The stage event for one width: where the page is, how big it is, and the picture's id once the hub has it. */
+export function liveStage(url, run, viewport, { shot = null, colorScheme } = {}) {
+  const load = run.load || {};
+  return {
+    url: live.stripUrl(url),
+    finalUrl: live.stripUrl(load.finalUrl || run.url || url),
+    width: viewport.width,
+    height: viewport.height,
+    page: run.page ? { width: run.page.width, height: run.page.height } : null,
+    colorScheme: colorScheme || null,
+    diagnosed: load.diagnosed !== false,
+    ...(load.diagnosed === false && { reason: load.reason || null }),
+    shot,
+  };
+}
+
+function emitRun(url, run, viewport, colorScheme) {
+  // The picture goes first, so the hub has it when the stage event names it; the report itself never carries it.
+  const shot = run.stage ? live.sendShot(run.stage.image, run.stage.type) : null;
+  const size = run.stage ? { width: run.stage.width, height: run.stage.height } : null;
+  delete run.stage;
+  live.emit('stage', { ...liveStage(url, run, viewport, { shot, colorScheme }), shotSize: size });
+  if (run.load?.diagnosed === false) return;
+  const names = Object.fromEntries(Object.keys(run.counts || {}).map((id) => [id, RULE_BY_ID.get(id)?.name || id]));
+  live.emit('findings', { width: viewport.width, findings: liveFindings(run), counts: run.counts || {}, names });
+}
+
+const liveRules = (report) => ({
+  url: live.stripUrl(report.url),
+  diagnosed: report.diagnosed !== false,
+  widths: report.widths,
+  rulesHit: report.rulesHit,
+  measured: report.measured,
+  findings: report.findings,
+  rules: report.rules.map((r) => ({ ruleId: r.ruleId, name: r.name, severity: r.severity, counts: r.counts, fix_patterns: r.fix_patterns })),
+});
 
 const sameUrl = (a, b) => {
   try {

@@ -74,6 +74,14 @@ The npm package is not published, and the npm name `taster` belongs to someone e
 command or `npx taster`. When none of the three is there, say so, offer them, and meanwhile run `data/detect.js` in
 the page with your own browser tool ([references/diagnose.md](references/diagnose.md)).
 
+## Let the user watch
+
+When the user wants to see the work as it happens, tell them to run `node <clone>/packages/engine/taster.mjs watch`
+in another terminal (with the plugin, `node <clone>/packages/engine/start.mjs watch`) and open the address it prints.
+Every tool you call through the local MCP server then shows on that page as it happens: the page on a stage, a cursor
+for you on each finding, swap, component and token change. Nothing changes in how you call the tools, and nothing is
+sent while it is not running.
+
 ## If the taster MCP server is connected
 
 Prefer its tools; they run the same detector in a real browser for you.

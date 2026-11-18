@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, isAbsolute, join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { RESPONSIVE_WIDTHS, RULES, VIEWPORTS, diagnose, explainRule, extract, formatText, viewportFor } from './diagnose.mjs';
 import { brandTheme } from './brand.mjs';
+import * as live from './live.mjs';
 import { checkConsistency, formatConsistencyText } from './consistency.mjs';
 import { PLAN_FILE, nextStep, planFromExtract, planRelative, writePlan } from './plan.mjs';
 
@@ -24,9 +25,11 @@ const HELP = `Usage
   taster mcp                 MCP server on stdio
   taster acp [--setup]       ACP agent on stdio; --setup prepares the browser in a terminal
   taster setup               check for a browser, download Chromium if none works
+  taster watch [--port <n>]  live viewer on http://127.0.0.1:47474/: open the address it prints, then each Taster
+                             call an agent or this CLI makes is drawn on the page as it happens
   taster --version
 
-In a clone of the repository, run node packages/engine/taster.mjs (or node packages/engine/cli.mjs for all but mcp, acp and setup)
+In a clone of the repository, run node packages/engine/taster.mjs (or node packages/engine/cli.mjs for all but mcp, acp, setup and watch)
 in place of taster.
 
 A target is an http(s) URL, localhost:<port> (opened as http), a bare domain (opened as https), or a local .html,
@@ -96,7 +99,12 @@ async function add(argv) {
   if (!positionals.length) throw new Error('add needs at least one component id, for example: add blocks/button');
   const bundle = values.from ? await fetchBundle(positionals, values.from) : resolveComponents(positionals);
   const dir = values.dir || join('src', 'components', 'taster');
-  const { written, skipped } = writeBundle(bundle, dir, { overwrite: values.overwrite });
+  const { written, skipped } = await live.tracked('add', async () => {
+    const result = writeBundle(bundle, dir, { overwrite: values.overwrite });
+    // File names only, relative to the folder; never what is in them.
+    live.emit('component.add', { ids: positionals, dir: isAbsolute(dir) ? basename(dir) : dir, written: result.written.slice(0, 60), skipped: result.skipped.length });
+    return result;
+  })({ ids: positionals, dir }, null);
   if (values.json) {
     console.log(JSON.stringify({ dir, written, skipped, npm: bundle.npm, credits: bundle.credits }, null, 2));
     return 0;
@@ -219,7 +227,7 @@ async function main() {
   // --out is refused above for several targets, so with it there is exactly one.
   const reports = [];
   for (const target of positionals) {
-    const report = await diagnose(target, { viewports, outDir: values.out || null });
+    const report = await live.tracked('diagnose', () => diagnose(target, { viewports, outDir: values.out || null }))({ target, widths: viewports.map((v) => v.width) }, null);
     if (values.out) writeFileSync(join(values.out, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
     reports.push(report);
     console.log(values.json ? JSON.stringify(report, null, 2) : formatText(report));
@@ -236,10 +244,16 @@ async function main() {
   return worst >= ranks[failOn] ? 1 : 0;
 }
 
+// Live events still queued for `taster watch` go out before the process ends (a no-op when no hub runs).
+live.setAgent({ kind: 'cli' });
 main().then(
-  (code) => process.exit(code),
-  (err) => {
+  async (code) => {
+    await live.flush();
+    process.exit(code);
+  },
+  async (err) => {
     console.error(`taster: ${err.message}`);
+    await live.flush();
     process.exit(2);
   },
 );

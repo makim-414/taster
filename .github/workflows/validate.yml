@@ -106,6 +106,8 @@ jobs:
         run: node packages/engine/scripts/check-rebuild-example.mjs
       - name: Icon slot variations match the taxonomy and stay clean
         run: node packages/engine/scripts/check-icon-slots-example.mjs
+      - name: The live viewer draws real agent events with no page error or CSP violation
+        run: node packages/engine/scripts/check-live-viewer.mjs
       - name: Every component renders at 1440 and 390 with no page or console error
         run: npm --prefix packages/registry run test-render
       - name: Component keyboard focus, accessible names and reduced motion

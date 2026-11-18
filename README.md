@@ -350,6 +350,28 @@ JetBrains IDEs read the same `agent_servers` shape (without `type`) from `~/.jet
 full path of the executable, so put the output of `which node` in `command`. Other ACP clients (Neovim, Emacs,
 and more) take the same command and arguments.
 
+### Watch agents work (live viewer)
+
+`taster watch` starts a local page that draws what agents do with Taster while they do it. In a second terminal, from
+the clone:
+
+```bash
+node packages/engine/taster.mjs watch     # prints http://127.0.0.1:47474/#k=<key>; --port 0 picks a free port
+```
+
+Open the address it prints. From then on every Taster call made as your user (the local MCP server in Claude Code,
+Codex or Cursor, an ACP editor, or the CLI) shows up as it happens: each diagnose puts a clean picture of the page on
+the stage with a mark on every finding at its real position, and each agent gets a cursor in its own color that flies
+to the findings, the components it swaps in, the tokens it tunes and the plan steps it records. After a component add,
+a token tune or a plan check, the hub opens a local page (a file or a localhost server) again until it changes, and
+the marks whose rules are gone turn resolved. With the plugin, `node packages/engine/start.mjs watch` in the installed
+copy does the same.
+
+The detector measures a page in one pass, so the findings arrive together. The order the cursors visit them is chosen
+by the viewer from their real positions: the 30 most severe first, top to bottom; the rest get a mark only. The viewer
+says so on the page. Nothing is sent while `taster watch` is not running, and the hub listens on 127.0.0.1 only
+([SECURITY.md](SECURITY.md#live-viewer-taster-watch)).
+
 ## Privacy
 
 The hosted site (https://taster-six.vercel.app, its hosted MCP server included) has no analytics scripts and sets no
@@ -361,7 +383,8 @@ opened on request) stay in server memory for up to 30 minutes and are never writ
 gallery stays in your browser (`localStorage`). Vercel, which hosts the site, keeps its own request logs under
 [its privacy policy](https://vercel.com/legal/privacy-policy).
 
-The local tools, the bookmarklet and the extension send the findings nowhere and have no telemetry.
+The local tools, the bookmarklet and the extension send the findings nowhere and have no telemetry. While
+`taster watch` runs, the local tools also report each call to it, on 127.0.0.1 and to nothing else.
 
 ## Taxonomy at a glance
 

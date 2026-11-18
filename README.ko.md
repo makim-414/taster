@@ -341,6 +341,26 @@ JetBrains IDE 는 같은 `agent_servers` 모양(`type` 없이)을 `~/.jetbrains/
 경로를 원하므로 `command` 에는 `which node` 결과를 넣으세요. 다른 ACP 클라이언트(Neovim, Emacs 등)도 같은 명령과
 인자를 넣으면 됩니다.
 
+### 에이전트가 일하는 모습 보기 (라이브 뷰어)
+
+`taster watch` 는 에이전트가 Taster 로 하는 일을 하는 동안 그려 주는 로컬 페이지를 띄웁니다. 터미널을 하나 더 열고
+클론에서:
+
+```bash
+node packages/engine/taster.mjs watch     # http://127.0.0.1:47474/#k=<키> 를 찍어 줍니다. --port 0 은 빈 포트
+```
+
+찍힌 주소를 브라우저에서 엽니다. 그다음부터 같은 사용자로 돌린 Taster 호출(Claude Code, Codex, Cursor 의 로컬 MCP
+서버, ACP 에디터, 명령줄)이 일어나는 대로 보입니다. 진단 하나마다 페이지의 깨끗한 사진이 무대에 올라가고 발견 하나하나가
+실제 위치에 표시됩니다. 에이전트마다 제 색의 커서가 발견, 바꿔 넣는 부품, 조정하는 토큰, 기록하는 계획 단계로 날아갑니다.
+부품을 넣거나 토큰을 조정하거나 계획 검사를 기록하면 허브가 로컬 페이지(파일이나 localhost 서버)를 바뀔 때까지 다시
+열고, 규칙이 사라진 표시는 해결로 바뀝니다. 플러그인으로 설치했다면 설치된 사본의 `node packages/engine/start.mjs watch`
+가 같은 일을 합니다.
+
+검사기는 페이지를 한 번에 재므로 발견은 한꺼번에 도착합니다. 커서가 들르는 순서는 뷰어가 실제 위치를 보고 정한 것입니다.
+심각한 것부터 30개를 위에서 아래로 들르고, 나머지는 표시만 합니다. 뷰어 화면에도 그렇게 적혀 있습니다. `taster watch` 가
+돌지 않을 때는 아무것도 보내지 않고, 허브는 127.0.0.1 에서만 듣습니다([SECURITY.md](SECURITY.md#live-viewer-taster-watch)).
+
 ## 개인정보
 
 호스팅 사이트(https://taster-six.vercel.app, 원격 MCP 서버 포함)에는 분석 스크립트와 쿠키가 없습니다. 넣은 주소와
@@ -351,7 +371,8 @@ JetBrains IDE 는 같은 `agent_servers` 모양(`type` 없이)을 `~/.jetbrains/
 안(`localStorage`)에만 남습니다. 호스팅을 맡은 Vercel 이 남기는 요청 기록은
 [Vercel 의 개인정보 정책](https://vercel.com/legal/privacy-policy)을 따릅니다.
 
-로컬 도구, 북마클릿, 확장은 측정 결과를 어디로도 보내지 않고 원격 측정도 없습니다.
+로컬 도구, 북마클릿, 확장은 측정 결과를 어디로도 보내지 않고 원격 측정도 없습니다. `taster watch` 가 돌고 있을
+때만 로컬 도구가 호출 하나하나를 127.0.0.1 의 그 허브에 알리고, 다른 곳으로는 보내지 않습니다.
 
 ## 분류 체계 한눈에
 
