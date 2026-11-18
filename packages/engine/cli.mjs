@@ -25,9 +25,11 @@ const HELP = `Usage
   taster mcp                 MCP server on stdio
   taster acp [--setup]       ACP agent on stdio; --setup prepares the browser in a terminal
   taster setup               check for a browser, download Chromium if none works
+  taster watch [--port <n>]  live viewer on http://127.0.0.1:47474/: open the address it prints, then each Taster
+                             call an agent or this CLI makes is drawn on the page as it happens
   taster --version
 
-In a clone of the repository, run node packages/engine/taster.mjs (or node packages/engine/cli.mjs for all but mcp, acp and setup)
+In a clone of the repository, run node packages/engine/taster.mjs (or node packages/engine/cli.mjs for all but mcp, acp, setup and watch)
 in place of taster.
 
 A target is an http(s) URL, localhost:<port> (opened as http), a bare domain (opened as https), or a local .html,
