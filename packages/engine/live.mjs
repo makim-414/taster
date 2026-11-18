@@ -20,7 +20,8 @@ import { basename, join } from 'node:path';
 export const VERSION = 1;
 export const TOKEN_HEADER = 'x-taster-token';
 const CACHE_MS = 5000;
-const HELLO_MS = 400;
+// A tool call asks quickly; a short lived process (`taster live edit`) waits longer, since its first fetch is cold.
+let HELLO_MS = 400;
 const POST_MS = 1500;
 const MAX_QUEUE = 1000;
 const BATCH = 50;
@@ -92,6 +93,11 @@ export function probe() {
 /** True when a hub is listening, so a caller can skip work only the viewer needs (the stage shot). */
 export async function active() {
   return Boolean(await probe());
+}
+
+/** For a short lived process: how long the first /api/hello may take ({ helloMs }). */
+export function configure({ helloMs } = {}) {
+  if (Number.isFinite(helloMs) && helloMs > 0) HELLO_MS = helloMs;
 }
 
 /** Forget the cached hub, so the next event looks again (tests, and a hub that just started). */

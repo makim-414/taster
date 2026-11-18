@@ -252,6 +252,8 @@ async function main() {
 
 // Live events still queued for `taster watch` go out before the process ends (a no-op when no hub runs).
 live.setAgent({ kind: 'cli' });
+// A one-shot process: its first request to the hub is cold, so it is given longer than a tool call in a server.
+live.configure({ helloMs: 1500 });
 main().then(
   async (code) => {
     await live.flush();

@@ -92,13 +92,15 @@ function flags(argv) {
   return out;
 }
 
-/** Send one edit event and wait for it to go out (up to 1.5 seconds). Never throws. */
+/** Send one edit event and wait for it to go out (up to 3 seconds, inside the hook's own 5). Never throws. */
 export async function reportEdit({ file, tool, agent, files }) {
   try {
     if (!file) return false;
+    // A new process's first request is cold (well over the 400ms a tool call allows on a busy machine).
+    live.configure({ helloMs: 1500 });
     live.setAgent(agent);
     live.emit('edit', { file, tool, ...(files?.length > 1 && { files: files.slice(0, 20) }) });
-    await live.flush(1500);
+    await live.flush(3000);
     return true;
   } catch {
     return false;
