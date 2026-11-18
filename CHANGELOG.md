@@ -28,6 +28,11 @@ All notable changes to Taster are recorded here. The format follows
   region crossfades to the new picture; findings that are gone resolve there and the count goes down edit by edit.
   The regions come from that comparison after the reload, not from tracing the edit to elements; edits that land
   between two loads are matched to regions by file name and marked as a guess. `detectOnce` takes a `domShot` option.
+- The per-edit view ignores what changes by itself. Right after a diagnose the hub loads the page 3 times with no
+  edit, and elements that differ between those loads (a rotating word, a clock, a ticker, a random chart) are left out
+  of every edit's regions (`changedKeys`, and `diffSnapshots` takes `ignore`). On a page whose picture never repeats
+  (WebGL, video) the hub keeps loading until the elements change, instead of taking the moving picture as the reload:
+  before, such a page sent its patch before the dev server had rebuilt, and the change landed on the next edit.
 - 8 components, for 152 in the registry, written new after picks on 21st.dev with no code taken: `scene/noise-orb`
   and `scene/ridge-terrain` (a wire sphere and a low-poly terrain), `motion/lamp-glow` and `motion/band-shader` (a
   section lamp in CSS and light slats in one WebGL1 shader), `blocks/password-field` (strength bar and checklist on

@@ -15,7 +15,9 @@
 // opened again: that is where the edits land, and a public site is not loaded over and over.
 // After an `edit` (an agent's PostToolUse hook, `taster live edit`, `taster add`), the hub waits for edits to stop for
 // 400ms, opens the same local stage again, lists its elements (packages/engine/domdiff.mjs) and compares them with the
-// capture before, retrying for a moment while the dev server has not reloaded yet. It sends stage.patch: the new
+// capture before, retrying for a moment while the dev server has not reloaded yet. Right after a diagnose it loads the
+// stage a few times with no edit, and the elements that differ between those loads (a rotating word, a clock, a ticker)
+// are left out of every comparison on that stage. It sends stage.patch: the new
 // picture, the regions that changed, the findings measured on the new load, and the edit (file and agent) each region
 // goes with. The regions come from that comparison, not from tracing the edit to elements.
 // The ingest token is in the discovery file only (os.tmpdir()/taster-live-<uid>.json, mode 0600, removed on exit);
@@ -25,7 +27,7 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import http from 'node:http';
 import { fileURLToPath } from 'node:url';
-import { assignRegions, diffSnapshots } from './domdiff.mjs';
+import { assignRegions, changedKeys, diffSnapshots } from './domdiff.mjs';
 import { TOKEN_HEADER, VERSION, discoveryFile, readDiscovery } from './live.mjs';
 
 export const DEFAULT_PORT = 47474;
@@ -47,6 +49,8 @@ const EDIT_DEBOUNCE = 400;
 const EDIT_RETRY = 700;
 const EDIT_TRIES = 4;
 const BASELINE_DELAY = 300;
+// Loads of the stage right after a diagnose, with no edit between them: what differs between them changes by itself.
+const BASELINE_LOADS = 3;
 const MAX_EDITS = 20;
 // The events after which the page on the stage has probably changed.
 const CHANGES = (e) => e.type === 'component.add' || e.type === 'system.tuned' || (e.type === 'plan' && (e.data?.event === 'check' || e.data?.recorded?.type === 'check'));
@@ -183,7 +187,7 @@ export function cleanEvent(e) {
  *   snapshot() method after each edit too.
  * @returns {Promise<{ port: number, url: string, viewUrl: string, key: string, token: string, publish: (type: string, data: object) => object, shot: (image: Buffer, type?: string) => string, close: () => Promise<void>, events: object[], idle: () => Promise<void> }>}
  */
-export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(), viewerDir = VIEWER_DIR, onEvent, refresher = engineRefresher(), refreshEvery = REFRESH_EVERY, refreshTries = REFRESH_TRIES, editDebounce = EDIT_DEBOUNCE, editRetry = EDIT_RETRY, editTries = EDIT_TRIES, baselineDelay = BASELINE_DELAY } = {}) {
+export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(), viewerDir = VIEWER_DIR, onEvent, refresher = engineRefresher(), refreshEvery = REFRESH_EVERY, refreshTries = REFRESH_TRIES, editDebounce = EDIT_DEBOUNCE, editRetry = EDIT_RETRY, editTries = EDIT_TRIES, baselineDelay = BASELINE_DELAY, baselineLoads = BASELINE_LOADS } = {}) {
   const other = await running(discovery);
   if (other) throw Object.assign(new Error(`taster watch is already running at http://127.0.0.1:${other.port}/ (pid ${other.pid})`), { code: 'RUNNING' });
 
@@ -237,7 +241,9 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
     });
   };
   // ---- per edit: the stage captured again after each edit, compared with the capture before it ----
-  const editing = { pending: [], timer: null, chain: Promise.resolve(), base: null, gen: 0, lastPatch: 0, busy: false };
+  // volatile: the paths that changed between loads with no edit; noisyImage: the picture differs between such loads
+  // (WebGL, video, a clock), so an unchanged picture cannot tell that the dev server has not reloaded yet.
+  const editing = { pending: [], timer: null, chain: Promise.resolve(), base: null, gen: 0, lastPatch: 0, busy: false, seen: 0, volatile: new Set(), noisyImage: false };
   const canSnap = () => Boolean(refresher && typeof refresher.snapshot === 'function');
   const later = (fn, ms) => setTimeout(fn, ms).unref?.();
   const wait = (ms) => new Promise((r) => later(r, ms));
@@ -253,16 +259,33 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
       return null;
     }
   };
-  // The page as the diagnose left it, to compare the first edit with (the diagnose's own load is not kept).
+  // The page as the diagnose left it, to compare the first edit with (the diagnose's own load is not kept), loaded
+  // baselineLoads times: what differs between those loads changed by itself and is left out of the comparisons. A load
+  // that an edit may have reached (one arrived while it ran) is not used, and stops the learning.
   const takeBaseline = () => {
     const gen = ++editing.gen;
     editing.base = null;
+    editing.volatile = new Set();
+    editing.noisyImage = false;
     if (!canSnap() || !stage) return;
     later(
       () =>
         inChain(async () => {
-          if (gen !== editing.gen || refresh.closed || !stage || editing.base) return;
-          const got = await snap(stage);
+          let got = null;
+          for (let i = 0; i < Math.max(1, baselineLoads); i++) {
+            if (gen !== editing.gen || refresh.closed || !stage || editing.base) return;
+            if (got && editing.pending.length) break;
+            const seen = editing.seen;
+            const next = await snap(stage);
+            if (gen !== editing.gen) return;
+            if (!next) continue;
+            if (got && editing.seen !== seen) break;
+            if (got) {
+              for (const k of changedKeys(got.dom, next.dom)) editing.volatile.add(k);
+              if (hashOf(got.image) !== hashOf(next.image)) editing.noisyImage = true;
+            }
+            got = next;
+          }
           if (got && gen === editing.gen && !editing.base) editing.base = got;
         }),
       baselineDelay,
@@ -278,9 +301,10 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
       got = next;
       // With nothing to compare with, the whole new picture is the change.
       if (!base) break;
-      const regions = diffSnapshots(base.dom, got.dom, { height: got.shotSize?.height || Infinity });
+      const regions = diffSnapshots(base.dom, got.dom, { height: got.shotSize?.height || Infinity, ignore: editing.volatile });
       setRegions(regions);
-      if (regions.length || hashOf(got.image) !== target.hash) break;
+      // On a page whose picture moves by itself, only the elements can say the reload has landed.
+      if (regions.length || (!editing.noisyImage && hashOf(got.image) !== target.hash)) break;
     }
     return got;
   };
@@ -303,7 +327,7 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
     editing.base = got;
     editing.lastPatch = Date.now();
     const hash = hashOf(got.image);
-    const changed = hash !== target.hash || regions.length > 0;
+    const changed = regions.length > 0 || ((!base || !editing.noisyImage) && hash !== target.hash);
     target.hash = hash;
     const shot = changed ? storeShot(`h${Date.now().toString(36)}${randomBytes(6).toString('hex')}`, got.image, got.type || 'image/jpeg') : null;
     const list = edits.map((e) => ({ file: e.file, tool: e.tool, agent: e.agent }));
@@ -332,6 +356,7 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
     const file = str(d.file, 200);
     if (!file) return;
     const now = Date.now();
+    editing.seen++;
     editing.pending.push({ file, tool: str(d.tool, 40), agent: event.agent, at: now });
     if (editing.pending.length > MAX_EDITS) editing.pending.splice(0, editing.pending.length - MAX_EDITS);
     clearTimeout(editing.timer);

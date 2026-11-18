@@ -276,7 +276,7 @@ test('after an edit the hub captures the stage again and sends the regions that 
       return { image: Buffer.from(`${d.nodes[1].s}${d.nodes[2].s}`), type: 'image/jpeg', shotSize: { width: 1440, height: 1600 }, dom: d, findings: [{ id: 0, ruleId: 'AC-01', rect: { x: 0, y: 0, w: 10, h: 10 } }], counts: { 'AC-01': 1 } };
     },
   };
-  const hub = await startHub({ port: 0, discovery: discovery(), viewerDir, refresher, editDebounce: 30, editRetry: 20, editTries: 4, baselineDelay: 10 });
+  const hub = await startHub({ port: 0, discovery: discovery(), viewerDir, refresher, editDebounce: 30, editRetry: 20, editTries: 4, baselineDelay: 10, baselineLoads: 1 });
   try {
     const hook = (id, file) => event('edit', { file, tool: 'Edit' }, { agent: { id, kind: 'hook', client: 'claude-code', label: 'site', lane: 0 }, call: null, tool: null });
     // Before any stage, an edit has nothing to capture.
@@ -318,6 +318,62 @@ test('after an edit the hub captures the stage again and sends the regions that 
     assert.equal(quiet.data.shot, null);
     assert.deepEqual(quiet.data.changed, []);
     assert.equal(asked.length - before, 4, 'tried editTries times');
+  } finally {
+    await hub.close();
+  }
+});
+
+// A page with parts that change on every load (a rotating word, a clock) and a picture that never repeats (WebGL): the
+// hub learns those parts from the loads right after the diagnose, leaves them out, and keeps retrying while only they
+// changed, so the region it sends is the edit's.
+test('elements that change by themselves are learned after the diagnose and left out of the edit regions', async () => {
+  const el = (k, p, r, s, extra = {}) => ({ k, p, t: 'div', id: '', c: [], r, s, x: '', ...extra });
+  let tick = 0;
+  let edited = false;
+  const dom = () => {
+    tick++;
+    return {
+      width: 1440,
+      height: 1600,
+      truncated: false,
+      nodes: [
+        el('html>body:0', -1, [0, 0, 1440, 1600], 'b'),
+        el('html>body:0>header#hero', 0, [0, 0, 1440, 500], 'h', { id: 'hero' }),
+        el('html>body:0>header#hero>span:0', 1, [100, 100, 200, 40], `word${tick % 3}`, { x: ['ChatGPT', 'Gemini', 'Claude'][tick % 3] }),
+        el('html>body:0>section#pricing', 0, [0, 900, 1440, 500], edited ? 'p2' : 'p1', { id: 'pricing' }),
+        el('html>body:0>footer:0>span:0', 0, [0, 1500, 120, 20], `clock${tick}`),
+      ],
+    };
+  };
+  // The dev server picks the edit up on the third load after it.
+  let afterEdit = 0;
+  const asked = [];
+  const refresher = {
+    run: async () => null,
+    snapshot: async (stage) => {
+      asked.push(stage.url);
+      if (afterEdit && ++afterEdit > 3) edited = true;
+      const d = dom();
+      return { image: Buffer.from(`frame${tick}`), type: 'image/jpeg', shotSize: { width: 1440, height: 1600 }, dom: d, findings: [], counts: {} };
+    },
+  };
+  const hub = await startHub({ port: 0, discovery: discovery(), viewerDir, refresher, editDebounce: 30, editRetry: 20, editTries: 5, baselineDelay: 10, baselineLoads: 3 });
+  try {
+    await fetch(`${hub.url}ingest/shot?id=stage0002`, { method: 'POST', headers: { 'content-type': 'image/jpeg', [live.TOKEN_HEADER]: hub.token }, body: Buffer.from('frame0') });
+    await ingest(hub, event('stage', { url: 'http://localhost:5190/', width: 1440, height: 900, shot: 'stage0002', diagnosed: true }));
+    await new Promise((r) => setTimeout(r, 40));
+    await hub.idle();
+    assert.equal(asked.length, 3, 'three loads right after the stage');
+
+    afterEdit = 1;
+    await ingest(hub, event('edit', { file: 'components/pricing.tsx', tool: 'Edit' }, { agent: { id: 'cc-a', kind: 'hook', client: 'claude-code', label: 'site', lane: 0 }, call: null, tool: null }));
+    for (let i = 0; i < 100 && !hub.events.some((e) => e.type === 'stage.patch'); i++) await new Promise((r) => setTimeout(r, 20));
+    await hub.idle();
+    const patch = hub.events.find((e) => e.type === 'stage.patch');
+    assert.ok(patch, 'a patch was sent');
+    assert.equal(asked.length, 6, 'the picture changed on every load, but it kept loading until the elements did');
+    assert.deepEqual(patch.data.changed.map((r) => [r.rect.y, r.kind]), [[900, 'changed']], 'only the edited section, not the word or the clock');
+    assert.ok(patch.data.shot);
   } finally {
     await hub.close();
   }
