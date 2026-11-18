@@ -201,7 +201,9 @@ node packages/engine/start.mjs watch             # the same from a plugin instal
   wrote. With no hub in the discovery file it exits 0 before reading stdin (about 25ms over Node's own start), and it
   always exits 0. On `edit` the hub waits 400ms for more, loads the stage again with `detectOnce({ stageShot, domShot })`
   and compares the element list (`domdiff.mjs`: path, rect, and a hash of own text and visible computed styles) with the
-  load before, loading again up to 4 times while nothing changed (a dev server still rebuilding). Right after each
+  load before, loading again up to 4 times while nothing changed (a dev server still rebuilding). A newer edit ends
+  that wait: the edits that showed nothing get a `stage.patch` with no picture and `superseded: true`, and the next
+  change goes to the newer edit; an edit that comes in while the load that shows a change runs joins that patch. Right after each
   diagnose it loads the stage 3 times with no edit and leaves the element paths that differ between those loads (a
   rotating headline word, a clock, a ticker, a chart drawn from random data) out of every comparison on that stage;
   when the picture itself differs between those loads (WebGL, video), only the elements decide that the reload has

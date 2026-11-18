@@ -104,6 +104,12 @@ All notable changes to Taster are recorded here. The format follows
   real page, and sends `stage.error` with the status, a short message and the edit before it. The viewer shows it as
   a line over the stage and a failed line in the log, cleared by the next good load, and the fix is compared with the
   last load that worked. `engineRefresher` answers such a load with `{ error }` instead of null.
+- An edit with no visible change no longer holds up the next one in the live hub. It ran its whole retry window
+  (about 10 seconds on a real page) while the next edit waited, and the next edit's change, landing during those
+  retries, was shown for the first edit's file. Now a newer edit ends that wait: the first edit gets a `stage.patch`
+  with no change and `superseded: true` ("no visible change before the next edit" in the viewer), and the change goes
+  to the newer edit. An edit that comes in while the load showing a change runs joins that patch, and its regions are
+  matched to the edits by file name.
 - The skill no longer tells the agent to download missing component files from the main branch at run time; the code
   comes from `get_component` or from `add` in a clone.
 - `lint` no longer reports the second line of a custom property value that a formatter split over lines

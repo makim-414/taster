@@ -17,12 +17,13 @@
 // 400ms, opens the same local stage again, lists its elements (packages/engine/domdiff.mjs) and compares them with the
 // capture before, retrying for a moment while the dev server has not reloaded yet. Right after a diagnose it loads the
 // stage a few times with no edit, and the elements that differ between those loads (a rotating word, a clock, a ticker)
-// are left out of every comparison on that stage. It sends stage.patch: the new
-// picture, the regions that changed, the findings measured on the new load, and the edit (file and agent) each region
-// goes with. The regions come from that comparison, not from tracing the edit to elements. When the stage answers
-// with an error (HTTP 5xx, a dev server that is down) after an edit, the hub stops retrying once the same error comes
-// back twice and sends stage.error with the status, a short message and the edit before it; the viewer shows it on
-// the stage until the next good load.
+// are left out of every comparison on that stage. It sends stage.patch: the new picture, the regions that changed, the
+// findings measured on the new load, and the edit (file and agent) each region goes with. The regions come from that
+// comparison, not from tracing the edit to elements. An edit that shows nothing yet does not hold up the next one: when
+// a newer edit comes in during its retries, it gets a patch with no change (superseded) and the next change goes to the
+// newer edit. When the stage answers with an error (HTTP 5xx, a dev server that is down) after an edit, the hub stops
+// retrying once the same error comes back twice and sends stage.error with the status, a short message and the edit
+// before it; the viewer shows it on the stage until the next good load.
 // The ingest token is in the discovery file only (os.tmpdir()/taster-live-<uid>.json, mode 0600, removed on exit);
 // the viewer key is in the URL the hub prints. Every request must name this host and port in Host (DNS rebinding), a
 // request from any other origin is refused, and no response carries CORS headers. SECURITY.md has the threat model.
@@ -317,12 +318,20 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
   };
   // Loads the stage until it differs from base (the dev server may still be rebuilding), editTries times at most.
   // error: the last load answered with an error; the same error twice in a row is the page broken, not still
-  // reloading, so the retries stop there.
-  const captureUntilChanged = async (target, base, setRegions) => {
+  // reloading, so the retries stop there. superseded: a newer edit came in while these edits showed nothing, so their
+  // wait ends and the next change goes to the newer edit, not to them. edits: the batch; an edit that comes in while a
+  // load that shows a change runs joins it, since that load may show either.
+  const captureUntilChanged = async (target, base, setRegions, edits) => {
     let got = null;
     let error = null;
+    let superseded = false;
     for (let i = 0; i < editTries && !refresh.closed; i++) {
       if (i) await wait(editRetry);
+      if (i && editing.pending.length) {
+        superseded = true;
+        break;
+      }
+      const seen = editing.seen;
       const next = await snap(target);
       if (next?.error) {
         const again = error && sameError(error, next.error);
@@ -338,9 +347,12 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
       const regions = diffSnapshots(base.dom, got.dom, { height: got.shotSize?.height || Infinity, ignore: editing.volatile });
       setRegions(regions);
       // On a page whose picture moves by itself, only the elements can say the reload has landed.
-      if (regions.length || (!editing.noisyImage && hashOf(got.image) !== target.hash)) break;
+      if (regions.length || (!editing.noisyImage && hashOf(got.image) !== target.hash)) {
+        if (editing.seen !== seen) edits.push(...editing.pending.splice(0));
+        break;
+      }
     }
-    return { got, error };
+    return { got, error, superseded };
   };
   const capturePatch = async () => {
     const edits = editing.pending.splice(0);
@@ -349,12 +361,18 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
     const base = editing.base;
     let got = null;
     let error = null;
+    let superseded = false;
     let regions = [];
     editing.busy = true;
     try {
-      ({ got, error } = await captureUntilChanged(target, base, (r) => {
-        regions = r;
-      }));
+      ({ got, error, superseded } = await captureUntilChanged(
+        target,
+        base,
+        (r) => {
+          regions = r;
+        },
+        edits,
+      ));
     } finally {
       editing.busy = false;
     }
@@ -366,11 +384,11 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
       publishHub('stage.error', { of: target.seq, url: target.url, width: target.width, status: error.status, reason: error.reason, message: error.message, file: last.file, tool: last.tool, agent: last.agent, edits: list });
       return;
     }
-    if (!got) return;
-    editing.base = got;
+    if (!got && !superseded) return;
+    if (got) editing.base = got;
     editing.lastPatch = Date.now();
-    const hash = hashOf(got.image);
-    const changed = regions.length > 0 || ((!base || !editing.noisyImage) && hash !== target.hash);
+    const hash = got ? hashOf(got.image) : target.hash;
+    const changed = Boolean(got) && (regions.length > 0 || ((!base || !editing.noisyImage) && hash !== target.hash));
     target.hash = hash;
     const shot = changed ? storeShot(`h${Date.now().toString(36)}${randomBytes(6).toString('hex')}`, got.image, got.type || 'image/jpeg') : null;
     publishHub('stage.patch', {
@@ -378,8 +396,8 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
       url: target.url,
       width: target.width,
       shot,
-      shotSize: got.shotSize || null,
-      page: got.page || null,
+      shotSize: got?.shotSize || null,
+      page: got?.page || null,
       file: last.file,
       tool: last.tool,
       agent: last.agent,
@@ -387,6 +405,7 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
       // Regions found by comparing the two loads; `edit` says which of the edits it is shown for.
       changed: assignRegions(regions, list).map(({ rect, kind, label, count, edit, guessed }) => ({ rect, kind, label, count, edit, guessed })),
       compared: Boolean(base),
+      ...(superseded && { superseded: true }),
       ...(shot && { findings: got.findings || [], counts: got.counts || {} }),
     });
   };

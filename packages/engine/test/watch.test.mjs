@@ -467,3 +467,82 @@ test('the engine refresher answers an error page and a server that is down with 
     await refresher.close();
   }
 });
+
+// Head of line: an edit with no visible change used to run its whole retry window while the next edit waited, and the
+// next edit's change, landing during those retries, went to the first edit's file. Now a newer edit ends that wait
+// (a no-change patch for the first edit, marked superseded) and the change goes to the newer edit; an edit that comes
+// in while the load showing a change runs joins that patch, matched to its regions by file name.
+test('a newer edit ends the wait of an edit with no visible change and gets the change itself', async () => {
+  const el = (k, p, r, s, extra = {}) => ({ k, p, t: 'div', id: '', c: [], r, s, x: '', ...extra });
+  const dom = (pricing, hero = 'h1') => ({
+    width: 1440,
+    height: 1600,
+    truncated: false,
+    nodes: [el('html>body:0', -1, [0, 0, 1440, 1600], 'b'), el('html>body:0>header#hero', 0, [0, 0, 1440, 500], hero, { id: 'hero' }), el('html>body:0>section#pricing', 0, [0, 900, 1440, 500], pricing, { id: 'pricing' })],
+  });
+  let state = { pricing: 'p1', hero: 'h1' };
+  let onLoad = null;
+  const asked = [];
+  const refresher = {
+    run: async () => null,
+    snapshot: async () => {
+      asked.push({ ...state });
+      if (onLoad) await onLoad();
+      const d = dom(state.pricing, state.hero);
+      return { image: Buffer.from(`${state.pricing}${state.hero}`), type: 'image/jpeg', shotSize: { width: 1440, height: 1600 }, dom: d, findings: [], counts: {} };
+    },
+  };
+  const tries = 8;
+  const hub = await startHub({ port: 0, discovery: discovery(), viewerDir, refresher, editDebounce: 30, editRetry: 40, editTries: tries, baselineDelay: 10, baselineLoads: 1 });
+  const hook = (id, file) => event('edit', { file, tool: 'Edit' }, { agent: { id, kind: 'hook', client: 'claude-code', label: 'site', lane: 0 }, call: null, tool: null });
+  const patches = () => hub.events.filter((e) => e.type === 'stage.patch');
+  const until = async (fn) => {
+    for (let i = 0; i < 300 && !fn(); i++) await new Promise((r) => setTimeout(r, 10));
+  };
+  try {
+    await fetch(`${hub.url}ingest/shot?id=stage0004`, { method: 'POST', headers: { 'content-type': 'image/jpeg', [live.TOKEN_HEADER]: hub.token }, body: Buffer.from('p1h1') });
+    await ingest(hub, event('stage', { url: 'http://localhost:5190/', width: 1440, height: 900, shot: 'stage0004', diagnosed: true }));
+    await until(() => asked.length >= 1);
+    await hub.idle();
+
+    // A changes nothing the page shows. Once its first load is in, B edits the pricing, and the dev server shows it.
+    const start = asked.length;
+    await ingest(hub, hook('cc-a', 'notes/todo.md'));
+    await until(() => asked.length > start);
+    state = { ...state, pricing: 'p2' };
+    await ingest(hub, hook('cc-b', 'components/pricing.tsx'));
+    await until(() => patches().length >= 2);
+    await hub.idle();
+    const [a, b] = patches();
+    assert.deepEqual(a.data.edits.map((x) => x.file), ['notes/todo.md']);
+    assert.equal(a.data.shot, null, 'no visible change for the edit that showed none');
+    assert.deepEqual(a.data.changed, []);
+    assert.equal(a.data.superseded, true);
+    assert.deepEqual(b.data.edits.map((x) => x.file), ['components/pricing.tsx']);
+    assert.equal(b.data.file, 'components/pricing.tsx');
+    assert.equal(b.data.superseded, undefined);
+    assert.ok(b.data.shot);
+    assert.deepEqual(b.data.changed.map((r) => [r.rect.y, r.edit]), [[900, 0]], 'the pricing region goes with the pricing edit');
+    assert.ok(asked.length - start < tries, `the first edit did not run its whole retry window (${asked.length - start} loads)`);
+
+    // C edits the hero; D comes in while the load that shows a change is still running: one patch for both, each
+    // region matched to its edit by file name.
+    const before = patches().length;
+    onLoad = async () => {
+      if (state.hero !== 'h1') return;
+      onLoad = null;
+      state = { ...state, hero: 'h2', pricing: 'p3' };
+      await ingest(hub, hook('cc-b', 'components/pricing.tsx'));
+    };
+    await ingest(hub, hook('cc-a', 'components/hero.tsx'));
+    await until(() => patches().length > before);
+    await new Promise((r) => setTimeout(r, 120));
+    await hub.idle();
+    const joined = patches().slice(before);
+    assert.equal(joined.length, 1, 'one patch for the two edits');
+    assert.deepEqual(joined[0].data.edits.map((x) => x.file), ['components/hero.tsx', 'components/pricing.tsx']);
+    assert.deepEqual(joined[0].data.changed.map((r) => [r.rect.y, joined[0].data.edits[r.edit].file]), [[0, 'components/hero.tsx'], [900, 'components/pricing.tsx']]);
+  } finally {
+    await hub.close();
+  }
+});

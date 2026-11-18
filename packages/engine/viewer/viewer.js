@@ -716,7 +716,7 @@
       edits.forEach((x, i) => {
         const c = cursorFor(i);
         if (!c) return;
-        step(c, { say: [fileSay(x), h('span', null, 'no visible change')], dwell: 300 });
+        step(c, { say: [fileSay(x), h('span', null, d.superseded ? 'no visible change before the next edit' : 'no visible change')], dwell: 300 });
         c.done = true;
       });
       return Promise.resolve();
