@@ -367,6 +367,16 @@ a token tune or a plan check, the hub opens a local page (a file or a localhost 
 the marks whose rules are gone turn resolved. With the plugin, `node packages/engine/start.mjs watch` in the installed
 copy does the same.
 
+The page also changes edit by edit while an agent works on the source. The plugin adds a Claude Code hook that runs
+after each Edit, Write or MultiEdit and tells the hub which file changed (other agents run
+`node packages/engine/taster.mjs live edit --file <path> --client <name>` themselves, and `add` reports its files). The
+hub then loads the local page again once the dev server has reloaded, compares its elements with the load before, and
+sends the regions that changed. The editing agent's cursor flies to each region, draws its box with its size, and only
+that region fades to the new picture; findings that are gone resolve there, so the count goes down edit by edit. The
+regions come from comparing the page before and after the reload, not from tracing the edit to elements: an edit to a
+shared stylesheet shows as everything it restyled, and edits that land between two loads are matched to regions by
+their file names. With no `taster watch` running the hook does nothing and returns at once.
+
 The detector measures a page in one pass, so the findings arrive together. The order the cursors visit them is chosen
 by the viewer from their real positions: the 30 most severe first, top to bottom; the rest get a mark only. The viewer
 says so on the page. Nothing is sent while `taster watch` is not running, and the hub listens on 127.0.0.1 only
@@ -384,7 +394,8 @@ gallery stays in your browser (`localStorage`). Vercel, which hosts the site, ke
 [its privacy policy](https://vercel.com/legal/privacy-policy).
 
 The local tools, the bookmarklet and the extension send the findings nowhere and have no telemetry. While
-`taster watch` runs, the local tools also report each call to it, on 127.0.0.1 and to nothing else.
+`taster watch` runs, the local tools also report each call, and the edit hook each edited file's path, to it, on
+127.0.0.1 and to nothing else.
 
 ## Taxonomy at a glance
 

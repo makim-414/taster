@@ -254,3 +254,71 @@ test('the viewer counts through plural(), so one is a rule and a finding', () =>
   assert.deepEqual(fixed, [], 'a count with a fixed plural noun');
   for (const noun of ['rule', 'finding', 'element', 'token', 'screen']) assert.match(src, new RegExp(`plural\\([^)]*'${noun}'\\)`), `${noun} is counted with plural()`);
 });
+
+// The per-edit view: after each edit an agent reports, the hub loads the stage again, compares its elements with the
+// load before, retries while the dev server has not reloaded yet, and sends one stage.patch with the changed regions
+// and the edit each goes with.
+test('after an edit the hub captures the stage again and sends the regions that changed, with their edit', async () => {
+  const el = (k, p, r, s, extra = {}) => ({ k, p, t: 'div', id: '', c: [], r, s, x: '', ...extra });
+  const dom = (hero, cards) => ({
+    width: 1440,
+    height: 1600,
+    truncated: false,
+    nodes: [el('html>body:0', -1, [0, 0, 1440, 1600], 'b'), el('html>body:0>header#hero', 0, [0, 0, 1440, 500], hero, { id: 'hero' }), el('html>body:0>section#cards', 0, [0, 900, 1440, 500], cards, { id: 'cards' })],
+  });
+  const loads = [dom('h1', 'c1'), dom('h1', 'c1'), dom('h2', 'c2'), dom('h2', 'c2'), dom('h2', 'c2')];
+  const asked = [];
+  const refresher = {
+    run: async () => null,
+    snapshot: async (stage) => {
+      asked.push(stage.url);
+      const d = loads.shift() || dom('h2', 'c2');
+      return { image: Buffer.from(`${d.nodes[1].s}${d.nodes[2].s}`), type: 'image/jpeg', shotSize: { width: 1440, height: 1600 }, dom: d, findings: [{ id: 0, ruleId: 'AC-01', rect: { x: 0, y: 0, w: 10, h: 10 } }], counts: { 'AC-01': 1 } };
+    },
+  };
+  const hub = await startHub({ port: 0, discovery: discovery(), viewerDir, refresher, editDebounce: 30, editRetry: 20, editTries: 4, baselineDelay: 10 });
+  try {
+    const hook = (id, file) => event('edit', { file, tool: 'Edit' }, { agent: { id, kind: 'hook', client: 'claude-code', label: 'site', lane: 0 }, call: null, tool: null });
+    // Before any stage, an edit has nothing to capture.
+    await ingest(hub, hook('cc-a', 'src/hero.html'));
+    await new Promise((r) => setTimeout(r, 80));
+    assert.equal(asked.length, 0);
+
+    await fetch(`${hub.url}ingest/shot?id=stage0001`, { method: 'POST', headers: { 'content-type': 'image/jpeg', [live.TOKEN_HEADER]: hub.token }, body: Buffer.from('h1c1') });
+    await ingest(hub, event('stage', { url: 'http://localhost:5173/', width: 1440, height: 900, shot: 'stage0001', diagnosed: true }));
+    await new Promise((r) => setTimeout(r, 40));
+    await hub.idle();
+    assert.equal(asked.length, 1, 'a baseline load right after the stage');
+
+    // Two agents edit two files inside one debounce: one capture, and each region goes with its file.
+    await ingest(hub, [hook('cc-a', 'src/partials/hero.html'), hook('cc-b', 'src/partials/cards.html')]);
+    for (let i = 0; i < 100 && !hub.events.some((e) => e.type === 'stage.patch'); i++) await new Promise((r) => setTimeout(r, 20));
+    await hub.idle();
+    const patch = hub.events.find((e) => e.type === 'stage.patch');
+    assert.ok(patch, 'a patch was sent');
+    assert.equal(patch.agent.id, 'hub');
+    assert.equal(asked.length, 3, 'the first load after the edit had not changed yet, so it loaded again');
+    assert.ok(asked.every((u) => u === 'http://localhost:5173/'));
+    const d = patch.data;
+    assert.equal(d.of, hub.events.find((e) => e.type === 'stage').seq);
+    assert.ok(hub.getShot(d.shot), 'the new picture is kept for the viewer');
+    assert.equal(d.compared, true);
+    assert.deepEqual(d.edits.map((x) => [x.file, x.agent.id]), [['src/partials/hero.html', 'cc-a'], ['src/partials/cards.html', 'cc-b']]);
+    assert.equal(d.file, 'src/partials/cards.html');
+    assert.deepEqual(d.changed.map((r) => [r.rect.y, r.kind, r.edit, r.guessed]), [[0, 'changed', 0, true], [900, 'changed', 1, true]]);
+    assert.equal(d.findings[0].ruleId, 'AC-01', 'the findings of the same load go with it');
+
+    // An edit that changes nothing visible: a patch with no picture, after the retries.
+    const before = asked.length;
+    await ingest(hub, hook('cc-a', 'README.md'));
+    for (let i = 0; i < 100 && hub.events.filter((e) => e.type === 'stage.patch').length < 2; i++) await new Promise((r) => setTimeout(r, 20));
+    await hub.idle();
+    const quiet = hub.events.filter((e) => e.type === 'stage.patch')[1];
+    assert.ok(quiet);
+    assert.equal(quiet.data.shot, null);
+    assert.deepEqual(quiet.data.changed, []);
+    assert.equal(asked.length - before, 4, 'tried editTries times');
+  } finally {
+    await hub.close();
+  }
+});

@@ -18,6 +18,16 @@ All notable changes to Taster are recorded here. The format follows
   bottom) is the viewer's own, and it says so. The hub listens on 127.0.0.1 only, checks Host and Origin, needs a token
   to report and a key to read ([SECURITY.md](SECURITY.md#live-viewer-taster-watch)).
   `detectOnce` takes a `stageShot` option for the clean picture. `check-live-viewer.mjs` runs in the browser job.
+- The live viewer shows the page change edit by edit. The plugin adds a Claude Code PostToolUse hook
+  (`hooks/hooks.json`, on Edit, Write, MultiEdit and NotebookEdit) that runs `taster live edit`, which tells a running
+  `taster watch` which file changed; other agents call `taster live edit --file <path> --client <name>`, and `add`
+  reports the files it wrote. With no hub it returns at once without reading its input and always exits 0. On each
+  edit the hub loads the local page again once the dev server has reloaded, compares its elements (path, rect, own
+  text and visible computed styles) with the load before, and sends `stage.patch` with the regions that changed and
+  the findings of the new load. The editing agent's cursor flies to each region, draws its box and size, and only that
+  region crossfades to the new picture; findings that are gone resolve there and the count goes down edit by edit.
+  The regions come from that comparison after the reload, not from tracing the edit to elements; edits that land
+  between two loads are matched to regions by file name and marked as a guess. `detectOnce` takes a `domShot` option.
 - 8 components, for 152 in the registry, written new after picks on 21st.dev with no code taken: `scene/noise-orb`
   and `scene/ridge-terrain` (a wire sphere and a low-poly terrain), `motion/lamp-glow` and `motion/band-shader` (a
   section lamp in CSS and light slats in one WebGL1 shader), `blocks/password-field` (strength bar and checklist on

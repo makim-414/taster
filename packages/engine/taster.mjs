@@ -8,8 +8,13 @@
 //   taster acp [--setup]         ACP agent on stdio; --setup prepares the browser in a terminal
 //   taster setup                 check for a browser, download Chromium if none works
 //   taster watch [--port <n>]    live viewer: a local page that draws what agents running Taster tools do
+//   taster live edit [--file f]  tell a running live viewer a source file changed (the plugin's edit hook runs it)
 const [cmd, ...rest] = process.argv.slice(2);
-if (cmd === 'mcp') {
+if (cmd === 'live') {
+  // First and with nothing but node:* behind it, since an agent's edit hook waits on it: no browser, no SDK.
+  const { liveCommand } = await import('./edit.mjs');
+  process.exit(await liveCommand(rest));
+} else if (cmd === 'mcp') {
   await import('./mcp.mjs');
 } else if (cmd === 'acp' && rest.includes('--setup')) {
   const { setup } = await import('./setup.mjs');

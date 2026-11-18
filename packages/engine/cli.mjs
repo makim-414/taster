@@ -27,9 +27,12 @@ const HELP = `Usage
   taster setup               check for a browser, download Chromium if none works
   taster watch [--port <n>]  live viewer on http://127.0.0.1:47474/: open the address it prints, then each Taster
                              call an agent or this CLI makes is drawn on the page as it happens
+  taster live edit [--file <path>] [--tool <name>] [--agent <label>] [--client <name>]
+                             tell the live viewer a source file changed; with no --file it reads a Claude Code hook's
+                             JSON from stdin. Exits 0 at once when no viewer runs
   taster --version
 
-In a clone of the repository, run node packages/engine/taster.mjs (or node packages/engine/cli.mjs for all but mcp, acp, setup and watch)
+In a clone of the repository, run node packages/engine/taster.mjs (or node packages/engine/cli.mjs for all but mcp, acp, setup, watch and live)
 in place of taster.
 
 A target is an http(s) URL, localhost:<port> (opened as http), a bare domain (opened as https), or a local .html,
@@ -103,6 +106,9 @@ async function add(argv) {
     const result = writeBundle(bundle, dir, { overwrite: values.overwrite });
     // File names only, relative to the folder; never what is in them.
     live.emit('component.add', { ids: positionals, dir: isAbsolute(dir) ? basename(dir) : dir, written: result.written.slice(0, 60), skipped: result.skipped.length });
+    // The same as an agent's edit: the viewer captures the page again and shows what the new files changed.
+    const shown = isAbsolute(dir) ? basename(dir) : dir;
+    if (result.written.length) live.emit('edit', { file: `${shown}/${result.written[0]}`.replace(/\\/g, '/'), tool: 'add', ...(result.written.length > 1 && { files: result.written.slice(0, 20).map((f) => `${shown}/${f}`.replace(/\\/g, '/')) }) });
     return result;
   })({ ids: positionals, dir }, null);
   if (values.json) {
@@ -246,6 +252,8 @@ async function main() {
 
 // Live events still queued for `taster watch` go out before the process ends (a no-op when no hub runs).
 live.setAgent({ kind: 'cli' });
+// A one-shot process: its first request to the hub is cold, so it is given longer than a tool call in a server.
+live.configure({ helloMs: 1500 });
 main().then(
   async (code) => {
     await live.flush();

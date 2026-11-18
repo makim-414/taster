@@ -3,7 +3,10 @@
 // took from the same load, with a mark on every finding at its real rect. Each agent (and each call it runs at the same
 // time, a lane) gets a cursor in its own color that flies to the findings, the swaps, the components and the token
 // changes as the events arrive. Detection is one pass, so the visiting order is chosen here: the 30 most severe
-// findings, top to bottom. Page text from events is only ever set with textContent.
+// findings, top to bottom. After an agent edits a file, the hub loads the page again and sends what changed
+// (stage.patch): that agent's cursor flies to each changed region, draws its box and size, and only that region of the
+// new picture fades in; the whole new picture settles once every region is shown, and findings that are gone resolve
+// where they were. Page text from events is only ever set with textContent.
 'use strict';
 
 (() => {
@@ -19,6 +22,7 @@
     inner: $('inner'),
     shots: [$('shot-a'), $('shot-b')],
     pins: $('pins'),
+    patches: $('patches'),
     empty: $('empty'),
     tokens: $('tokens'),
     tokensEmpty: $('tokens-empty'),
@@ -40,6 +44,10 @@
   const RESOLVED_MS = 2800;
   // How many resolved elements the hub cursor visits after a refresh; the rest resolve where they are.
   const RESOLVED_VISITS = 6;
+  // A cursor stays on each changed region of an edit this long; an edit whose regions are not all shown by then (a
+  // cursor busy elsewhere) settles anyway.
+  const PATCH_DWELL = 650;
+  const PATCH_WAIT = 20000;
 
   // ---- small DOM helpers: every string goes in as text ----
   function h(tag, attrs, ...children) {
@@ -75,6 +83,7 @@
   let current = null;
   let replaying = true;
   let follow = null;
+  let patching = Promise.resolve();
 
   function agentOf(a) {
     let agent = agents.get(a.id);
@@ -91,8 +100,11 @@
     agents.set(agent.id, agent);
     return agent;
   }
+  // An agent's own edits come through its hook, a channel of their own: "claude-code edits", next to the same
+  // client's Taster calls.
+  const via = (agent) => (agent.kind === 'hook' ? `${agent.client || 'agent'} edits` : agent.client || agent.kind);
   function agentLabel(agent) {
-    return [h('b', null, agent.label), ` ${agent.client || agent.kind}`];
+    return [h('b', null, agent.label), ` ${via(agent)}`];
   }
 
   // ---- cursors: one per agent and lane, moved by a queue of steps, drawn every frame ----
@@ -103,7 +115,7 @@
     let c = cursors.get(id);
     if (c) return c;
     const say = h('span', { class: 'cursor-say' });
-    const name = `${agent.label}${lane ? ` #${lane + 1}` : ''} (${agent.client || agent.kind})`;
+    const name = `${agent.label}${lane ? ` #${lane + 1}` : ''} (${via(agent)})`;
     const el = h(
       'div',
       { class: 'cursor', 'data-color': agent.color, 'data-idle': true },
@@ -253,6 +265,7 @@
   }
 
   // ---- the stage: the page picture, its marks, and the widths of the same diagnose ----
+  const shotUrl = (id) => `/shot/${encodeURIComponent(id)}?k=${encodeURIComponent(key)}`;
   let front = 0;
   function showPicture(stage) {
     if (!stage.shot) {
@@ -266,7 +279,7 @@
       shown.removeAttribute('data-on');
       front = 1 - front;
     };
-    back.src = `/shot/${encodeURIComponent(stage.shot)}?k=${encodeURIComponent(key)}`;
+    back.src = shotUrl(stage.shot);
   }
 
   function show(stage) {
@@ -304,7 +317,13 @@
     }
     const spots = s.spots ? s.spots.size : 0;
     const rules = s.findings ? new Set(s.findings.map((f) => f.ruleId)).size : 0;
-    const after = s.refreshed ? (s.resolvedCount ? `${s.resolvedCount} resolved after the change` : 'the page changed') : '';
+    const after = s.patches
+      ? `${plural(s.patches, 'edit')} shown, ${s.patchResolved || 0} resolved`
+      : s.refreshed
+        ? s.resolvedCount
+          ? `${s.resolvedCount} resolved after the change`
+          : 'the page changed'
+        : '';
     ui.counts.textContent = s.findings
       ? `${plural(rules, 'rule')}, ${plural(s.findings.length, 'finding')} at ${s.width}${s.spots && spots < s.findings.length ? ` on ${plural(spots, 'element')}` : ''}${after ? `, ${after}` : ''}`
       : `measuring at ${s.width}`;
@@ -410,6 +429,13 @@
       calls.delete(e.call);
     }
   }
+  // An edit an agent reported outside any Taster call (its own Edit or Write tool): one line in the log.
+  function logEdit(e, agent) {
+    const d = e.data || {};
+    const el = h('li', { class: 'call', 'data-color': agent.color, 'data-state': 'done' }, h('span', { class: 'call-what' }, h('b', null, d.tool || 'edit'), ' ', short(d.file || '', 90)), h('span', { class: 'call-state' }, 'edit'), h('span', { class: 'call-detail' }));
+    ui.log.prepend(el);
+    while (ui.log.children.length > MAX_LOG) ui.log.lastElementChild.remove();
+  }
   function tokenRows(diff) {
     ui.tokensEmpty.hidden = diff.length > 0;
     if (!diff.length) ui.tokensEmpty.textContent = 'The last change moved no token.';
@@ -424,6 +450,12 @@
 
   // ---- events ----
   function onEvent(e) {
+    // A patch is drawn by the cursors of the agents whose edits it shows, one patch after another.
+    if (e.type === 'stage.patch') {
+      const d = e.data || {};
+      patching = patching.then(() => patched(d)).catch((err) => console.warn('taster watch: could not draw a patch', err));
+      return;
+    }
     const agent = agentOf(e.agent);
     const c = cursorOf(e);
     const d = e.data || {};
@@ -522,35 +554,36 @@
       case 'stage.refresh':
         refreshed(c, d);
         break;
+      case 'edit':
+        // Inside a Taster call (add) the call is in the log already; an agent's own edit gets a line of its own.
+        if (!e.call) logEdit(e, agent);
+        step(c, { say: h('span', null, 'edited ', code(short(d.file || '', 60))), dwell: 200 });
+        if (!e.call) c.done = true;
+        break;
       default:
         break;
     }
   }
 
-  // A newer picture of the same page after a change: crossfade, and the elements whose rules are gone turn resolved.
-  function refreshed(c, d) {
-    const stage = stages.find((s) => s.seq === d.of);
-    if (!stage) return;
-    stage.shot = d.shot;
-    if (d.shotSize) stage.shotSize = d.shotSize;
+  // A newer load of the stage's page: its marks before and after, and the elements whose rules are all gone.
+  function compare(stage, findings, shotSize) {
     const before = stage.spots || spotsOf(stage);
-    stage.findings = d.findings || [];
-    const after = spotsOf(stage);
+    const after = spotsOf({ findings, shotSize: shotSize || stage.shotSize });
     const resolved = [];
     for (const spot of before.values()) {
+      if (spot.resolved) continue;
       const now = after.get(spot.key);
       const gone = [...spot.rules].filter((r) => !now?.rules.has(r));
       if (gone.length === spot.rules.size) resolved.push({ spot, gone });
     }
-    stage.refreshed = true;
-    stage.resolvedCount = resolved.length;
-    if (stage !== current) return;
-    if (stage.shotSize) ui.inner.style.aspectRatio = `${stage.shotSize.width} / ${stage.shotSize.height}`;
-    showPicture(stage);
-    // Elements still found keep their mark, moved to where they are on the new picture; new ones get a mark.
+    for (const { spot } of resolved) spot.resolved = true;
+    return { before, after, resolved };
+  }
+  // Elements still found keep their mark, moved to where they are on the new picture; new ones get a mark.
+  function remark(stage, before, after) {
     for (const spot of after.values()) {
       const old = before.get(spot.key);
-      if (old?.el?.isConnected) spot.el = old.el;
+      if (old?.el?.isConnected && !old.resolved) spot.el = old.el;
       if (!spot.el) ui.pins.append(placeMark(stage, spot));
       else placeMark(stage, spot);
       spot.el.setAttribute('data-on', '');
@@ -558,19 +591,37 @@
     }
     stage.spots = after;
     stage.visited = new Set(after.keys());
-    // Resolved marks are hidden at once, so they never read as findings on the new picture. Each one then plays its
-    // turn (green, then fading out) and is removed: the first few when the hub cursor gets there, the rest at once.
-    for (const { spot } of resolved) {
-      spot.resolved = true;
-      spot.el?.setAttribute('data-gone', '');
+  }
+  // A resolved mark plays its turn (green, then fading out) and is removed.
+  function settle(spot) {
+    if (!spot.el) return;
+    spot.el.removeAttribute('data-gone');
+    spot.el.setAttribute('data-resolved', '');
+    const el = spot.el;
+    setTimeout(() => el.remove(), reducedMotion.matches ? 0 : RESOLVED_MS);
+  }
+
+  // A newer picture of the same page after a change: crossfade, and the elements whose rules are gone turn resolved.
+  function refreshed(c, d) {
+    const stage = stages.find((s) => s.seq === d.of);
+    if (!stage) return;
+    const shotSize = d.shotSize || stage.shotSize;
+    const { before, after, resolved } = compare(stage, d.findings || [], shotSize);
+    stage.shot = d.shot;
+    stage.shotSize = shotSize;
+    stage.findings = d.findings || [];
+    stage.refreshed = true;
+    stage.resolvedCount = resolved.length;
+    if (stage !== current) {
+      stage.spots = null;
+      return;
     }
-    const settle = (spot) => {
-      if (!spot.el) return;
-      spot.el.removeAttribute('data-gone');
-      spot.el.setAttribute('data-resolved', '');
-      const el = spot.el;
-      setTimeout(() => el.remove(), reducedMotion.matches ? 0 : RESOLVED_MS);
-    };
+    if (stage.shotSize) ui.inner.style.aspectRatio = `${stage.shotSize.width} / ${stage.shotSize.height}`;
+    showPicture(stage);
+    remark(stage, before, after);
+    // Resolved marks are hidden at once, so they never read as findings on the new picture. Each one then plays its
+    // turn: the first few when the hub cursor gets there, the rest at once.
+    for (const { spot } of resolved) spot.el?.setAttribute('data-gone', '');
     for (const { spot } of resolved.slice(RESOLVED_VISITS)) settle(spot);
     for (const { spot, gone } of resolved.slice(0, RESOLVED_VISITS)) {
       step(c, { anchor: pointOf(spot), say: ['resolved ', ...ruleSay(gone)], arrive: () => settle(spot), dwell: 320 });
@@ -584,6 +635,163 @@
       },
     });
     drawCounts();
+  }
+
+  // ---- per edit: the regions that changed, each shown by the cursor of the agent whose edit it goes with ----
+  const overlaps = (a, b) => a && b && a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+
+  // The new picture clipped to one region, over the old one, in a box with the region's size. Null when the region is
+  // not on the picture shown now.
+  function patchBox(stage, r, src, newWidth, color) {
+    const W = stage.shotSize.width;
+    const H = stage.shotSize.height;
+    const x = Math.max(0, r.rect.x);
+    const y = Math.max(0, r.rect.y);
+    if (x >= W || y >= H) return null;
+    const w = Math.max(1, Math.min(r.rect.w, W - x));
+    const ht = Math.max(1, Math.min(r.rect.h, H - y));
+    const img = h('img', { class: 'patch-img', alt: '' });
+    img.src = src;
+    // In the box's own units: the picture is newWidth / w boxes wide, and starts x and y back from the box's corner.
+    img.style.width = `${(newWidth / w) * 100}%`;
+    img.style.left = `${(-x / w) * 100}%`;
+    img.style.top = `${(-y / ht) * 100}%`;
+    const el = h('div', { class: 'patch', 'data-color': color, 'data-kind': r.kind, 'data-top': y < 28 }, h('div', { class: 'patch-clip' }, img), h('span', { class: 'patch-size' }, `${Math.round(w)} x ${Math.round(ht)}`));
+    el.style.left = `${(x / W) * 100}%`;
+    el.style.top = `${(y / H) * 100}%`;
+    el.style.width = `${(w / W) * 100}%`;
+    el.style.height = `${(ht / H) * 100}%`;
+    return el;
+  }
+
+  function patched(d) {
+    const stage = stages.find((s) => s.seq === d.of);
+    if (!stage) return Promise.resolve();
+    const edits = (Array.isArray(d.edits) && d.edits.length ? d.edits : [{ file: d.file, tool: d.tool, agent: d.agent }]).filter((x) => x && x.agent && typeof x.agent.id === 'string');
+    const cursorFor = (i) => (edits[i] ? cursorOf({ agent: edits[i].agent }) : null);
+    const fileSay = (x) => h('span', null, code(short(x.file || 'a file', 48)));
+
+    // The page looks the same after the edit: each editing cursor says so.
+    if (!d.shot) {
+      edits.forEach((x, i) => {
+        const c = cursorFor(i);
+        if (!c) return;
+        step(c, { say: [fileSay(x), h('span', null, 'no visible change')], dwell: 300 });
+        c.done = true;
+      });
+      return Promise.resolve();
+    }
+    const shotSize = d.shotSize || stage.shotSize;
+    const findings = Array.isArray(d.findings) ? d.findings : stage.findings || [];
+    const regions = (Array.isArray(d.changed) ? d.changed : []).filter((r) => r && r.rect && r.rect.w > 0 && r.rect.h > 0);
+    const apply = (before, after, resolved) => {
+      stage.shot = d.shot;
+      stage.shotSize = shotSize;
+      stage.findings = findings;
+      stage.patches = (stage.patches || 0) + 1;
+      stage.patchResolved = (stage.patchResolved || 0) + resolved.length;
+      if (stage !== current) {
+        stage.spots = null;
+        return;
+      }
+      if (shotSize) ui.inner.style.aspectRatio = `${shotSize.width} / ${shotSize.height}`;
+      showPicture(stage);
+      remark(stage, before, after);
+      drawCounts();
+    };
+
+    // While the stream replays, on a stage not shown, or with no picture size: straight to the new picture.
+    if (replaying || stage !== current || !stage.shotSize || !shotSize) {
+      const { before, after, resolved } = compare(stage, findings, shotSize);
+      for (const { spot } of resolved) spot.el?.remove();
+      apply(before, after, resolved);
+      return Promise.resolve();
+    }
+
+    return new Promise((done) => {
+      const pre = new Image();
+      pre.onload = pre.onerror = () => run();
+      pre.src = shotUrl(d.shot);
+      function run() {
+        const { before, after, resolved } = compare(stage, findings, shotSize);
+        const waiting = new Set(resolved.map((x) => x.spot));
+        const boxes = [];
+        let ended = false;
+        const end = () => {
+          if (ended) return;
+          ended = true;
+          clearTimeout(guard);
+          for (const spot of waiting) settle(spot);
+          apply(before, after, resolved);
+          // The boxes stay a moment over the settled picture, then fade.
+          setTimeout(() => {
+            for (const b of boxes) b.setAttribute('data-out', '');
+            setTimeout(() => boxes.forEach((b) => b.remove()), reducedMotion.matches ? 0 : FADE_MS);
+          }, reducedMotion.matches ? 0 : FADE_MS + 300);
+          done();
+        };
+        const guard = setTimeout(end, PATCH_WAIT);
+
+        // The regions of each edit, in the order the hub found them (top to bottom).
+        const groups = new Map();
+        for (const r of regions) {
+          const i = Number.isInteger(r.edit) && edits[r.edit] ? r.edit : edits.length - 1;
+          if (!groups.has(i)) groups.set(i, []);
+          groups.get(i).push(r);
+        }
+        // A new picture with no region to show (nothing to compare with yet): each editing cursor says the page changed.
+        if (!groups.size) {
+          let left = edits.length;
+          if (!left) return end();
+          edits.forEach((x, i) => {
+            const c = cursorFor(i);
+            step(c, {
+              anchor: { stage: { x: 40, y: 40 } },
+              say: [fileSay(x), h('span', null, 'the page changed')],
+              arrive: () => {
+                c.done = true;
+                if (--left === 0) end();
+              },
+            });
+          });
+          return undefined;
+        }
+        let left = groups.size;
+        for (const [i, list] of groups) {
+          const c = cursorFor(i);
+          follow = c;
+          list.forEach((r) => {
+            const box = patchBox(stage, r, shotUrl(d.shot), shotSize.width, c.agent.color);
+            if (!box) return;
+            ui.patches.append(box);
+            boxes.push(box);
+            const w = Math.round(Math.min(r.rect.w, stage.shotSize.width - Math.max(0, r.rect.x)));
+            const ht = Math.round(Math.min(r.rect.h, stage.shotSize.height - Math.max(0, r.rect.y)));
+            step(c, {
+              anchor: { stage: { x: r.rect.x + Math.min(r.rect.w / 2, 80), y: r.rect.y + Math.min(r.rect.h / 2, 40) } },
+              say: [fileSay(edits[i]), h('span', null, `${r.kind || 'changed'} `, code(short(r.label || '', 40)), ` ${w} x ${ht}`), r.guessed ? h('span', null, 'matched to this edit by file name') : null],
+              arrive: () => {
+                box.setAttribute('data-on', '');
+                for (const spot of waiting) {
+                  if (!overlaps(spot.rect, r.rect)) continue;
+                  waiting.delete(spot);
+                  settle(spot);
+                }
+              },
+              dwell: PATCH_DWELL,
+            });
+          });
+          step(c, {
+            arrive: () => {
+              c.done = true;
+              if (--left === 0) end();
+            },
+            dwell: 0,
+          });
+        }
+        return undefined;
+      }
+    });
   }
 
   // ---- the stream ----

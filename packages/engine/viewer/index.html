@@ -25,6 +25,7 @@
       <div class="stage-inner" id="inner" hidden>
         <img class="shot" id="shot-a" alt="">
         <img class="shot" id="shot-b" alt="">
+        <div class="patches" id="patches"></div>
         <div class="pins" id="pins"></div>
       </div>
       <div class="empty" id="empty">
@@ -32,7 +33,7 @@
         <p>Run a Taster tool from Claude Code, Codex, Cursor, an ACP editor or the CLI in this account. A diagnose puts its page here.</p>
       </div>
     </div>
-    <p class="note">Detection is one pass over the page, so its findings arrive together. The order the cursors visit them is chosen here, from their real positions on the page: the 30 most severe first, top to bottom. The rest get a mark only.</p>
+    <p class="note">Detection is one pass over the page, so its findings arrive together. The order the cursors visit them is chosen here, from their real positions on the page: the 30 most severe first, top to bottom. The rest get a mark only. After an agent edits a file, the page is loaded again and compared with the load before it: the boxes are the elements that comparison found changed, not elements traced from the edit.</p>
   </section>
   <aside class="side" aria-label="Activity">
     <section class="panel" aria-labelledby="tokens-title">

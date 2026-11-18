@@ -256,10 +256,68 @@ code {
 .shot[data-on] {
   opacity: 1;
 }
-.pins {
+.pins,
+.patches {
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+/* One changed region after an edit: the new picture clipped to the region crossfades in over the old one, inside a
+   box in the editing agent's color with its size. The full new picture settles under it once every region is shown. */
+.patch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  outline: var(--mark-width) solid var(--cursor);
+  outline-offset: 1px;
+  opacity: 0;
+  transition: opacity var(--dur-dropdown) var(--ease-out);
+}
+.patch[data-on],
+.patch[data-done] {
+  opacity: 1;
+}
+.patch[data-out] {
+  opacity: 0;
+  transition-duration: var(--dur-fade);
+}
+.patch-clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.patch-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  max-width: none;
+  height: auto;
+  opacity: 0;
+  transition: opacity var(--dur-fade) var(--ease-out);
+}
+.patch[data-on] .patch-img {
+  opacity: 1;
+}
+.patch-size {
+  position: absolute;
+  bottom: 100%;
+  left: calc(-1 * var(--mark-width));
+  margin-bottom: var(--sp-1);
+  padding: 0 var(--sp-1);
+  color: var(--ink-on-cursor);
+  background: var(--cursor);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  line-height: var(--lh-normal);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.patch[data-top] .patch-size {
+  top: 100%;
+  bottom: auto;
+  margin: var(--sp-1) 0 0;
 }
 .mark {
   position: absolute;
@@ -308,6 +366,10 @@ code {
   padding: var(--sp-6);
   color: var(--text-muted);
   text-align: center;
+}
+/* display: grid above would otherwise win over the hidden attribute and leave the empty note under a short page. */
+.empty[hidden] {
+  display: none;
 }
 .empty-lead {
   color: var(--text);
@@ -499,6 +561,8 @@ code {
 
 @media (prefers-reduced-motion: reduce) {
   .shot,
+  .patch,
+  .patch-img,
   .mark,
   .token,
   .cursor,

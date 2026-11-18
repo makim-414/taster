@@ -88,13 +88,19 @@ against, and how:
   file is in your own temporary folder.
 - **What leaves the tools.** Tool arguments with URLs cut to scheme, host and path and secret looking keys hidden,
   finding labels (selector up to 200 characters, page text up to 60), rects, rule ids, token names and values, file
-  names that `add` wrote, and pictures of the page each diagnose opened. No file contents, no page text beyond those
+  names that `add` wrote, the path of each file an agent edits (relative to the folder it works in, or the name alone
+  for a file outside it; the edit hook hashes the session id), and pictures of the page each diagnose opened. No file contents, no page text beyond those
   labels, nothing sent anywhere but the hub. With no hub running nothing is sent and no connection is opened.
 - **The viewer.** It sets page text with `textContent` only, and runs under `default-src 'self'` (pictures from the
   hub or `data:`), with `frame-ancestors 'none'`. The key stays in the address after `#`, which browsers do not send.
-- **Pages opened again.** After a change, the hub opens the last diagnosed page again to refresh its picture, only when
-  it is a local file or a server on localhost, with the same checks a target gets in the engine (`TASTER_ROOT`
+- **Pages opened again.** After a change or a reported edit, the hub opens the last diagnosed page again to refresh its
+  picture and list its elements for the per-edit comparison (kept in the hub's memory, never sent), only when it is a
+  local file or a server on localhost, with the same checks a target gets in the engine (`TASTER_ROOT`
   included), and closes its browser after a minute without work.
+
+- **The edit hook.** The plugin's PostToolUse hook runs `taster live edit` after each Edit, Write or MultiEdit. It reads
+  only `tool_name`, the file path, `cwd`, `session_id` and the subagent fields from the hook input (never the edit's
+  text), does nothing when no hub runs, and always exits 0.
 
 Anyone who can run code as your user can already read the discovery file and the viewer key; the hub does not protect
 against that.

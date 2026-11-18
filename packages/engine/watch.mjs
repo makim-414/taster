@@ -13,6 +13,11 @@
 // seconds, up to 8 times, until the picture differs, and sends it as stage.refresh with the findings measured on it; the
 // viewer crossfades and marks the rules that are gone as resolved. Only local pages (file:, localhost, 127.0.0.1) are
 // opened again: that is where the edits land, and a public site is not loaded over and over.
+// After an `edit` (an agent's PostToolUse hook, `taster live edit`, `taster add`), the hub waits for edits to stop for
+// 400ms, opens the same local stage again, lists its elements (packages/engine/domdiff.mjs) and compares them with the
+// capture before, retrying for a moment while the dev server has not reloaded yet. It sends stage.patch: the new
+// picture, the regions that changed, the findings measured on the new load, and the edit (file and agent) each region
+// goes with. The regions come from that comparison, not from tracing the edit to elements.
 // The ingest token is in the discovery file only (os.tmpdir()/taster-live-<uid>.json, mode 0600, removed on exit);
 // the viewer key is in the URL the hub prints. Every request must name this host and port in Host (DNS rebinding), a
 // request from any other origin is refused, and no response carries CORS headers. SECURITY.md has the threat model.
@@ -20,6 +25,7 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import http from 'node:http';
 import { fileURLToPath } from 'node:url';
+import { assignRegions, diffSnapshots } from './domdiff.mjs';
 import { TOKEN_HEADER, VERSION, discoveryFile, readDiscovery } from './live.mjs';
 
 export const DEFAULT_PORT = 47474;
@@ -35,6 +41,13 @@ const HEARTBEAT_MS = 15000;
 const REFRESH_EVERY = 2500;
 const REFRESH_TRIES = 8;
 const BROWSER_IDLE = 60000;
+// Per edit: wait this long after the last edit, then capture; while nothing changed yet (the dev server is still
+// rebuilding), capture again after EDIT_RETRY, up to EDIT_TRIES loads in all.
+const EDIT_DEBOUNCE = 400;
+const EDIT_RETRY = 700;
+const EDIT_TRIES = 4;
+const BASELINE_DELAY = 300;
+const MAX_EDITS = 20;
 // The events after which the page on the stage has probably changed.
 const CHANGES = (e) => e.type === 'component.add' || e.type === 'system.tuned' || (e.type === 'plan' && (e.data?.event === 'check' || e.data?.recorded?.type === 'check'));
 
@@ -105,8 +118,9 @@ export function isLocalPage(url) {
 
 /**
  * The default stage refresher: the engine's own browser and detector (packages/engine/diagnose.mjs), loaded on first
- * use, with the browser closed after a minute without work. run() answers { image, type, findings, counts, page }, or
- * null for a page that did not open as the site.
+ * use, with the browser closed after a minute without work. run() answers { image, type, findings, counts, page, dom }
+ * (dom: the element list domdiff.mjs compares), or null for a page that did not open as the site. snapshot() is the
+ * same call; a refresher that has it turns on the per-edit view.
  */
 export function engineRefresher() {
   let browser = null;
@@ -126,13 +140,16 @@ export function engineRefresher() {
       clearTimeout(idle);
       browser ||= await engine.launch();
       try {
-        const run = await engine.detectOnce(browser, target, { width, height: height || (width < 768 ? 844 : 900) }, { stageShot: true, ...(colorScheme ? { colorScheme } : {}) });
+        const run = await engine.detectOnce(browser, target, { width, height: height || (width < 768 ? 844 : 900) }, { stageShot: true, domShot: true, ...(colorScheme ? { colorScheme } : {}) });
         if (!run.load?.diagnosed || !run.stage) return null;
-        return { image: run.stage.image, type: run.stage.type, shotSize: { width: run.stage.width, height: run.stage.height }, findings: engine.liveFindings(run), counts: run.counts || {}, page: run.page };
+        return { image: run.stage.image, type: run.stage.type, shotSize: { width: run.stage.width, height: run.stage.height }, findings: engine.liveFindings(run), counts: run.counts || {}, page: run.page, dom: run.dom || null };
       } finally {
         idle = setTimeout(close, BROWSER_IDLE);
         idle.unref();
       }
+    },
+    snapshot(stage) {
+      return this.run(stage);
     },
     close,
   };
@@ -160,12 +177,13 @@ export function cleanEvent(e) {
 
 /**
  * Start the hub. Resolves once it listens and the discovery file is written.
- * @param {{ port?: number, discovery?: string, viewerDir?: string, onEvent?: (event: object) => void, refresher?: { run: Function, close?: Function } | null, refreshEvery?: number, refreshTries?: number }} [options]
+ * @param {{ port?: number, discovery?: string, viewerDir?: string, onEvent?: (event: object) => void, refresher?: { run: Function, snapshot?: Function, close?: Function } | null, refreshEvery?: number, refreshTries?: number, editDebounce?: number, editRetry?: number, editTries?: number, baselineDelay?: number }} [options]
  *   discovery: where to write the discovery file (default live.mjs discoveryFile()); onEvent sees every event kept;
- *   refresher: opens the last stage again after a change (engineRefresher(); null turns refreshing off).
- * @returns {Promise<{ port: number, url: string, viewUrl: string, key: string, token: string, publish: (type: string, data: object) => object, shot: (image: Buffer, type?: string) => string, close: () => Promise<void>, events: object[] }>}
+ *   refresher: opens the last stage again after a change (engineRefresher(); null turns refreshing off), and with a
+ *   snapshot() method after each edit too.
+ * @returns {Promise<{ port: number, url: string, viewUrl: string, key: string, token: string, publish: (type: string, data: object) => object, shot: (image: Buffer, type?: string) => string, close: () => Promise<void>, events: object[], idle: () => Promise<void> }>}
  */
-export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(), viewerDir = VIEWER_DIR, onEvent, refresher = engineRefresher(), refreshEvery = REFRESH_EVERY, refreshTries = REFRESH_TRIES } = {}) {
+export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(), viewerDir = VIEWER_DIR, onEvent, refresher = engineRefresher(), refreshEvery = REFRESH_EVERY, refreshTries = REFRESH_TRIES, editDebounce = EDIT_DEBOUNCE, editRetry = EDIT_RETRY, editTries = EDIT_TRIES, baselineDelay = BASELINE_DELAY } = {}) {
   const other = await running(discovery);
   if (other) throw Object.assign(new Error(`taster watch is already running at http://127.0.0.1:${other.port}/ (pid ${other.pid})`), { code: 'RUNNING' });
 
@@ -190,6 +208,9 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
       refresh.tries++;
       await new Promise((r) => setTimeout(r, refreshEvery).unref?.());
       if (refresh.closed || !stage) return;
+      // An edit was captured since the change: it already showed the new page. One being captured will.
+      if (editing.lastPatch >= refresh.since) return;
+      if (editing.pending.length || editing.busy) continue;
       const target = stage;
       let got = null;
       try {
@@ -201,6 +222,7 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
       const hash = hashOf(got.image);
       if (hash === target.hash) continue;
       target.hash = hash;
+      if (got.dom && target === stage) editing.base = got;
       const id = storeShot(`h${Date.now().toString(36)}${randomBytes(6).toString('hex')}`, got.image, got.type || 'image/jpeg');
       publishHub('stage.refresh', { of: target.seq, url: target.url, width: target.width, shot: id, shotSize: got.shotSize || null, page: got.page || null, findings: got.findings || [], counts: got.counts || {}, attempt: refresh.tries });
       return;
@@ -209,10 +231,115 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
   const scheduleRefresh = () => {
     if (!refresher || !stage) return;
     refresh.tries = 0;
+    refresh.since = Date.now();
     refresh.running ||= refreshLoop().finally(() => {
       refresh.running = null;
     });
   };
+  // ---- per edit: the stage captured again after each edit, compared with the capture before it ----
+  const editing = { pending: [], timer: null, chain: Promise.resolve(), base: null, gen: 0, lastPatch: 0, busy: false };
+  const canSnap = () => Boolean(refresher && typeof refresher.snapshot === 'function');
+  const later = (fn, ms) => setTimeout(fn, ms).unref?.();
+  const wait = (ms) => new Promise((r) => later(r, ms));
+  const inChain = (fn) => {
+    editing.chain = editing.chain.then(fn).catch(() => {});
+    return editing.chain;
+  };
+  const snap = async (target) => {
+    try {
+      const got = await refresher.snapshot({ url: target.url, width: target.width, height: target.height, colorScheme: target.colorScheme });
+      return got?.image && got.dom ? got : null;
+    } catch {
+      return null;
+    }
+  };
+  // The page as the diagnose left it, to compare the first edit with (the diagnose's own load is not kept).
+  const takeBaseline = () => {
+    const gen = ++editing.gen;
+    editing.base = null;
+    if (!canSnap() || !stage) return;
+    later(
+      () =>
+        inChain(async () => {
+          if (gen !== editing.gen || refresh.closed || !stage || editing.base) return;
+          const got = await snap(stage);
+          if (got && gen === editing.gen && !editing.base) editing.base = got;
+        }),
+      baselineDelay,
+    );
+  };
+  // Loads the stage until it differs from base (the dev server may still be rebuilding), editTries times at most.
+  const captureUntilChanged = async (target, base, setRegions) => {
+    let got = null;
+    for (let i = 0; i < editTries && !refresh.closed; i++) {
+      if (i) await wait(editRetry);
+      const next = await snap(target);
+      if (!next) continue;
+      got = next;
+      // With nothing to compare with, the whole new picture is the change.
+      if (!base) break;
+      const regions = diffSnapshots(base.dom, got.dom, { height: got.shotSize?.height || Infinity });
+      setRegions(regions);
+      if (regions.length || hashOf(got.image) !== target.hash) break;
+    }
+    return got;
+  };
+  const capturePatch = async () => {
+    const edits = editing.pending.splice(0);
+    const target = stage;
+    if (!edits.length || !target || refresh.closed) return;
+    const base = editing.base;
+    let got = null;
+    let regions = [];
+    editing.busy = true;
+    try {
+      got = await captureUntilChanged(target, base, (r) => {
+        regions = r;
+      });
+    } finally {
+      editing.busy = false;
+    }
+    if (!got || refresh.closed || target !== stage) return;
+    editing.base = got;
+    editing.lastPatch = Date.now();
+    const hash = hashOf(got.image);
+    const changed = hash !== target.hash || regions.length > 0;
+    target.hash = hash;
+    const shot = changed ? storeShot(`h${Date.now().toString(36)}${randomBytes(6).toString('hex')}`, got.image, got.type || 'image/jpeg') : null;
+    const list = edits.map((e) => ({ file: e.file, tool: e.tool, agent: e.agent }));
+    const last = list.at(-1);
+    publishHub('stage.patch', {
+      of: target.seq,
+      url: target.url,
+      width: target.width,
+      shot,
+      shotSize: got.shotSize || null,
+      page: got.page || null,
+      file: last.file,
+      tool: last.tool,
+      agent: last.agent,
+      edits: list,
+      // Regions found by comparing the two loads; `edit` says which of the edits it is shown for.
+      changed: assignRegions(regions, list).map(({ rect, kind, label, count, edit, guessed }) => ({ rect, kind, label, count, edit, guessed })),
+      compared: Boolean(base),
+      ...(shot && { findings: got.findings || [], counts: got.counts || {} }),
+    });
+  };
+  const onEdit = (event) => {
+    if (!canSnap() || !stage) return;
+    const d = event.data;
+    const str = (v, n) => (typeof v === 'string' && v ? v.slice(0, n) : null);
+    const file = str(d.file, 200);
+    if (!file) return;
+    const now = Date.now();
+    editing.pending.push({ file, tool: str(d.tool, 40), agent: event.agent, at: now });
+    if (editing.pending.length > MAX_EDITS) editing.pending.splice(0, editing.pending.length - MAX_EDITS);
+    clearTimeout(editing.timer);
+    // Each edit waits for the next one a moment, but a steady stream of edits is still captured every few debounces.
+    const delay = Math.max(0, Math.min(editDebounce, editing.pending[0].at + 4 * editDebounce - now));
+    editing.timer = later(() => inChain(capturePatch), delay);
+  };
+
   const watchStage = (event) => {
     const d = event.data;
     if (event.type === 'stage') {
@@ -221,7 +348,10 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
       if (stage && stage.call === event.call && stage.width >= d.width) return;
       const shot = typeof d.shot === 'string' ? shots.get(d.shot) : null;
       stage = d.diagnosed !== false && shot && isLocalPage(d.url) ? { seq: event.seq, call: event.call, url: d.url, width: d.width, height: d.height, colorScheme: d.colorScheme || null, hash: hashOf(shot.image) } : null;
-    } else if (CHANGES(event)) scheduleRefresh();
+      takeBaseline();
+    } else if (event.type === 'edit') onEdit(event);
+    // `taster add` reports its files as an edit too, so with the per-edit view on, that edit shows the change.
+    else if (CHANGES(event) && !(event.type === 'component.add' && canSnap())) scheduleRefresh();
   };
 
   const keep = (event) => {
@@ -372,6 +502,7 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
     if (closed) return;
     closed = true;
     refresh.closed = true;
+    clearTimeout(editing.timer);
     forget();
     await refresher?.close?.();
     for (const res of clients) res.end();
@@ -395,6 +526,8 @@ export async function startHub({ port = DEFAULT_PORT, discovery = discoveryFile(
     /** Keep a picture taken by the hub; returns its id. */
     shot: (image, type = 'image/jpeg') => storeShot(`h${Date.now().toString(36)}${randomBytes(6).toString('hex')}`, image, type),
     getShot: (id) => shots.get(id) || null,
+    /** Resolves once the edit captures queued so far are done (tests). */
+    idle: () => editing.chain,
     close,
   };
 }
