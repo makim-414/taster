@@ -13,10 +13,17 @@ All notable changes to Taster are recorded here. The format follows
   section lamp in CSS and light slats in one WebGL1 shader), `blocks/password-field` (strength bar and checklist on
   `sensitive-input`), `blocks/location-expand` (a place card that opens into a map), `marketing/index-testimonial`
   and `marketing/topo-hero`.
-- The site has a `/demo` page: the worked rebuild in `examples/rebuild/` at its first screen, with three labeled
-  cursors working on it at once. Diagnose runs the detector inside the original and visits each finding, swap wipes
-  the rebuilt page in block by block while the count of rules left goes down, and system moves the rebuilt page's
-  radius and spacing tokens live. The home page links to it under the before and after slider.
+- The site has a `/demo` page: the worked rebuild in `examples/rebuild/` rebuilt by a swarm of agents. A diagnose crew
+  flies out at once to what the detector finds on the original (at 1300 and 390 wide), outlines each element and pins
+  its rules while the count climbs to 18. A rebuild crew of 6 to 24 agents then builds the rebuilt page layer by layer
+  from its real DOM (each box and each line of text, in document order): an agent flies to the layer, draws it with
+  its size, and the layer shows or its text types in. A floating bar shows the agents, the layers done, a progress
+  line, 1x or 2x, pause and replay. A system cursor then drags the radius and spacing tokens and the whole page
+  restyles, and the end card says how many agents took how long and that the rules went from 18 to 0, with a link to
+  the rebuilt page. Reduced motion shows the end state. The home page links to it under the before and after slider.
+- The demo's cursor curves and arrow come from Stageshow (MIT, credited in `THIRD_PARTY_NOTICES.md`).
+- `apps/web/scripts/demo/record.mjs` records the same demo on any before and after page you can open, to a local
+  video (`--before`, `--after`, `--out` outside the repository).
 - The worked rebuild in `examples/rebuild/` has a light mode: when the visitor's system asks for light, `site.css`
   loads `light/theme.css`, the light scheme of the same design system (same brand and tone). Dark stays the default, so
   the README and slider pictures do not change (`apps/web/scripts/compare/render.mjs` now asks for dark). It passes

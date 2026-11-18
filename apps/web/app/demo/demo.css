@@ -1,7 +1,8 @@
-/* /demo. Only registry token values through var(), like globals.css. The frames keep their 1300x871 first screen
-   (FRAME in timeline.ts, set inline) and are scaled to the column; the marks, the chip and the cursors are drawn in
-   screen pixels over them, so their type stays readable on a phone. Cursor colors are the theme's danger, success and
-   accent tokens, solid, with no glow. */
+/* /demo. Only registry token values through var(), like globals.css. The frames keep their 1300x871 window (VIEW in
+   timeline.ts, set inline) and are scaled to the column; the outlines, chips, boxes and cursors are drawn in screen
+   pixels over them, so their type stays readable on a phone. The diagnose crew is the theme's danger color; each
+   rebuild agent turns the hue of the theme's success color by its own step (--turn), keeping its lightness and chroma,
+   so the crew reads as many hands of one system. Solid fills, no glow. */
 .demo-intro {
   max-width: 760px;
   padding: var(--sp-12) 0 var(--sp-8);
@@ -16,6 +17,7 @@
   padding-bottom: var(--sp-12);
 }
 .demo-board {
+  --agent-base: var(--success);
   position: relative;
 }
 .demo-stage {
@@ -32,7 +34,11 @@
   left: 0;
   transform-origin: 0 0;
 }
-.demo-frames iframe {
+.demo-frame {
+  position: absolute;
+  inset: 0;
+}
+.demo-frame iframe {
   position: absolute;
   top: 0;
   left: 0;
@@ -41,16 +47,28 @@
   pointer-events: none;
 }
 .demo-after {
-  position: absolute;
-  inset: 0;
-  clip-path: inset(0 0 100% 0);
+  opacity: 0;
 }
 .demo-after[data-whole] {
-  clip-path: none;
+  opacity: 1;
 }
+.demo-narrow {
+  position: absolute;
+  top: 0;
+  left: -200vw;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+.demo-narrow iframe {
+  border: 0;
+}
+
 .demo-marks {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   pointer-events: none;
 }
 .demo-mark {
@@ -59,16 +77,11 @@
   left: 0;
   border: 2px solid var(--danger);
   opacity: 0;
-  transition: opacity var(--dur-dropdown) var(--ease-out);
+  will-change: transform;
 }
-.demo-mark[data-on] {
-  opacity: 1;
-}
-.demo-chip {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: grid;
+.demo-chip,
+.demo-extra {
+  display: none;
   gap: var(--sp-1);
   max-width: 280px;
   padding: var(--sp-1) var(--sp-2);
@@ -78,72 +91,215 @@
   box-shadow: var(--sh-pop);
   font-size: var(--t-xs);
   line-height: var(--lh-snug);
-  opacity: 0;
-  transition: opacity var(--dur-dropdown) var(--ease-out);
 }
-.demo-chip[data-on] {
-  opacity: 1;
+.demo-chip {
+  position: absolute;
+  top: 100%;
+  left: -2px;
+  width: max-content;
+  margin-top: var(--sp-1);
 }
-.demo-chip code {
+.demo-mark[data-in] .demo-chip {
+  top: var(--sp-1);
+  left: var(--sp-1);
+  margin-top: 0;
+}
+.demo-mark[data-chip] .demo-chip {
+  display: grid;
+}
+.demo-extra {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+}
+.demo-extra[data-on] {
+  display: grid;
+}
+.demo-chip code,
+.demo-extra code {
   font-size: inherit;
   font-weight: var(--w-semi);
 }
+
+.demo-box {
+  --agent: oklch(from var(--agent-base) l c calc(h + var(--turn, 0)));
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid var(--agent);
+  background: color-mix(in oklch, var(--agent) 10%, transparent);
+  opacity: 0;
+  will-change: transform;
+}
+.demo-size {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-top: var(--sp-1);
+  padding: 0 var(--sp-1);
+  color: var(--accent-fg);
+  background: var(--agent);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  line-height: var(--lh-normal);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
 @media (max-width: 639px) {
-  .demo-chip-name {
+  .demo-chip-name,
+  .demo-size {
     display: none;
   }
 }
-.demo-end {
-  position: absolute;
-  left: var(--sp-4);
-  bottom: var(--sp-4);
-  margin: 0;
-  padding: var(--sp-2) var(--sp-4);
+
+/* The bar: under the stage on a phone, floating over its foot from 640 wide. */
+.demo-dock {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
   color: var(--text);
-  background: var(--bg-elev);
+  background: var(--popover);
+  border: 1px solid var(--border);
   border-radius: var(--r-md);
   box-shadow: var(--sh-pop);
-  font-size: var(--t-title);
-  font-weight: var(--w-semi);
-  opacity: 0;
-  transition: opacity var(--dur-modal) var(--ease-out);
+  font-size: var(--t-body);
 }
-.demo-end[data-on] {
-  opacity: 1;
-}
-@media (max-width: 639px) {
-  .demo-end {
-    left: var(--sp-2);
-    bottom: var(--sp-2);
-    padding: var(--sp-1) var(--sp-3);
-    font-size: var(--t-body);
+@media (min-width: 640px) {
+  .demo-dock {
+    position: absolute;
+    left: 50%;
+    bottom: var(--sp-4);
+    width: max-content;
+    max-width: calc(100% - var(--sp-8));
+    margin: 0;
+    transform: translateX(-50%);
   }
 }
-
-.demo-bar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--sp-4) var(--sp-8);
-  padding: var(--sp-5) 0 var(--sp-4);
+.demo-play,
+.demo-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
 }
-@media (min-width: 900px) {
-  .demo-bar {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
-    align-items: center;
-  }
+.demo-end,
+.demo-dock[data-end] .demo-play {
+  display: none;
 }
-.demo-counts {
+.demo-dock[data-end] .demo-end {
+  display: flex;
+}
+.demo-live,
+.demo-done {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--sp-2);
   margin: 0;
-  font-size: var(--t-title);
   font-variant-numeric: tabular-nums;
 }
-.demo-counts b {
+.demo-done {
+  gap: 0 var(--sp-4);
+}
+.demo-live b,
+.demo-done b {
   font-weight: var(--w-semi);
 }
-.demo-tokens {
+.demo-dots {
+  display: inline-flex;
+}
+.demo-dots i {
+  --agent: oklch(from var(--agent-base) l c calc(h + var(--turn, 0)));
+  width: var(--sp-3);
+  height: var(--sp-3);
+  margin-left: calc(-1 * var(--sp-1));
+  background: var(--agent);
+  border: 2px solid var(--popover);
+  border-radius: var(--r-pill);
+}
+.demo-dots i:first-child {
+  margin-left: 0;
+}
+.demo-dots[data-crew='diagnose'] i {
+  --agent: var(--danger);
+}
+.demo-line {
+  display: block;
+  flex: 1 1 80px;
+  min-width: 80px;
+  height: 2px;
+  overflow: hidden;
+  background: var(--border);
+  border-radius: var(--r-pill);
+}
+.demo-line span {
+  display: block;
+  height: 100%;
+  background: var(--text);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+.demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-1);
+}
+.demo-buttons button,
+.demo-open {
+  min-height: var(--control-touch);
+}
+button.demo-quiet {
+  padding: 0 var(--sp-3);
+  color: var(--text);
+  background: var(--bg-sunken);
+  font-variant-numeric: tabular-nums;
+}
+.demo-open {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--sp-4);
+  color: var(--accent-fg);
+  background: var(--accent);
+  border-radius: var(--r-md);
+  font-weight: var(--w-med);
+  text-decoration: none;
+}
+
+/* The token sliders: under the bar on a phone, over the stage's top right corner from 640 wide once tuning starts. */
+.demo-tune {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 var(--sp-5);
+  gap: 0 var(--sp-4);
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.demo-tune[hidden] {
+  display: none;
+}
+@media (min-width: 640px) {
+  .demo-tune {
+    position: absolute;
+    top: var(--sp-4);
+    right: var(--sp-4);
+    width: min(360px, 40%);
+    margin: 0;
+    box-shadow: var(--sh-pop);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--dur-modal) var(--ease-out), visibility var(--dur-modal);
+  }
+  .demo-tune[data-on],
+  .demo[data-reduced] .demo-tune {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 .demo-token {
   display: grid;
@@ -171,26 +327,123 @@
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
-.demo-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-.demo-controls button {
-  min-height: var(--control-touch);
-}
-button.demo-replay {
-  color: var(--text);
-  background: var(--bg-sunken);
-}
+
 .demo-note {
-  margin: 0;
+  margin: var(--sp-3) 0 0;
   color: var(--text-muted);
 }
 .demo-result {
-  margin: var(--sp-2) 0 0;
+  margin: var(--sp-4) 0 0;
   font-size: var(--t-title);
 }
+
+.demo-cursors {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  overflow-clip-margin: var(--sp-8);
+  pointer-events: none;
+}
+.demo-cursor {
+  --agent: oklch(from var(--agent-base) l c calc(h + var(--turn, 0)));
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--agent);
+  opacity: 0;
+  transition: opacity var(--dur-dropdown) var(--ease-out);
+  will-change: transform;
+}
+.demo-cursor[data-who='diagnose'] {
+  --agent: var(--danger);
+}
+.demo-cursor[data-who='system'] {
+  --agent: var(--accent);
+}
+.demo-cursor svg {
+  display: block;
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+}
+.demo-cursor path {
+  fill: currentColor;
+  stroke: var(--bg);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.demo-cursor-tag {
+  position: absolute;
+  top: var(--sp-4);
+  left: var(--sp-3);
+  padding: 0 var(--sp-1);
+  color: var(--accent-fg);
+  background: var(--agent);
+  border-radius: var(--r-sm);
+  font-size: var(--t-micro);
+  font-weight: var(--w-semi);
+  line-height: var(--lh-normal);
+  white-space: nowrap;
+}
+.demo-cursor[data-flip] .demo-cursor-tag {
+  left: auto;
+  right: var(--sp-1);
+}
+@media (max-width: 639px) {
+  .demo-cursor svg {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+  }
+  .demo-cursor[data-who='build'] .demo-cursor-tag,
+  .demo-cursor[data-who='diagnose'] .demo-cursor-tag {
+    display: none;
+  }
+}
+
+.demo-steps {
+  max-width: 760px;
+  padding: var(--sp-8) 0 var(--sp-12);
+  border-top: 1px solid var(--border);
+}
+.demo-steps .steps {
+  margin-top: var(--sp-4);
+}
+
+/* A recording run (scripts/demo/record.mjs): the board alone, as large as the window allows. */
+html[data-demo-record] body {
+  overflow: hidden;
+}
+html[data-demo-record] .page {
+  max-width: none;
+  padding: 0;
+}
+html[data-demo-record] .page > :not(.demo),
+html[data-demo-record] .demo-result,
+html[data-demo-record] .demo-note {
+  display: none;
+}
+html[data-demo-record] .demo {
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  padding: 0;
+}
+html[data-demo-record] .demo-board {
+  width: min(100vw, calc(100vh * 1300 / 871));
+}
+html[data-demo-record] .demo-stage {
+  border: 0;
+  border-radius: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-cursors {
+    display: none;
+  }
+  .demo-tune {
+    transition: none;
+  }
+}
+
 .demo-links {
   display: flex;
   flex-wrap: wrap;
@@ -204,76 +457,7 @@ button.demo-replay {
   align-items: center;
   min-height: var(--control-touch);
 }
-
-.demo-cursors {
-  /* Reaches below the bar, so a name tag under a slider is not cut off. */
-  position: absolute;
-  inset: 0 0 calc(-1 * var(--sp-12)) 0;
-  overflow: clip;
-  pointer-events: none;
-}
-.demo-cursor {
-  position: absolute;
-  top: 0;
-  left: 0;
-  color: var(--cursor);
-  will-change: transform;
-}
-.demo-cursor[data-who='diagnose'] {
-  --cursor: var(--danger);
-}
-.demo-cursor[data-who='swap'] {
-  --cursor: var(--success);
-}
-.demo-cursor[data-who='system'] {
-  --cursor: var(--accent);
-}
-.demo-cursor svg {
-  display: block;
-  width: var(--icon-md);
-  height: var(--icon-md);
-}
-.demo-cursor path {
-  fill: currentColor;
-  stroke: var(--bg);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-}
-.demo-cursor-tag {
-  position: absolute;
-  top: var(--sp-5);
-  left: var(--sp-3);
-  padding: var(--sp-1) var(--sp-2);
-  color: var(--accent-fg);
-  background: var(--cursor);
-  border-radius: var(--r-sm);
-  box-shadow: var(--sh-card);
-  font-size: var(--t-sm);
-  font-weight: var(--w-semi);
-  line-height: var(--lh-snug);
-  white-space: nowrap;
-}
-.demo-cursor[data-flip] .demo-cursor-tag {
-  left: auto;
-  right: var(--sp-1);
-}
-
-.demo-steps {
-  max-width: 760px;
-  padding: var(--sp-8) 0 var(--sp-12);
-  border-top: 1px solid var(--border);
-}
-.demo-steps .steps {
-  margin-top: var(--sp-4);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .demo-cursors {
-    display: none;
-  }
-  .demo-mark,
-  .demo-chip,
-  .demo-end {
-    transition: none;
-  }
+html[data-demo-record] .demo-links,
+html[data-demo-record] .demo .fineprint {
+  display: none;
 }
