@@ -276,6 +276,10 @@ export function emit(type, data = {}) {
   try {
     if (knownAbsent()) return;
     const ctx = store.getStore();
+    // A call that has ended says nothing more: a run that was cancelled can still be working in the background, and
+    // its pictures and findings would land on the viewer under a call it already showed as over.
+    if (ctx?.ended) return;
+    if (ctx && type === 'call.end') ctx.ended = true;
     const agent = ctx?.agent || { ...processAgent, lane: 0 };
     const n = (counters.get(agent.id) || 0) + 1;
     counters.set(agent.id, n);
@@ -291,7 +295,7 @@ export function emit(type, data = {}) {
  */
 export function sendShot(image, type = 'image/jpeg') {
   try {
-    if (knownAbsent() || !image?.length) return null;
+    if (knownAbsent() || !image?.length || store.getStore()?.ended) return null;
     const id = `${Date.now().toString(36)}${rand()}${rand()}`;
     enqueue({ shot: { id, image, type } });
     return id;

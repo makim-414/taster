@@ -71,6 +71,7 @@ test('the ACP agent answers slash commands over stdio', { timeout: 120000 }, asy
     const commands = await c.waitFor((m) => m.method === 'session/update' && m.params.update.sessionUpdate === 'available_commands_update');
     assert.deepEqual(commands.params.update.availableCommands.map((x) => x.name), ['start', 'diagnose', 'extract', 'brand', 'explain', 'rules', 'help']);
     assert.equal(commands.params.update.availableCommands.find((x) => x.name === 'diagnose').input.hint, 'URL or path to an HTML file');
+    assert.equal(commands.params.update.availableCommands.find((x) => x.name === 'start').input.hint, 'optional URL or path to an HTML file');
 
     // The opening question comes from the skill's start guide.
     let seen = c.updates(sessionId).length;
@@ -104,6 +105,20 @@ test('the ACP agent answers slash commands over stdio', { timeout: 120000 }, asy
     assert.ok(kinds.indexOf('tool_call') < kinds.lastIndexOf('agent_message_chunk'), 'findings come after the tool call');
     assert.match(textOf(turn), /AC-01 {2}All-caps label with wide letter spacing/);
 
+    // /start with a target diagnoses it at once, as the MCP start prompt does, and /taster is the same command.
+    for (const text of ['/start csp.html', '/taster csp.html']) {
+      seen = c.updates(sessionId).length;
+      res = await c.request('session/prompt', { sessionId, prompt: [{ type: 'text', text }] });
+      assert.equal(res.result.stopReason, 'end_turn');
+      const started = c.updates(sessionId).slice(seen);
+      assert.ok(started.some((u) => u.sessionUpdate === 'tool_call_update' && u.status === 'completed'), `${text}: no diagnose`);
+      assert.match(textOf(started), /AC-01 {2}All-caps label/, text);
+      assert.ok(!/Is this a site that already exists/.test(textOf(started)), `${text} asked the opening question`);
+    }
+    seen = c.updates(sessionId).length;
+    await c.request('session/prompt', { sessionId, prompt: [{ type: 'text', text: '/taster' }] });
+    assert.match(textOf(c.updates(sessionId).slice(seen)), /Is this a site that already exists/);
+
     // A bad target fails the tool call and still ends the turn.
     seen = c.updates(sessionId).length;
     res = await c.request('session/prompt', { sessionId, prompt: [{ type: 'text', text: '/diagnose /no/such/file.html' }] });
@@ -122,8 +137,15 @@ test('the ACP agent answers slash commands over stdio', { timeout: 120000 }, asy
     // session/cancel ends a running turn with stopReason cancelled.
     const pending = c.request('session/prompt', { sessionId, prompt: [{ type: 'text', text: '/diagnose csp.html' }] });
     await c.waitFor((m) => m.method === 'session/update' && m.params.update.sessionUpdate === 'tool_call' && c.messages.indexOf(m) > c.messages.indexOf(res));
+    const cancelledCall = c.messages.filter((m) => m.method === 'session/update' && m.params.update.sessionUpdate === 'tool_call').pop().params.update.toolCallId;
     c.notify('session/cancel', { sessionId });
-    assert.equal((await pending).result.stopReason, 'cancelled');
+    const cancelledAnswer = await pending;
+    assert.equal(cancelledAnswer.result.stopReason, 'cancelled');
+    // The tool call is ended before the turn's answer, so an editor does not show it running forever.
+    const ended = c.messages.find((m) => m.method === 'session/update' && m.params.update.toolCallId === cancelledCall && m.params.update.status === 'failed');
+    assert.ok(ended, 'the cancelled tool call never got a final status');
+    assert.ok(c.messages.indexOf(ended) < c.messages.indexOf(cancelledAnswer), 'the final status came after the cancelled answer');
+    assert.match(ended.params.update.content[0].content.text, /Cancelled/);
 
     // Negative control: malformed input gets JSON-RPC errors and the agent keeps serving.
     c.send('this is not json');
