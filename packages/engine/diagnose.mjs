@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 import { NotDiagnosedError, classifyLoad } from './blocked.mjs';
 import * as live from './live.mjs';
+import { SNAPSHOT_MAX, domSnapshot } from './domdiff.mjs';
 
 export { NotDiagnosedError } from './blocked.mjs';
 
@@ -125,16 +126,20 @@ async function stagePicture(page, viewport) {
 // bypassCSP: many large sites forbid inline scripts, which would block the injected detector.
 // colorScheme ('light' or 'dark') sets prefers-color-scheme for the load; left out, the browser's own default (light).
 // stageShot: also take the page as it is, from the same load, before the detector runs (report.stage, see stagePicture).
-export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50, colorScheme, stageShot = false } = {}) {
+// domShot: also list its elements with their rects and a signature of how they look (report.dom, see domdiff.mjs), so
+// two loads can be compared after an edit.
+export async function detectOnce(browser, url, viewport, { highlight = false, screenshot = null, timeout = 30000, maxPerRule = 50, colorScheme, stageShot = false, domShot = false } = {}) {
   const page = await browser.newPage({ viewport, deviceScaleFactor: 1, bypassCSP: true, ...(colorScheme ? { colorScheme } : {}) });
   try {
     const load = await open(page, url, timeout);
     if (!load.diagnosed) return { url: load.finalUrl, viewport, page: { width: viewport.width, height: 0 }, counts: {}, findings: [], load };
     const stage = stageShot ? await stagePicture(page, viewport).catch(() => null) : null;
+    const dom = domShot ? await page.evaluate(domSnapshot, SNAPSHOT_MAX).catch(() => null) : null;
     await page.addScriptTag({ content: DETECT_SOURCE });
     const report = await page.evaluate((o) => window.tasterDetect(o), { highlight: highlight || !!screenshot, maxPerRule });
     report.load = load;
     if (stage) report.stage = stage;
+    if (dom) report.dom = dom;
     if (screenshot) {
       // Wide overflow is shown up to half a screen past the viewport, the way the web capture does.
       const width = Math.min(Math.max(report.page.width, viewport.width), Math.round(viewport.width * 1.5));
