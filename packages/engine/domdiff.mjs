@@ -8,6 +8,10 @@
 // This finds what changed on the page after the dev server reloaded, not which elements an edit touched: an edit to a
 // shared stylesheet shows as every element it restyled, and two edits that land between two captures share one diff
 // (assignRegions splits it between them by the file names, which is a guess and is labelled as one).
+//
+// Some elements change on every load with no edit at all: a rotating headline word, a live clock, a ticker, a chart
+// drawn from random data. changedKeys lists them from two loads in a row, and diffSnapshots leaves out exactly those
+// paths (`ignore`), so they neither show up as regions nor crowd the real change out of the cap.
 
 export const SNAPSHOT_MAX = 4000;
 export const MAX_REGIONS = 10;
@@ -91,21 +95,24 @@ function hintOf(nodes, i) {
  * The regions that changed between two snapshots: [{ rect: { x, y, w, h }, kind: added | removed | changed, label,
  * hint, count }], top to bottom, at most `max`. A rect is on the page of the snapshot it was found in (removed: the
  * one before). Regions start below `height` are dropped and the rest are cut to it (the stage picture's height).
+ * `ignore` is a set of paths (changedKeys of two loads with no edit between them) whose changes are not the edit's.
  */
-export function diffSnapshots(prev, next, { max = MAX_REGIONS, gap = 16, height = Infinity } = {}) {
+export function diffSnapshots(prev, next, { max = MAX_REGIONS, gap = 16, height = Infinity, ignore = null } = {}) {
   const a = prev?.nodes || [];
   const b = next?.nodes || [];
   const inA = new Map(a.map((n, i) => [n.k, i]));
   const inB = new Map(b.map((n, i) => [n.k, i]));
   const markB = new Map();
   const markA = new Map();
+  const skip = (n) => Boolean(ignore?.has(n.k));
   b.forEach((n, i) => {
+    if (skip(n)) return;
     const j = inA.get(n.k);
     if (j === undefined) markB.set(i, 'added');
     else if (a[j].s !== n.s) markB.set(i, 'changed');
   });
   a.forEach((n, i) => {
-    if (!inB.has(n.k)) markA.set(i, 'removed');
+    if (!skip(n) && !inB.has(n.k)) markA.set(i, 'removed');
   });
   // Only the topmost changed element of a subtree: its children changed with it (inherited color, a new list).
   const top = (nodes, marks) => {
@@ -156,6 +163,18 @@ export function diffSnapshots(prev, next, { max = MAX_REGIONS, gap = 16, height 
     items.splice(best.j, 1);
   }
   return items.sort((p, q) => p.rect.y - q.rect.y || p.rect.x - q.rect.x).map(({ rect, kind, label, hint, count }) => ({ rect, kind, label, hint, count: count || 1 }));
+}
+
+/** The paths that differ between two snapshots (added, removed or changed), every one, not only the topmost. */
+export function changedKeys(prev, next) {
+  const a = prev?.nodes || [];
+  const b = next?.nodes || [];
+  const sigA = new Map(a.map((n) => [n.k, n.s]));
+  const inB = new Set(b.map((n) => n.k));
+  const out = new Set();
+  for (const n of b) if (sigA.get(n.k) !== n.s) out.add(n.k);
+  for (const n of a) if (!inB.has(n.k)) out.add(n.k);
+  return out;
 }
 
 // Words of a file name or class list that can name a part of a page; the rest (index, src, components...) cannot.

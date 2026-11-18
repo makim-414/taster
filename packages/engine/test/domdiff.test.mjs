@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { chromium } from 'playwright';
-import { assignRegions, diffSnapshots, domSnapshot, labelOf, words } from '../domdiff.mjs';
+import { assignRegions, changedKeys, diffSnapshots, domSnapshot, labelOf, words } from '../domdiff.mjs';
 
 // The per-edit view compares two loads of a page element by element. These hold the comparison to what changed, at
 // the topmost changed element, merged with its neighbours, and never to what only moved.
@@ -67,6 +67,22 @@ test('regions are capped, cut to the picture height, and zero size elements are 
   assert.ok(cut.every((r) => r.rect.y < 1000 && r.rect.y + r.rect.h <= 1000));
   const hidden = [...base(), node('html>body:0>i:0', 0, [0, 0, 0, 0], 'z')];
   assert.deepEqual(diffSnapshots(page(base()), page(hidden)), []);
+});
+
+test('changedKeys lists every path that differs, and diffSnapshots leaves exactly those paths out', () => {
+  const next = base();
+  next[2] = { ...next[2], s: 't2' };
+  next.push(node('html>body:0>section#cards>div:2', 4, [980, 760, 400, 300], 'k3'));
+  const noise = changedKeys(page(base()), page(next));
+  assert.deepEqual([...noise].sort(), ['html>body:0>header#hero>h1:0', 'html>body:0>section#cards>div:2']);
+  assert.deepEqual(diffSnapshots(page(base()), page(next), { ignore: noise }), []);
+  // A real change next to an ignored one still shows, and so does a change to an ignored element's parent.
+  const edit = next.map((n) => ({ ...n }));
+  edit[3] = { ...edit[3], s: 'p2' };
+  edit[1] = { ...edit[1], s: 'h2' };
+  const regions = diffSnapshots(page(base()), page(edit), { ignore: noise });
+  assert.deepEqual(regions.map((r) => r.label), ['header#hero']);
+  assert.equal(regions[0].rect.y, 0, 'the hero itself changed, so its region is the hero');
 });
 
 test('assignRegions matches regions to edits by file name words, and the latest edit takes the rest', () => {
