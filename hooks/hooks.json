@@ -1,0 +1,17 @@
+{
+  "description": "Tells a running taster watch which file an edit changed, so the live viewer shows the page change edit by edit. Does nothing when no taster watch runs.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/packages/engine/taster.mjs\" live edit",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
