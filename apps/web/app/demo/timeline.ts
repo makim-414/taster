@@ -89,9 +89,12 @@ const travel = (a: Point, b: Point): number => clamp(0.42 + Math.hypot(b.x - a.x
 export const diagAgents = (spots: number): number => clamp(Math.ceil(spots / 3), 1, 6);
 export const buildAgents = (layers: number): number => Math.min(layers, clamp(Math.round(layers / 5), 6, 24));
 
-/** Spots in the order the agents take them: whole page findings first, then top to bottom, left to right. */
+/** Spots in the order the agents take them: whole page findings first, then top to bottom, left to right. A whole page
+ * finding is a big box that starts on the first screen; a big box further down (a gradient band above the footer) waits
+ * for its turn by height, or the camera, which never moves back up within a phase, would sit at the bottom from the
+ * start while the agents work above it. */
 export function orderSpots(spots: Spot[], pageH = VIEW.h): Spot[] {
-  const big = (s: Spot) => s.box.w * s.box.h >= VIEW.w * Math.min(pageH, VIEW.h) * 0.4;
+  const big = (s: Spot) => s.box.y < VIEW.h && s.box.w * s.box.h >= VIEW.w * Math.min(pageH, VIEW.h) * 0.4;
   return [...spots].sort((a, b) => Number(big(b)) - Number(big(a)) || a.box.y - b.box.y || a.box.x - b.box.x);
 }
 
