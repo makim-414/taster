@@ -3,8 +3,9 @@
 // examples/rebuild/after.html in place of the changed page. The viewer is opened in headless Chromium before the
 // events (live) and again after them (replay), at desktop and phone width. It must draw the picture, the marks and a
 // cursor per agent, mark findings resolved after the refresh and then clear those marks, let a cursor's last label fade
-// once its call is over, count in the singular for one, and do it with no page error, no console error and no content
-// security policy violation. Run: node packages/engine/scripts/check-live-viewer.mjs
+// once its call is over, count in the singular for one, draw a per-edit patch (the region of the new picture fading in
+// inside a box in the editing agent's color, a finding in it resolving), and do it with no page error, no console error
+// and no content security policy violation. Run: node packages/engine/scripts/check-live-viewer.mjs
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -120,6 +121,32 @@ try {
   await quiet('hub');
   const legend = await p.locator('.agent').count();
   if (legend !== 3) fail(`desktop: the agent legend lost an agent once the cursors went quiet (${legend})`);
+
+  // Per edit: an agent's own edit (what its PostToolUse hook reports) and two patches the hub sends for edits. The
+  // editing agent's cursor flies to the changed region, the region of the new picture crossfades in inside a box with
+  // its size, a finding inside the region resolves, and the count goes down. The hub's capture and DOM diff are
+  // checked in test/watch.test.mjs; here the patches are published as the hub would.
+  const stageEvent = hub.events.find((e) => e.type === 'stage' && e.agent.id === 'mcp-check' && e.data.width === 1440);
+  const refresh = [...hub.events].reverse().find((e) => e.type === 'stage.refresh');
+  const hookAgent = { id: 'cc-check', kind: 'hook', client: 'claude-code', label: 'site', lane: 0 };
+  await post([{ v: 1, n: 1, t: Date.now(), agent: hookAgent, call: null, tool: null, type: 'edit', data: { file: 'src/hero.html', tool: 'Edit' } }]);
+  const spot = { ruleId: 'AC-01', severity: 'high', selector: 'main > h1', rect: { x: 120, y: 140, w: 300, h: 60 } };
+  const region = { rect: { x: 100, y: 120, w: 420, h: 120 }, kind: 'changed', label: 'h1 "Close your books"', count: 1, edit: 0, guessed: false };
+  const patch = (findings, changed) => ({ of: stageEvent.seq, url: stageEvent.data.url, width: 1440, shot: refresh.data.shot, shotSize: refresh.data.shotSize, file: 'src/hero.html', tool: 'Edit', agent: hookAgent, edits: [{ file: 'src/hero.html', tool: 'Edit', agent: hookAgent }], changed, compared: true, findings, counts: {} });
+  hub.publish('stage.patch', patch([spot], [region]));
+  await p.waitForFunction(() => document.querySelector('.patch[data-on] .patch-img') && /^\d+ x \d+$/.test(document.querySelector('.patch-size')?.textContent || ''), null, { timeout: 15000 }).catch(() => fail('desktop: the first patch never showed a region crossfade with its size'));
+  const editor = await p.evaluate(() => [...document.querySelectorAll('.cursor-name')].find((n) => n.textContent.includes('claude-code'))?.textContent || null);
+  if (!editor) fail('desktop: no cursor for the editing agent');
+  await p.waitForFunction(() => /1 edit shown, 0 resolved/.test(document.getElementById('counts').textContent), null, { timeout: 15000 }).catch(async () => fail(`desktop: after one patch the counts say "${await p.locator('#counts').textContent()}"`));
+  hub.publish('stage.patch', patch([], [region]));
+  await p.waitForFunction(() => document.querySelectorAll('.mark[data-resolved]').length > 0, null, { timeout: 15000 }).catch(() => fail('desktop: the finding inside the second patch did not resolve'));
+  await p.waitForFunction(() => /2 edits shown, 1 resolved/.test(document.getElementById('counts').textContent), null, { timeout: 15000 }).catch(async () => fail(`desktop: after two patches the counts say "${await p.locator('#counts').textContent()}"`));
+  await p.waitForFunction(() => document.querySelectorAll('.patch').length === 0, null, { timeout: 15000 }).catch(() => fail('desktop: the patch boxes stayed after the picture settled'));
+  if (!editor?.includes('claude-code edits')) fail(`desktop: the editing cursor is named "${editor}"`);
+  // A page shorter than the stage leaves no "Waiting for an agent" note under it.
+  if (await p.evaluate(() => getComputedStyle(document.getElementById('empty')).display !== 'none')) fail('desktop: the empty note shows under the stage');
+  const logged = await p.evaluate(() => [...document.querySelectorAll('.call')].some((c) => c.textContent.includes('src/hero.html')));
+  if (!logged) fail('desktop: the edit is not in the log');
   await finish('desktop', desk);
 
   // A tab opened afterwards gets everything from the replay, and a phone width does not scroll sideways.
