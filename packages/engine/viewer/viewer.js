@@ -100,8 +100,11 @@
     agents.set(agent.id, agent);
     return agent;
   }
+  // An agent's own edits come through its hook, a channel of their own: "claude-code edits", next to the same
+  // client's Taster calls.
+  const via = (agent) => (agent.kind === 'hook' ? `${agent.client || 'agent'} edits` : agent.client || agent.kind);
   function agentLabel(agent) {
-    return [h('b', null, agent.label), ` ${agent.client || agent.kind}`];
+    return [h('b', null, agent.label), ` ${via(agent)}`];
   }
 
   // ---- cursors: one per agent and lane, moved by a queue of steps, drawn every frame ----
@@ -112,7 +115,7 @@
     let c = cursors.get(id);
     if (c) return c;
     const say = h('span', { class: 'cursor-say' });
-    const name = `${agent.label}${lane ? ` #${lane + 1}` : ''} (${agent.client || agent.kind})`;
+    const name = `${agent.label}${lane ? ` #${lane + 1}` : ''} (${via(agent)})`;
     const el = h(
       'div',
       { class: 'cursor', 'data-color': agent.color, 'data-idle': true },

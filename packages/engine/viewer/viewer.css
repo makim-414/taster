@@ -367,6 +367,10 @@ code {
   color: var(--text-muted);
   text-align: center;
 }
+/* display: grid above would otherwise win over the hidden attribute and leave the empty note under a short page. */
+.empty[hidden] {
+  display: none;
+}
 .empty-lead {
   color: var(--text);
   font-size: var(--t-title);
