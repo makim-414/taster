@@ -4,7 +4,11 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import * as live from '../live.mjs';
+import { createServer as createMcpServer } from '../server.mjs';
 
 // The event bus behind `taster watch`: silent and cheap with no hub, ordered and tagged with one.
 const dir = mkdtempSync(join(tmpdir(), 'taster-live-test-'));
@@ -169,4 +173,44 @@ test('stripUrl and safeArgs keep addresses and drop what could be secret', () =>
   assert.equal(args.nested.list.length, 21);
   assert.equal(args.long.length, 200);
   assert.equal(args.deep.a.b, '{...}');
+});
+
+test('the local MCP server reports each call and what the tools found', { timeout: 120000 }, async () => {
+  const hub = await fakeHub();
+  const [serverSide, clientSide] = InMemoryTransport.createLinkedPair();
+  await createMcpServer().connect(serverSide);
+  const client = new Client({ name: 'watch-test-client', version: '0.1.0' });
+  await client.connect(clientSide);
+  try {
+    const fixture = fileURLToPath(new URL('../../../data/rules/fixtures/slop.html', import.meta.url));
+    const diag = await client.callTool({ name: 'diagnose', arguments: { target: fixture, widths: [1440], screenshots: false } });
+    assert.ok(!diag.isError, diag.content[0].text);
+    await client.callTool({ name: 'suggest_swaps', arguments: { ruleIds: ['AC-01'] } });
+    await client.callTool({ name: 'get_component', arguments: { id: 'blocks/button' } });
+    await live.flush();
+
+    const types = hub.got.map((e) => `${e.tool}:${e.type}`);
+    assert.deepEqual(types.filter((t) => t.startsWith('diagnose:')), ['diagnose:call.start', 'diagnose:stage', 'diagnose:findings', 'diagnose:rules', 'diagnose:call.end']);
+    assert.deepEqual(types.filter((t) => !t.startsWith('diagnose:')), ['suggest_swaps:call.start', 'suggest_swaps:swaps', 'suggest_swaps:call.end', 'get_component:call.start', 'get_component:component', 'get_component:call.end']);
+    const first = hub.got[0];
+    assert.equal(first.agent.kind, 'mcp');
+    assert.equal(first.agent.client, 'watch-test-client');
+    const findings = hub.got.find((e) => e.type === 'findings').data;
+    assert.equal(findings.width, 1440);
+    assert.ok(findings.findings.length > 5);
+    for (const f of findings.findings) {
+      assert.ok(f.selector.length <= 200 && Array.from(f.text).length <= 60);
+      assert.ok(['high', 'medium', 'low'].includes(f.severity));
+      assert.equal(typeof f.rect.x, 'number');
+    }
+    const rules = hub.got.find((e) => e.type === 'rules').data;
+    assert.ok(rules.rules.length > 3 && rules.rules.every((r) => r.name));
+    const swaps = hub.got.find((e) => e.type === 'swaps').data;
+    assert.equal(swaps.items[0].ruleId, 'AC-01');
+    assert.ok(swaps.items[0].components.length > 0);
+    assert.ok(Array.isArray(hub.got.find((e) => e.type === 'component').data.fixes));
+  } finally {
+    await client.close();
+    await hub.close();
+  }
 });

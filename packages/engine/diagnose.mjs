@@ -5,6 +5,7 @@ import { isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 import { NotDiagnosedError, classifyLoad } from './blocked.mjs';
+import * as live from './live.mjs';
 
 export { NotDiagnosedError } from './blocked.mjs';
 
@@ -131,20 +132,72 @@ export async function detectOnce(browser, url, viewport, { highlight = false, sc
 
 export async function diagnose(target, { viewports = VIEWPORTS, outDir = null, timeout = 30000, maxPerRule = 50, colorScheme } = {}) {
   const url = toUrl(target);
+  // Only with `taster watch` running: the viewer is told about each width as it is measured (packages/engine/live.mjs).
+  const watched = await live.active();
   const browser = await launch();
   try {
     const runs = [];
     for (const viewport of viewports) {
       const screenshot = outDir ? join(outDir, `annotated-${viewport.width}.jpg`) : null;
       runs.push(await detectOnce(browser, url, viewport, { screenshot, timeout, maxPerRule, colorScheme }));
+      if (watched) emitRun(url, runs.at(-1), viewport, colorScheme);
       // A block or error page is not loaded again at the next width.
       if (!runs.at(-1).load.diagnosed) break;
     }
-    return summarize(url, runs);
+    const report = summarize(url, runs);
+    if (watched) live.emit('rules', liveRules(report));
+    return report;
   } finally {
     await browser.close();
   }
 }
+
+// ---- what the live viewer gets (packages/engine/live.mjs): rects, rule ids and short labels, never page contents ----
+
+const MAX_LIVE_FINDINGS = 600;
+/** One width's findings as the viewer draws them: selector up to 200 characters, text up to 60, the page rect. */
+export function liveFindings(run) {
+  return (run.findings || []).slice(0, MAX_LIVE_FINDINGS).map((f, i) => ({
+    id: i,
+    ruleId: f.ruleId,
+    severity: RULE_BY_ID.get(f.ruleId)?.severity || 'low',
+    selector: String(f.selector || '').slice(0, 200),
+    text: Array.from(String(f.text || '')).slice(0, 60).join(''),
+    rect: f.rect ? { x: f.rect.x, y: f.rect.y, w: f.rect.w, h: f.rect.h } : null,
+  }));
+}
+
+/** The stage event for one width: where the page is, how big it is, and the picture's id once the hub has it. */
+export function liveStage(url, run, viewport, { shot = null, colorScheme } = {}) {
+  const load = run.load || {};
+  return {
+    url: live.stripUrl(url),
+    finalUrl: live.stripUrl(load.finalUrl || run.url || url),
+    width: viewport.width,
+    height: viewport.height,
+    page: run.page ? { width: run.page.width, height: run.page.height } : null,
+    colorScheme: colorScheme || null,
+    diagnosed: load.diagnosed !== false,
+    ...(load.diagnosed === false && { reason: load.reason || null }),
+    shot,
+  };
+}
+
+function emitRun(url, run, viewport, colorScheme) {
+  live.emit('stage', liveStage(url, run, viewport, { colorScheme }));
+  if (run.load?.diagnosed === false) return;
+  live.emit('findings', { width: viewport.width, findings: liveFindings(run), counts: run.counts || {} });
+}
+
+const liveRules = (report) => ({
+  url: live.stripUrl(report.url),
+  diagnosed: report.diagnosed !== false,
+  widths: report.widths,
+  rulesHit: report.rulesHit,
+  measured: report.measured,
+  findings: report.findings,
+  rules: report.rules.map((r) => ({ ruleId: r.ruleId, name: r.name, severity: r.severity, counts: r.counts, fix_patterns: r.fix_patterns })),
+});
 
 const sameUrl = (a, b) => {
   try {

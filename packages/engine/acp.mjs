@@ -5,12 +5,13 @@
 import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { tmpdir } from 'node:os';
-import { isAbsolute, join, resolve } from 'node:path';
+import { basename, isAbsolute, join, resolve } from 'node:path';
 import { Readable, Writable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import { PROTOCOL_VERSION, RequestError, agent, methods, ndJsonStream } from '@agentclientprotocol/sdk';
 import { RULES, diagnose, explainRule, extract, formatText } from './diagnose.mjs';
 import { brandTheme } from './brand.mjs';
+import * as live from './live.mjs';
 
 const VERSION = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version;
 const START_GUIDE = fileURLToPath(new URL('../../skills/taster/references/start.md', import.meta.url));
@@ -142,22 +143,27 @@ function untilAborted(promise, signal) {
 export function createAgent() {
   const sessions = new Map();
   process.once('exit', () => sessions.forEach(dropCaptures));
+  // The editor's name, for the live viewer's cursor label (packages/engine/live.mjs).
+  let clientName = null;
 
   return agent({ name: 'taster' })
-    .onRequest(methods.agent.initialize, () => ({
-      // Version 1 is the only one this agent speaks; the spec says to answer with the latest supported one.
-      protocolVersion: PROTOCOL_VERSION,
-      agentCapabilities: {
-        loadSession: false,
-        promptCapabilities: { image: false, audio: false, embeddedContext: false },
-      },
-      agentInfo: { name: 'taster', title: 'Taster', version: VERSION },
-      // No account: the only setup is a browser for page checks. Clients that support terminal setup can run it
-      // before first use (`taster acp --setup`); nothing ever requires it, and authenticate is a no-op.
-      authMethods: [
-        { id: 'setup', name: 'Set up the browser', description: 'Checks for Chrome or Chromium and downloads Chromium once if neither works.', type: 'terminal', args: ['acp', '--setup'], env: {} },
-      ],
-    }))
+    .onRequest(methods.agent.initialize, ({ params }) => {
+      clientName = typeof params?.clientInfo?.name === 'string' ? params.clientInfo.name : null;
+      return {
+        // Version 1 is the only one this agent speaks; the spec says to answer with the latest supported one.
+        protocolVersion: PROTOCOL_VERSION,
+        agentCapabilities: {
+          loadSession: false,
+          promptCapabilities: { image: false, audio: false, embeddedContext: false },
+        },
+        agentInfo: { name: 'taster', title: 'Taster', version: VERSION },
+        // No account: the only setup is a browser for page checks. Clients that support terminal setup can run it
+        // before first use (`taster acp --setup`); nothing ever requires it, and authenticate is a no-op.
+        authMethods: [
+          { id: 'setup', name: 'Set up the browser', description: 'Checks for Chrome or Chromium and downloads Chromium once if neither works.', type: 'terminal', args: ['acp', '--setup'], env: {} },
+        ],
+      };
+    })
     .onRequest(methods.agent.authenticate, () => ({}))
     .onRequest(methods.agent.session.new, ({ params, client }) => {
       const sessionId = randomUUID();
@@ -184,20 +190,27 @@ export function createAgent() {
       const messageId = randomUUID();
       const say = (text) => update({ sessionUpdate: 'agent_message_chunk', messageId, content: { type: 'text', text } });
 
-      // One browser run, shown in the editor as a tool call, then its result as a message.
-      const browserRun = async (title, run, render, { locations } = {}) => {
+      // One browser run, shown in the editor as a tool call, then its result as a message. It is also one live call
+      // for `taster watch`, with the session as the agent.
+      const who = { id: sessionId, kind: 'acp', client: clientName, label: basename(session.cwd || process.cwd()) };
+      const browserRun = (title, run, render, { locations, tool, target } = {}) => live.withCall({ tool, agent: who }, async () => {
         const toolCallId = `taster-${randomUUID()}`;
+        const started = Date.now();
+        live.emit('call.start', { args: live.safeArgs({ target }) });
         await update({ sessionUpdate: 'tool_call', toolCallId, title, kind: 'fetch', status: 'pending', locations });
         await update({ sessionUpdate: 'tool_call_update', toolCallId, status: 'in_progress' });
         let result;
         try {
           result = await untilAborted(run(), turn.signal);
         } catch (err) {
-          if (err instanceof Cancelled) throw err;
+          const cancelled = err instanceof Cancelled;
+          live.emit('call.end', { ok: false, ms: Date.now() - started, ...(cancelled ? { cancelled: true } : { error: live.stripUrls(String(err.message).split('\n')[0]).slice(0, 200) }) });
+          if (cancelled) throw err;
           await update({ sessionUpdate: 'tool_call_update', toolCallId, status: 'failed', content: [{ type: 'content', content: { type: 'text', text: err.message } }] });
           await say(`${title} failed: ${err.message}`);
           return;
         }
+        live.emit('call.end', { ok: true, ms: Date.now() - started });
         const { summary, message, files = [] } = render(result);
         await update({
           sessionUpdate: 'tool_call_update',
@@ -207,7 +220,7 @@ export function createAgent() {
           locations: files.length ? files.map((path) => ({ path })) : undefined,
         });
         await say(message);
-      };
+      });
 
       try {
         const { command, arg } = parseCommand(promptText(params.prompt));
@@ -237,7 +250,7 @@ export function createAgent() {
               summary: `${report.rulesHit} of ${report.measured} measured rules hit, ${report.findings} findings at ${report.widths.join(' and ')} wide`,
               message: fence(formatText(report)),
               files: report.screenshots,
-            }), { locations: fileLocation });
+            }), { locations: fileLocation, tool: 'diagnose', target });
           }
         } else if (command === 'extract') {
           if (!target) await needsTarget('extract');
@@ -245,7 +258,7 @@ export function createAgent() {
             await browserRun(`Extract ${arg}`, () => extract(target), (content) => ({
               summary: `${content.sections?.length ?? 0} sections read`,
               message: fence(JSON.stringify(content, null, 2), 'json'),
-            }), { locations: fileLocation });
+            }), { locations: fileLocation, tool: 'extract', target });
           }
         } else if (command === 'brand') {
           if (!target) await needsTarget('brand');
@@ -253,7 +266,7 @@ export function createAgent() {
             await browserRun(`Brand ${arg}`, async () => brandTheme(await extract(target)), (theme) => ({
               summary: `${Object.keys(theme.tokens).length} token overrides`,
               message: brandMessage(theme),
-            }), { locations: fileLocation });
+            }), { locations: fileLocation, tool: 'brand', target });
           }
         } else {
           await say(`Unknown command /${command}.\n\n${HELP}`);
