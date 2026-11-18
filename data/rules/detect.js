@@ -1876,10 +1876,17 @@
         var it = M.get(o.el);
         if (!it || hiddenFromReader(o.el) || inOverlay(o.el)) return;
         // One box per line fragment: a bounding box of wrapped text would cover its neighbours on the same lines.
+        // Each box is cut to the line height: under tight leading the font's content area runs past the line box, so
+        // words set as separate elements on two lines would touch by the half leading without any glyph overlapping.
+        var lh = px(it.cs.lineHeight);
         var rng = document.createRange();
         rng.selectNodeContents(o.node);
         Array.prototype.forEach.call(rng.getClientRects(), function (r) {
           if (r.width <= 1 || r.height <= 1) return;
+          if (lh > 0 && r.height > lh) {
+            var cut = (r.height - lh) / 2;
+            r = { left: r.left, right: r.right, top: r.top + cut, bottom: r.bottom - cut };
+          }
           var c = clipToAncestors(o.el, r);
           if (c) boxes.push({ el: o.el, r: c });
         });

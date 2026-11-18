@@ -18,6 +18,8 @@ button { min-height: 44px; min-width: 44px; padding: 0 20px; border: 0; border-r
 button.secondary { background: #ffffff; color: #1a1a1a; border: 1px solid #d9d5cf; }
 label.check { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
 .fold summary { min-height: 44px; }
+.words { font-size: 44px; line-height: 1.1; font-weight: 600; margin: 24px 0 0; max-width: 300px; }
+.words span { display: inline-block; margin-right: 0.25em; }
 .item { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
 .item .name { min-width: 0; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .item .state { flex: none; color: #5a5753; }
@@ -37,6 +39,7 @@ label.check { display: inline-flex; align-items: center; gap: 8px; min-height: 4
   <label class="check"><input type="checkbox"> 답변이 끝난 문의 숨기기</label>
   <details class="fold"><summary>더 보기</summary><form class="fold-row"><button type="button">접힌 버튼</button><input aria-label="접힌 입력"></form></details>
   <p class="after-fold">접힌 내용 바로 아래 문장은 겹쳐 보이지 않습니다.</p>
+  <h2 class="words"><span>한</span><span>단어씩</span><span>나타나는</span><span>제목은</span><span>줄</span><span>사이가</span><span>좁습니다</span></h2>
   <div class="item"><span class="name">주문 번호 2048번 고객이 보낸 배송지 변경과 포장 요청 문의</span><span class="state">답변 대기</span></div>
   <div class="panel"><div class="ring" aria-hidden="true"></div><p>테두리를 따라 커서 빛이 지나가는 상자입니다. 빛은 1픽셀 테두리 안에서만 보입니다.</p></div>
   <div class="actions">
