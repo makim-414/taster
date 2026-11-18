@@ -162,6 +162,49 @@ Try it by hand:
 printf '%s\n' '{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":1}}' | node packages/engine/acp.mjs
 ```
 
+## Live viewer (`taster watch`)
+
+`watch.mjs` is a local hub and `viewer/` the page it serves; `live.mjs` is the event bus the tools report through.
+
+```bash
+node packages/engine/taster.mjs watch            # http://127.0.0.1:47474/#k=<key>, until Ctrl+C
+node packages/engine/taster.mjs watch --port 0   # any free port
+node packages/engine/start.mjs watch             # the same from a plugin install (installs dependencies first)
+```
+
+- **Discovery.** The hub writes `os.tmpdir()/taster-live-<uid>.json` (mode 0600: port, ingest token, pid) and removes
+  it when it stops; a second hub for the same user refuses to start. `TASTER_LIVE_FILE` names another file (tests),
+  and `TASTER_LIVE=off` turns reporting off.
+- **Reporting.** `live.withCall(ctx, fn)` runs a tool call inside `AsyncLocalStorage`, so `live.emit(type, data)`
+  anywhere below it (inside `diagnose()` too) is tagged with the agent, the call and the tool. The local MCP server
+  wraps `registerTool`, so every tool reports `call.start` and `call.end`; the ACP agent reports each browser run with
+  the session as the agent; the CLI reports `diagnose` and `add` and waits for the queue before it exits. The first
+  event reads the discovery file and asks `/api/hello`, and the answer is cached for five seconds. With no hub, `emit`
+  does nothing and opens no connection; with one, events go out in order, in batches, with a 1.5 second timeout, and
+  never throw into a tool call.
+- **Events, version 1.** `{ v, seq, n, t, agent: { id, kind: mcp | acp | cli, client, label, lane }, call, tool,
+  type, data }`; the hub adds `seq`, `n` counts per agent, `label` is the folder the tool runs in, and `lane` numbers
+  the calls of one agent that run at the same time. Types: `call.start` (`args`, with URLs cut to scheme, host and
+  path, and secret looking keys hidden), `call.end` (`ok`, `ms`, `error`, `cancelled`), `stage`, `findings` (rule,
+  severity, selector up to 200 characters, text up to 60, page rect), `rules`, `swaps`, `component`,
+  `component.add` (file names, never contents), `system`, `system.tuned` (token `diff`), `consistency`, `plan`, and
+  the hub's own `stage.refresh`.
+- **The stage.** While a hub listens, `diagnose()` passes `stageShot` to `detectOnce`, which takes a JPEG of the page
+  from the same load before the detector runs, so the rects line up. The picture goes to `/ingest/shot` ahead of the
+  `stage` event that names it and never into the report. After `component.add`, `system.tuned` or a plan check, the
+  hub opens the last local stage again (file, localhost, 127.0.0.1) every 2.5 seconds, up to 8 times, until the picture
+  differs, and sends `stage.refresh` with the findings measured on it.
+- **Honest order.** The detector is one `page.evaluate`, so findings are not found one by one. The viewer chooses the
+  order its cursors visit them in from their real rects (the 30 most severe, top to bottom) and says so on the page.
+- **Hub routes.** `GET /api/hello`, `POST /ingest` and `POST /ingest/shot?id=` (token header), `GET /events?k=` (SSE,
+  replays what it keeps to a late or reconnecting tab), `GET /shot/<id>?k=`, and the viewer's three files under the
+  content security policy `default-src 'self'`. Host must be this host and port, a request from another origin is
+  refused, and there are no CORS headers.
+
+`node packages/engine/scripts/check-live-viewer.mjs` runs a real diagnose against a hub on a free port, adds a second
+agent and a refresh, and opens the viewer in headless Chromium at 1440 and 390: marks, cursors, resolved marks, and no
+page error, console error or CSP violation.
+
 ## Checks
 
 `node scripts/gates.mjs` runs these with every other gate, in CI's order (see `CONTRIBUTING.md`). One by one:
@@ -171,6 +214,7 @@ node data/rules/test-detect.mjs           # fixtures: exact rule sets on slop pa
 node packages/engine/scripts/check-rules.mjs  # rules.json schema, and detect.js checks exactly the measured rules
 npm --prefix packages/engine test             # CLI, MCP, ACP, extract, consistency and the plan steps
 node packages/engine/scripts/check-rebuild-example.mjs  # examples/rebuild: original is slop (the count the READMEs give), both rebuilt screens are clean, consistent and on the system
+node packages/engine/scripts/check-live-viewer.mjs      # taster watch: a real diagnose drawn by the viewer, no page error or CSP violation
 ```
 
 To add a measured rule: write the check in `data/rules/detect.js` (`flag('XX-00', el, evidence)`), set its `detect.level` to `deterministic` in `data/rules/rules.json`, make a fixture in `data/rules/fixtures/` hit it and add the id to `data/rules/fixtures/expected-engine.json`. The clean fixture must stay at zero.

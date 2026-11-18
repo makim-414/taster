@@ -8,6 +8,16 @@ All notable changes to Taster are recorded here. The format follows
 
 ### Added
 
+- `taster watch`, a live viewer: a local page that draws what agents do with Taster while they do it. Start it in a
+  second terminal (`node packages/engine/taster.mjs watch`, or `start.mjs watch` for a plugin install) and open the
+  address it prints. The local MCP server, the ACP agent and the CLI then report each call (`packages/engine/live.mjs`,
+  a no-op while no hub runs), and the page shows a clean picture of each diagnosed page with a mark on every finding at
+  its real rect, and a cursor per agent that flies to the findings, swaps, components, token changes and plan steps.
+  After a component add, a token tune or a plan check, a local page is opened again until it changes, and the marks
+  whose rules are gone turn resolved. Detection is one pass, so the visiting order (the 30 most severe findings, top to
+  bottom) is the viewer's own, and it says so. The hub listens on 127.0.0.1 only, checks Host and Origin, needs a token
+  to report and a key to read ([SECURITY.md](SECURITY.md#live-viewer-taster-watch)).
+  `detectOnce` takes a `stageShot` option for the clean picture. `check-live-viewer.mjs` runs in the browser job.
 - 8 components, for 152 in the registry, written new after picks on 21st.dev with no code taken: `scene/noise-orb`
   and `scene/ridge-terrain` (a wire sphere and a low-poly terrain), `motion/lamp-glow` and `motion/band-shader` (a
   section lamp in CSS and light slats in one WebGL1 shader), `blocks/password-field` (strength bar and checklist on
