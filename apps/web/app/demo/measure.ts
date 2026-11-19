@@ -7,21 +7,88 @@ import { VIEW, type Box, type Layer, type Slider, type Spot, orderSpots } from '
 
 export type Finding = { ruleId: string; selector: string; rect: Box };
 export type Report = { findings: Finding[]; counts: Record<string, number> };
+/** A spot with the element it was found on, when the frame's page still has it, to draw its outline where it is now. */
+export type Found = Spot & { selector: string };
 
-/** Findings grouped by element, one spot per element with every rule it hit, cut to the page. */
-export function spotsOf(report: Report, pageH: number): Spot[] {
-  const by = new Map<string, Spot>();
+/**
+ * Whether an element stays put in its window while the page scrolls: it, or a box that holds it, is fixed, or sticky
+ * and already stuck at the top of the page. Its box measured at scroll 0 is then in window pixels, not page pixels.
+ */
+export function pinned(el: Element | null, win: Window): boolean {
+  for (let e = el; e && e !== e.ownerDocument.documentElement; e = e.parentElement) {
+    const cs = win.getComputedStyle(e);
+    if (cs.position === 'fixed') return true;
+    if (cs.position === 'sticky') {
+      const top = parseFloat(cs.top);
+      if (Number.isFinite(top) && e.getBoundingClientRect().top + win.scrollY <= top + 1) return true;
+    }
+  }
+  return false;
+}
+
+/** How far down a bar the page pins across the top of its window reaches, in window pixels (0 when there is none). */
+export function topBar(doc: Document): number {
+  const win = doc.defaultView as Window;
+  win.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  let reach = 0;
+  for (const el of Array.from(doc.body?.querySelectorAll('*') ?? [])) {
+    const cs = win.getComputedStyle(el);
+    if (cs.position !== 'fixed' && cs.position !== 'sticky') continue;
+    if (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) continue;
+    const r = el.getBoundingClientRect();
+    if (r.top > 4 || r.height < 8 || r.height > VIEW.h * 0.3 || r.width < VIEW.w * 0.5 || !pinned(el, win)) continue;
+    reach = Math.max(reach, r.bottom);
+  }
+  return Math.round(reach);
+}
+
+/** Findings grouped by element, one spot per element with every rule it hit, cut to the page (to the window, for an
+ * element the page pins there). With the frame's document, each spot knows whether its element is pinned. */
+export function spotsOf(report: Report, pageH: number, doc?: Document): Found[] {
+  const by = new Map<string, Found>();
+  const win = doc?.defaultView ?? null;
   for (const f of report.findings) {
+    let el: Element | null = null;
+    try {
+      el = doc?.querySelector(f.selector) ?? null;
+    } catch {
+      el = null;
+    }
+    const pin = Boolean(win && el && pinned(el, win));
     const x = Math.max(0, f.rect.x);
     const y = Math.max(0, f.rect.y);
     const w = Math.min(VIEW.w, f.rect.x + f.rect.w) - x;
-    const h = Math.min(pageH, f.rect.y + f.rect.h) - y;
+    const h = Math.min(pin ? VIEW.h : pageH, f.rect.y + f.rect.h) - y;
     if (w <= 0 || h <= 0) continue;
-    const spot = by.get(f.selector) ?? { box: { x, y, w, h }, rules: [] };
+    const spot = by.get(f.selector) ?? { box: pin ? { x, y, w, h, pin } : { x, y, w, h }, rules: [], selector: f.selector };
     if (!spot.rules.includes(f.ruleId)) spot.rules.push(f.ruleId);
     by.set(f.selector, spot);
   }
   return orderSpots([...by.values()], pageH);
+}
+
+/**
+ * The part of the work that the first window shows, for a one screen run: spots and layers that start inside it, cut to
+ * it, each layer's holder renumbered (a holder starts at or above what it holds, so it is kept too). `from` maps a kept
+ * layer back to its index in the page's full list.
+ */
+/** The foot of the first window a one screen run leaves out: the demo's bar covers it. */
+export const SCREEN_FOOT = 96;
+
+export function firstScreen<S extends Spot>(spots: S[], layers: Layer[]): { spots: S[]; layers: Layer[]; from: number[] } {
+  // What starts above the bar at the foot of the stage, so its pointer stays in sight while it works.
+  const inside = (b: Box) => b.y < VIEW.h - SCREEN_FOOT && b.x < VIEW.w;
+  const cut = (b: Box): Box => ({ ...b, h: Math.min(b.h, VIEW.h - b.y) });
+  const keptSpots = spots.filter((s) => inside(s.box)).map((s) => ({ ...s, box: cut(s.box) }));
+  const from: number[] = [];
+  const to = new Map<number, number>();
+  layers.forEach((l, i) => {
+    if (!inside(l.box)) return;
+    to.set(i, from.length);
+    from.push(i);
+  });
+  const kept = from.map((i) => ({ ...layers[i], box: cut(layers[i].box), parent: to.get(layers[i].parent) ?? -1 }));
+  return { spots: orderSpots(keptSpots, VIEW.h), layers: kept, from };
 }
 
 /** The page's full height in the frame. */
@@ -54,6 +121,8 @@ export function settled(win: Window, quiet = 600, max = 5000): Promise<void> {
 /** The after page, ready to be rebuilt: its layers, and the calls that show a layer or type a line. */
 export type Rebuild = {
   layers: Layer[];
+  /** Where layer i is in its window now (an element's box, or a line's holder), to draw its box over it. */
+  rect(i: number): DOMRect | null;
   /** Hide every layer (true) or show the page as it is (false). */
   run(on: boolean): void;
   show(i: number, on: boolean, fade: boolean): void;
@@ -117,9 +186,10 @@ function linesOf(node: Text, win: Window, whole: boolean): { start: number; end:
 
 /**
  * The after page's layers in document order: every visible element that makes a box, and every line of visible text.
- * Over `cap`, the smallest boxes go first (they show with the layer that holds them), then the shortest lines.
+ * Over `cap`, the smallest boxes go first (they show with the layer that holds them), then the shortest lines. With
+ * `within`, only what starts above that line of the page is a layer (a one screen run spends the cap on its window).
  */
-export function layersOf(doc: Document, cap = 190): Rebuild {
+export function layersOf(doc: Document, cap = 190, within = Infinity): Rebuild {
   const win = doc.defaultView as Window;
   win.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   const style = doc.createElement('style');
@@ -161,7 +231,7 @@ export function layersOf(doc: Document, cap = 190): Rebuild {
   if (doc.body) walk(doc.body);
 
   // Over the cap: drop the smallest boxes, then the shortest lines. Document order stays.
-  let keep = items;
+  let keep = items.filter((it) => it.box.y < within);
   if (keep.length > cap) {
     const rank = (k: Item['kind']) => keep.map((it, i) => ({ it, i })).filter((x) => x.it.kind === k).sort((a, b) => a.it.area - b.it.area);
     const drop = new Set<number>();
@@ -208,7 +278,7 @@ export function layersOf(doc: Document, cap = 190): Rebuild {
     return -1;
   };
   const layers: Layer[] = keep.map((it) => ({
-    box: { x: Math.round(it.box.x), y: Math.round(it.box.y), w: Math.round(it.box.w), h: Math.round(it.box.h) },
+    box: { x: Math.round(it.box.x), y: Math.round(it.box.y), w: Math.round(it.box.w), h: Math.round(it.box.h), ...(pinned(it.kind === 'block' ? it.el : it.host, win) ? { pin: true } : {}) },
     chars: it.kind === 'text' ? Math.max(1, it.end - it.start) : 0,
     parent: it.kind === 'block' ? parentOf(it.el.parentElement) : parentOf(it.host),
   }));
@@ -220,6 +290,12 @@ export function layersOf(doc: Document, cap = 190): Rebuild {
   const typedCount: number[] = keep.map(() => -1);
   return {
     layers,
+    rect(i) {
+      const it = keep[i];
+      if (!it) return null;
+      const el = it.kind === 'block' ? it.el : it.holder;
+      return el ? el.getBoundingClientRect() : null;
+    },
     run(on) {
       doc.documentElement.toggleAttribute('data-tl-run', on);
     },

@@ -1,8 +1,8 @@
 /* /demo. Only registry token values through var(), like globals.css. The frames keep their 1300x871 window (VIEW in
    timeline.ts, set inline) and are scaled to the column; the outlines, chips, boxes and cursors are drawn in screen
-   pixels over them, so their type stays readable on a phone. The diagnose crew is the theme's danger color; each
-   rebuild agent turns the hue of the theme's success color by its own step (--turn), keeping its lightness and chroma,
-   so the crew reads as many hands of one system. Solid fills, no glow. */
+   pixels over them, so their type stays readable on a phone. One color per role, the same wherever it shows: the
+   diagnose crew is the theme's danger color, the rebuild crew its success color, the system cursor its warning color,
+   and each label names the role. Solid fills, no glow. */
 .demo-intro {
   max-width: 760px;
   padding: var(--sp-12) 0 var(--sp-8);
@@ -122,7 +122,7 @@
 }
 
 .demo-box {
-  --agent: oklch(from var(--agent-base) l c calc(h + var(--turn, 0)));
+  --agent: var(--agent-base);
   position: absolute;
   top: 0;
   left: 0;
@@ -130,6 +130,9 @@
   background: color-mix(in oklch, var(--agent) 10%, transparent);
   opacity: 0;
   will-change: transform;
+}
+.demo-box[data-big] {
+  background: transparent;
 }
 .demo-size {
   position: absolute;
@@ -212,7 +215,7 @@
   display: inline-flex;
 }
 .demo-dots i {
-  --agent: oklch(from var(--agent-base) l c calc(h + var(--turn, 0)));
+  --agent: var(--agent-base);
   width: var(--sp-3);
   height: var(--sp-3);
   margin-left: calc(-1 * var(--sp-1));
@@ -345,7 +348,7 @@ button.demo-quiet {
   pointer-events: none;
 }
 .demo-cursor {
-  --agent: oklch(from var(--agent-base) l c calc(h + var(--turn, 0)));
+  --agent: var(--agent-base);
   position: absolute;
   top: 0;
   left: 0;
@@ -358,7 +361,10 @@ button.demo-quiet {
   --agent: var(--danger);
 }
 .demo-cursor[data-who='system'] {
-  --agent: var(--accent);
+  --agent: var(--warning);
+}
+.demo-cursor[data-who='system'] .demo-cursor-tag {
+  color: var(--warning-foreground);
 }
 .demo-cursor svg {
   display: block;
@@ -406,6 +412,56 @@ button.demo-quiet {
 }
 .demo-steps .steps {
   margin-top: var(--sp-4);
+}
+
+/* A hook run's closing beat: the before page on the left, the after page on the right, the two counts over both. */
+.demo-tune[data-beat] {
+  visibility: hidden;
+}
+.demo-beat {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: space-between;
+  padding: var(--sp-4);
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(to right, transparent calc(50% - 1px), var(--text) calc(50% - 1px), var(--text) calc(50% + 1px), transparent calc(50% + 1px));
+}
+.demo-beat-side {
+  justify-self: center;
+  padding: var(--sp-1) var(--sp-3);
+  color: var(--text);
+  background: var(--popover);
+  border-radius: var(--r-sm);
+  font-size: var(--t-title);
+  font-weight: var(--w-semi);
+}
+.demo-beat-count {
+  grid-column: 1 / -1;
+  justify-self: center;
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-16);
+  padding: var(--sp-3) var(--sp-6);
+  color: var(--text);
+  background: var(--popover);
+  border-radius: var(--r-card);
+  font-size: var(--t-h1);
+  font-weight: var(--w-semi);
+  line-height: var(--lh-tight);
+}
+.demo-beat-count b {
+  font-size: calc(var(--t-display) * 2);
+  font-variant-numeric: tabular-nums;
+}
+.demo-beat-count b:first-of-type {
+  color: var(--danger);
+}
+.demo-beat-count b:last-of-type {
+  color: var(--success);
 }
 
 /* A recording run (scripts/demo/record.mjs): the board alone, as large as the window allows. */

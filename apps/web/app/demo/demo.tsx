@@ -9,28 +9,44 @@
    below say the same in text.
 
    The pages default to the worked rebuild in examples/rebuild. A recording run (scripts/demo/record.mjs) sets
-   window.__TASTER_DEMO__ before the page loads to point the same overlay at two other pages. */
+   window.__TASTER_DEMO__ before the page loads to point the same overlay at two other pages, and may ask for the first
+   screen only (screen 'one'), the fast pace, a clip's opening and closing beat (hook), and a manual clock it steps
+   frame by frame through window.__tasterDemo. ?screen=one and ?pace=fast do the first two on the worked rebuild.
+
+   Outlines and boxes are drawn where their element is in its frame at that moment (its live box), so an element the
+   page pins (a sticky top bar, a fixed side menu) or moves on scroll keeps its outline; the part of an outline under a
+   pinned top bar is cut off, as the bar covers the element there. */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { layersOf, pageHeight, settled, spotsOf, tokenBase, type Rebuild, type Report, type TokenBase } from './measure.ts';
-import { ARROW_PATH, ARROW_TIP } from './stageshow.ts';
+import { SCREEN_FOOT, firstScreen, layersOf, pageHeight, settled, spotsOf, tokenBase, topBar, type Rebuild, type Report, type TokenBase } from './measure.ts';
+import { ARROW_PATH, ARROW_TIP, bezier } from './stageshow.ts';
 import {
   TOKEN_RANGE,
   VIEW,
   agentAt,
   cameraAt,
+  clamp,
   crossAt,
+  ease,
   foundAt,
+  behindWork,
+  framingAt,
+  jobAt,
   layerAt,
   layersShownAt,
   markAt,
   phaseAt,
   plan as makePlan,
+  progress,
   systemAt,
+  underBar,
   tokensAt,
   type Anchor,
+  type Box,
   type Crew,
+  type Input,
   type Layer,
+  type Pace,
   type Plan,
   type Slider,
   type Spot,
@@ -39,9 +55,14 @@ import {
 export type Script = { src: string; integrity: string };
 
 type FrameWindow = Window & { tasterDetect?: (options: { maxPerRule?: number }) => Report; __tasterRules?: Record<string, { name: string }> };
-type Pages = { before: string; after: string; record: boolean; speed: number };
+type Pages = { before: string; after: string; record: boolean; speed: number; screen: 'page' | 'one'; pace: Pace; hook: boolean; manual: boolean; tune: boolean };
 type Measured = {
   spots: Spot[];
+  /** Each spot's element in the before frame, to draw its outline where it is now. */
+  spotEls: (Element | null)[];
+  /** Each layer's index in the after page's full list (a one screen run keeps only some). */
+  from: number[];
+  inset: { before: number; after: number };
   /** Rules found on the before page only at 390 wide. */
   extra: string[];
   names: Record<string, string>;
@@ -57,11 +78,20 @@ type Measured = {
 
 declare global {
   interface Window {
-    __TASTER_DEMO__?: { before?: unknown; after?: unknown; record?: unknown; speed?: unknown };
+    __TASTER_DEMO__?: { before?: unknown; after?: unknown; record?: unknown; speed?: unknown; screen?: unknown; pace?: unknown; hook?: unknown; clock?: unknown; tune?: unknown };
+    /** A recording run's handle on the demo: its length, a frame at any second, and what that frame shows. */
+    __tasterDemo?: { duration: number; input: Input; seek(t: number): void; check(t: number): Check };
   }
 }
 
-const EXAMPLE: Pages = { before: '/examples/rebuild/before.html', after: '/examples/rebuild/after.html', record: false, speed: 1 };
+/** What a recording run checks on a frame: drawing pointers in the window, the camera behind the work, outlines on
+ * their elements (largest gap in screen pixels). */
+export type Check = { phase: string; drawing: number; inside: number; frontierOk: boolean; empty: number; aligned: number; worstGap: number; worst: string };
+
+const EXAMPLE: Pages = { before: '/examples/rebuild/before.html', after: '/examples/rebuild/after.html', record: false, speed: 1, screen: 'page', pace: 'normal', hook: false, manual: false, tune: true };
+/** The closing beat of a hook run: the before page wipes in beside the after page under the two counts. */
+const BEAT = 2;
+const house = bezier('house');
 const NARROW = { w: 390, h: 844 };
 const INSTALL = 'https://github.com/makim-414/taster#install';
 const SLIDERS = ['radius', 'density'] as const;
@@ -71,15 +101,34 @@ const THUMB = 16;
 /** The pages to frame: the worked rebuild, or the two http(s) pages a recording run set before the page loaded. */
 function choosePages(): Pages {
   const set = typeof window === 'undefined' ? undefined : window.__TASTER_DEMO__;
-  if (!set || typeof set.before !== 'string' || typeof set.after !== 'string') return EXAMPLE;
+  const query = typeof window === 'undefined' ? new URLSearchParams() : new URLSearchParams(window.location.search);
+  const example: Pages = { ...EXAMPLE, screen: query.get('screen') === 'one' ? 'one' : 'page', pace: query.get('pace') === 'fast' ? 'fast' : 'normal' };
+  if (!set || typeof set.before !== 'string' || typeof set.after !== 'string') return example;
   try {
     const before = new URL(set.before, window.location.href);
     const after = new URL(set.after, window.location.href);
-    if (![before, after].every((u) => u.protocol === 'http:' || u.protocol === 'https:')) return EXAMPLE;
-    return { before: before.href, after: after.href, record: set.record === true, speed: set.speed === 2 ? 2 : 1 };
+    if (![before, after].every((u) => u.protocol === 'http:' || u.protocol === 'https:')) return example;
+    const record = set.record === true;
+    return {
+      before: before.href,
+      after: after.href,
+      record,
+      speed: set.speed === 2 ? 2 : 1,
+      screen: set.screen === 'one' ? 'one' : 'page',
+      pace: set.pace === 'fast' ? 'fast' : 'normal',
+      hook: set.hook === true,
+      manual: record && set.clock === 'manual',
+      tune: set.tune !== false,
+    };
   } catch {
-    return EXAMPLE;
+    return example;
   }
+}
+
+/** A box in window pixels from an element's live box in its frame, or null when the element is gone or not laid out. */
+function boxNow(r: DOMRect | null | undefined): Box | null {
+  if (!r || (r.width === 0 && r.height === 0)) return null;
+  return { x: r.left, y: r.top, w: r.width, h: r.height };
 }
 
 function useReducedMotion(): boolean {
@@ -164,6 +213,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
   const lineRef = useRef<HTMLSpanElement>(null);
   const dotsRef = useRef<HTMLSpanElement>(null);
   const tuneRef = useRef<HTMLDivElement>(null);
+  const beatRef = useRef<HTMLDivElement>(null);
   const sliderRefs = { radius: useRef<HTMLInputElement>(null), density: useRef<HTMLInputElement>(null) };
   const outputRefs = { radius: useRef<HTMLOutputElement>(null), density: useRef<HTMLOutputElement>(null) };
   const rebuild = useRef<Rebuild | null>(null);
@@ -184,8 +234,21 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
   }, [pages]);
 
   const plan: Plan | null = useMemo(
-    () => (measured ? makePlan({ spots: measured.spots, extra: measured.extra, layers: measured.layers, beforeH: measured.beforeH, afterH: measured.afterH, tune: measured.base.radius.length > 0 && measured.base.density.length > 0 }) : null),
-    [measured],
+    () =>
+      measured
+        ? makePlan({
+            spots: measured.spots,
+            extra: measured.extra,
+            layers: measured.layers,
+            beforeH: measured.beforeH,
+            afterH: measured.afterH,
+            tune: pages?.tune !== false && measured.base.radius.length > 0 && measured.base.density.length > 0,
+            inset: measured.inset,
+            pace: pages?.pace,
+            hook: pages?.hook,
+          })
+        : null,
+    [measured, pages],
   );
   // Each agent's jobs, to find the one it is on without scanning every job each frame.
   const jobsBy = useMemo(() => (plan ? Array.from({ length: plan.build.count }, (_, a) => plan.build.jobs.filter((j) => j.agent === a)) : []), [plan]);
@@ -215,16 +278,51 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
           return [];
         }
       };
-      const wide = Object.keys(rb.counts);
-      const extra = narrow(bn).filter((id) => !wide.includes(id));
-      const stays = [...new Set([...Object.keys(ra.counts), ...narrow(an)])];
-      const beforeH = pageHeight(bw.document);
-      const afterH = pageHeight(aw.document);
+      const one = pages.screen === 'one';
+      let beforeH = pageHeight(bw.document);
+      let afterH = pageHeight(aw.document);
+      const inset = { before: topBar(bw.document), after: topBar(aw.document) };
       const base = tokenBase(aw.document);
-      const built = layersOf(aw.document);
+      let spots = spotsOf(rb, beforeH, bw.document);
+      // The fast pace and the first screen arc draw fewer, larger layers; the count of rules found is the same.
+      const fast = pages.pace === 'fast' && !one;
+      const built = layersOf(aw.document, one || fast ? 80 : 190, one ? VIEW.h - SCREEN_FOOT : Infinity);
       rebuild.current = built;
+      let layers = built.layers;
+      let from = layers.map((_, i) => i);
+      let wide = Object.keys(rb.counts);
+      let extra = narrow(bn).filter((id) => !wide.includes(id));
+      let stays = [...new Set([...Object.keys(ra.counts), ...narrow(an)])];
+      if (fast) {
+        // One outline per rule: an element is kept when it shows a rule no earlier one did. Every rule is still counted.
+        const seen = new Set<string>();
+        spots = spots.filter((s) => {
+          const fresh = s.rules.some((r) => !seen.has(r));
+          for (const r of s.rules) seen.add(r);
+          return fresh;
+        });
+      }
+      if (one) {
+        // The first window only: what starts in it, and the rules found there, at 1300 wide.
+        const cut = firstScreen(spots, layers);
+        spots = cut.spots;
+        layers = cut.layers;
+        from = cut.from;
+        wide = [...new Set(spots.flatMap((s) => s.rules))];
+        extra = [];
+        stays = [...new Set(firstScreen(spotsOf(ra, afterH, aw.document), []).spots.flatMap((s) => s.rules))];
+        beforeH = VIEW.h;
+        afterH = VIEW.h;
+      }
+      const spotEls = spots.map((s) => {
+        try {
+          return bw.document.querySelector(s.selector);
+        } catch {
+          return null;
+        }
+      });
       const names = Object.fromEntries(Object.entries(bw.__tasterRules ?? {}).map(([id, r]) => [id, r.name]));
-      const result: Measured = { spots: spotsOf(rb, beforeH), extra, names, found: [...wide, ...extra], stays, layers: built.layers, beforeH, afterH, base };
+      const result: Measured = { spots, spotEls, from, inset, extra, names, found: [...wide, ...extra], stays, layers, beforeH, afterH, base };
       if (live) setMeasured(result);
     })().catch(() => {
       if (live) setFailed(true);
@@ -300,32 +398,57 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
         frame?.contentWindow?.scrollTo({ top: y, left: 0, behavior: 'instant' });
       });
       const cross = crossAt(plan, t);
-      if (beforeWrapRef.current) beforeWrapRef.current.style.opacity = String(1 - cross);
-      if (afterWrapRef.current) afterWrapRef.current.style.opacity = String(cross);
+      // A hook run ends on a beat: the after page wipes off the left half, so the before page shows beside it.
+      const beat = plan.hook ? ease(progress(t, plan.end, plan.end + BEAT * 0.3)) : 0;
+      if (beforeWrapRef.current) beforeWrapRef.current.style.opacity = String(beat > 0 ? 1 : 1 - cross);
+      if (afterWrapRef.current) {
+        afterWrapRef.current.style.opacity = String(cross);
+        afterWrapRef.current.style.clipPath = beat > 0 ? `inset(0 0 0 ${(50 * beat).toFixed(2)}%)` : '';
+      }
+      if (beatRef.current) beatRef.current.style.opacity = beat.toFixed(3);
+      tuneRef.current?.toggleAttribute('data-beat', beat > 0);
 
-      // The after page, layer by layer.
+      // The after page, layer by layer. A one screen run leaves the rest of the page as it is, out of sight below.
       const built = rebuild.current;
       if (built) {
         built.run(t < plan.end);
+        const kept = new Set(measured.from);
         for (let i = 0; i < layers.length; i++) {
           const st = layerAt(plan, layers, i, t);
-          built.show(i, st.shown, forward);
-          built.type(i, st.typed);
+          built.show(measured.from[i], st.shown, forward);
+          built.type(measured.from[i], st.typed);
         }
+        if (kept.size < built.layers.length) built.layers.forEach((l, i) => {
+          if (kept.has(i)) return;
+          built.show(i, t >= plan.end, false);
+          built.type(i, t >= plan.end ? l.chars : 0);
+        });
       }
 
       const sx = (x: number) => x * scale;
       const sy = (y: number) => (y - cam) * scale;
+      // A planned box in window pixels: a pinned one is already there; the others scroll with the camera.
+      const win = (b: Box): Box => (b.pin ? b : { ...b, y: b.y - cam });
+      // Where an outline goes: on its element as it is now, else where it was measured; and how much of its top the
+      // pinned bar covers, cut off.
+      const put = (el: HTMLElement, b: Box, now: Box | null, drawn: number, inset: number) => {
+        const at = now ?? win(b);
+        const h = Math.min(at.h, VIEW.h - at.y);
+        const hidden = underBar({ ...at, y: at.y + cam, pin: b.pin }, cam, inset);
+        el.style.transform = `translate(${sx(at.x).toFixed(1)}px, ${(at.y * scale).toFixed(1)}px)`;
+        el.style.width = `${(Math.min(at.w, VIEW.w - at.x) * scale * drawn).toFixed(1)}px`;
+        el.style.height = `${(Math.max(0, h) * scale * drawn).toFixed(1)}px`;
+        el.style.clipPath = hidden > 0 ? `inset(${(hidden * scale).toFixed(1)}px 0 0 0)` : '';
+        return hidden >= at.h - 2;
+      };
 
       // Diagnose: an outline per spot and a chip with its rules while its agent is there.
       spots.forEach((s, i) => {
         const el = markRefs.current[i];
         if (!el) return;
         const m = markAt(plan, i, t);
-        el.style.transform = `translate(${sx(s.box.x).toFixed(1)}px, ${sy(s.box.y).toFixed(1)}px)`;
-        el.style.width = `${(s.box.w * scale * m.drawn).toFixed(1)}px`;
-        el.style.height = `${(s.box.h * scale * m.drawn).toFixed(1)}px`;
-        el.style.opacity = m.drawn > 0 ? String(m.fade) : '0';
+        const gone = m.drawn > 0 && put(el, s.box, boxNow(measured.spotEls[i]?.getBoundingClientRect()), m.drawn, plan.inset.before);
+        el.style.opacity = m.drawn > 0 && !gone ? String(m.fade) : '0';
         el.toggleAttribute('data-chip', m.chip);
       });
       extraRef.current?.toggleAttribute('data-on', t >= plan.diag.extraAt && t < plan.cross.start);
@@ -341,10 +464,10 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
           return;
         }
         const b = layers[job.target].box;
-        el.style.opacity = t > job.done ? String(1 - (t - job.done) / 0.3) : '1';
-        el.style.transform = `translate(${sx(b.x).toFixed(1)}px, ${sy(b.y).toFixed(1)}px)`;
-        el.style.width = `${(b.w * scale * st.box).toFixed(1)}px`;
-        el.style.height = `${(b.h * scale * st.box).toFixed(1)}px`;
+        const gone = put(el, b, boxNow(built?.rect(measured.from[job.target])), st.box, plan.inset.after);
+        el.style.opacity = gone ? '0' : t > job.done ? String(1 - (t - job.done) / 0.3) : '1';
+        // A box as big as a section is outlined only, so the page is not tinted while it is drawn.
+        el.toggleAttribute('data-big', b.w * b.h > VIEW.w * VIEW.h * 0.2);
         const label = `${b.w} x ${b.h}`;
         if (drawn.current.boxes[a] !== label) {
           drawn.current.boxes[a] = label;
@@ -389,23 +512,41 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
       const st = stage.getBoundingClientRect();
       const ox = st.left - b.left;
       const oy = st.top - b.top;
-      const place = (el: HTMLElement | null, x: number, y: number, on: boolean) => {
+      // A pointer above the stage (one whose work has scrolled up out of the window) fades out instead of piling its
+      // label on the top edge; one below it comes in from or goes back to the bar.
+      const place = (el: HTMLElement | null, x: number, y: number, on: boolean, crew = true) => {
         if (!el) return;
-        el.style.opacity = on ? '1' : '0';
-        if (!on) return;
+        const fade = crew ? clamp(1 - (oy - y) / 24, 0, 1) : 1;
+        el.style.opacity = on ? String(fade) : '0';
+        if (!on || fade === 0) return;
         const cx = Math.max(-20, Math.min(b.width + 20, x));
         const cy = Math.max(-20, Math.min(b.height + 20, y));
         el.style.transform = `translate(${cx.toFixed(1)}px, ${cy.toFixed(1)}px)`;
         el.toggleAttribute('data-flip', cx > b.width - 90);
       };
-      const crews: [Crew, number][] = [
-        [plan.diag, 0],
-        [plan.build, plan.diag.count],
+      const crews: [Crew, number, (i: number) => Box | null, (i: number) => Box][] = [
+        [plan.diag, 0, (i) => boxNow(measured.spotEls[i]?.getBoundingClientRect()), (i) => spots[i].box],
+        [plan.build, plan.diag.count, (i) => boxNow(rebuild.current?.rect(measured.from[i])), (i) => layers[i].box],
       ];
-      for (const [c, offset] of crews) {
+      for (const [c, offset, now, planned] of crews) {
         for (let a = 0; a < c.count; a++) {
-          const pose = agentAt(c, a, t);
-          place(cursorRefs.current[offset + a], ox + sx(pose.at.x), oy + sy(pose.at.y), pose.on);
+          const pose = agentAt(c, a, t, cam);
+          // An element that is not where it was measured (it moved on scroll, or its bar is pinned) pulls its pointer
+          // along, all the way once the agent has arrived.
+          const job = jobAt(c, a, t);
+          let { x, y } = pose.at;
+          if (job) {
+            const was = win(planned(job.target));
+            const is = now(job.target);
+            const dx = is ? is.x - was.x : 0;
+            const dy = is ? is.y - was.y : 0;
+            if (Math.abs(dx) < 400 && Math.abs(dy) < 400) {
+              const k = house(progress(t, job.leave, job.arrive));
+              x += dx * k;
+              y += dy * k;
+            }
+          }
+          place(cursorRefs.current[offset + a], ox + sx(x), oy + sy(y), pose.on);
         }
       }
       const sys = systemAt(plan, t);
@@ -420,7 +561,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
       };
       const [x0, y0] = resolve(sys.from);
       const [x1, y1] = resolve(sys.to);
-      place(systemRef.current, x0 + (x1 - x0) * sys.p, y0 + (y1 - y0) * sys.p, sys.on);
+      place(systemRef.current, x0 + (x1 - x0) * sys.p, y0 + (y1 - y0) * sys.p, sys.on, false);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [measured, plan, jobsBy, scale, reduced, applyTokens],
@@ -434,8 +575,67 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
     draw(time.current, false);
   }, [plan, reduced, scale, draw]);
 
+  // A recording run with a manual clock: the recorder steps the frames itself, so the frames never drop.
   useEffect(() => {
-    if (!plan || reduced || !playing || !onScreen) return;
+    if (!plan || !measured || !pages?.record) return;
+    const duration = plan.end + (plan.hook ? BEAT : 0);
+    const check = (t: number): Check => {
+      const phase = phaseAt(plan, t);
+      const c = phase === 'diagnose' ? plan.diag : plan.build;
+      const f = framingAt(plan, c, t);
+      // Outlines against their elements, in screen pixels: the mark or box as drawn, the element as its frame shows it.
+      let aligned = 0;
+      let worstGap = 0;
+      let worst = '';
+      const compare = (mark: HTMLElement | null | undefined, frame: HTMLIFrameElement | null, rect: DOMRect | null | undefined, what: string) => {
+        // An element the page has since taken out of its layout keeps the outline where it was measured; nothing to compare.
+        const r = boxNow(rect) ? rect : null;
+        if (!mark || !frame || !r || Number(mark.style.opacity) < 0.99 || mark.style.clipPath) return;
+        if (r.top < 0 || r.top > VIEW.h - 8) return;
+        const fr = frame.getBoundingClientRect();
+        const m = mark.getBoundingClientRect();
+        const gap = Math.max(Math.abs(m.left - (fr.left + r.left * scale)), Math.abs(m.top - (fr.top + r.top * scale)));
+        aligned++;
+        if (gap > worstGap) worst = `${what}: drawn at ${Math.round(m.left)},${Math.round(m.top)}, element at ${Math.round(fr.left + r.left * scale)},${Math.round(fr.top + r.top * scale)}`;
+        worstGap = Math.max(worstGap, gap);
+      };
+      if (phase === 'diagnose') measured.spots.forEach((_, i) => compare(markRefs.current[i], beforeRef.current, measured.spotEls[i]?.getBoundingClientRect(), `spot ${i}`));
+      if (phase === 'rebuild')
+        jobsBy.forEach((jobs, a) => {
+          const job = jobs.find((j) => t >= j.arrive && t < j.done);
+          if (job) compare(boxRefs.current[a], afterRef.current, rebuild.current?.rect(measured.from[job.target]), `layer ${job.target}`);
+        });
+      // Pointers of the agents drawing now, as placed on screen: inside the stage (a pointer over a pinned bar shows too).
+      const st = stageRef.current?.getBoundingClientRect();
+      const offset = c === plan.diag ? 0 : plan.diag.count;
+      let drawing = 0;
+      let inside = 0;
+      for (let a = 0; a < c.count; a++) {
+        const job = jobAt(c, a, t);
+        if (!job || t < job.arrive) continue;
+        drawing++;
+        const r = cursorRefs.current[offset + a]?.getBoundingClientRect();
+        const shown = Number(cursorRefs.current[offset + a]?.style.opacity ?? 0) > 0.5;
+        if (st && r && shown && r.left >= st.left - 2 && r.left <= st.right && r.top >= st.top - 2 && r.top <= st.bottom) inside++;
+      }
+            return { phase, drawing, inside, frontierOk: behindWork(f, c === plan.diag ? plan.inset.before : plan.inset.after), empty: Math.round(f.empty * 1000) / 1000, aligned, worstGap: Math.round(worstGap * 10) / 10, worst };
+    };
+    window.__tasterDemo = {
+      duration,
+      input: { spots: measured.spots.map((s) => ({ box: s.box, rules: s.rules })), extra: measured.extra, layers: measured.layers, beforeH: measured.beforeH, afterH: measured.afterH, tune: Boolean(plan.tune), inset: measured.inset, pace: pages.pace, hook: pages.hook },
+      seek(t: number) {
+        time.current = Math.max(0, Math.min(duration, t));
+        draw(time.current, true);
+      },
+      check,
+    };
+    return () => {
+      delete window.__tasterDemo;
+    };
+  }, [plan, measured, pages, jobsBy, scale, draw]);
+
+  useEffect(() => {
+    if (!plan || reduced || !playing || !onScreen || pages?.manual) return;
     let raf = 0;
     let last = performance.now();
     const frame = (now: number) => {
@@ -446,7 +646,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [plan, reduced, playing, onScreen, draw]);
+  }, [plan, reduced, playing, onScreen, draw, pages]);
 
   const play = () => {
     manual.current = {};
@@ -528,7 +728,6 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
                   <div
                     key={a}
                     className="demo-box"
-                    style={{ ['--turn' as string]: String(Math.round((a * 360) / plan.build.count)) }}
                     ref={(el) => {
                       boxRefs.current[a] = el;
                     }}
@@ -538,6 +737,18 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
                 ))
               : null}
           </div>
+          {pages?.hook ? (
+            <div className="demo-beat" ref={beatRef} aria-hidden="true">
+              <span className="demo-beat-side">고치기 전</span>
+              <span className="demo-beat-side">다시 지은 뒤</span>
+              <p className="demo-beat-count">
+                <span>{pages.screen === 'one' ? '첫 화면 규칙' : '규칙'}</span>
+                <b>{total}</b>
+                <span aria-hidden="true">→</span>
+                <b>{left}</b>
+              </p>
+            </div>
+          ) : null}
         </div>
 
         <div className="demo-dock" data-end={ended || undefined}>
@@ -545,7 +756,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
             <p className="demo-live">
               <span className="demo-dots" ref={dotsRef} data-crew="diagnose" aria-hidden="true">
                 {[0, 1, 2, 3, 4].map((i) => (
-                  <i key={i} style={{ ['--turn' as string]: String(i * 72) }} />
+                  <i key={i} />
                 ))}
               </span>
               <span ref={crewRef}>{failed ? '' : '에이전트'}</span>
@@ -622,7 +833,6 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
                   key={i}
                   className="demo-cursor"
                   data-who={diag ? 'diagnose' : 'build'}
-                  style={diag ? undefined : { ['--turn' as string]: String(Math.round((n * 360) / plan.build.count)) }}
                   ref={(el) => {
                     cursorRefs.current[i] = el;
                   }}
@@ -630,7 +840,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
                   <svg viewBox="0 0 22 22" aria-hidden="true" style={{ marginLeft: -ARROW_TIP.x, marginTop: -ARROW_TIP.y }}>
                     <path d={ARROW_PATH} />
                   </svg>
-                  <span className="demo-cursor-tag">{diag ? `진단 ${n + 1}` : `에이전트 ${two(n + 1)}`}</span>
+                  <span className="demo-cursor-tag">{diag ? `진단 ${n + 1}` : `재구성 ${two(n + 1)}`}</span>
                 </div>
               );
             })}
@@ -654,7 +864,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
       {reduced ? <p className="demo-note">움직임 줄이기 설정이라 마지막 화면만 보여 줍니다. 각 단계는 아래 목록에 글로 적었습니다.</p> : null}
       <p className="demo-result">
         {measured && plan
-          ? `고치기 전 페이지에서 규칙 ${total}개(1300 폭과 390 폭), 다시 지은 페이지에서 ${left}개. 다시 지은 페이지의 레이어 ${measured.layers.length}개를 에이전트 ${agents}개가 쌓았습니다.`
+          ? `${pages?.screen === 'one' ? `첫 화면(1300 x 871)만 보면 고치기 전 페이지에서 규칙 ${total}개` : `고치기 전 페이지에서 규칙 ${total}개(1300 폭과 390 폭)`}, 다시 지은 페이지에서 ${left}개. 다시 지은 페이지의 레이어 ${measured.layers.length}개를 에이전트 ${agents}개가 쌓았습니다.`
           : '두 페이지에서 잰 규칙 수와 레이어 수가 여기에 나옵니다.'}
         {measured?.stays.length ? ` 다시 지은 페이지에 남은 규칙: ${measured.stays.map((id) => `${id} ${measured.names[id] ?? ''}`.trim()).join(', ')}.` : ''}
       </p>
