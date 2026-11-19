@@ -284,9 +284,9 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
       const inset = { before: topBar(bw.document), after: topBar(aw.document) };
       const base = tokenBase(aw.document);
       let spots = spotsOf(rb, beforeH, bw.document);
-      // The fast pace draws fewer, larger layers; its count of rules found is the same.
+      // The fast pace and the first screen arc draw fewer, larger layers; the count of rules found is the same.
       const fast = pages.pace === 'fast' && !one;
-      const built = layersOf(aw.document, fast ? 120 : 190, one ? VIEW.h - SCREEN_FOOT : Infinity);
+      const built = layersOf(aw.document, one ? 80 : fast ? 120 : 190, one ? VIEW.h - SCREEN_FOOT : Infinity);
       rebuild.current = built;
       let layers = built.layers;
       let from = layers.map((_, i) => i);
