@@ -31,11 +31,16 @@ Live at https://taster-six.vercel.app (no custom domain for now; set `NEXT_PUBLI
 ## Recording the demo on other pages
 
 `node apps/web/scripts/demo/record.mjs --before <url> --after <url> --out <file.mp4>` plays the same diagnose, rebuild,
-tune and end card on any two pages you can open and records it with Playwright, at 1280x800 by default (`--width`,
-`--height`, `--scheme dark|light`, `--speed 2`, `--site` for a local build instead of the hosted one). The two pages
-load straight into a local Chromium started with web security off, so the overlay can measure them across origins;
-nothing is uploaded. `--out` is required and must be outside the repository, so a recording of a private page never
-lands in a commit. An `.mp4` needs ffmpeg.
+tune and end card on any two pages you can open, at 1280x800 by default (`--width`, `--height`, `--scheme dark|light`,
+`--speed 2`, `--site` for a local build instead of the hosted one). It steps the demo frame by frame and captures each
+one, 60 per second by default (`--fps`), so no frame drops on a heavy page. Every recording opens on a short arc that
+tells the whole story in under ten seconds (the first screen of both pages diagnosed all at once, rebuilt, and a
+before and after beat with the two counts), then plays the full page; `--one-screen` records only the arc, `--pace
+fast` plays the full page quicker, `--no-intro` leaves the arc out. As it steps it checks frames (the drawing
+pointers in the window, the camera behind the work, each outline on its element) and writes them to
+`<out>.check.json`; `--check` fails the run on a miss. The two pages load straight into a local Chromium started with
+web security off, so the overlay can measure them across origins; nothing is uploaded. `--out` is required and must be
+outside the repository, so a recording of a private page never lands in a commit. It needs ffmpeg.
 
 ## Safety
 
