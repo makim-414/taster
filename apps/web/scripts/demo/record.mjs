@@ -165,7 +165,7 @@ async function segment(browser, o, set, file) {
     const from = set.hook ? 0.35 : 0;
     const frames = Math.ceil(((duration - from) / o.speed + hold) * o.fps);
     const webm = /\.webm$/i.test(file);
-    const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(o.fps), '-c:v', 'mjpeg', '-i', '-', ...(webm ? ['-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '30'] : ['-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'medium']), '-r', String(o.fps), file], { stdio: ['pipe', 'inherit', 'inherit'] });
+    const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(o.fps), '-c:v', 'mjpeg', '-i', '-', '-vf', 'scale=in_range=full:out_range=tv,format=yuv420p', ...(webm ? ['-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '30'] : ['-c:v', 'libx264', '-crf', '18', '-preset', 'medium']), '-r', String(o.fps), file], { stdio: ['pipe', 'inherit', 'inherit'] });
     const done = new Promise((resolve, reject) => ff.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`ffmpeg exited ${code}`)))));
     const samples = [];
     const phases = {};
