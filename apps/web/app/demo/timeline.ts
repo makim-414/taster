@@ -68,6 +68,8 @@ export type Plan = {
   afterH: number;
   inset: { before: number; after: number };
   hook: boolean;
+  /** The camera's smoothing scales with the pace, so a quick crew is not left behind. */
+  cameraPace: number;
 };
 
 // Seconds at the normal pace; the fast pace scales them (see TIMES).
@@ -90,7 +92,7 @@ const BASE = {
 type Times = typeof BASE;
 const TIMES: Record<Pace, Times> = {
   normal: BASE,
-  fast: { diagStart: 0.15, diagStagger: 0.08, diagDwell: 0.25, draw: 0.2, textDraw: 0.1, chipHold: 1, hold: 0.3, cross: 0.4, cps: 90, typeMax: 0.4, exit: 0.4, rebuildTarget: 2.4, travel: 0.55, tune: 0.22 },
+  fast: { diagStart: 0.15, diagStagger: 0.08, diagDwell: 0.2, draw: 0.16, textDraw: 0.08, chipHold: 1, hold: 0.3, cross: 0.4, cps: 110, typeMax: 0.3, exit: 0.4, rebuildTarget: 2.4, travel: 0.45, tune: 0.22 },
 };
 // A hook opening: the whole diagnose crew is out within a fifth of a second.
 const HOOK = { diagStart: 0.05, diagStagger: 0.03 };
@@ -282,7 +284,7 @@ export function plan(input: Input): Plan {
     end = tune.home + 0.3 * k;
   }
 
-  const p: Plan = { diag: { ...diag, extraAt, chipHold: times.chipHold }, cross, build, tune, end, rebuildSeconds: Math.round((build.end - buildStart) * 10) / 10, focus, beforeH, afterH, inset, hook };
+  const p: Plan = { diag: { ...diag, extraAt, chipHold: times.chipHold }, cross, build, tune, end, rebuildSeconds: Math.round((build.end - buildStart) * 10) / 10, focus, beforeH, afterH, inset, hook, cameraPace: times.travel };
   // Each agent leaves the page from where it last worked, back toward the bar it came from.
   const exits = (c: Crew, leaveBy: number): Crew['exits'] =>
     c.home.map((h, a) => {
@@ -305,17 +307,30 @@ function focusAt(p: Plan, t: number): number {
   return y;
 }
 
-/** How far the frames are scrolled at t: the focus under a triangle filter, so the camera eases and leads a little. */
+/** How far the frames are scrolled at t: the focus under a triangle filter, so the camera eases and leads a little,
+ * held to the range that shows every job in flight (leading toward the next job never leaves the current ones). */
 export function cameraAt(p: Plan, t: number): number {
   const N = 10;
   let sum = 0;
   let weight = 0;
   for (let k = -N; k <= N; k++) {
     const w = N + 1 - Math.abs(k);
-    sum += w * focusAt(p, t + (k * CAMERA_HALF) / N);
+    sum += w * focusAt(p, t + (k * CAMERA_HALF * p.cameraPace) / N);
     weight += w;
   }
-  return sum / weight;
+  const y = sum / weight;
+  const diag = t < p.cross.start;
+  const c = diag ? p.diag : p.build;
+  let top = Infinity;
+  let bottom = -Infinity;
+  for (const j of c.jobs) {
+    if (j.pin || j.leave > t || j.done <= t) continue;
+    top = Math.min(top, j.to.y);
+    bottom = Math.max(bottom, j.to.y, j.rest.y);
+  }
+  if (top === Infinity) return y;
+  const s = span(top, bottom, diag ? p.beforeH : p.afterH, diag ? p.inset.before : p.inset.after);
+  return s.lo > s.hi ? s.hi : clamp(y, s.lo, s.hi);
 }
 
 /** How many pixels of a box's top are under the page's pinned top bar at camera y (0 for a pinned box). */
