@@ -55,7 +55,7 @@ import {
 export type Script = { src: string; integrity: string };
 
 type FrameWindow = Window & { tasterDetect?: (options: { maxPerRule?: number }) => Report; __tasterRules?: Record<string, { name: string }> };
-type Pages = { before: string; after: string; record: boolean; speed: number; screen: 'page' | 'one'; pace: Pace; hook: boolean; manual: boolean };
+type Pages = { before: string; after: string; record: boolean; speed: number; screen: 'page' | 'one'; pace: Pace; hook: boolean; manual: boolean; tune: boolean };
 type Measured = {
   spots: Spot[];
   /** Each spot's element in the before frame, to draw its outline where it is now. */
@@ -78,7 +78,7 @@ type Measured = {
 
 declare global {
   interface Window {
-    __TASTER_DEMO__?: { before?: unknown; after?: unknown; record?: unknown; speed?: unknown; screen?: unknown; pace?: unknown; hook?: unknown; clock?: unknown };
+    __TASTER_DEMO__?: { before?: unknown; after?: unknown; record?: unknown; speed?: unknown; screen?: unknown; pace?: unknown; hook?: unknown; clock?: unknown; tune?: unknown };
     /** A recording run's handle on the demo: its length, a frame at any second, and what that frame shows. */
     __tasterDemo?: { duration: number; input: Input; seek(t: number): void; check(t: number): Check };
   }
@@ -88,7 +88,7 @@ declare global {
  * their elements (largest gap in screen pixels). */
 export type Check = { phase: string; drawing: number; inside: number; frontierOk: boolean; empty: number; aligned: number; worstGap: number; worst: string };
 
-const EXAMPLE: Pages = { before: '/examples/rebuild/before.html', after: '/examples/rebuild/after.html', record: false, speed: 1, screen: 'page', pace: 'normal', hook: false, manual: false };
+const EXAMPLE: Pages = { before: '/examples/rebuild/before.html', after: '/examples/rebuild/after.html', record: false, speed: 1, screen: 'page', pace: 'normal', hook: false, manual: false, tune: true };
 /** The closing beat of a hook run: the before page wipes in beside the after page under the two counts. */
 const BEAT = 2;
 const house = bezier('house');
@@ -118,6 +118,7 @@ function choosePages(): Pages {
       pace: set.pace === 'fast' ? 'fast' : 'normal',
       hook: set.hook === true,
       manual: record && set.clock === 'manual',
+      tune: set.tune !== false,
     };
   } catch {
     return example;
@@ -241,7 +242,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
             layers: measured.layers,
             beforeH: measured.beforeH,
             afterH: measured.afterH,
-            tune: measured.base.radius.length > 0 && measured.base.density.length > 0,
+            tune: pages?.tune !== false && measured.base.radius.length > 0 && measured.base.density.length > 0,
             inset: measured.inset,
             pace: pages?.pace,
             hook: pages?.hook,
@@ -283,13 +284,24 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
       const inset = { before: topBar(bw.document), after: topBar(aw.document) };
       const base = tokenBase(aw.document);
       let spots = spotsOf(rb, beforeH, bw.document);
-      const built = layersOf(aw.document, 190, one ? VIEW.h - SCREEN_FOOT : Infinity);
+      // The fast pace draws fewer, larger layers; its count of rules found is the same.
+      const fast = pages.pace === 'fast' && !one;
+      const built = layersOf(aw.document, fast ? 120 : 190, one ? VIEW.h - SCREEN_FOOT : Infinity);
       rebuild.current = built;
       let layers = built.layers;
       let from = layers.map((_, i) => i);
       let wide = Object.keys(rb.counts);
       let extra = narrow(bn).filter((id) => !wide.includes(id));
       let stays = [...new Set([...Object.keys(ra.counts), ...narrow(an)])];
+      if (fast) {
+        // One outline per rule: an element is kept when it shows a rule no earlier one did. Every rule is still counted.
+        const seen = new Set<string>();
+        spots = spots.filter((s) => {
+          const fresh = s.rules.some((r) => !seen.has(r));
+          for (const r of s.rules) seen.add(r);
+          return fresh;
+        });
+      }
       if (one) {
         // The first window only: what starts in it, and the rules found there, at 1300 wide.
         const cut = firstScreen(spots, layers);

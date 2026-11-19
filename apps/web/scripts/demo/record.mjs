@@ -253,7 +253,8 @@ export async function record(opt, hooks = {}) {
     }
     if (!one) {
       console.log(`the page: ${pace} pace`);
-      parts.push({ name: 'page', ...(await segment(browser, o, { screen: 'page', pace, hook: pace === 'fast' }, path.join(tmp, `page${ext}`))) });
+      // After the arc has shown the tokens, the fast page run goes straight from the rebuild to its closing beat.
+      parts.push({ name: 'page', ...(await segment(browser, o, { screen: 'page', pace, hook: pace === 'fast', tune: !(pace === 'fast' && intro) }, path.join(tmp, `page${ext}`))) });
     }
   } finally {
     await browser.close();

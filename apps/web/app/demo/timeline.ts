@@ -120,7 +120,7 @@ const mix = (a: Point, b: Point, p: number): Point => ({ x: lerp(a.x, b.x, p), y
 const travel = (a: Point, b: Point, k: number): number => k * clamp(0.42 + Math.hypot(b.x - a.x, b.y - a.y) / 2600, 0.42, 1.05);
 
 /** How many agents each crew gets for this much work. */
-export const diagAgents = (spots: number): number => clamp(Math.ceil(spots / 3), 1, 6);
+export const diagAgents = (spots: number, pace: Pace = 'normal'): number => (pace === 'fast' ? clamp(Math.ceil(spots / 8), Math.min(spots, 6), 16) : clamp(Math.ceil(spots / 3), 1, 6));
 export const buildAgents = (layers: number, pace: Pace = 'normal'): number =>
   Math.min(layers, pace === 'fast' ? clamp(Math.round(layers / 2.5), 10, 24) : clamp(Math.round(layers / 5), 6, 24));
 
@@ -252,7 +252,7 @@ export function plan(input: Input): Plan {
   const inset = { before: insetOf(input.inset?.before), after: insetOf(input.inset?.after) };
   const diagStart = hook ? HOOK.diagStart : times.diagStart;
 
-  const dCount = diagAgents(Math.max(1, spots.length));
+  const dCount = diagAgents(Math.max(1, spots.length), input.pace);
   const dJobs = assign(
     spots.map((s) => ({ box: s.box, chars: 0, parent: -1 })),
     dCount,
