@@ -259,7 +259,7 @@ test('on a long page the camera follows the agents at work and never runs past t
   const q = plan({ ...INPUT, layers, afterH: h, inset: { before: 0, after: 64 } });
   const r = follow(q, q.build, q.build.start, q.build.end);
   assert.ok(r.drawing > 100, `only ${r.drawing} drawing samples`);
-  assert.ok(r.share >= 0.95, `${(r.share * 100).toFixed(1)}% of drawing pointers in the window`);
+  assert.ok(r.share >= 0.99, `${(r.share * 100).toFixed(1)}% of drawing pointers in the window`);
   assert.equal(r.past, 0, 'the camera ran past the work');
   let most = 0;
   for (let t = q.build.start; t <= q.build.end; t += 0.1) most = Math.max(most, cameraAt(q, t));
@@ -347,4 +347,16 @@ test('a first screen run keeps what starts in the window, renumbers holders and 
   for (let t = 0; t <= q.end; t += 0.1) assert.equal(cameraAt(q, t), 0);
   assert.ok(q.end < 10, `the first screen arc ends at ${q.end}`);
   assert.equal(layersShownAt(q, cut.layers, q.end - 0.01), cut.layers.length, 'every layer is up before the end card');
+});
+
+test('at the fast pace on a long page the camera keeps up with the quicker crew', () => {
+  const { layers, h } = longPage();
+  const H = 6000;
+  const cards = Array.from({ length: 36 }, (_, i) => spot(100 + (i % 3) * 400, 300 + Math.floor(i / 3) * 450, 360, 220, 'AC-03'));
+  const q = plan({ ...INPUT, spots: orderSpots([spot(0, 0, 1300, H, 'CMP-11'), ...cards], H), beforeH: H, layers, afterH: h, inset: { before: 0, after: 64 }, pace: 'fast', hook: true });
+  for (const c of [q.diag, q.build]) {
+    const r = follow(q, c, c.start, c.end);
+    assert.ok(r.share >= 0.97, `${(r.share * 100).toFixed(1)}% in the window`);
+    assert.equal(r.past, 0);
+  }
 });
