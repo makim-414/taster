@@ -2,7 +2,9 @@
 // and the whole demo stays between 20 and 40 seconds, several agents work at once in both crews, no agent holds two
 // jobs at a time, a layer never lands before the layer that holds it, the rule count climbs to every rule found
 // (including the ones only the narrow width shows), every layer shows and every line is typed by the end, the camera
-// stays on the page, and the tokens come back to the page's own theme.
+// stays on the page, and the tokens come back to the page's own theme. On a long page the camera follows the agents at
+// work (their pointers stay in the window, it never runs past the work), a pinned bar's boxes stay put, and the fast,
+// hook and first screen runs keep their shape.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -13,6 +15,10 @@ import {
   cameraAt,
   diagAgents,
   foundAt,
+  behindWork,
+  framingAt,
+  jobAt,
+  underBar,
   layerAt,
   layersShownAt,
   orderSpots,
@@ -24,6 +30,7 @@ import {
   type Spot,
 } from '../app/demo/timeline.ts';
 import { bezier } from '../app/demo/stageshow.ts';
+import { firstScreen } from '../app/demo/measure.ts';
 
 const spot = (x: number, y: number, w: number, h: number, ...rules: string[]): Spot => ({ box: { x, y, w, h }, rules });
 // Eighteen elements and seventeen rules, like examples/rebuild/before.html at 1300 wide; RSP-01 shows only at 390.
@@ -208,4 +215,136 @@ test('a page with many layers keeps the rebuild near the same length with more a
   assert.equal(q.build.count, 24);
   assert.ok(q.rebuildSeconds < 18, `rebuild ${q.rebuildSeconds}s`);
   assert.equal(layersShownAt(q, many, q.build.end), 190);
+});
+
+// A long landing page like the ones the recorder runs on: sections down 6000 pixels, each a block with a heading, a
+// few lines and a row of cards with their own lines, 190 layers in all; a fixed top bar of 64 pixels with its links.
+function longPage(): { layers: Layer[]; h: number } {
+  const out: Layer[] = [];
+  const add = (x: number, y: number, w: number, h: number, chars: number, parent: number, pin = false) =>
+    out.push({ box: pin ? { x, y, w, h, pin } : { x, y, w, h }, chars, parent }) - 1;
+  const bar = add(0, 0, 1300, 64, 0, -1, true);
+  for (const x of [700, 800, 900, 1000]) add(x, 22, 70, 20, 8, bar, true);
+  let y = 64;
+  while (out.length < 190) {
+    const section = add(0, y, 1300, 760, 0, -1);
+    add(114, y + 80, 700, 48, 30, section);
+    for (let i = 0; i < 3; i++) add(114, y + 150 + i * 28, 640, 24, 70, section);
+    for (let c = 0; c < 3 && out.length < 186; c++) {
+      const card = add(114 + c * 370, y + 300, 340, 380, 0, section);
+      add(134 + c * 370, y + 320, 300, 22, 24, card);
+      add(134 + c * 370, y + 350, 300, 20, 60, card);
+    }
+    y += 760;
+  }
+  return { layers: out.slice(0, 190), h: y + 200 };
+}
+
+/** Samples a crew ten times a second: the share of drawing pointers in the window, and frames where the camera ran past the work. */
+function follow(q: ReturnType<typeof plan>, c: Crew, from: number, to: number) {
+  let drawing = 0;
+  let inside = 0;
+  let past = 0;
+  for (let t = from; t <= to; t += 0.1) {
+    const f = framingAt(q, c, t);
+    drawing += f.drawing;
+    inside += f.inside;
+    if (!behindWork(f, c === q.diag ? q.inset.before : q.inset.after)) past++;
+  }
+  return { share: inside / Math.max(1, drawing), past, drawing };
+}
+
+test('on a long page the camera follows the agents at work and never runs past them', () => {
+  const { layers, h } = longPage();
+  const q = plan({ ...INPUT, layers, afterH: h, inset: { before: 0, after: 64 } });
+  const r = follow(q, q.build, q.build.start, q.build.end);
+  assert.ok(r.drawing > 100, `only ${r.drawing} drawing samples`);
+  assert.ok(r.share >= 0.95, `${(r.share * 100).toFixed(1)}% of drawing pointers in the window`);
+  assert.equal(r.past, 0, 'the camera ran past the work');
+  let most = 0;
+  for (let t = q.build.start; t <= q.build.end; t += 0.1) most = Math.max(most, cameraAt(q, t));
+  assert.ok(most > h - VIEW.h - 800, `the camera reached ${most} of ${h - VIEW.h}`);
+  assert.ok(q.rebuildSeconds < 40, `rebuild ${q.rebuildSeconds}s`);
+});
+
+test('no job leaves while a job too far above it to share the window is still in flight', () => {
+  const { layers, h } = longPage();
+  const q = plan({ ...INPUT, layers, afterH: h, inset: { before: 0, after: 64 } });
+  for (const j of q.build.jobs) {
+    if (j.pin) continue;
+    const open = q.build.jobs.filter((k) => !k.pin && k.leave <= j.leave && k.done > j.leave);
+    const top = Math.min(j.to.y, ...open.map((k) => k.to.y));
+    const bottom = Math.max(j.rest.y, ...open.map((k) => k.rest.y));
+    assert.ok(bottom - top <= VIEW.h - 64, `jobs from ${top} to ${bottom} in flight at ${j.leave.toFixed(2)}`);
+  }
+});
+
+test('the diagnose crew on a long page keeps its pointers in the window too', () => {
+  const H = 6000;
+  const cards = Array.from({ length: 36 }, (_, i) => spot(100 + (i % 3) * 400, 300 + Math.floor(i / 3) * 450, 360, 220, 'AC-03'));
+  const spots = orderSpots([spot(0, 0, 1300, H, 'CMP-11'), ...cards], H);
+  const q = plan({ ...INPUT, spots, beforeH: H });
+  const r = follow(q, q.diag, q.diag.start, q.diag.end);
+  assert.ok(r.share >= 0.9, `${(r.share * 100).toFixed(1)}% in the window`);
+  assert.equal(r.past, 0);
+});
+
+test('a pinned box stays in the window: its pointer moves with the camera, and it never pulls the camera up', () => {
+  const { layers, h } = longPage();
+  // The bar's links come last, as a footer menu pinned to the window would.
+  const late = [...layers.slice(5), ...layers.slice(1, 5).map((l) => ({ ...l, parent: -1 }))].map((l) => ({ ...l, parent: l.parent > 4 ? l.parent - 5 : -1 }));
+  const q = plan({ ...INPUT, layers: late, afterH: h, inset: { before: 0, after: 64 } });
+  const pinned = q.build.jobs.filter((j) => j.pin);
+  assert.equal(pinned.length, 4);
+  for (const j of pinned) {
+    const t = (j.arrive + j.done) / 2;
+    const cam = cameraAt(q, t);
+    assert.ok(cam > 1000, `the camera went back up to ${cam} for a pinned box`);
+    const y = agentAt(q.build, j.agent, t, cam).at.y;
+    assert.ok(y >= cam && y <= cam + 80, `pinned pointer at ${y} with the camera at ${cam}`);
+    assert.equal(jobAt(q.build, j.agent, t), j);
+  }
+});
+
+test('the part of a box under a pinned top bar is what the bar covers', () => {
+  assert.equal(underBar({ x: 0, y: 1000, w: 10, h: 100 }, 900, 64), 0);
+  assert.equal(underBar({ x: 0, y: 1000, w: 10, h: 100 }, 960, 64), 24);
+  assert.equal(underBar({ x: 0, y: 1000, w: 10, h: 100 }, 2000, 64), 100);
+  assert.equal(underBar({ x: 0, y: 10, w: 10, h: 40, pin: true }, 2000, 64), 0);
+  assert.equal(underBar({ x: 0, y: 1000, w: 10, h: 100 }, 960, 0), 0);
+});
+
+test('the worked rebuild keeps its camera and its timing: the page fits the window, so nothing waits', () => {
+  for (let t = p.build.start; t <= p.end; t += 0.1) assert.equal(cameraAt(p, t), 0);
+  const r = follow(p, p.build, p.build.start, p.build.end);
+  assert.equal(r.share, 1);
+  assert.ok(Math.abs(p.end - 28.03) < 0.05, `end ${p.end}`);
+});
+
+test('the fast pace and the hook: the whole crew out at once, a much shorter run, the same work done', () => {
+  const q = plan({ ...INPUT, pace: 'fast', hook: true });
+  const leaves = q.diag.jobs.slice(0, q.diag.count).map((j) => j.leave);
+  assert.ok(Math.max(...leaves) <= 0.25, `the diagnose crew is out by ${Math.max(...leaves)}`);
+  assert.ok(q.end < p.end * 0.5, `fast end ${q.end} against ${p.end}`);
+  assert.equal(layersShownAt(q, LAYERS, q.build.end), LAYERS.length);
+  assert.deepEqual(foundAt(q, SPOTS, EXTRA, q.cross.start), RULES);
+  assert.ok(q.hook && !p.hook);
+});
+
+test('a first screen run keeps what starts in the window, renumbers holders and stays inside it', () => {
+  const { layers, h } = longPage();
+  const spots = orderSpots([spot(0, 0, 1300, h, 'CMP-11'), spot(100, 200, 300, 100, 'AC-03'), spot(100, 2000, 300, 100, 'COL-01'), { box: { x: 700, y: 20, w: 80, h: 20, pin: true }, rules: ['AC-04'] }], h);
+  const cut = firstScreen(spots, layers);
+  assert.deepEqual(cut.spots.map((s) => s.rules[0]).sort(), ['AC-03', 'AC-04', 'CMP-11']);
+  assert.ok(cut.spots.every((s) => s.box.y + s.box.h <= VIEW.h));
+  assert.ok(cut.layers.length > 5 && cut.layers.length < layers.length);
+  cut.layers.forEach((l, i) => {
+    assert.ok(l.parent < i, 'a holder comes before what it holds');
+    assert.ok(l.box.y < VIEW.h && l.box.y + l.box.h <= VIEW.h);
+    assert.deepEqual({ ...l.box, h: 0 }, { ...layers[cut.from[i]].box, h: 0 });
+  });
+  const q = plan({ ...INPUT, spots: cut.spots, layers: cut.layers, beforeH: VIEW.h, afterH: VIEW.h, pace: 'fast', hook: true });
+  for (let t = 0; t <= q.end; t += 0.1) assert.equal(cameraAt(q, t), 0);
+  assert.ok(q.end < 10, `the first screen arc ends at ${q.end}`);
+  assert.equal(layersShownAt(q, cut.layers, q.end - 0.01), cut.layers.length, 'every layer is up before the end card');
 });
