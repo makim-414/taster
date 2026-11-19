@@ -80,6 +80,16 @@ All notable changes to Taster are recorded here. The format follows
 
 ### Changed
 
+- /demo: one color per role, the same everywhere: diagnose agents in the danger color, rebuild agents in the success
+  color (no longer a hue per agent), the system cursor in the warning color, each label naming its role.
+- `scripts/demo/record.mjs` steps the demo frame by frame on a manual clock and captures each frame, 60 per second by
+  default (`--fps`), instead of filming it at Playwright's 25. The framed pages' own clocks (animation frames,
+  `performance.now`, `Date.now`) and their CSS animations follow, so a WebGL scene keeps its speed. Every recording
+  opens on a short arc, the first screen diagnosed all at once, rebuilt and closed on a before and after beat with the
+  two counts, before the full run; `--one-screen` records only that arc, `--pace fast` plays the full run at about
+  twice the speed, `--no-intro` leaves the arc out. It checks frames as it steps (drawing pointers in the window, the
+  camera behind the work, outlines on their elements) into `<out>.check.json`, and `--check` fails the run on a miss.
+  /demo also takes `?screen=one` and `?pace=fast`.
 - **Breaking:** a new repository layout, the `apps/` and `packages/` shape most JavaScript monorepos use. The engine
   (CLI, MCP server, ACP agent) moved from `engine/` to `packages/engine/`, and `bin/taster.mjs` is now
   `packages/engine/taster.mjs`. The registry moved from `registry/` to `packages/registry/`, the site and the extension
@@ -125,6 +135,19 @@ All notable changes to Taster are recorded here. The format follows
 
 ### Fixed
 
+- /demo: on a long page the camera now follows the agents at work. It aimed at the last layer an agent set off to,
+  so with two dozen agents in flight it scrolled ahead of them, and the window showed page nobody had started while the
+  pointers piled at its top edge (in one recording 21% of drawing pointers were in the window during the rebuild). The
+  camera now keeps the jobs in flight in the window, the oldest near its top, and a job that would not fit in the same
+  window waits until the jobs far above it are done, for both crews (the same recording: 98.6%). A pointer whose work
+  has scrolled up out of the window fades out instead of pinning its label to the edge. The worked rebuild fits its
+  window, so it plays as before.
+- /demo: outlines and boxes sit on their elements at every scroll position. They were drawn where the element was
+  measured at the top of the page, so an element the page pins (a sticky top bar, a fixed side menu) or moves on
+  scroll drifted away from its outline as the camera moved, and the outline of an element scrolled under a sticky bar
+  was drawn on top of the bar. Each is now drawn on its element's live box in the frame, a pinned element's box and
+  pointer stay put in the window, the part under a pinned top bar is cut off, and the camera keeps the work below the
+  bar.
 - BG-01 no longer reports a cursor spotlight drawn on a card's edge as an aurora background. Such a gradient border
   masks a radial gradient to the padding ring (two mask layers composited with `exclude`, one clipped to the content
   box), so it paints a 1px line, yet the rule measured the whole card against the viewport and flagged every card of
