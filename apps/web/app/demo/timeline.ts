@@ -53,7 +53,8 @@ export type Input = {
 
 /** One agent's visit: it leaves, arrives at `to`, draws the box by `drawn` (types from typeStart to typeEnd) and is free at `done`. */
 export type Job = { agent: number; target: number; leave: number; arrive: number; drawn: number; typeStart: number; typeEnd: number; done: number; to: Point; rest: Point; pin: boolean; bottom: number };
-export type Crew = { count: number; start: number; end: number; jobs: Job[]; home: Point[]; exits: { at: number; to: Point }[]; leaveIn: number };
+/** `lead`: the first agents of the crew take only the component jobs (see componentsOf); 0 when the crew is not split. */
+export type Crew = { count: number; start: number; end: number; jobs: Job[]; home: Point[]; exits: { at: number; to: Point }[]; leaveIn: number; lead: number };
 export type Tune = { start: number; atRadius: number; radiusUp: number; radiusDown: number; atDensity: number; densityUp: number; densityDown: number; settled: number; home: number };
 export type Plan = {
   diag: Crew & { extraAt: number; chipHold: number };
@@ -126,6 +127,19 @@ export const diagAgents = (spots: number, pace: Pace = 'normal'): number => (pac
 export const buildAgents = (layers: number, pace: Pace = 'normal'): number =>
   Math.min(layers, pace === 'fast' ? clamp(Math.round(layers / 2.5), 10, 24) : clamp(Math.round(layers / 5), 6, 24));
 
+/** The layers that are components: a box (not a line of text) that holds at least two other layers and is no bigger than
+ * about a screen and a half, so a card, a panel or a row of controls, not the page or a whole band. */
+export function componentsOf(layers: Layer[]): boolean[] {
+  const kids = layers.map(() => 0);
+  for (const l of layers) if (l.parent >= 0) kids[l.parent]++;
+  return layers.map((l, i) => l.chars === 0 && kids[i] >= 2 && l.box.w >= 80 && l.box.w * l.box.h <= VIEW.w * VIEW.h * 1.5);
+}
+
+/** How many of the rebuild crew place components: their share of the jobs, so neither part of the crew waits on the
+ * other, at least two and leaving at least two, and none on a crew too small to split or a page with no components. */
+export const componentAgents = (count: number, components: number, jobs: number): number =>
+  count < 6 || components === 0 ? 0 : clamp(Math.round((count * components) / Math.max(1, jobs)), 2, count - 2);
+
 /** Spots in the order the agents take them: whole page findings first, then top to bottom, left to right. A whole page
  * finding is a big box that starts on the first screen; a big box further down (a gradient band above the footer) waits
  * for its turn by height, or the camera would sit at the bottom from the start while the agents work above it. Pinned
@@ -163,11 +177,11 @@ function homes(count: number, y: number): Point[] {
 }
 
 type Work = { box: Box; chars: number; parent: number };
-type Rules = { start: number; gap: number; pageH: number; dwell: number; inset: number; times: Times };
+type Rules = { start: number; gap: number; pageH: number; dwell: number; inset: number; times: Times; lead?: number; component?: boolean[] };
 
 /** Hands each piece of work, in order, to the agent free first; a piece never lands before the one that holds it, and
  * never leaves while a job too far above it to share the window with it is still in flight. */
-function assign(work: Work[], count: number, { start, gap, pageH, dwell, inset, times }: Rules): Job[] {
+function assign(work: Work[], count: number, { start, gap, pageH, dwell, inset, times, lead = 0, component = [] }: Rules): Job[] {
   const home = homes(count, VIEW.h + 30);
   const free = Array.from({ length: count }, () => start);
   const at = home.map((p) => ({ ...p }));
@@ -185,8 +199,10 @@ function assign(work: Work[], count: number, { start, gap, pageH, dwell, inset, 
     return s.lo <= s.hi + 1e-6;
   };
   work.forEach((w, i) => {
-    let agent = 0;
-    for (let a = 1; a < count; a++) if (free[a] < free[agent]) agent = a;
+    // A split crew: the first `lead` agents take the components, the rest everything else.
+    const [from, to_] = lead > 0 ? (component[i] ? [0, lead] : [lead, count]) : [0, count];
+    let agent = from;
+    for (let a = from + 1; a < to_; a++) if (free[a] < free[agent]) agent = a;
     const to = landing(w.box, pageH);
     const pin = Boolean(w.box.pin);
     const text = w.chars > 0;
@@ -221,7 +237,7 @@ function assign(work: Work[], count: number, { start, gap, pageH, dwell, inset, 
 
 function crew(jobs: Job[], count: number, start: number, leaveIn: number): Crew {
   const end = jobs.length ? Math.max(...jobs.map((j) => j.done)) : start;
-  return { count, start, end, jobs, home: homes(count, VIEW.h + 30), exits: [], leaveIn };
+  return { count, start, end, jobs, home: homes(count, VIEW.h + 30), exits: [], leaveIn, lead: 0 };
 }
 
 /** The focus the camera follows: at every moment a job leaves or ends, the scroll that keeps the jobs then in flight in
@@ -269,8 +285,10 @@ export function plan(input: Input): Plan {
   const bCount = Math.max(1, buildAgents(layers.length, input.pace));
   const buildStart = cross.end - 0.2 * times.travel;
   const gap = clamp(times.rebuildTarget / Math.max(1, layers.length), 0.04 * times.travel, 0.2 * times.travel);
-  const bJobs = assign(layers, bCount, { start: buildStart, gap, pageH: afterH, dwell: 0.12 * times.travel, inset: inset.after, times });
-  const build = crew(bJobs, bCount, buildStart, times.exit);
+  const component = componentsOf(layers);
+  const lead = componentAgents(bCount, component.filter(Boolean).length, layers.length);
+  const bJobs = assign(layers, bCount, { start: buildStart, gap, pageH: afterH, dwell: 0.12 * times.travel, inset: inset.after, times, lead, component });
+  const build = { ...crew(bJobs, bCount, buildStart, times.exit), lead };
   build.end = Math.max(build.end, buildStart) + 0.3 * times.travel;
 
   const focus = [...focusOf(dJobs, beforeH, inset.before, 0, cross.start), ...focusOf(bJobs, afterH, inset.after, buildStart, build.end)].sort((a, b) => a.t - b.t);

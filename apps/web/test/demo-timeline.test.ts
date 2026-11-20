@@ -4,7 +4,7 @@
 // (including the ones only the narrow width shows), every layer shows and every line is typed by the end, the camera
 // stays on the page, and the tokens come back to the page's own theme. On a long page the camera follows the agents at
 // work (their pointers stay in the window, it never runs past the work), a pinned bar's boxes stay put, and the fast,
-// hook and first screen runs keep their shape.
+// hook and first screen runs keep their shape, and the first agents of the rebuild crew place the components.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -13,6 +13,7 @@ import {
   agentAt,
   buildAgents,
   cameraAt,
+  componentsOf,
   diagAgents,
   foundAt,
   behindWork,
@@ -318,7 +319,16 @@ test('the worked rebuild keeps its camera and its timing: the page fits the wind
   for (let t = p.build.start; t <= p.end; t += 0.1) assert.equal(cameraAt(p, t), 0);
   const r = follow(p, p.build, p.build.start, p.build.end);
   assert.equal(r.share, 1);
-  assert.ok(Math.abs(p.end - 28.03) < 0.05, `end ${p.end}`);
+  // 28.03 before the crew was split: the holders now wait for the component agents, and the run is still close to it.
+  assert.ok(Math.abs(p.end - 29.78) < 0.05, `end ${p.end}`);
+});
+
+test('the first agents of the rebuild crew place the components, and only they do', () => {
+  const component = componentsOf(LAYERS);
+  assert.ok(component.some(Boolean) && !component.every(Boolean));
+  assert.ok(p.build.lead >= 2 && p.build.lead <= p.build.count - 2, `lead ${p.build.lead} of ${p.build.count}`);
+  for (const j of p.build.jobs) assert.equal(j.agent < p.build.lead, component[j.target], `layer ${j.target} went to agent ${j.agent}`);
+  assert.equal(p.diag.lead, 0);
 });
 
 test('the fast pace and the hook: the whole crew out at once, a much shorter run, the same work done', () => {
