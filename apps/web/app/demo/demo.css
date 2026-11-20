@@ -2,9 +2,10 @@
    timeline.ts, set inline) and are scaled to the column; the outlines, chips, boxes and cursors are drawn in screen
    pixels over them, so their type stays readable on a phone. The two crews look like the two pages they stand for:
    the diagnose crew runs in loud colors, each pointer its own hue turned off the theme's danger color (--n is the
-   pointer's number), while the rebuild crew keeps to quiet tones, paper, silver and a blue turned off the ink, in
-   turn (data-tone), each edged in the other end of the scale (--agent-fg) so it reads on a dark page or a light one.
-   The system cursor wears that blue. Each label names the role. Solid fills, no glow. */
+   pointer's number) with a not-allowed badge on its arrow, while the rebuild crew keeps to quiet tones, paper, silver
+   and a blue turned off the ink, in turn (data-tone), each edged in the other end of the scale (--agent-fg) so it
+   reads on a dark page or a light one. The component agents, the first of the rebuild crew, wear teal, navy and a
+   bright blue. The system cursor wears the quiet blue. Each label names the role. Solid fills, no glow. */
 .demo-intro {
   max-width: 760px;
   padding: var(--sp-12) 0 var(--sp-8);
@@ -156,6 +157,21 @@
 .demo-dots:not([data-crew='diagnose']) i[data-tone='blue'] {
   --agent: var(--agent-blue);
   --agent-fg: var(--accent-fg);
+}
+.demo-box[data-tone='teal'],
+.demo-cursor[data-tone='teal'] {
+  --agent: oklch(from var(--foreground) 0.7 0.12 calc(h - 90));
+  --agent-fg: var(--foreground);
+}
+.demo-box[data-tone='navy'],
+.demo-cursor[data-tone='navy'] {
+  --agent: oklch(from var(--foreground) 0.34 0.13 calc(h - 18));
+  --agent-fg: var(--accent-fg);
+}
+.demo-box[data-tone='bright'],
+.demo-cursor[data-tone='bright'] {
+  --agent: oklch(from var(--foreground) 0.72 0.17 calc(h - 40));
+  --agent-fg: var(--foreground);
 }
 .demo-size {
   position: absolute;
@@ -400,6 +416,25 @@ button.demo-quiet {
   stroke-width: 1.5;
   stroke-linejoin: round;
 }
+.demo-cursor[data-who='diagnose'] svg {
+  width: calc(var(--icon-lg) * 1.5);
+  height: calc(var(--icon-lg) * 1.5);
+}
+.demo-cursor[data-who='diagnose'] .demo-cursor-tag {
+  top: var(--sp-6);
+  left: calc(var(--sp-8) + var(--sp-1));
+}
+.demo-cursor .demo-no {
+  fill: var(--agent-fg);
+  stroke: currentColor;
+  stroke-width: 2.6;
+}
+.demo-cursor .demo-no-bar {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
 .demo-cursor-tag {
   position: absolute;
   top: var(--sp-4);
@@ -423,7 +458,12 @@ button.demo-quiet {
     width: var(--icon-sm);
     height: var(--icon-sm);
   }
+  .demo-cursor[data-who='diagnose'] svg {
+    width: calc(var(--icon-sm) * 1.5);
+    height: calc(var(--icon-sm) * 1.5);
+  }
   .demo-cursor[data-who='build'] .demo-cursor-tag,
+  .demo-cursor[data-who='component'] .demo-cursor-tag,
   .demo-cursor[data-who='diagnose'] .demo-cursor-tag {
     display: none;
   }
