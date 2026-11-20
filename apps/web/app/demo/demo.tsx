@@ -97,6 +97,13 @@ const INSTALL = 'https://github.com/makim-414/taster#install';
 const SLIDERS = ['radius', 'density'] as const;
 /** The rebuild crew's quiet tones (demo.css): paper, silver and the blue the system cursor wears, in turn. */
 const TONES = ['paper', 'silver', 'blue'] as const;
+/** The component agents' blues (demo.css): teal, navy and a bright blue, in turn. */
+const COMPONENT_TONES = ['teal', 'navy', 'bright'] as const;
+/** A rebuild agent's role, tone and label: the first `lead` of the crew place components. */
+const builder = (a: number, lead: number) =>
+  a < lead
+    ? { who: 'component', tone: COMPONENT_TONES[a % COMPONENT_TONES.length], tag: `컴포넌트 ${two(a + 1)}` }
+    : { who: 'build', tone: TONES[(a - lead) % TONES.length], tag: `재구성 ${two(a - lead + 1)}` };
 // The thumb of a native range input, to place the system cursor on it.
 const THUMB = 16;
 
@@ -732,7 +739,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
                   <div
                     key={a}
                     className="demo-box"
-                    data-tone={TONES[a % TONES.length]}
+                    data-tone={builder(a, plan.build.lead).tone}
                     ref={(el) => {
                       boxRefs.current[a] = el;
                     }}
@@ -827,21 +834,30 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
             {Array.from({ length: plan.diag.count + plan.build.count }, (_, i) => {
               const diag = i < plan.diag.count;
               const n = diag ? i : i - plan.diag.count;
+              const role = diag ? { who: 'diagnose', tone: undefined, tag: `진단 ${n + 1}` } : builder(n, plan.build.lead);
               return (
                 <div
                   key={i}
                   className="demo-cursor"
-                  data-who={diag ? 'diagnose' : 'build'}
-                  data-tone={diag ? undefined : TONES[n % TONES.length]}
+                  data-who={role.who}
+                  data-tone={role.tone}
                   style={diag ? ({ '--n': n } as CSSProperties) : undefined}
                   ref={(el) => {
                     cursorRefs.current[i] = el;
                   }}
                 >
-                  <svg viewBox="0 0 22 22" aria-hidden="true" style={{ marginLeft: -ARROW_TIP.x, marginTop: -ARROW_TIP.y }}>
+                  {/* A diagnose pointer carries a not-allowed badge below its arrow: it is looking for what is wrong. Its box
+                      is half again as big (33 units for 22) so the arrow keeps its size and the badge has room. */}
+                  <svg viewBox={diag ? '0 0 33 33' : '0 0 22 22'} aria-hidden="true" style={{ marginLeft: -ARROW_TIP.x, marginTop: -ARROW_TIP.y }}>
                     <path d={ARROW_PATH} />
+                    {diag ? (
+                      <>
+                        <circle className="demo-no" cx="23" cy="23" r="8" />
+                        <path className="demo-no-bar" d="M17.6 28.4 28.4 17.6" />
+                      </>
+                    ) : null}
                   </svg>
-                  <span className="demo-cursor-tag">{diag ? `진단 ${n + 1}` : `재구성 ${two(n + 1)}`}</span>
+                  <span className="demo-cursor-tag">{role.tag}</span>
                 </div>
               );
             })}
