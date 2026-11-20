@@ -85,8 +85,8 @@ All notable changes to Taster are recorded here. The format follows
 - `scripts/demo/record.mjs` steps the demo frame by frame on a manual clock and captures each frame, 60 per second by
   default (`--fps`), instead of filming it at Playwright's 25. The framed pages' own clocks (animation frames,
   `performance.now`, `Date.now`) and their CSS animations follow, so a WebGL scene keeps its speed. Every recording
-  opens on a short arc, the first screen diagnosed all at once, rebuilt and closed on a before and after beat with the
-  two counts, before the full run; `--one-screen` records only that arc, `--pace fast` plays the full run at about
+  opens on a short arc, the first screen diagnosed all at once, rebuilt and closed on a before and after beat labeled
+  Before and After, before the full run; `--one-screen` records only that arc, `--pace fast` plays the full run at about
   twice the speed, `--no-intro` leaves the arc out. It checks frames as it steps (drawing pointers in the window, the
   camera behind the work, outlines on their elements) into `<out>.check.json`, and `--check` fails the run on a miss.
   /demo also takes `?screen=one` and `?pace=fast`.

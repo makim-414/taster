@@ -414,8 +414,10 @@ button.demo-quiet {
   margin-top: var(--sp-4);
 }
 
-/* A hook run's closing beat: the before page on the left, the after page on the right, the two counts over both. */
-.demo-tune[data-beat] {
+/* A hook run's closing beat: the before page on the left, the after page on the right, a label over each, and
+   nothing else on the board. */
+.demo-tune[data-beat],
+.demo-dock[data-beat] {
   visibility: hidden;
 }
 .demo-beat {
@@ -423,7 +425,7 @@ button.demo-quiet {
   inset: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  align-content: space-between;
+  align-content: start;
   padding: var(--sp-4);
   opacity: 0;
   pointer-events: none;
@@ -437,31 +439,6 @@ button.demo-quiet {
   border-radius: var(--r-sm);
   font-size: var(--t-title);
   font-weight: var(--w-semi);
-}
-.demo-beat-count {
-  grid-column: 1 / -1;
-  justify-self: center;
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-3);
-  margin: 0 0 var(--sp-16);
-  padding: var(--sp-3) var(--sp-6);
-  color: var(--text);
-  background: var(--popover);
-  border-radius: var(--r-card);
-  font-size: var(--t-h1);
-  font-weight: var(--w-semi);
-  line-height: var(--lh-tight);
-}
-.demo-beat-count b {
-  font-size: calc(var(--t-display) * 2);
-  font-variant-numeric: tabular-nums;
-}
-.demo-beat-count b:first-of-type {
-  color: var(--danger);
-}
-.demo-beat-count b:last-of-type {
-  color: var(--success);
 }
 
 /* A recording run (scripts/demo/record.mjs): the board alone, as large as the window allows. */

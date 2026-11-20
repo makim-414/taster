@@ -89,7 +89,7 @@ declare global {
 export type Check = { phase: string; drawing: number; inside: number; frontierOk: boolean; empty: number; aligned: number; worstGap: number; worst: string };
 
 const EXAMPLE: Pages = { before: '/examples/rebuild/before.html', after: '/examples/rebuild/after.html', record: false, speed: 1, screen: 'page', pace: 'normal', hook: false, manual: false, tune: true };
-/** The closing beat of a hook run: the before page wipes in beside the after page under the two counts. */
+/** The closing beat of a hook run: the before page wipes in beside the after page, each under its label. */
 const BEAT = 2;
 const house = bezier('house');
 const NARROW = { w: 390, h: 844 };
@@ -214,6 +214,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
   const dotsRef = useRef<HTMLSpanElement>(null);
   const tuneRef = useRef<HTMLDivElement>(null);
   const beatRef = useRef<HTMLDivElement>(null);
+  const dockRef = useRef<HTMLDivElement>(null);
   const sliderRefs = { radius: useRef<HTMLInputElement>(null), density: useRef<HTMLInputElement>(null) };
   const outputRefs = { radius: useRef<HTMLOutputElement>(null), density: useRef<HTMLOutputElement>(null) };
   const rebuild = useRef<Rebuild | null>(null);
@@ -407,6 +408,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
       }
       if (beatRef.current) beatRef.current.style.opacity = beat.toFixed(3);
       tuneRef.current?.toggleAttribute('data-beat', beat > 0);
+      dockRef.current?.toggleAttribute('data-beat', beat > 0);
 
       // The after page, layer by layer. A one screen run leaves the rest of the page as it is, out of sight below.
       const built = rebuild.current;
@@ -739,19 +741,13 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
           </div>
           {pages?.hook ? (
             <div className="demo-beat" ref={beatRef} aria-hidden="true">
-              <span className="demo-beat-side">고치기 전</span>
-              <span className="demo-beat-side">다시 지은 뒤</span>
-              <p className="demo-beat-count">
-                <span>{pages.screen === 'one' ? '첫 화면 규칙' : '규칙'}</span>
-                <b>{total}</b>
-                <span aria-hidden="true">→</span>
-                <b>{left}</b>
-              </p>
+              <span className="demo-beat-side">Before</span>
+              <span className="demo-beat-side">After</span>
             </div>
           ) : null}
         </div>
 
-        <div className="demo-dock" data-end={ended || undefined}>
+        <div className="demo-dock" ref={dockRef} data-end={ended || undefined}>
           <div className="demo-play">
             <p className="demo-live">
               <span className="demo-dots" ref={dotsRef} data-crew="diagnose" aria-hidden="true">

@@ -35,7 +35,7 @@ tune and end card on any two pages you can open, at 1280x800 by default (`--widt
 `--speed 2`, `--site` for a local build instead of the hosted one). It steps the demo frame by frame and captures each
 one, 60 per second by default (`--fps`), so no frame drops on a heavy page. Every recording opens on a short arc that
 tells the whole story in under ten seconds (the first screen of both pages diagnosed all at once, rebuilt, and a
-before and after beat with the two counts), then plays the full page; `--one-screen` records only the arc, `--pace
+before and after beat, labeled Before and After), then plays the full page; `--one-screen` records only the arc, `--pace
 fast` plays the full page quicker, `--no-intro` leaves the arc out. As it steps it checks frames (the drawing
 pointers in the window, the camera behind the work, each outline on its element) and writes them to
 `<out>.check.json`; `--check` fails the run on a miss. The two pages load straight into a local Chromium started with
