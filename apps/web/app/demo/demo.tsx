@@ -17,7 +17,7 @@
    page pins (a sticky top bar, a fixed side menu) or moves on scroll keeps its outline; the part of an outline under a
    pinned top bar is cut off, as the bar covers the element there. */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { SCREEN_FOOT, firstScreen, layersOf, pageHeight, settled, spotsOf, tokenBase, topBar, type Rebuild, type Report, type TokenBase } from './measure.ts';
 import { ARROW_PATH, ARROW_TIP, bezier } from './stageshow.ts';
 import {
@@ -89,12 +89,14 @@ declare global {
 export type Check = { phase: string; drawing: number; inside: number; frontierOk: boolean; empty: number; aligned: number; worstGap: number; worst: string };
 
 const EXAMPLE: Pages = { before: '/examples/rebuild/before.html', after: '/examples/rebuild/after.html', record: false, speed: 1, screen: 'page', pace: 'normal', hook: false, manual: false, tune: true };
-/** The closing beat of a hook run: the before page wipes in beside the after page under the two counts. */
+/** The closing beat of a hook run: the before page wipes in beside the after page, each under its label. */
 const BEAT = 2;
 const house = bezier('house');
 const NARROW = { w: 390, h: 844 };
 const INSTALL = 'https://github.com/makim-414/taster#install';
 const SLIDERS = ['radius', 'density'] as const;
+/** The rebuild crew's quiet tones (demo.css): paper, silver and the blue the system cursor wears, in turn. */
+const TONES = ['paper', 'silver', 'blue'] as const;
 // The thumb of a native range input, to place the system cursor on it.
 const THUMB = 16;
 
@@ -214,6 +216,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
   const dotsRef = useRef<HTMLSpanElement>(null);
   const tuneRef = useRef<HTMLDivElement>(null);
   const beatRef = useRef<HTMLDivElement>(null);
+  const dockRef = useRef<HTMLDivElement>(null);
   const sliderRefs = { radius: useRef<HTMLInputElement>(null), density: useRef<HTMLInputElement>(null) };
   const outputRefs = { radius: useRef<HTMLOutputElement>(null), density: useRef<HTMLOutputElement>(null) };
   const rebuild = useRef<Rebuild | null>(null);
@@ -407,6 +410,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
       }
       if (beatRef.current) beatRef.current.style.opacity = beat.toFixed(3);
       tuneRef.current?.toggleAttribute('data-beat', beat > 0);
+      dockRef.current?.toggleAttribute('data-beat', beat > 0);
 
       // The after page, layer by layer. A one screen run leaves the rest of the page as it is, out of sight below.
       const built = rebuild.current;
@@ -728,6 +732,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
                   <div
                     key={a}
                     className="demo-box"
+                    data-tone={TONES[a % TONES.length]}
                     ref={(el) => {
                       boxRefs.current[a] = el;
                     }}
@@ -739,24 +744,18 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
           </div>
           {pages?.hook ? (
             <div className="demo-beat" ref={beatRef} aria-hidden="true">
-              <span className="demo-beat-side">고치기 전</span>
-              <span className="demo-beat-side">다시 지은 뒤</span>
-              <p className="demo-beat-count">
-                <span>{pages.screen === 'one' ? '첫 화면 규칙' : '규칙'}</span>
-                <b>{total}</b>
-                <span aria-hidden="true">→</span>
-                <b>{left}</b>
-              </p>
+              <span className="demo-beat-side">Before</span>
+              <span className="demo-beat-side">After</span>
             </div>
           ) : null}
         </div>
 
-        <div className="demo-dock" data-end={ended || undefined}>
+        <div className="demo-dock" ref={dockRef} data-end={ended || undefined}>
           <div className="demo-play">
             <p className="demo-live">
               <span className="demo-dots" ref={dotsRef} data-crew="diagnose" aria-hidden="true">
                 {[0, 1, 2, 3, 4].map((i) => (
-                  <i key={i} />
+                  <i key={i} data-tone={TONES[i % TONES.length]} style={{ '--n': i } as CSSProperties} />
                 ))}
               </span>
               <span ref={crewRef}>{failed ? '' : '에이전트'}</span>
@@ -833,6 +832,8 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
                   key={i}
                   className="demo-cursor"
                   data-who={diag ? 'diagnose' : 'build'}
+                  data-tone={diag ? undefined : TONES[n % TONES.length]}
+                  style={diag ? ({ '--n': n } as CSSProperties) : undefined}
                   ref={(el) => {
                     cursorRefs.current[i] = el;
                   }}

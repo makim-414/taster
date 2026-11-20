@@ -15,7 +15,7 @@
 // element. The numbers go to <out>.check.json; --check makes a miss fail the run.
 //
 // Every run opens on a short arc that tells the whole story in under ten seconds: the first screen of both pages,
-// diagnosed all at once, rebuilt, and a before and after beat with the two counts. A full run then plays the page in
+// diagnosed all at once, rebuilt, and a before and after beat, labeled Before and After. A full run then plays the page in
 // full. --one-screen records only that arc; --pace fast plays the full page quicker after it.
 //
 // Usage:

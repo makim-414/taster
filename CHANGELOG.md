@@ -80,13 +80,15 @@ All notable changes to Taster are recorded here. The format follows
 
 ### Changed
 
-- /demo: one color per role, the same everywhere: diagnose agents in the danger color, rebuild agents in the success
-  color (no longer a hue per agent), the system cursor in the warning color, each label naming its role.
+- /demo: the two crews look like the two pages. Diagnose agents run in loud colors, each its own hue turned off the
+  danger color; rebuild agents keep to quiet tones (paper, silver and a blue turned off the ink, in turn), each edged in
+  the other end of the scale so it reads on a dark page or a light one; the system cursor wears the blue. Each label
+  names its role.
 - `scripts/demo/record.mjs` steps the demo frame by frame on a manual clock and captures each frame, 60 per second by
   default (`--fps`), instead of filming it at Playwright's 25. The framed pages' own clocks (animation frames,
   `performance.now`, `Date.now`) and their CSS animations follow, so a WebGL scene keeps its speed. Every recording
-  opens on a short arc, the first screen diagnosed all at once, rebuilt and closed on a before and after beat with the
-  two counts, before the full run; `--one-screen` records only that arc, `--pace fast` plays the full run at about
+  opens on a short arc, the first screen diagnosed all at once, rebuilt and closed on a before and after beat labeled
+  Before and After, before the full run; `--one-screen` records only that arc, `--pace fast` plays the full run at about
   twice the speed, `--no-intro` leaves the arc out. It checks frames as it steps (drawing pointers in the window, the
   camera behind the work, outlines on their elements) into `<out>.check.json`, and `--check` fails the run on a miss.
   /demo also takes `?screen=one` and `?pace=fast`.

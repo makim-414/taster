@@ -286,6 +286,52 @@ export function layersOf(doc: Document, cap = 190, within = Infinity): Rebuild {
     if (it.kind === 'block') it.el.setAttribute('data-tl', '');
   });
 
+  // A box or line left out of the layers waits for a kept layer beside it: the next one in document order inside the
+  // same kept holder, else the last one before it there, else the nearest one in reading order. Left visible, it
+  // would show whole with its holder, so a big card would land already full and the rebuild would look laid down
+  // rather than built.
+  const keptAt = new Map<Item, number>();
+  keep.forEach((it, i) => keptAt.set(it, i));
+  const order = items.filter((it) => it.box.y < within);
+  const holderOf = (it: Item) => (it.kind === 'block' ? parentOf(it.el.parentElement) : parentOf(it.host));
+  const under = (i: number, a: number) => {
+    if (a < 0) return true;
+    for (let k = i; k >= 0; k = layers[k].parent) if (k === a) return true;
+    return false;
+  };
+  const riders: Element[][] = keep.map(() => []);
+  order.forEach((it, p) => {
+    if (keptAt.has(it)) return;
+    const el = it.kind === 'block' ? it.el : it.holder;
+    if (!el) return;
+    const a = holderOf(it);
+    let to = -1;
+    for (let q = p + 1; q < order.length && to < 0; q++) {
+      const k = keptAt.get(order[q]);
+      if (k !== undefined) to = under(k, a) ? k : -2;
+    }
+    if (to < 0) {
+      to = -1;
+      for (let q = p - 1; q >= 0 && to < 0; q--) {
+        const k = keptAt.get(order[q]);
+        if (k !== undefined && k !== a && under(k, a)) to = k;
+      }
+    }
+    // No kept layer of its own holder beside it: the nearest kept layer in reading order, so a section without one
+    // still lands in its turn instead of with the wrapper that holds the whole page.
+    for (let q = p + 1; q < order.length && to < 0; q++) to = keptAt.get(order[q]) ?? -1;
+    for (let q = p - 1; q >= 0 && to < 0; q--) to = keptAt.get(order[q]) ?? -1;
+    if (to < 0) return;
+    el.setAttribute('data-tl', '');
+    riders[to].push(el);
+  });
+  const ride = (i: number, on: boolean, fade: boolean) => {
+    for (const el of riders[i]) {
+      el.toggleAttribute('data-tl-on', on);
+      if (on && fade && typeof el.animate === 'function') el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: 'ease-out' });
+    }
+  };
+
   const shown: boolean[] = keep.map(() => false);
   const typedCount: number[] = keep.map(() => -1);
   return {
@@ -305,10 +351,12 @@ export function layersOf(doc: Document, cap = 190, within = Infinity): Rebuild {
       shown[i] = on;
       it.el.toggleAttribute('data-tl-on', on);
       if (on && fade && typeof it.el.animate === 'function') it.el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: 'ease-out' });
+      ride(i, on, fade);
     },
     type(i, n) {
       const it = keep[i];
       if (!it || it.kind !== 'text' || !it.typed || !it.rest || typedCount[i] === n) return;
+      if (n > 0 !== typedCount[i] > 0) ride(i, n > 0, n > 0);
       typedCount[i] = n;
       const text = it.node.data.slice(it.start, it.end);
       it.typed.data = text.slice(0, n);
