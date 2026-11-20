@@ -17,7 +17,7 @@
    page pins (a sticky top bar, a fixed side menu) or moves on scroll keeps its outline; the part of an outline under a
    pinned top bar is cut off, as the bar covers the element there. */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { SCREEN_FOOT, firstScreen, layersOf, pageHeight, settled, spotsOf, tokenBase, topBar, type Rebuild, type Report, type TokenBase } from './measure.ts';
 import { ARROW_PATH, ARROW_TIP, bezier } from './stageshow.ts';
 import {
@@ -95,6 +95,8 @@ const house = bezier('house');
 const NARROW = { w: 390, h: 844 };
 const INSTALL = 'https://github.com/makim-414/taster#install';
 const SLIDERS = ['radius', 'density'] as const;
+/** The rebuild crew's quiet tones (demo.css): paper, silver and the blue the system cursor wears, in turn. */
+const TONES = ['paper', 'silver', 'blue'] as const;
 // The thumb of a native range input, to place the system cursor on it.
 const THUMB = 16;
 
@@ -730,6 +732,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
                   <div
                     key={a}
                     className="demo-box"
+                    data-tone={TONES[a % TONES.length]}
                     ref={(el) => {
                       boxRefs.current[a] = el;
                     }}
@@ -752,7 +755,7 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
             <p className="demo-live">
               <span className="demo-dots" ref={dotsRef} data-crew="diagnose" aria-hidden="true">
                 {[0, 1, 2, 3, 4].map((i) => (
-                  <i key={i} />
+                  <i key={i} data-tone={TONES[i % TONES.length]} style={{ '--n': i } as CSSProperties} />
                 ))}
               </span>
               <span ref={crewRef}>{failed ? '' : '에이전트'}</span>
@@ -829,6 +832,8 @@ export function CursorDemo({ detect, rules }: { detect: Script; rules: Script })
                   key={i}
                   className="demo-cursor"
                   data-who={diag ? 'diagnose' : 'build'}
+                  data-tone={diag ? undefined : TONES[n % TONES.length]}
+                  style={diag ? ({ '--n': n } as CSSProperties) : undefined}
                   ref={(el) => {
                     cursorRefs.current[i] = el;
                   }}

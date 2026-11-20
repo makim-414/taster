@@ -1,8 +1,10 @@
 /* /demo. Only registry token values through var(), like globals.css. The frames keep their 1300x871 window (VIEW in
    timeline.ts, set inline) and are scaled to the column; the outlines, chips, boxes and cursors are drawn in screen
-   pixels over them, so their type stays readable on a phone. One color per role, the same wherever it shows: the
-   diagnose crew is the theme's danger color, the rebuild crew its success color, the system cursor its warning color,
-   and each label names the role. Solid fills, no glow. */
+   pixels over them, so their type stays readable on a phone. The two crews look like the two pages they stand for:
+   the diagnose crew runs in loud colors, each pointer its own hue turned off the theme's danger color (--n is the
+   pointer's number), while the rebuild crew keeps to quiet tones, paper, silver and a blue turned off the ink, in
+   turn (data-tone), each edged in the other end of the scale (--agent-fg) so it reads on a dark page or a light one.
+   The system cursor wears that blue. Each label names the role. Solid fills, no glow. */
 .demo-intro {
   max-width: 760px;
   padding: var(--sp-12) 0 var(--sp-8);
@@ -17,7 +19,9 @@
   padding-bottom: var(--sp-12);
 }
 .demo-board {
-  --agent-base: var(--success);
+  --agent-base: var(--popover);
+  --agent-fg: var(--foreground);
+  --agent-blue: oklch(from var(--foreground) 0.55 0.15 calc(h - 25));
   position: relative;
 }
 .demo-stage {
@@ -128,11 +132,30 @@
   left: 0;
   border: 1px solid var(--agent);
   background: color-mix(in oklch, var(--agent) 10%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--agent-fg) 35%, transparent);
   opacity: 0;
   will-change: transform;
 }
 .demo-box[data-big] {
   background: transparent;
+}
+.demo-box[data-tone='paper'],
+.demo-cursor[data-tone='paper'],
+.demo-dots:not([data-crew='diagnose']) i[data-tone='paper'] {
+  --agent: var(--popover);
+  --agent-fg: var(--foreground);
+}
+.demo-box[data-tone='silver'],
+.demo-cursor[data-tone='silver'],
+.demo-dots:not([data-crew='diagnose']) i[data-tone='silver'] {
+  --agent: var(--chart-4);
+  --agent-fg: var(--foreground);
+}
+.demo-box[data-tone='blue'],
+.demo-cursor[data-tone='blue'],
+.demo-dots:not([data-crew='diagnose']) i[data-tone='blue'] {
+  --agent: var(--agent-blue);
+  --agent-fg: var(--accent-fg);
 }
 .demo-size {
   position: absolute;
@@ -140,7 +163,7 @@
   left: 50%;
   margin-top: var(--sp-1);
   padding: 0 var(--sp-1);
-  color: var(--accent-fg);
+  color: var(--agent-fg);
   background: var(--agent);
   border-radius: var(--r-sm);
   font-family: var(--font-mono);
@@ -227,7 +250,8 @@
   margin-left: 0;
 }
 .demo-dots[data-crew='diagnose'] i {
-  --agent: var(--danger);
+  --agent: oklch(from var(--danger) 0.6 0.21 calc(h + var(--n, 0) * 67));
+  --agent-fg: var(--accent-fg);
 }
 .demo-line {
   display: block;
@@ -358,13 +382,12 @@ button.demo-quiet {
   will-change: transform;
 }
 .demo-cursor[data-who='diagnose'] {
-  --agent: var(--danger);
+  --agent: oklch(from var(--danger) 0.6 0.21 calc(h + var(--n, 0) * 67));
+  --agent-fg: var(--accent-fg);
 }
 .demo-cursor[data-who='system'] {
-  --agent: var(--warning);
-}
-.demo-cursor[data-who='system'] .demo-cursor-tag {
-  color: var(--warning-foreground);
+  --agent: var(--agent-blue);
+  --agent-fg: var(--accent-fg);
 }
 .demo-cursor svg {
   display: block;
@@ -373,7 +396,7 @@ button.demo-quiet {
 }
 .demo-cursor path {
   fill: currentColor;
-  stroke: var(--bg);
+  stroke: var(--agent-fg);
   stroke-width: 1.5;
   stroke-linejoin: round;
 }
@@ -382,7 +405,8 @@ button.demo-quiet {
   top: var(--sp-4);
   left: var(--sp-3);
   padding: 0 var(--sp-1);
-  color: var(--accent-fg);
+  color: var(--agent-fg);
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--agent-fg) 35%, transparent);
   background: var(--agent);
   border-radius: var(--r-sm);
   font-size: var(--t-micro);
