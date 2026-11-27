@@ -173,6 +173,11 @@ Do not pick the look alone. Before you write or swap in anything the visitor wil
 `browse_components`, show the pictures and the live links, ask which number, try the shortlist in their brand (and
 tone tokens) with `preview_component`, and write code only after they choose.
 
+When the registry has nothing that fits, or the user names an outside catalogue (21st.dev and the like) or pastes a
+component from one, follow [references/source.md](references/source.md): slots first, a free search, a shortlist the
+user picks from, retrievals spent on the hardest part, the licence read, the original kept apart, and a port onto the
+app's own tokens.
+
 ## Icons
 
 Every route that adds, keeps or swaps an icon goes through [data/patterns/icon-placement.md](data/patterns/icon-placement.md) first:
