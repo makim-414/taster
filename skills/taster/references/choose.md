@@ -33,7 +33,8 @@ from minimal 0 to expressive 1, `genre`), or with `like` set to a reference they
    - A number: go to step 5.
    - "Like 2 but calmer", "something with a photo": search again from what they said, leave out what they turned down,
      and say in one line what you changed.
-   - Nothing fits: say so, and offer to build it from the closest pattern (`get_pattern`).
+   - Nothing fits: say so, and offer to build it from the closest pattern (`get_pattern`), or to look outside the
+     registry with [source.md](source.md).
 5. **Try it in their brand.** Call `preview_component` with the pick and their color or the `tokens` from `brand_theme`.
    At `width` 390 too if the phone matters. Show it and ask whether it is right.
 6. **Build.** `get_component` for the choice, then the swap or build route as usual, then diagnose.
